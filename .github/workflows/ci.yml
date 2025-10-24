@@ -1,0 +1,50 @@
+name: CI – Code Quality & Guardrails
+
+on:
+  push:
+    branches: [ main, staging ]
+  pull_request:
+    branches: [ main, staging ]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Garante PNPM disponível (com corepack) e não instala deps ainda
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      # Use Node 20 (evita erro de "engines" e é padrão atual do Vite)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Show tool versions
+        run: |
+          node -v
+          pnpm -v
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (if present)
+        run: pnpm run -if-present lint
+
+      - name: Type check (if present)
+        run: pnpm run -if-present typecheck
+
+      - name: Build (if present)
+        run: pnpm run -if-present build
