@@ -2,24 +2,31 @@ name: CI — Code Quality & Guardrails
 
 on:
   pull_request:
-    branches: [ main, staging ]
+    branches: [main, staging]
   push:
-    branches: [ main, staging ]
+    branches: [main, staging]
   workflow_dispatch:
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node (com cache pnpm)
+      # instala pnpm antes do setup-node (necessário para cache pnpm)
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Setup Node (cache pnpm)
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Enable Corepack
         run: corepack enable
@@ -28,10 +35,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Type check
-        run: pnpm run -s typecheck || echo "skip:typecheck"
+        run: pnpm run ts typecheck || echo "skip:typecheck"
 
       - name: Lint
-        run: pnpm run -s lint || echo "skip:lint"
+        run: pnpm run ts lint || echo "skip:lint"
 
       - name: Build
-        run: pnpm run -s build || echo "skip:build"
+        run: pnpm run ts build || echo "skip:build"
