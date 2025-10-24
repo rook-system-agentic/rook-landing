@@ -1,8 +1,8 @@
-# Padrão: todo PR precisa de 1 review dos reviewers
+# Padrão: todo PR pede review do time reviewers
 *                                   @rook-system-agentic/rook-reviewers
 
-# Regras por pasta (ajuste conforme sua estrutura)
-src/**                               @rook-system-agentic/rook-reviewers
+# (opcional) regras por pasta
+src/**                              @rook-system-agentic/rook-reviewers
 
-# Infra sensível (workflows, configs): só core
-.github/**                           @rook-system-agentic/rook-core
+# Workflows / configs: time core
+.github/**                          @rook-system-agentic/rook-core
