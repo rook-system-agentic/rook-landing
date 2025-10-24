@@ -213,3 +213,4 @@ rook-landing/
 **Última atualização:** 16 de outubro de 2025  
 **Mantido por:** Equipe Rook System
 
+hero placeholder 1761345187
