@@ -1,0 +1,13 @@
+name: guardrail
+
+on:
+  pull_request:
+    branches: [ main, staging ]
+  push:
+    branches: [ main, staging ]
+
+jobs:
+  required:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "OK"
