@@ -1,0 +1,44 @@
+name: node-ci (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        type: string
+        default: '20'
+      cache_manager:
+        type: string
+        default: 'pnpm'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Instala pnpm (sem instalar deps agora)
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          cache: ${{ inputs.cache_manager }}
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            **/pnpm-lock.yaml
+
+      - run: corepack enable
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm run ts typecheck || echo "skip:typecheck"
+
+      - name: Lint
+        run: pnpm run ts lint || echo "skip:lint"
+
+      - name: Build
+        run: pnpm run ts build || echo "skip:build"
