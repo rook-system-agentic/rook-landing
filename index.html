@@ -238,12 +238,29 @@
     </section>
 
     <!-- Pricing Section -->
+    <!-- Pricing Section -->
     <section class="pricing-section" id="precos">
         <div class="container">
             <h2 class="section-title">Escolha o plano ideal para seu restaurante</h2>
             <p class="section-description">
                 Comece grátis e evolua conforme seu negócio cresce. Sem contratos, sem surpresas, cancele quando quiser.
             </p>
+
+            <!-- Period Selector -->
+            <div class="pricing-period-selector">
+                <button class="period-option active" data-period="monthly">
+                    <span class="period-label">Mensal</span>
+                    <span class="period-badge flexible">Mais Flexível</span>
+                </button>
+                <button class="period-option" data-period="annual_card">
+                    <span class="period-label">Anual no Cartão</span>
+                    <span class="period-badge discount">25% OFF</span>
+                </button>
+                <button class="period-option highlight" data-period="annual_pix">
+                    <span class="period-label">Anual via PIX</span>
+                    <span class="period-badge hot">MAIOR DESCONTO 🔥</span>
+                </button>
+            </div>
 
             <div class="pricing-grid">
                 <!-- Freemium Plan -->
@@ -253,9 +270,9 @@
                         <p class="plan-description">Ideal para conhecer o Rook e começar a controlar seu CMV</p>
                     </div>
                     
-                    <div class="plan-price">
-                        <span class="price">Grátis</span>
-                        <span class="period">para sempre</span>
+                    <div class="plan-price-container">
+                        <span class="price-main">Grátis</span>
+                        <span class="price-period">para sempre</span>
                     </div>
 
                     <ul class="plan-features">
@@ -267,7 +284,7 @@
                         <li>✓ Suporte por email</li>
                     </ul>
 
-                    <a href="https://app.rooksystem.com.br/registro" class="btn-outline">Começar Grátis</a>
+                    <a href="https://app.rooksystem.com.br/registro" class="btn-plan btn-outline">Começar Grátis</a>
                 </div>
 
                 <!-- Basic Plan (Popular) -->
@@ -280,11 +297,34 @@
                         <p class="plan-description">Para pequenos restaurantes que querem resultados reais</p>
                     </div>
                     
-                    <div class="plan-price">
+                    <!-- Preço Mensal (visível por padrão) -->
+                    <div class="plan-price-container" data-period="monthly">
                         <span class="price-old">R$ 179,90</span>
-                        <span class="price">R$ 99</span>
-                        <span class="period">/mês</span>
-                        <p class="savings">Economize R$ 80,90 por mês! 🎉</p>
+                        <div class="price-wrapper">
+                            <span class="price-main">R$ 99</span>
+                            <span class="price-period">/mês</span>
+                        </div>
+                        <p class="price-savings">Economize R$ 80,90 por mês! 🎉</p>
+                    </div>
+
+                    <!-- Preço Anual Cartão (oculto) -->
+                    <div class="plan-price-container hidden" data-period="annual_card">
+                        <div class="price-wrapper">
+                            <span class="price-main">R$ 891</span>
+                            <span class="price-period">/ano</span>
+                        </div>
+                        <p class="price-savings">Economize R$ 297/ano</p>
+                        <p class="price-equivalent">Equivale a R$ 74,25/mês</p>
+                    </div>
+
+                    <!-- Preço Anual PIX (oculto) -->
+                    <div class="plan-price-container hidden" data-period="annual_pix">
+                        <div class="price-wrapper">
+                            <span class="price-main">R$ 831,60</span>
+                            <span class="price-period">/ano</span>
+                        </div>
+                        <p class="price-savings highlight">Economize R$ 356,40/ano 🔥</p>
+                        <p class="price-equivalent">Equivale a R$ 69,30/mês</p>
                     </div>
 
                     <ul class="plan-features">
@@ -298,36 +338,7 @@
                         <li>✓ Relatórios personalizados</li>
                     </ul>
 
-                    <!-- Payment Options -->
-                    <div class="payment-options">
-                        <p class="payment-title">Escolha sua modalidade:</p>
-                        
-                        <a href="https://app.rooksystem.com.br/registro?plan=basic_monthly" class="payment-option">
-                            <div class="option-header">
-                                <span class="option-name">Mensal Recorrente</span>
-                            </div>
-                            <div class="option-price">R$ 99/mês</div>
-                            <div class="option-badge">Mais Flexível</div>
-                        </a>
-
-                        <a href="https://app.rooksystem.com.br/registro?plan=basic_annual_card" class="payment-option">
-                            <div class="option-header">
-                                <span class="option-name">Anual no Cartão</span>
-                                <span class="option-discount">25% OFF</span>
-                            </div>
-                            <div class="option-price">R$ 891/ano</div>
-                            <div class="option-savings">Economize R$ 297/ano</div>
-                        </a>
-
-                        <a href="https://app.rooksystem.com.br/registro?plan=basic_annual_pix" class="payment-option highlight">
-                            <div class="option-header">
-                                <span class="option-name">Anual via PIX</span>
-                                <span class="option-discount hot">30% OFF 🔥</span>
-                            </div>
-                            <div class="option-price">R$ 831,60/ano</div>
-                            <div class="option-savings">Economize R$ 356,40/ano</div>
-                        </a>
-                    </div>
+                    <a href="https://app.rooksystem.com.br/registro?plan=basic_monthly" class="btn-plan btn-primary" data-plan="basic">Assinar Basic</a>
                 </div>
 
                 <!-- Business Plan (Coming Soon) -->
@@ -339,10 +350,8 @@
                         <p class="plan-description">Para restaurantes com ERP que querem automação total</p>
                     </div>
                     
-                    <!-- Preço oculto - plano em breve -->
-                    <div class="plan-price" style="visibility: hidden; height: 0; margin: 0;">
-                        <span class="price">R$ 379,90</span>
-                        <span class="period">/mês</span>
+                    <div class="plan-price-container">
+                        <span class="price-main">Em breve</span>
                     </div>
 
                     <ul class="plan-features">
@@ -358,7 +367,7 @@
                         <li>✓ Suporte prioritário</li>
                     </ul>
 
-                    <button class="btn-disabled" disabled>Avise-me Quando Disponível</button>
+                    <button class="btn-plan btn-disabled" disabled>Avise-me Quando Disponível</button>
                 </div>
             </div>
 
@@ -367,6 +376,42 @@
             </p>
         </div>
     </section>
+
+    <!-- JavaScript for Period Switching -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const periodButtons = document.querySelectorAll('.period-option');
+            const priceContainers = document.querySelectorAll('.plan-price-container[data-period]');
+            const planButtons = document.querySelectorAll('.btn-plan[data-plan]');
+
+            periodButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const selectedPeriod = this.dataset.period;
+                    
+                    // Update active button
+                    periodButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show/hide price containers
+                    priceContainers.forEach(container => {
+                        if (container.dataset.period === selectedPeriod) {
+                            container.classList.remove('hidden');
+                        } else {
+                            container.classList.add('hidden');
+                        }
+                    });
+                    
+                    // Update plan button links
+                    planButtons.forEach(btn => {
+                        const plan = btn.dataset.plan;
+                        if (plan) {
+                            btn.href = `https://app.rooksystem.com.br/registro?plan=${plan}_${selectedPeriod}`;
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 
     <!-- FAQ Section -->
     <section class="faq-section" id="faq">
