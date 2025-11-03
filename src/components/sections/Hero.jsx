@@ -59,7 +59,7 @@ const Hero = () => {
               <Button 
                 variant="primary" 
                 size="lg"
-                href="https://app.rooksystem.com.br/planos"
+                href="https://app.rooksystem.com.br/registro"
                 className="group bg-terracota hover:bg-terracota-dark text-white border-none"
               >
                 Começar Grátis

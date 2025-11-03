@@ -12,13 +12,14 @@ const Pricing = () => {
       icon: Zap,
       features: [
         'Calculadora de CMV básica',
-        'Histórico de 30 dias',
-        'Gráficos de evolução',
-        'Alertas por email',
+        'Até 30 cálculos por mês',
+        'Visualização de CMV',
+        'Limite de compra semanal',
+        '1 usuário',
         'Suporte por email'
       ],
       cta: 'Começar Grátis',
-      href: 'https://app.rooksystem.com.br/planos',
+      href: 'https://app.rooksystem.com.br/registro',
       popular: false
     },
     {
@@ -29,16 +30,17 @@ const Pricing = () => {
       icon: Sparkles,
       badge: 'MAIS POPULAR',
       features: [
-        'Tudo do Freemium',
-        'Histórico completo ilimitado',
-        'Gráficos avançados de evolução',
-        'Insights com IA',
-        'Análise de tendências',
-        'Relatórios mensais',
-        'Suporte prioritário'
+        'Calculadora de CMV avançada',
+        'Cálculos ilimitados',
+        'Histórico completo de cálculos',
+        'Projeções de 12 meses',
+        'Dashboard completo',
+        'Até 3 usuários',
+        'Suporte por email e chat',
+        'Relatórios personalizados'
       ],
       cta: 'Escolher Basic',
-      href: 'https://app.rooksystem.com.br/planos',
+      href: 'https://app.rooksystem.com.br/checkout?plan=basic_monthly',
       popular: true
     },
     {
@@ -49,17 +51,24 @@ const Pricing = () => {
       icon: Crown,
       badge: 'RECOMENDADO',
       features: [
-        'Tudo do Basic',
-        'Integração ERP automática',
-        'Omie, Colibri, Saipo, Teknisa',
-        'Multi-unidade ilimitado',
-        'Análise preditiva avançada',
-        'Consultoria especializada',
-        'Suporte 24/7 via WhatsApp',
-        'Onboarding personalizado'
+        'Integração com ERPs (até 3)',
+        'Leitura automática de dados',
+        'CMV com IA preditiva',
+        'Produtos mais vendidos',
+        'Curva ABC avançada',
+        'Projeções de 24 meses',
+        'Dashboard premium',
+        'Até 10 usuários',
+        'Suporte prioritário',
+        'Provisionamento de folha',
+        'Benchmarking com mercado',
+        'Análise de tendências',
+        'Metas por garçom',
+        'Análise de rotatividade'
       ],
-      cta: 'Escolher Business',
-      href: 'https://app.rooksystem.com.br/planos',
+      cta: 'Em Breve',
+      href: '#',
+      disabled: true,
       popular: false
     }
   ]
@@ -179,11 +188,14 @@ const Pricing = () => {
               <Button
                 variant={plan.popular ? 'secondary' : 'primary'}
                 size="lg"
-                href={plan.href}
+                href={plan.disabled ? undefined : plan.href}
+                disabled={plan.disabled}
                 className={`
                   w-full
                   ${plan.popular 
                     ? 'bg-white text-rook hover:bg-white/90' 
+                    : plan.disabled
+                    ? 'bg-rook-light/30 text-rook-dark/40 cursor-not-allowed'
                     : 'bg-terracota text-white hover:bg-terracota-dark border-none'
                   }
                 `}
