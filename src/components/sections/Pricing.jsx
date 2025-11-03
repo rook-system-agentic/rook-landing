@@ -18,7 +18,7 @@ const Pricing = () => {
         'Suporte por email'
       ],
       cta: 'Começar Grátis',
-      href: 'https://app.rooksystem.com.br/registro?plan=freemium',
+      href: 'https://app.rooksystem.com.br/planos',
       popular: false
     },
     {
@@ -38,7 +38,7 @@ const Pricing = () => {
         'Suporte prioritário'
       ],
       cta: 'Escolher Basic',
-      href: 'https://app.rooksystem.com.br/registro?plan=basic',
+      href: 'https://app.rooksystem.com.br/planos',
       popular: true
     },
     {
@@ -59,7 +59,7 @@ const Pricing = () => {
         'Onboarding personalizado'
       ],
       cta: 'Escolher Business',
-      href: 'https://app.rooksystem.com.br/registro?plan=business',
+      href: 'https://app.rooksystem.com.br/planos',
       popular: false
     }
   ]
