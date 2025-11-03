@@ -1,1 +1,12 @@
-node_modules\ndist\n.env\n.DS_Store
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
