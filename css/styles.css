@@ -1108,3 +1108,127 @@ body {
         font-size: 2.25rem;
     }
 }
+
+
+/* ===================================
+   PRICING V2 - 2 ABAS (MENSAL/ANUAL)
+   =================================== */
+
+.pricing-period-selector-v2 {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 48px;
+}
+
+.period-tab {
+    position: relative;
+    padding: 16px 48px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border: 3px solid #e0e0e0;
+    border-radius: 12px;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.period-tab:hover {
+    border-color: #c77f3b;
+    color: #c77f3b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(199, 127, 59, 0.15);
+}
+
+.period-tab.active {
+    border-color: #c77f3b;
+    background: linear-gradient(135deg, #c77f3b 0%, #a86a2f 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(199, 127, 59, 0.3);
+}
+
+.tab-badge {
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.period-tab.active .tab-badge {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.pricing-grid.hidden {
+    display: none !important;
+}
+
+.pricing-card.pix-highlight {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.discount-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.discount-badge.blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.discount-badge.green {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.price-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.price-equivalent {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.btn-pix {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.btn-pix:hover {
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+@media (max-width: 768px) {
+    .pricing-period-selector-v2 {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .period-tab {
+        width: 100%;
+        justify-content: center;
+    }
+}
