@@ -38,3 +38,53 @@ document.querySelectorAll('a[href*="registro"]').forEach(button => {
         trackEvent('CTA', 'click', 'Começar Grátis');
     });
 });
+
+// ===================================
+// SCROLL ANIMATIONS
+// ===================================
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('animate-on-scroll');
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+// Observar elementos para animar
+document.addEventListener('DOMContentLoaded', () => {
+    // Animar cards de features
+    document.querySelectorAll('.feature-card').forEach((card, index) => {
+        card.classList.add(`animate-delay-${(index % 4) + 1}`);
+        observer.observe(card);
+    });
+    
+    // Animar cards de problemas
+    document.querySelectorAll('.problem-card').forEach((card, index) => {
+        card.classList.add(`animate-delay-${(index % 4) + 1}`);
+        observer.observe(card);
+    });
+    
+    // Animar cards de pricing
+    document.querySelectorAll('.pricing-card').forEach((card, index) => {
+        card.classList.add(`animate-delay-${(index % 3) + 1}`);
+        observer.observe(card);
+    });
+    
+    // Animar seção de origem
+    const originText = document.querySelector('.origin-text');
+    const originImage = document.querySelector('.origin-image');
+    if (originText) observer.observe(originText);
+    if (originImage) observer.observe(originImage);
+    
+    // Animar stats
+    document.querySelectorAll('.stat-card').forEach((card, index) => {
+        card.classList.add(`animate-delay-${index + 1}`);
+        observer.observe(card);
+    });
+});
