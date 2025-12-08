@@ -10,8 +10,8 @@
     --color-dark: #6B4423;
     --color-accent: #F4C430;
     --color-bg-light: #F5F1E8;
-    --color-danger: #DC2626;
-    --color-success: #16A34A;
+    --color-danger: #E54C00;
+    --color-success: #46604A;
 }
 
 body {
@@ -298,8 +298,8 @@ body {
 }
 
 .problem-card {
-    background: #FEF2F2;
-    border: 1px solid #FEE2E2;
+    background: #FFF4ED;
+    border: 1px solid #FFE4D6;
     padding: 1.5rem;
     border-radius: 0.75rem;
 }
@@ -681,8 +681,8 @@ body {
 }
 
 .option-discount.hot {
-    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-    color: #DC2626;
+    background: linear-gradient(135deg, #FFE4D6 0%, #FFD4BA 100%);
+    color: #E54C00;
 }
 
 .option-price {
@@ -694,13 +694,13 @@ body {
 
 .option-badge {
     font-size: 0.75rem;
-    color: #059669;
+    color: #46604A;
     font-weight: 600;
 }
 
 .option-savings {
     font-size: 0.75rem;
-    color: #16A34A;
+    color: #46604A;
     font-weight: 600;
 }
 
@@ -779,8 +779,8 @@ body {
 }
 
 .period-badge.flexible {
-    background: #D1FAE5;
-    color: #059669;
+    background: #E8F0E9;
+    color: #46604A;
 }
 
 .period-badge.discount {
@@ -789,8 +789,8 @@ body {
 }
 
 .period-badge.hot {
-    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-    color: #DC2626;
+    background: linear-gradient(135deg, #FFE4D6 0%, #FFD4BA 100%);
+    color: #E54C00;
 }
 
 .period-option.active .period-badge {
@@ -956,7 +956,7 @@ body {
 }
 
 .price-savings.highlight {
-    color: #DC2626;
+    color: #E54C00;
     font-weight: 700;
 }
 
@@ -1172,8 +1172,8 @@ body {
 }
 
 .pricing-card.pix-highlight {
-    border-color: #10b981;
-    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+    border-color: #46604A;
+    background: linear-gradient(135deg, #ffffff 0%, #E8F0E9 100%);
 }
 
 .discount-badge {
@@ -1196,7 +1196,7 @@ body {
 }
 
 .discount-badge.green {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #46604A 0%, #3A4D3E 100%);
     color: white;
 }
 
@@ -1214,7 +1214,7 @@ body {
 }
 
 .btn-pix {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #46604A 0%, #3A4D3E 100%);
 }
 
 .btn-pix:hover {
@@ -1698,7 +1698,7 @@ body {
 }
 
 .stat-shock-card.red {
-    border-left-color: #dc3545;
+    border-left-color: #E54C00;
 }
 
 .stat-shock-card.orange {
@@ -1870,7 +1870,7 @@ body {
 .result-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #dc3545;
+    color: #E54C00;
 }
 
 .result-text {
@@ -1911,7 +1911,7 @@ body {
 .result-roi {
     text-align: center;
     padding: 1.5rem;
-    background: #e8f5e9;
+    background: #E8F0E9;
     border-radius: 8px;
     margin-bottom: 2rem;
 }
@@ -2010,9 +2010,9 @@ body {
 .cta-stat {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #dc3545;
+    color: #E54C00;
     padding: 1rem 2rem;
-    background: rgba(220,53,69,0.1);
+    background: rgba(229,76,0,0.1);
     border-radius: 8px;
 }
 
