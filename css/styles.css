@@ -569,7 +569,7 @@ body {
 /* CTA Section */
 .cta-section {
     padding: 5rem 1.5rem;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-dark) 100%);
+    background: #3D2817;
     text-align: center;
 }
 
@@ -2012,8 +2012,9 @@ body {
     font-weight: 700;
     color: #E54C00;
     padding: 1rem 2rem;
-    background: rgba(229,76,0,0.1);
+    background: rgba(229,76,0,0.15);
     border-radius: 8px;
+    border: 1px solid rgba(229,76,0,0.3);
 }
 
 .cta-choices {
@@ -2029,14 +2030,16 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 1.5rem;
-    background: rgba(255,255,255,0.1);
+    background: rgba(245,241,232,0.1);
+    border: 1px solid rgba(245,241,232,0.2);
     border-radius: 8px;
     font-size: 1.1rem;
+    color: #F5F1E8;
 }
 
 .choice-item.highlight {
-    background: rgba(200,169,97,0.2);
-    border: 2px solid var(--color-primary);
+    background: rgba(201,169,97,0.15);
+    border: 2px solid #C9A961;
 }
 
 .choice-number {
