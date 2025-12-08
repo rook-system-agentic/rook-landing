@@ -88,3 +88,61 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(card);
     });
 });
+
+// ========================================
+// CALCULATOR FUNCTION
+// ========================================
+
+function calculateSavings() {
+    const revenue = parseFloat(document.getElementById('revenue').value);
+    const currentCMV = parseFloat(document.getElementById('cmv').value);
+    
+    // Validação
+    if (!revenue || revenue <= 0) {
+        alert('Por favor, insira um faturamento mensal válido');
+        return;
+    }
+    
+    if (!currentCMV || currentCMV <= 0 || currentCMV > 100) {
+        alert('Por favor, insira um CMV válido (entre 1% e 100%)');
+        return;
+    }
+    
+    // CMV ideal baseado no faturamento
+    let idealCMV = 30;
+    if (revenue >= 500000) {
+        idealCMV = 32; // Restaurantes maiores podem ter CMV um pouco maior
+    } else if (revenue >= 200000) {
+        idealCMV = 30;
+    } else {
+        idealCMV = 28; // Pequenos precisam CMV mais baixo
+    }
+    
+    // Se o CMV atual já está abaixo do ideal, ajustar
+    if (currentCMV <= idealCMV) {
+        alert(`Parabéns! Seu CMV de ${currentCMV}% já está dentro ou abaixo da meta ideal de ${idealCMV}%. Continue assim! 🎉`);
+        return;
+    }
+    
+    // Cálculos
+    const cmvDifference = (currentCMV - idealCMV) / 100;
+    const monthlySavings = revenue * cmvDifference;
+    const annualSavings = monthlySavings * 12;
+    
+    // ROI (Rook Knight custa R$ 99/mês = R$ 1.188/ano)
+    const rookAnnualCost = 1188;
+    const roi = (annualSavings / rookAnnualCost).toFixed(1);
+    
+    // Atualizar valores na tela
+    document.getElementById('currentCMV').textContent = currentCMV;
+    document.getElementById('idealCMV').textContent = idealCMV;
+    document.getElementById('savingsMonth').textContent = monthlySavings.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('savingsYear').textContent = annualSavings.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    document.getElementById('roi').textContent = roi;
+    
+    // Mostrar resultado
+    document.getElementById('calculatorResult').style.display = 'block';
+    
+    // Scroll suave até o resultado
+    document.getElementById('calculatorResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
