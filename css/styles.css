@@ -2082,3 +2082,55 @@ body {
         gap: 1rem;
     }
 }
+
+
+/* ========================================
+   LUCIDE ICONS STYLING
+   ======================================== */
+
+/* Ícones da seção OS NÚMEROS NÃO MENTEM */
+.stat-shock-icon i {
+    width: 64px;
+    height: 64px;
+    stroke-width: 2;
+}
+
+/* Ícones da seção O PROBLEMA */
+.problem-icon i {
+    width: 64px;
+    height: 64px;
+    stroke-width: 2;
+}
+
+/* Ícone da calculadora */
+.result-icon i {
+    width: 48px;
+    height: 48px;
+    stroke-width: 2;
+}
+
+/* Ícones do CTA */
+.choice-number i {
+    width: 40px;
+    height: 40px;
+    stroke-width: 2;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .stat-shock-icon i,
+    .problem-icon i {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .result-icon i {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .choice-number i {
+        width: 32px;
+        height: 32px;
+    }
+}

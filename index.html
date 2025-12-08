@@ -7,6 +7,8 @@
     <title>Rook System - Visão, Estratégia, Controle</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" href="/favicon.ico">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -110,28 +112,28 @@
             
             <div class="stats-shock-grid">
                 <div class="stat-shock-card red">
-                    <div class="stat-shock-icon">📉</div>
+                    <div class="stat-shock-icon"><i data-lucide="trending-down"></i></div>
                     <div class="stat-shock-number">397 MIL</div>
                     <div class="stat-shock-label">Restaurantes fecharam em 2024</div>
                     <div class="stat-shock-source">Fonte: Abrasel/Sebrae</div>
                 </div>
                 
                 <div class="stat-shock-card orange">
-                    <div class="stat-shock-icon">💸</div>
+                    <div class="stat-shock-icon"><i data-lucide="dollar-sign"></i></div>
                     <div class="stat-shock-number">40%</div>
                     <div class="stat-shock-label">Estão endividados</div>
                     <div class="stat-shock-source">Dívidas em impostos e fornecedores</div>
                 </div>
                 
                 <div class="stat-shock-card yellow">
-                    <div class="stat-shock-icon">⚠️</div>
+                    <div class="stat-shock-icon"><i data-lucide="alert-triangle"></i></div>
                     <div class="stat-shock-number">71%</div>
                     <div class="stat-shock-label">Fecham por queda de vendas</div>
                     <div class="stat-shock-source">Mas o problema real é CMV alto</div>
                 </div>
                 
                 <div class="stat-shock-card red">
-                    <div class="stat-shock-icon">🚪</div>
+                    <div class="stat-shock-icon"><i data-lucide="door-open"></i></div>
                     <div class="stat-shock-number">50%</div>
                     <div class="stat-shock-label">De pequenos fecham em 2 anos</div>
                     <div class="stat-shock-source">Microempresas são as mais vulneráveis</div>
@@ -167,22 +169,22 @@
 
             <div class="problem-grid">
                 <div class="problem-card">
-                    <div class="problem-icon">📈</div>
+                    <div class="problem-icon"><i data-lucide="trending-up"></i></div>
                     <h3>Insumos subiram 30% em 2024</h3>
                     <p>Mas 40% dos restaurantes não reajustaram preços</p>
                 </div>
                 <div class="problem-card">
-                    <div class="problem-icon">🔴</div>
+                    <div class="problem-icon"><i data-lucide="x-circle"></i></div>
                     <h3>CMV acima de 36%</h3>
                     <p>Significa que você perde 11,84% de lucro</p>
                 </div>
                 <div class="problem-card">
-                    <div class="problem-icon">🚨</div>
+                    <div class="problem-icon"><i data-lucide="alert-circle"></i></div>
                     <h3>71% dos fechamentos</h3>
                     <p>Acontecem por "queda de vendas" (mas o real problema é CMV descontrolado)</p>
                 </div>
                 <div class="problem-card">
-                    <div class="problem-icon">📊</div>
+                    <div class="problem-icon"><i data-lucide="bar-chart-3"></i></div>
                     <h3>26% operam com prejuízo</h3>
                     <p>Mesmo vendendo. Mesmo cheios.</p>
                 </div>
@@ -380,7 +382,7 @@
                 
                 <div id="calculatorResult" class="calculator-result" style="display:none;">
                     <div class="result-header">
-                        <div class="result-icon">⚠️</div>
+                        <div class="result-icon"><i data-lucide="alert-triangle"></i></div>
                         <div class="result-title">ALERTA DE OPORTUNIDADE</div>
                     </div>
                     
@@ -747,11 +749,11 @@
             </p>
             <div class="cta-choices">
                 <div class="choice-item">
-                    <span class="choice-number">1️⃣</span>
+                    <span class="choice-number"><i data-lucide="circle-1"></i></span>
                     <span class="choice-text">Continuar no "feeling" e torcer para dar certo</span>
                 </div>
                 <div class="choice-item highlight">
-                    <span class="choice-number">2️⃣</span>
+                    <span class="choice-number"><i data-lucide="circle-2"></i></span>
                     <span class="choice-text">Ter visão, estratégia e controle com o Rook System</span>
                 </div>
             </div>
@@ -837,5 +839,9 @@
     </footer>
 
     <script src="js/main.js"></script>
+    <script>
+        // Inicializar Lucide Icons
+        lucide.createIcons();
+    </script>
 </body>
 </html>
