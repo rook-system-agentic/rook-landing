@@ -2185,7 +2185,7 @@ body {
    MOBILE MENU
    ============================================================ */
 
-/* Mobile Menu Button (Hamburger) */
+/* Mobile Menu Button (Hamburger) - Hidden by default */
 .mobile-menu-button {
     display: none;
     background: none;
@@ -2193,6 +2193,17 @@ body {
     cursor: pointer;
     padding: 0.5rem;
     z-index: 1001;
+}
+
+/* Hide mobile menu on desktop */
+@media (min-width: 769px) {
+    .mobile-menu {
+        display: none !important;
+    }
+    
+    .mobile-menu-button {
+        display: none !important;
+    }
 }
 
 .mobile-menu-button svg {
@@ -2215,7 +2226,6 @@ body {
 
 /* Mobile Menu Overlay */
 .mobile-menu {
-    display: none;
     position: fixed;
     top: 4rem;
     left: 0;
@@ -2225,11 +2235,13 @@ body {
     backdrop-filter: blur(5px);
     z-index: 999;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .mobile-menu.active {
     opacity: 1;
+    visibility: visible;
 }
 
 .mobile-menu-content {
@@ -2280,15 +2292,6 @@ body {
 @media (max-width: 768px) {
     .mobile-menu-button {
         display: block;
-    }
-
-    .mobile-menu {
-        display: block;
-    }
-
-    /* Hide mobile menu by default */
-    .mobile-menu:not(.active) {
-        pointer-events: none;
     }
 }
 
