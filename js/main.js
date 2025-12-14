@@ -146,3 +146,53 @@ function calculateSavings() {
     // Scroll suave até o resultado
     document.getElementById('calculatorResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
+
+
+// ===================================
+// MOBILE MENU
+// ===================================
+const mobileMenuButton = document.getElementById('mobileMenuButton');
+const mobileMenu = document.getElementById('mobileMenu');
+const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+
+// Toggle mobile menu
+if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenuButton.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        
+        // Prevent body scroll when menu is open
+        if (mobileMenu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Close menu when clicking outside
+    mobileMenu.addEventListener('click', (e) => {
+        if (e.target === mobileMenu) {
+            mobileMenuButton.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Close menu when clicking on a link
+    mobileMenuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenuButton.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    });
+
+    // Close menu on ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+            mobileMenuButton.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+}

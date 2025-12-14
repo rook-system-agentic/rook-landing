@@ -2179,3 +2179,120 @@ body {
         height: 32px;
     }
 }
+
+
+/* ============================================================
+   MOBILE MENU
+   ============================================================ */
+
+/* Mobile Menu Button (Hamburger) */
+.mobile-menu-button {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 1001;
+}
+
+.mobile-menu-button svg {
+    width: 28px;
+    height: 28px;
+    color: var(--color-dark);
+}
+
+.mobile-menu-button .close-icon {
+    display: none;
+}
+
+.mobile-menu-button.active .menu-icon {
+    display: none;
+}
+
+.mobile-menu-button.active .close-icon {
+    display: block;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu {
+    display: none;
+    position: fixed;
+    top: 4rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-menu.active {
+    opacity: 1;
+}
+
+.mobile-menu-content {
+    background: white;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.mobile-menu-link {
+    text-decoration: none;
+    color: #1F2937;
+    font-weight: 600;
+    font-size: 1.125rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s;
+    display: block;
+}
+
+.mobile-menu-link:hover,
+.mobile-menu-link:active {
+    background: var(--color-bg-light);
+    color: var(--color-primary);
+}
+
+.mobile-menu-cta {
+    margin-top: 1rem;
+    justify-content: center;
+    font-size: 1.125rem;
+}
+
+/* Show mobile menu button on mobile */
+@media (max-width: 768px) {
+    .mobile-menu-button {
+        display: block;
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+
+    /* Hide mobile menu by default */
+    .mobile-menu:not(.active) {
+        pointer-events: none;
+    }
+}
+
+/* Smooth scroll */
+html {
+    scroll-behavior: smooth;
+}
