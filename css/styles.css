@@ -2195,14 +2195,23 @@ body {
     z-index: 1001;
 }
 
-/* Hide mobile menu on desktop */
+/* Hide mobile menu on desktop - FORCE */
 @media (min-width: 769px) {
-    .mobile-menu {
+    .mobile-menu,
+    .mobile-menu-content,
+    .mobile-menu-link,
+    .mobile-menu-cta {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -9999px !important;
     }
     
     .mobile-menu-button {
         display: none !important;
+        visibility: hidden !important;
     }
 }
 
