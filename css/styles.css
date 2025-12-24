@@ -2569,3 +2569,607 @@ html {
         padding: 1.5rem;
     }
 }
+
+
+/* ========================================
+   SEÇÃO PLANO CHESS - Para Redes e Holdings
+   ======================================== */
+
+.chess-section {
+    padding: 5rem 1.5rem;
+    background: linear-gradient(135deg, #F5F1E8 0%, #FEFCF8 50%, #F5F1E8 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.chess-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #754A31, #E54C00, #E79F4A, #44604A);
+}
+
+.chess-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.chess-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #754A31 0%, #8B5A3C 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(117, 74, 49, 0.3);
+}
+
+.chess-badge .icon-chess {
+    font-size: 1.5rem;
+}
+
+.chess-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #754A31;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.chess-subtitle {
+    font-size: 1.25rem;
+    color: #6B7280;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.chess-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+/* Tabela de Descontos */
+.chess-pricing-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(117, 74, 49, 0.15);
+    border: 2px solid #E79F4A;
+}
+
+.chess-pricing-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px dashed #E5E7EB;
+}
+
+.chess-pricing-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #754A31;
+    margin-bottom: 0.5rem;
+}
+
+.chess-base-price {
+    font-size: 1rem;
+    color: #6B7280;
+}
+
+.chess-base-price strong {
+    color: #E54C00;
+    font-size: 1.5rem;
+}
+
+.chess-discount-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.chess-discount-table th,
+.chess-discount-table td {
+    padding: 1rem 0.75rem;
+    text-align: center;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.chess-discount-table th {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #754A31;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #F9FAFB;
+}
+
+.chess-discount-table td {
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+.chess-discount-table tr:last-child td {
+    border-bottom: none;
+}
+
+.chess-discount-table .discount-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #44604A 0%, #5A7D5F 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.chess-discount-table .discount-badge.highlight {
+    background: linear-gradient(135deg, #E54C00 0%, #FF6B2B 100%);
+    animation: pulse 2s infinite;
+}
+
+.chess-discount-table .price-final {
+    font-weight: 700;
+    color: #44604A;
+}
+
+/* Benefícios */
+.chess-benefits-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(117, 74, 49, 0.15);
+}
+
+.chess-benefits-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #754A31;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chess-benefits-list {
+    list-style: none;
+    margin-bottom: 2rem;
+}
+
+.chess-benefits-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    color: #374151;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.chess-benefits-list li svg {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: #44604A;
+    margin-top: 2px;
+}
+
+.chess-benefits-list li strong {
+    color: #754A31;
+}
+
+.chess-cta-container {
+    text-align: center;
+    padding-top: 1rem;
+}
+
+.btn-chess {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #E54C00 0%, #FF6B2B 100%);
+    color: white;
+    padding: 1.25rem 2.5rem;
+    border-radius: 12px;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(229, 76, 0, 0.35);
+    width: 100%;
+}
+
+.btn-chess:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(229, 76, 0, 0.45);
+    background: linear-gradient(135deg, #CC4300 0%, #E54C00 100%);
+}
+
+.btn-chess .icon-chess {
+    font-size: 1.5rem;
+}
+
+.chess-cta-note {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: #6B7280;
+}
+
+/* ========================================
+   MODAL FORMULÁRIO CHESS
+   ======================================== */
+
+.chess-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.chess-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.chess-modal {
+    background: white;
+    border-radius: 20px;
+    max-width: 520px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.chess-modal-overlay.active .chess-modal {
+    transform: scale(1) translateY(0);
+}
+
+.chess-modal-header {
+    background: linear-gradient(135deg, #754A31 0%, #8B5A3C 100%);
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.chess-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: white;
+}
+
+.chess-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.chess-modal-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.chess-modal-title {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.chess-modal-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+}
+
+.chess-modal-content {
+    padding: 2rem;
+}
+
+.chess-form-group {
+    margin-bottom: 1.25rem;
+}
+
+.chess-form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.chess-form-group label .required {
+    color: #E54C00;
+}
+
+.chess-form-input,
+.chess-form-select,
+.chess-form-textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #E5E7EB;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: white;
+}
+
+.chess-form-input:focus,
+.chess-form-select:focus,
+.chess-form-textarea:focus {
+    outline: none;
+    border-color: #E54C00;
+    box-shadow: 0 0 0 3px rgba(229, 76, 0, 0.1);
+}
+
+.chess-form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.chess-form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
+    padding-right: 3rem;
+}
+
+.chess-form-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.chess-form-consent input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: #E54C00;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.chess-form-consent label {
+    font-size: 0.85rem;
+    color: #6B7280;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.chess-form-consent a {
+    color: #E54C00;
+    text-decoration: underline;
+}
+
+.chess-form-submit {
+    width: 100%;
+    padding: 1.125rem;
+    background: linear-gradient(135deg, #E54C00 0%, #FF6B2B 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.125rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.chess-form-submit:hover:not(:disabled) {
+    background: linear-gradient(135deg, #CC4300 0%, #E54C00 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 76, 0, 0.35);
+}
+
+.chess-form-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.chess-form-footer {
+    text-align: center;
+    padding-top: 1rem;
+    border-top: 1px solid #E5E7EB;
+    margin-top: 1rem;
+}
+
+.chess-form-footer p {
+    font-size: 0.8rem;
+    color: #9CA3AF;
+}
+
+/* Success State */
+.chess-modal-success {
+    text-align: center;
+    padding: 2.5rem 2rem;
+}
+
+.chess-success-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #44604A 0%, #5A7D5F 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.chess-success-icon svg {
+    width: 40px;
+    height: 40px;
+    color: white;
+}
+
+.chess-modal-success h3 {
+    color: #44604A;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.chess-modal-success p {
+    color: #6B7280;
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.chess-modal-success .btn-close {
+    background: #754A31;
+    color: white;
+    padding: 0.875rem 2rem;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chess-modal-success .btn-close:hover {
+    background: #5A3825;
+}
+
+/* Error State */
+.chess-form-error {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #DC2626;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+.chess-form-error.show {
+    display: block;
+}
+
+/* Loading Spinner */
+.chess-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .chess-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .chess-section {
+        padding: 3rem 1rem;
+    }
+    
+    .chess-title {
+        font-size: 1.875rem;
+    }
+    
+    .chess-subtitle {
+        font-size: 1rem;
+    }
+    
+    .chess-pricing-card,
+    .chess-benefits-card {
+        padding: 1.5rem;
+    }
+    
+    .chess-discount-table th,
+    .chess-discount-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .btn-chess {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .chess-modal {
+        margin: 0.5rem;
+        max-height: 95vh;
+    }
+    
+    .chess-modal-header {
+        padding: 1.5rem;
+    }
+    
+    .chess-modal-title {
+        font-size: 1.25rem;
+    }
+    
+    .chess-modal-content {
+        padding: 1.5rem;
+    }
+    
+    .chess-discount-table {
+        font-size: 0.8rem;
+    }
+    
+    .chess-discount-table th,
+    .chess-discount-table td {
+        padding: 0.5rem 0.25rem;
+    }
+}
