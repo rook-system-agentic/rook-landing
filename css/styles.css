@@ -3173,3 +3173,95 @@ html {
         padding: 0.5rem 0.25rem;
     }
 }
+
+
+/* ========================================
+   CHESS ENTERPRISE STYLES
+   ======================================== */
+
+.chess-content.chess-enterprise {
+    display: block;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.chess-enterprise-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 3rem;
+    box-shadow: 0 10px 40px rgba(196, 117, 59, 0.15);
+    border: 2px solid rgba(196, 117, 59, 0.2);
+    text-align: center;
+}
+
+.chess-enterprise-icon {
+    margin-bottom: 1.5rem;
+}
+
+.icon-chess-large {
+    font-size: 4rem;
+    display: block;
+}
+
+.chess-enterprise-info h3 {
+    font-size: 1.75rem;
+    color: var(--color-dark);
+    margin-bottom: 1rem;
+}
+
+.chess-enterprise-desc {
+    font-size: 1.125rem;
+    color: #6B7280;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+}
+
+.chess-enterprise-card .chess-benefits-card {
+    background: #F9F7F4;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.chess-enterprise-card .chess-benefits-card h4 {
+    font-size: 1.25rem;
+    color: var(--color-dark);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chess-enterprise-card .chess-benefits-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.chess-enterprise-card .chess-cta-container {
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .chess-enterprise-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .chess-enterprise-card .chess-benefits-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .icon-chess-large {
+        font-size: 3rem;
+    }
+    
+    .chess-enterprise-info h3 {
+        font-size: 1.5rem;
+    }
+    
+    .chess-enterprise-desc {
+        font-size: 1rem;
+    }
+}
