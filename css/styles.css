@@ -3277,6 +3277,11 @@ html {
     color: #111827; /* Mesma cor dos outros planos */
 }
 
+.pricing-card.chess-enterprise .price-main {
+    font-size: 1.5rem; /* Reduzido para caber no card */
+    color: #B8860B;
+}
+
 /* Enterprise Badge */
 .enterprise-badge {
     position: absolute;
