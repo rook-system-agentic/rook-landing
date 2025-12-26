@@ -3274,7 +3274,7 @@ html {
 }
 
 .pricing-card.chess-enterprise .plan-name {
-    color: #B8860B;
+    color: #111827; /* Mesma cor dos outros planos */
 }
 
 /* Enterprise Badge */
