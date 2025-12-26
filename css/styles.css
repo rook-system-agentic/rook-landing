@@ -840,11 +840,11 @@ body {
     color: white;
 }
 
-/* Pricing Grid */
+/* Pricing Grid - 4 colunas */
 .pricing-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
@@ -1083,9 +1083,15 @@ body {
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+    .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 1024px) {
     .pricing-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
     }
     
     .pricing-card.popular {
@@ -3263,5 +3269,127 @@ html {
     
     .chess-enterprise-desc {
         font-size: 1rem;
+    }
+}
+
+
+/* ========================================
+   CHESS ENTERPRISE CARD IN PRICING GRID
+   ======================================== */
+
+/* Card Chess Enterprise na grade de preços */
+.pricing-card.chess-enterprise {
+    border-color: #B8860B;
+    background: linear-gradient(135deg, #FFFEF5 0%, #FFF8E7 100%);
+    position: relative;
+}
+
+.pricing-card.chess-enterprise:hover {
+    box-shadow: 0 10px 30px rgba(184, 134, 11, 0.25);
+    transform: translateY(-4px);
+}
+
+.pricing-card.chess-enterprise .plan-icon {
+    color: #B8860B;
+    font-size: 2.5rem;
+}
+
+.pricing-card.chess-enterprise .plan-name {
+    color: #B8860B;
+}
+
+/* Enterprise Badge */
+.enterprise-badge {
+    position: absolute;
+    top: -0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* Botão Chess na grade */
+.btn-plan.btn-chess {
+    background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-decoration: none;
+}
+
+.btn-plan.btn-chess:hover {
+    background: linear-gradient(135deg, #996515 0%, #B8860B 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(184, 134, 11, 0.35);
+}
+
+/* Ajustes para cards menores na grade de 4 */
+.pricing-card .plan-features li {
+    font-size: 0.875rem;
+    padding: 0.35rem 0;
+}
+
+.pricing-card .plan-header {
+    margin-bottom: 1rem;
+}
+
+.pricing-card .plan-price-container {
+    margin-bottom: 1.5rem;
+    min-height: auto;
+}
+
+/* Responsivo para grade de 4 colunas */
+@media (max-width: 1400px) {
+    .pricing-grid {
+        gap: 1rem;
+    }
+    
+    .pricing-card {
+        padding: 1.5rem 1.25rem;
+    }
+    
+    .pricing-card .plan-features li {
+        font-size: 0.8rem;
+    }
+    
+    .price-main {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    
+    .pricing-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .pricing-card .plan-features li {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .pricing-grid {
+        grid-template-columns: 1fr;
     }
 }
