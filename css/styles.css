@@ -835,13 +835,14 @@ body {
     color: white;
 }
 
-/* Pricing Grid - 4 colunas */
+/* Pricing Grid - 4 colunas FORÇADO */
 .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.25rem;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 1rem !important;
     margin-bottom: 2rem;
     max-width: 100%;
+    width: 100%;
 }
 
 /* Pricing Cards */
@@ -3332,30 +3333,14 @@ html {
     min-height: auto;
 }
 
-/* Responsivo para grade de 4 colunas */
-@media (min-width: 1024px) {
-    .pricing-grid {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 1rem;
-    }
-    
-    .pricing-card {
-        padding: 1.5rem 1rem;
-    }
-    
-    .plan-features li {
-        font-size: 0.8rem;
-    }
-    
-    .price-main {
-        font-size: 1.75rem;
-    }
-}
+/* Responsivo para grade de planos - MOBILE/TABLET ONLY */
+/* Desktop: 4 colunas (definido na regra base .pricing-grid) */
 
-@media (max-width: 1023px) and (min-width: 640px) {
+/* Tablet: 2 colunas */
+@media screen and (max-width: 1023px) and (min-width: 640px) {
     .pricing-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 1.5rem;
+        gap: 1.5rem !important;
     }
     
     .pricing-card {
@@ -3363,10 +3348,11 @@ html {
     }
 }
 
-@media (max-width: 639px) {
+/* Mobile: 1 coluna */
+@media screen and (max-width: 639px) {
     .pricing-grid {
         grid-template-columns: 1fr !important;
-        gap: 1.5rem;
+        gap: 1.5rem !important;
     }
     
     .pricing-card {
