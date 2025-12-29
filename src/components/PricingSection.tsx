@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check, Crown, Star, Zap, Clock } from "lucide-react";
+import ContactModal from "./ContactModal";
 
 type BillingPeriod = "monthly" | "annual";
 
@@ -35,6 +36,7 @@ interface Plan {
   features: string[];
   cta: string;
   pricing: PlanPricing;
+  openModal?: boolean;
 }
 
 const plans: Plan[] = [
@@ -144,6 +146,7 @@ const plans: Plan[] = [
     disabled: false,
     comingSoon: false,
     isEnterprise: true,
+    openModal: true,
     features: [
       "Tudo do Rook",
       "Visão consolidada multi-unidade",
@@ -157,12 +160,12 @@ const plans: Plan[] = [
       monthly: {
         price: "Personalizado",
         period: "",
-        link: "mailto:contato@rooksystem.com.br?subject=Interesse%20no%20Plano%20Chess",
+        link: "#",
       },
       annual: {
         price: "Personalizado",
         period: "",
-        link: "mailto:contato@rooksystem.com.br?subject=Interesse%20no%20Plano%20Chess",
+        link: "#",
       },
     },
   },
@@ -170,6 +173,7 @@ const plans: Plan[] = [
 
 const PricingSection = () => {
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("monthly");
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   return (
     <section id="planos" className="py-24 relative bg-rook-beige/50">
@@ -336,6 +340,14 @@ const PricingSection = () => {
                   >
                     {plan.cta}
                   </Button>
+                ) : plan.openModal ? (
+                  <Button
+                    variant="rookOutline"
+                    className="w-full"
+                    onClick={() => setIsContactModalOpen(true)}
+                  >
+                    {plan.cta}
+                  </Button>
                 ) : (
                   <a href={currentPricing.link} className="block">
                     <Button
@@ -377,6 +389,12 @@ const PricingSection = () => {
           </div>
         )}
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
     </section>
   );
 };
