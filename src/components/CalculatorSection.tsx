@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import CurrencyInput from "@/components/ui/currency-input";
 import { Calculator, TrendingUp, AlertTriangle, ArrowRight, Target, Wallet, Sparkles } from "lucide-react";
 
 const CalculatorSection = () => {
   const [faturamento, setFaturamento] = useState(100000);
-  const [faturamentoDisplay, setFaturamentoDisplay] = useState("100.000,00");
   const [cmvAtual, setCmvAtual] = useState(38);
   const [calculated, setCalculated] = useState(false);
 
@@ -43,41 +43,10 @@ const CalculatorSection = () => {
     });
   };
 
-  // Formatar número para exibição brasileira (com ponto como separador de milhar e vírgula para decimais)
-  const formatInputDisplay = (value: number) => {
-    return value.toLocaleString('pt-BR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  };
-
-  // Converter string formatada para número
-  const parseFormattedNumber = (value: string) => {
-    // Remove pontos (separador de milhar) e substitui vírgula por ponto (decimal)
-    const cleanValue = value.replace(/\./g, '').replace(',', '.');
-    const numericValue = parseFloat(cleanValue) || 0;
-    return Math.round(numericValue); // Arredonda para inteiro para cálculos
-  };
-
-  // Handler para mudança no input de faturamento
-  const handleFaturamentoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    // Permite digitar livremente, formatação acontece no blur
-    setFaturamentoDisplay(inputValue);
+  // Handler para mudança no faturamento
+  const handleFaturamentoChange = (value: number) => {
+    setFaturamento(value);
     setCalculated(false);
-  };
-
-  // Handler para quando o usuário sai do campo (blur)
-  const handleFaturamentoBlur = () => {
-    const numericValue = parseFormattedNumber(faturamentoDisplay);
-    setFaturamento(numericValue);
-    setFaturamentoDisplay(formatInputDisplay(numericValue));
-  };
-
-  // Handler para quando o usuário entra no campo (focus)
-  const handleFaturamentoFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    // Selecionar todo o texto ao focar
-    e.target.select();
   };
 
   const isGoodCMV = cmvAtual <= cmvIdeal;
@@ -109,21 +78,12 @@ const CalculatorSection = () => {
                 <label className="block text-sm font-semibold text-foreground mb-3">
                   Qual seu faturamento mensal?
                 </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
-                    R$
-                  </span>
-                  <input
-                    type="text"
-                    inputMode="decimal"
-                    value={faturamentoDisplay}
-                    onChange={handleFaturamentoChange}
-                    onBlur={handleFaturamentoBlur}
-                    onFocus={handleFaturamentoFocus}
-                    className="w-full h-14 pl-12 pr-4 rounded-xl bg-muted border border-border text-foreground text-lg font-medium focus:outline-none focus:ring-2 focus:ring-rook-pingado focus:border-transparent transition-all"
-                    placeholder="100.000,00"
-                  />
-                </div>
+                <CurrencyInput
+                  value={faturamento}
+                  onChange={handleFaturamentoChange}
+                  placeholder="100.000,00"
+                  min={0}
+                />
               </div>
 
               {/* CMV Input */}
