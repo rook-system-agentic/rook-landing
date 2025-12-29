@@ -1,0 +1,532 @@
+/* ============================================
+   ROOK SYSTEM - LANDING PAGE IMPROVEMENTS V2
+   Based on Lovable analysis - Dec 2024
+   ============================================ */
+
+/* ============================================
+   1. HEXAGONAL BACKGROUND PATTERN
+   ============================================ */
+
+.hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23c4753b' fill-opacity='0.05'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.6;
+    z-index: 0;
+}
+
+.hero > .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   2. IMPROVED HERO TITLE
+   ============================================ */
+
+.hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    color: #111827;
+}
+
+.hero-title .highlight-big {
+    color: var(--color-primary);
+    font-size: clamp(3rem, 7vw, 5rem);
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.hero-title .subtitle {
+    display: block;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 600;
+    color: #6B7280;
+    margin-top: 1rem;
+}
+
+.hero-title .subtitle strong {
+    color: var(--color-danger);
+}
+
+/* ============================================
+   3. ANIMATIONS
+   ============================================ */
+
+/* Fade in up animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Scale in animation */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Slide in from right */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Animation classes */
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.5s ease-out forwards;
+}
+
+.animate-slide-left {
+    animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.animate-slide-right {
+    animation: slideInRight 0.6s ease-out forwards;
+}
+
+/* Animation delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+
+/* Initially hidden for animation */
+.animate-on-scroll {
+    opacity: 0;
+}
+
+.animate-on-scroll.is-visible {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* ============================================
+   4. IMPROVED STAT CARDS
+   ============================================ */
+
+.stat-card {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(196, 117, 59, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(196, 117, 59, 0.15);
+}
+
+.stat-number {
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    font-weight: 800;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.stat-label {
+    color: #6B7280;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ============================================
+   5. DASHBOARD PREVIEW SECTION (NEW)
+   ============================================ */
+
+.dashboard-preview-section {
+    padding: 5rem 1.5rem;
+    background: linear-gradient(180deg, var(--color-bg-light) 0%, white 100%);
+}
+
+.dashboard-preview-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.dashboard-preview-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.dashboard-preview-subtitle {
+    font-size: 1.25rem;
+    color: #6B7280;
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dashboard-preview-wrapper {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    background: white;
+    padding: 0.5rem;
+}
+
+.dashboard-preview-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2rem;
+    background: linear-gradient(90deg, #ff5f57, #ffbd2e, #28ca41);
+    background-size: 60px 12px;
+    background-repeat: no-repeat;
+    background-position: 12px center;
+    border-radius: 1rem 1rem 0 0;
+    z-index: 10;
+}
+
+.dashboard-preview-image {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin-top: 1.5rem;
+    display: block;
+}
+
+.dashboard-preview-cta {
+    margin-top: 2rem;
+}
+
+.dashboard-preview-features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.dashboard-feature {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #6B7280;
+}
+
+.dashboard-feature-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    background: rgba(196, 117, 59, 0.1);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-feature-icon svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: var(--color-primary);
+}
+
+.dashboard-feature-text {
+    font-weight: 500;
+}
+
+/* ============================================
+   6. IMPROVED CALCULATOR WITH SLIDER
+   ============================================ */
+
+.calculator-slider-container {
+    margin-bottom: 1.5rem;
+}
+
+.calculator-slider-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.calculator-slider-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.calculator-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, 
+        var(--color-success) 0%, 
+        var(--color-success) 32%, 
+        var(--color-accent) 32%, 
+        var(--color-accent) 36%, 
+        var(--color-danger) 36%, 
+        var(--color-danger) 100%);
+    outline: none;
+    cursor: pointer;
+}
+
+.calculator-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--color-primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.calculator-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+}
+
+.calculator-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--color-primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.calculator-slider-marks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #9CA3AF;
+}
+
+.calculator-slider-marks span {
+    position: relative;
+}
+
+.calculator-slider-marks .ideal {
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+.calculator-slider-marks .average {
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.calculator-slider-marks .critical {
+    color: var(--color-danger);
+    font-weight: 600;
+}
+
+/* ============================================
+   7. IMPROVED PRICING CARDS
+   ============================================ */
+
+.pricing-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pricing-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-card.popular {
+    border: 2px solid var(--color-primary);
+    position: relative;
+}
+
+.pricing-card.popular::before {
+    content: 'MAIS POPULAR';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-primary);
+    color: white;
+    padding: 0.25rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+/* ============================================
+   8. HOVER EFFECTS
+   ============================================ */
+
+.feature-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.problem-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.problem-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(229, 76, 0, 0.1);
+}
+
+.stat-shock-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-shock-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   9. RESPONSIVE IMPROVEMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .hero-title .highlight-big {
+        font-size: 3rem;
+    }
+    
+    .dashboard-preview-wrapper::before {
+        height: 1.5rem;
+        background-size: 45px 10px;
+        background-position: 8px center;
+    }
+    
+    .dashboard-preview-features {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .calculator-slider-marks {
+        font-size: 0.65rem;
+    }
+}
+
+/* ============================================
+   10. SMOOTH SCROLL
+   ============================================ */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ============================================
+   11. FOCUS STATES FOR ACCESSIBILITY
+   ============================================ */
+
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-outline:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   12. LOADING STATES
+   ============================================ */
+
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    right: 1rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
