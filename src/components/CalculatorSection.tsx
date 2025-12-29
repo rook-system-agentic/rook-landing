@@ -4,6 +4,7 @@ import { Calculator, TrendingUp, AlertTriangle, ArrowRight, Target, Wallet, Spar
 
 const CalculatorSection = () => {
   const [faturamento, setFaturamento] = useState(100000);
+  const [faturamentoDisplay, setFaturamentoDisplay] = useState("100.000");
   const [cmvAtual, setCmvAtual] = useState(38);
   const [calculated, setCalculated] = useState(false);
 
@@ -42,6 +43,39 @@ const CalculatorSection = () => {
     });
   };
 
+  // Formatar número para exibição brasileira (com ponto como separador de milhar)
+  const formatInputDisplay = (value: number) => {
+    return value.toLocaleString('pt-BR');
+  };
+
+  // Converter string formatada para número
+  const parseFormattedNumber = (value: string) => {
+    // Remove tudo exceto números
+    const numericValue = value.replace(/\D/g, '');
+    return parseInt(numericValue, 10) || 0;
+  };
+
+  // Handler para mudança no input de faturamento
+  const handleFaturamentoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const numericValue = parseFormattedNumber(inputValue);
+    
+    setFaturamento(numericValue);
+    setFaturamentoDisplay(formatInputDisplay(numericValue));
+    setCalculated(false);
+  };
+
+  // Handler para quando o usuário sai do campo (blur)
+  const handleFaturamentoBlur = () => {
+    setFaturamentoDisplay(formatInputDisplay(faturamento));
+  };
+
+  // Handler para quando o usuário entra no campo (focus)
+  const handleFaturamentoFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Selecionar todo o texto ao focar
+    e.target.select();
+  };
+
   const isGoodCMV = cmvAtual <= cmvIdeal;
 
   return (
@@ -76,15 +110,14 @@ const CalculatorSection = () => {
                     R$
                   </span>
                   <input
-                    type="number"
-                    value={faturamento}
-                    onChange={(e) => {
-                      setFaturamento(Number(e.target.value));
-                      setCalculated(false);
-                    }}
+                    type="text"
+                    inputMode="numeric"
+                    value={faturamentoDisplay}
+                    onChange={handleFaturamentoChange}
+                    onBlur={handleFaturamentoBlur}
+                    onFocus={handleFaturamentoFocus}
                     className="w-full h-14 pl-12 pr-4 rounded-xl bg-muted border border-border text-foreground text-lg font-medium focus:outline-none focus:ring-2 focus:ring-rook-pingado focus:border-transparent transition-all"
-                    min="0"
-                    step="1000"
+                    placeholder="100.000"
                   />
                 </div>
               </div>
