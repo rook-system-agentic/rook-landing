@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Calendar } from "lucide-react";
 import logoIcon from "@/assets/logo-icon.png";
 import pattern from "@/assets/pattern.png";
 
@@ -35,20 +35,25 @@ const CTASection = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button 
-              size="xl" 
-              className="w-full sm:w-auto bg-background text-rook-marrom hover:bg-background/90 shadow-lg hover:shadow-xl"
-            >
-              Começar Grátis Agora
-              <ArrowRight className="w-5 h-5" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="w-full sm:w-auto border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              Agendar Demonstração
-            </Button>
+            <a href="https://app.rooksystem.com.br/registro">
+              <Button 
+                size="xl" 
+                className="w-full sm:w-auto bg-background text-rook-marrom hover:bg-background/90 shadow-lg hover:shadow-xl"
+              >
+                Começar Grátis Agora
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            </a>
+            <a href="mailto:contato@rooksystem.com.br?subject=Agendar%20Demonstração%20Rook%20System">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full sm:w-auto border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+              >
+                <Calendar className="w-4 h-4" />
+                Agendar Demonstração
+              </Button>
+            </a>
           </div>
         </div>
       </div>

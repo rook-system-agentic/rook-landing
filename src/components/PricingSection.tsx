@@ -1,71 +1,101 @@
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Star, Zap } from "lucide-react";
+import { Check, Crown, Star, Zap, Clock } from "lucide-react";
 
 const plans = [
   {
     name: "Pawn",
-    description: "Para começar a controlar",
+    emoji: "♟️",
+    description: "O primeiro passo estratégico",
     price: "Grátis",
     period: "",
+    oldPrice: null,
+    savings: null,
     icon: Zap,
     featured: false,
+    disabled: false,
+    comingSoon: false,
     features: [
-      "Calculadora de CMV",
+      "Calculadora básica de CMV",
       "1 estabelecimento",
+      "Até 30 cálculos/mês",
       "Histórico de 30 dias",
       "Suporte por email",
     ],
     cta: "Começar Grátis",
+    link: "https://app.rooksystem.com.br/registro",
   },
   {
     name: "Knight",
-    description: "Para quem quer crescer",
+    emoji: "♞",
+    description: "Movimentos táticos e versáteis",
     price: "R$ 99",
     period: "/mês",
+    oldPrice: "R$ 179,90",
+    savings: "Economize R$ 80,90 por mês! 🎉",
+    promoBadge: "PROMOÇÃO DE LANÇAMENTO",
     icon: Star,
-    featured: false,
+    featured: true,
+    disabled: false,
+    comingSoon: false,
     features: [
       "Tudo do Pawn",
-      "3 estabelecimentos",
+      "Cálculos ilimitados",
       "Alertas em tempo real",
-      "Relatórios semanais",
+      "IA Preditiva de compras",
       "Histórico de 1 ano",
+      "Até 3 usuários",
+      "Suporte por email e chat",
+      "Relatórios personalizados",
     ],
     cta: "Assinar Knight",
+    link: "https://app.rooksystem.com.br/registro?plan=basic_monthly",
   },
   {
     name: "Rook",
-    description: "Para gestão profissional",
-    price: "R$ 179,90",
-    period: "/mês",
+    emoji: "♜",
+    description: "Domínio total da estratégia",
+    price: "Em breve",
+    period: "",
+    oldPrice: null,
+    savings: null,
     icon: Crown,
-    featured: true,
+    featured: false,
+    disabled: true,
+    comingSoon: true,
     features: [
       "Tudo do Knight",
-      "10 estabelecimentos",
-      "IA Preditiva",
-      "Integração ERP",
-      "Suporte prioritário",
+      "Integração automática ERP",
+      "Omie, Colibri, Saipo, Teknisa",
+      "Até 10 estabelecimentos",
       "Histórico ilimitado",
+      "Suporte prioritário",
     ],
-    cta: "Assinar Rook",
+    cta: "Em Breve",
+    link: "#",
   },
   {
     name: "Chess",
+    emoji: "♔",
     description: "Para redes e franquias",
-    price: "Sob consulta",
+    price: "Personalizado",
     period: "",
+    oldPrice: null,
+    savings: null,
     icon: Crown,
     featured: false,
+    disabled: false,
+    comingSoon: false,
+    isEnterprise: true,
     features: [
       "Tudo do Rook",
-      "Estabelecimentos ilimitados",
-      "API personalizada",
-      "Gerente de sucesso",
-      "Treinamento exclusivo",
-      "SLA garantido",
+      "Visão consolidada multi-unidade",
+      "Comparação de CMV por unidade",
+      "Dashboard multi-restaurante",
+      "Suporte prioritário dedicado",
+      "Auxílio na implantação",
     ],
     cta: "Falar com Vendas",
+    link: "mailto:contato@rooksystem.com.br?subject=Interesse%20no%20Plano%20Chess",
   },
 ];
 
@@ -92,48 +122,95 @@ const PricingSection = () => {
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`bg-background rounded-2xl p-6 relative transition-all duration-300 hover:scale-[1.02] border ${
+              className={`bg-background rounded-2xl p-6 relative transition-all duration-300 border ${
                 plan.featured
-                  ? "border-rook-marrom shadow-xl lg:scale-105"
-                  : "border-border hover:border-rook-pingado/50 hover:shadow-lg"
+                  ? "border-rook-marrom shadow-xl lg:scale-105 hover:scale-[1.07]"
+                  : plan.disabled
+                  ? "border-border opacity-75"
+                  : "border-border hover:border-rook-pingado/50 hover:shadow-lg hover:scale-[1.02]"
               }`}
             >
+              {/* Badges */}
               {plan.featured && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-rook-pingado to-rook-marrom rounded-full text-xs font-bold text-primary-foreground">
-                  Mais Popular
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-rook-pingado to-rook-marrom rounded-full text-xs font-bold text-primary-foreground whitespace-nowrap">
+                  MAIS POPULAR
+                </div>
+              )}
+              {plan.promoBadge && (
+                <div className="absolute -top-3 right-4 px-3 py-1 bg-rook-verde rounded-full text-xs font-bold text-white">
+                  {plan.promoBadge}
+                </div>
+              )}
+              {plan.comingSoon && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gray-500 rounded-full text-xs font-bold text-white flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  EM BREVE
+                </div>
+              )}
+              {plan.isEnterprise && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-rook-cafe rounded-full text-xs font-bold text-white">
+                  ♔ ENTERPRISE
                 </div>
               )}
 
-              <div className="mb-6">
+              <div className="mb-6 pt-2">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${
                   plan.featured ? "bg-gradient-to-br from-rook-pingado to-rook-marrom" : "bg-muted"
                 }`}>
-                  <plan.icon className={`w-6 h-6 ${plan.featured ? "text-primary-foreground" : "text-rook-marrom"}`} />
+                  <span className="text-2xl">{plan.emoji}</span>
                 </div>
-                <h3 className="text-xl font-bold text-rook-cafe">{plan.name}</h3>
+                <h3 className="text-xl font-bold text-rook-cafe uppercase">{plan.name}</h3>
                 <p className="text-sm text-muted-foreground">{plan.description}</p>
               </div>
 
               <div className="mb-6">
-                <span className="text-3xl font-bold text-rook-cafe">{plan.price}</span>
+                {plan.oldPrice && (
+                  <span className="text-sm text-muted-foreground line-through block mb-1">
+                    {plan.oldPrice}
+                  </span>
+                )}
+                <span className={`text-3xl font-bold ${plan.disabled ? "text-gray-400" : "text-rook-cafe"}`}>
+                  {plan.price}
+                </span>
                 <span className="text-muted-foreground">{plan.period}</span>
+                {plan.savings && (
+                  <p className="text-sm text-rook-verde font-medium mt-2">
+                    {plan.savings}
+                  </p>
+                )}
               </div>
 
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start gap-2 text-sm">
-                    <Check className={`w-4 h-4 mt-0.5 flex-shrink-0 ${plan.featured ? "text-rook-marrom" : "text-rook-pingado"}`} />
-                    <span className="text-muted-foreground">{feature}</span>
+                    <Check className={`w-4 h-4 mt-0.5 flex-shrink-0 ${
+                      plan.disabled ? "text-gray-400" : plan.featured ? "text-rook-marrom" : "text-rook-pingado"
+                    }`} />
+                    <span className={plan.disabled ? "text-gray-400" : "text-muted-foreground"}>
+                      {feature}
+                    </span>
                   </li>
                 ))}
               </ul>
 
-              <Button
-                variant={plan.featured ? "rook" : "rookOutline"}
-                className="w-full"
-              >
-                {plan.cta}
-              </Button>
+              {plan.disabled ? (
+                <Button
+                  variant="outline"
+                  className="w-full opacity-50 cursor-not-allowed"
+                  disabled
+                >
+                  {plan.cta}
+                </Button>
+              ) : (
+                <a href={plan.link} className="block">
+                  <Button
+                    variant={plan.featured ? "rook" : "rookOutline"}
+                    className="w-full"
+                  >
+                    {plan.cta}
+                  </Button>
+                </a>
+              )}
             </div>
           ))}
         </div>

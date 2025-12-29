@@ -7,29 +7,49 @@ import {
 
 const faqs = [
   {
-    question: "O que é CMV e por que ele é importante?",
+    question: "O que é CMV e por que devo controlá-lo?",
     answer:
-      "CMV (Custo de Mercadoria Vendida) é o custo dos ingredientes e insumos usados para produzir seus pratos. É o indicador mais importante para a saúde financeira do seu restaurante. Um CMV descontrolado pode consumir todo seu lucro, mesmo com vendas altas.",
+      "CMV (Custo de Mercadoria Vendida) é quanto você gasta em ingredientes e produtos para gerar suas vendas. Restaurantes com CMV acima de 36% perdem em média 11,84% de lucro. Controlar o CMV é essencial para manter seu negócio lucrativo e evitar prejuízos.",
   },
   {
-    question: "Como o Rook System calcula o CMV?",
+    question: "Como o Rook System calcula meu CMV?",
     answer:
-      "O Rook usa algoritmos estatísticos e IA preditiva para calcular seu CMV em tempo real. Basta inserir suas receitas e compras - o sistema faz o resto automaticamente, comparando com benchmarks do setor.",
+      "Você insere sua receita do período e o valor total de compras. O Rook calcula automaticamente seu CMV percentual e compara com sua meta. Além disso, a IA prevê quanto você pode comprar na próxima semana sem ultrapassar sua meta.",
   },
   {
-    question: "Preciso de conhecimento técnico para usar?",
+    question: "Preciso ter conhecimento técnico para usar?",
     answer:
-      "Não! O Rook foi criado para ser simples. Se você sabe usar um celular, você consegue usar o Rook. Além disso, oferecemos suporte completo em português.",
+      "Não! O Rook foi criado para ser simples e intuitivo. Você só precisa inserir receita e compras. O sistema faz todo o resto automaticamente. Nosso suporte está sempre disponível para ajudar.",
   },
   {
-    question: "Posso integrar com meu sistema atual?",
+    question: "Posso cancelar a qualquer momento?",
     answer:
-      "Sim! O Rook integra com os principais ERPs do mercado: Omie, Colibri, Saipo, Teknisa e outros. Os dados são sincronizados automaticamente.",
+      "Sim! Todos os planos são sem contrato e você pode cancelar quando quiser. Não há multas ou taxas de cancelamento.",
   },
   {
-    question: "E se eu não gostar do serviço?",
+    question: "O plano Pawn é realmente grátis?",
     answer:
-      "Você pode cancelar a qualquer momento, sem multas ou burocracia. Além disso, oferecemos um período de teste gratuito para você conhecer a plataforma.",
+      "Sim! O plano Pawn é 100% gratuito para sempre. Você tem acesso à calculadora básica de CMV com até 30 cálculos por mês. É o primeiro passo estratégico para conhecer o Rook e começar a controlar seu CMV sem compromisso.",
+  },
+  {
+    question: "Quando o plano Rook estará disponível?",
+    answer:
+      "O plano Rook com integração automática de ERP e domínio total da estratégia está em desenvolvimento e será lançado em breve. Você pode se cadastrar para ser avisado quando estiver disponível.",
+  },
+  {
+    question: "Por que tantos restaurantes fecham?",
+    answer:
+      "71% fecham por 'queda de vendas', mas o problema real é CMV descontrolado. Quando você compra sem planejamento, gasta 40% a mais. Quando seu CMV passa de 36%, você perde 11,84% de lucro. O Rook System te ajuda a ver isso ANTES de virar prejuízo. Em 2024, 397 mil restaurantes fecharam - não seja o próximo.",
+  },
+  {
+    question: "Como o Rook System me ajuda a não fechar?",
+    answer:
+      "Restaurantes com controle de CMV têm 15% mais chances de sobreviver. O Rook te dá visão em tempo real, alertas quando você está comprando demais, e projeções para tomar decisões baseadas em dados, não no 'feeling'. 50% dos pequenos restaurantes fecham em 2 anos - o Rook te tira dessa estatística.",
+  },
+  {
+    question: "Quanto posso economizar controlando o CMV?",
+    answer:
+      "Depende do seu faturamento! Use nossa calculadora acima para ver seu potencial. Exemplos reais: Faturamento R$ 50k/mês = até R$ 36 mil/ano de economia | Faturamento R$ 300k/mês = até R$ 288 mil/ano | Faturamento R$ 600k/mês = até R$ 576 mil/ano. O Rook System custa R$ 99/mês. ROI médio: 30-500x.",
   },
 ];
 
@@ -43,13 +63,16 @@ const FAQSection = () => {
             FAQ
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-rook-cafe">
-            Dúvidas{" "}
-            <span className="text-rook-marrom">frequentes</span>
+            Perguntas{" "}
+            <span className="text-rook-marrom">Frequentes</span>
           </h2>
+          <p className="text-lg text-muted-foreground">
+            Tudo que você precisa saber sobre o Rook System
+          </p>
         </div>
 
         {/* FAQ Accordion */}
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, index) => (
               <AccordionItem
