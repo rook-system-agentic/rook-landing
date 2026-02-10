@@ -18,10 +18,10 @@ const Footer = () => {
 
             {/* Links */}
             <nav className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-              <a href="https://app.rooksystem.com.br/registro" className="hover:text-rook-marrom transition-colors font-medium">
-                Começar Grátis
+              <a href="https://diagnostico.rooksystem.com.br" className="hover:text-rook-marrom transition-colors font-medium">
+                Diagnóstico Gratuito
               </a>
-              <a href="#funcionalidades" className="hover:text-rook-marrom transition-colors font-medium">
+              <a href="#solucao" className="hover:text-rook-marrom transition-colors font-medium">
                 Funcionalidades
               </a>
               <a href="#planos" className="hover:text-rook-marrom transition-colors font-medium">

@@ -7,49 +7,49 @@ import {
 
 const faqs = [
   {
-    question: "O que é CMV e por que devo controlá-lo?",
+    question: "O que é o Rook System?",
     answer:
-      "CMV (Custo de Mercadoria Vendida) é quanto você gasta em ingredientes e produtos para gerar suas vendas. Restaurantes com CMV acima de 36% perdem em média 11,84% de lucro. Controlar o CMV é essencial para manter seu negócio lucrativo e evitar prejuízos.",
+      "O Rook System é uma plataforma de gestão financeira desenvolvida especificamente para restaurantes. Ele analisa seus dados financeiros — receita, custos, despesas, impostos — e transforma em indicadores claros para você tomar decisões melhores. Não é contabilidade: é visão estratégica do seu negócio.",
   },
   {
-    question: "Como o Rook System calcula meu CMV?",
+    question: "O que é CMV e por que devo controlá-lo?",
     answer:
-      "Você insere sua receita do período e o valor total de compras. O Rook calcula automaticamente seu CMV percentual e compara com sua meta. Além disso, a IA prevê quanto você pode comprar na próxima semana sem ultrapassar sua meta.",
+      "CMV (Custo de Mercadoria Vendida) é quanto você gasta em ingredientes e produtos para gerar suas vendas. É o maior custo variável de um restaurante. Quando o CMV sai do controle, o lucro desaparece — mesmo com o salão cheio. O ideal é manter entre 28% e 35% do faturamento, dependendo do porte do restaurante.",
+  },
+  {
+    question: "O que é o Diagnóstico Financeiro?",
+    answer:
+      "É uma análise gratuita que gera um raio-x completo do seu restaurante em 2 minutos. Você informa receita, custos, despesas e dívidas, e recebe um DRE (Demonstrativo de Resultado), análise tributária comparativa entre regimes (Simples, Presumido e Real), indicadores de saúde financeira e recomendações personalizadas.",
+  },
+  {
+    question: "O Rook usa Inteligência Artificial?",
+    answer:
+      "O Rook é construído sobre uma base sólida de matemática estatística e analítica. Utilizamos modelos de análise de dados para gerar projeções, alertas e recomendações. O foco é na precisão dos cálculos e na relevância das análises para o seu negócio, não em buzzwords.",
   },
   {
     question: "Preciso ter conhecimento técnico para usar?",
     answer:
-      "Não! O Rook foi criado para ser simples e intuitivo. Você só precisa inserir receita e compras. O sistema faz todo o resto automaticamente. Nosso suporte está sempre disponível para ajudar.",
+      "Não. O Rook foi projetado para ser simples e intuitivo. Você insere seus dados financeiros básicos e o sistema faz toda a análise automaticamente. Se tiver dúvidas, nosso suporte está disponível para ajudar.",
   },
   {
     question: "Posso cancelar a qualquer momento?",
     answer:
-      "Sim! Todos os planos são sem contrato e você pode cancelar quando quiser. Não há multas ou taxas de cancelamento.",
+      "Sim. Todos os planos são sem contrato de fidelidade e você pode cancelar quando quiser. Não há multas ou taxas de cancelamento. Seus dados ficam disponíveis por 30 dias após o cancelamento.",
   },
   {
     question: "O plano Pawn é realmente grátis?",
     answer:
-      "Sim! O plano Pawn é 100% gratuito para sempre. Você tem acesso à calculadora básica de CMV com até 30 cálculos por mês. É o primeiro passo estratégico para conhecer o Rook e começar a controlar seu CMV sem compromisso.",
+      "Sim. O plano Pawn é 100% gratuito para sempre. Você tem acesso à calculadora básica de CMV com até 5 cálculos por mês. É o primeiro passo para começar a entender seus números sem nenhum compromisso financeiro.",
   },
   {
-    question: "Quando o plano Rook estará disponível?",
+    question: "Qual a diferença entre os planos Knight e Rook?",
     answer:
-      "O plano Rook com integração automática de ERP e domínio total da estratégia está em desenvolvimento e será lançado em breve. Você pode se cadastrar para ser avisado quando estiver disponível.",
+      "O Knight (R$ 179,90/mês) oferece controle financeiro completo: cálculos ilimitados, DRE automático, alertas e análise tributária para 1 estabelecimento. O Rook (R$ 379,90/mês) adiciona diagnóstico financeiro completo, projeções e cenários, relatórios personalizados e suporte para até 5 estabelecimentos.",
   },
   {
     question: "Por que tantos restaurantes fecham?",
     answer:
-      "71% fecham por 'queda de vendas', mas o problema real é CMV descontrolado. Quando você compra sem planejamento, gasta 40% a mais. Quando seu CMV passa de 36%, você perde 11,84% de lucro. O Rook System te ajuda a ver isso ANTES de virar prejuízo. Em 2024, 397 mil restaurantes fecharam - não seja o próximo.",
-  },
-  {
-    question: "Como o Rook System me ajuda a não fechar?",
-    answer:
-      "Restaurantes com controle de CMV têm 15% mais chances de sobreviver. O Rook te dá visão em tempo real, alertas quando você está comprando demais, e projeções para tomar decisões baseadas em dados, não no 'feeling'. 50% dos pequenos restaurantes fecham em 2 anos - o Rook te tira dessa estatística.",
-  },
-  {
-    question: "Quanto posso economizar controlando o CMV?",
-    answer:
-      "Depende do seu faturamento! Use nossa calculadora acima para ver seu potencial. Exemplos reais: Faturamento R$ 50k/mês = até R$ 36 mil/ano de economia | Faturamento R$ 300k/mês = até R$ 288 mil/ano | Faturamento R$ 600k/mês = até R$ 576 mil/ano. O Rook System custa R$ 99/mês. ROI médio: 30-500x.",
+      "Em 2024, 397 mil restaurantes fecharam no Brasil. A principal causa não é falta de clientes — é falta de controle financeiro. Sem saber o CMV real, a margem de lucro e o impacto dos impostos, o dono toma decisões no escuro. O lucro líquido médio do setor não passa de 10%, e 55% dos restaurantes não geram lucro. O Rook existe para mudar essa realidade.",
   },
 ];
 

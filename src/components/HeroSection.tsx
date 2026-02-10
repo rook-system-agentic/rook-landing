@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play, CheckCircle } from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle } from "lucide-react";
 import pattern from "@/assets/pattern.png";
 
 const HeroSection = () => {
@@ -20,39 +20,39 @@ const HeroSection = () => {
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border mb-8 animate-fade-up shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-rook-terracota animate-pulse" />
-            <span className="text-sm text-muted-foreground font-medium">Análise Preditiva e Estatística</span>
+            <BarChart3 className="w-4 h-4 text-rook-marrom" />
+            <span className="text-sm text-muted-foreground font-medium">Gestão Financeira para Restaurantes</span>
           </div>
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6 animate-fade-up animation-delay-100 text-rook-cafe">
-            <span className="text-rook-marrom">397 mil</span> restaurantes{" "}
+            Você sabe quanto{" "}
+            <span className="text-rook-marrom">sobra</span>{" "}
             <br className="hidden sm:block" />
-            fecharam em 2024.
+            no final do mês?
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 animate-fade-up animation-delay-200">
-            1 em cada 12 fecha este ano.{" "}
-            <span className="text-rook-marrom font-semibold">Não seja o próximo.</span>
+            A maioria dos donos de restaurante{" "}
+            <span className="text-rook-marrom font-semibold">não sabe responder essa pergunta.</span>
           </p>
 
           <p className="text-base text-muted-foreground max-w-xl mx-auto mb-10 animate-fade-up animation-delay-300">
-            Reduza custos, aumente lucros e tome decisões estratégicas baseadas em dados com o Rook System.
+            O Rook analisa seus números, identifica onde o dinheiro está indo e mostra exatamente o que fazer para sobrar mais.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 animate-fade-up animation-delay-400">
-            <a href="https://app.rooksystem.com.br/registro">
+            <a href="https://diagnostico.rooksystem.com.br">
               <Button variant="rook" size="xl" className="w-full sm:w-auto">
-                Começar Grátis
+                Fazer Diagnóstico Gratuito
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </a>
-            <a href="#calculadora">
+            <a href="#planos">
               <Button variant="rookOutline" size="xl" className="w-full sm:w-auto">
-                <Play className="w-5 h-5" />
-                Ver Demonstração
+                Ver Planos
               </Button>
             </a>
           </div>
@@ -61,15 +61,15 @@ const HeroSection = () => {
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground animate-fade-up animation-delay-500">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-rook-verde" />
+              <span>Resultado em 2 minutos</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-rook-verde" />
               <span>Sem cartão de crédito</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-rook-verde" />
-              <span>Cancele quando quiser</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-rook-verde" />
-              <span>Suporte em português</span>
+              <span>Dados 100% seguros</span>
             </div>
           </div>
         </div>
@@ -77,16 +77,16 @@ const HeroSection = () => {
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto mt-20 animate-fade-up animation-delay-500">
           <div className="text-center">
-            <div className="stat-number text-rook-marrom">40%</div>
-            <p className="text-sm text-muted-foreground mt-2 font-medium">Redução CMV</p>
+            <div className="stat-number text-rook-marrom">397 mil</div>
+            <p className="text-sm text-muted-foreground mt-2 font-medium">Restaurantes fecharam em 2024</p>
           </div>
           <div className="text-center">
-            <div className="stat-number text-rook-pingado">3x</div>
-            <p className="text-sm text-muted-foreground mt-2 font-medium">Mais Rápido</p>
+            <div className="stat-number text-rook-pingado">&lt; 10%</div>
+            <p className="text-sm text-muted-foreground mt-2 font-medium">Lucro líquido médio do setor</p>
           </div>
           <div className="text-center">
-            <div className="stat-number text-rook-terracota">100%</div>
-            <p className="text-sm text-muted-foreground mt-2 font-medium">Automático</p>
+            <div className="stat-number text-rook-terracota">55%</div>
+            <p className="text-sm text-muted-foreground mt-2 font-medium">Não geram lucro</p>
           </div>
         </div>
       </div>

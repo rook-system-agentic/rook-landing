@@ -2,28 +2,28 @@ import { AlertTriangle, TrendingDown, DollarSign, XCircle } from "lucide-react";
 
 const stats = [
   {
-    icon: AlertTriangle,
+    icon: XCircle,
     number: "397 mil",
     label: "Restaurantes fecharam em 2024",
-    source: "Abrasel/Sebrae",
+    source: "Valor Econômico / ABIA",
   },
   {
     icon: TrendingDown,
-    number: "40%",
-    label: "Estão endividados",
-    source: "Dívidas em impostos e fornecedores",
-  },
-  {
-    icon: XCircle,
-    number: "71%",
-    label: "Fecham por 'queda de vendas'",
-    source: "O problema real é CMV alto",
+    number: "55%",
+    label: "Não geram lucro",
+    source: "Operam no zero a zero ou no vermelho",
   },
   {
     icon: DollarSign,
-    number: "50%",
-    label: "Fecham em 2 anos",
-    source: "Microempresas são as mais vulneráveis",
+    number: "< R$ 0,10",
+    label: "Sobra por real faturado",
+    source: "Lucro líquido médio do setor",
+  },
+  {
+    icon: AlertTriangle,
+    number: "36%",
+    label: "Estão endividados",
+    source: "Dívidas com impostos e fornecedores",
   },
 ];
 
@@ -37,12 +37,14 @@ const ProblemSection = () => {
             O Problema
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-rook-cafe">
-            Não é falta de clientes.{" "}
-            <span className="text-rook-marrom">É falta de controle.</span>
+            Você vende bem, trabalha 14h por dia.{" "}
+            <br className="hidden md:block" />
+            <span className="text-rook-marrom">Mas cadê o lucro?</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Você trabalha 14 horas por dia, tem fila na porta, vende bem. 
-            Mas no final do mês: <span className="text-rook-terracota font-semibold">prejuízo.</span>
+            Salão cheio, delivery disparando, equipe trabalhando. 
+            Mas quando chega o final do mês, a conta não fecha.{" "}
+            <span className="text-rook-terracota font-semibold">Você não está sozinho.</span>
           </p>
         </div>
 
@@ -69,16 +71,15 @@ const ProblemSection = () => {
         <div className="glass-card rounded-2xl p-8 md:p-12 text-center max-w-4xl mx-auto border-rook-terracota/20">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rook-terracota/10 text-rook-terracota text-sm font-semibold mb-6">
             <AlertTriangle className="w-4 h-4" />
-            Alerta Crítico
+            A Verdade que Ninguém Conta
           </div>
           <p className="text-2xl md:text-3xl font-bold mb-4 text-rook-cafe">
-            CMV acima de 36% significa{" "}
-            <span className="text-rook-terracota">-11,84%</span> de lucro
+            O problema não é falta de cliente.{" "}
+            <span className="text-rook-terracota">É falta de visão financeira.</span>
           </p>
-          <p className="text-muted-foreground text-lg">
-            Insumos subiram 30% em 2024, mas 40% dos restaurantes não reajustaram preços.
-            <br />
-            <span className="text-rook-marrom font-semibold">O Rook System nasceu para mudar isso.</span>
+          <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
+            Sem saber seu CMV real, sua margem de lucro, seus impostos e suas despesas operacionais, 
+            você toma decisões no escuro. O Rook System nasceu para acender essa luz.
           </p>
         </div>
       </div>

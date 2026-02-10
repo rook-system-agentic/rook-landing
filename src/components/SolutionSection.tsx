@@ -1,42 +1,42 @@
-import { Calculator, Brain, Bell, LineChart, Plug, ShoppingCart } from "lucide-react";
+import { Calculator, BarChart3, Bell, LineChart, FileText, ShoppingCart } from "lucide-react";
 import pattern from "@/assets/pattern.png";
 
 const features = [
   {
     icon: Calculator,
-    title: "Calculadora Automática de CMV",
-    description: "Insira receita e compras. O Rook calcula seu CMV instantaneamente, mostrando se está dentro da meta.",
+    title: "Controle de CMV",
+    description: "Acompanhe seu Custo de Mercadoria Vendida em tempo real. Saiba se está dentro da meta antes que vire prejuízo.",
   },
   {
-    icon: Brain,
-    title: "Inteligência Preditiva",
-    description: "IA prevê quanto você pode comprar na próxima semana sem comprometer sua meta de CMV.",
+    icon: FileText,
+    title: "DRE Automático",
+    description: "Demonstrativo de Resultado gerado automaticamente. Visualize receita, custos, despesas e lucro de forma clara.",
+  },
+  {
+    icon: BarChart3,
+    title: "Análise Tributária",
+    description: "Compare Simples Nacional, Lucro Presumido e Lucro Real. Descubra o regime mais vantajoso para seu faturamento.",
   },
   {
     icon: Bell,
-    title: "Alertas em Tempo Real",
-    description: "Receba notificações quando o CMV estiver acima do ideal. Aja antes que vire prejuízo.",
+    title: "Alertas Inteligentes",
+    description: "Receba notificações quando indicadores saírem da meta. Aja antes que pequenos desvios virem grandes problemas.",
   },
   {
     icon: LineChart,
-    title: "Gráficos de Evolução",
-    description: "Visualize a evolução do seu CMV em gráficos interativos. Compare períodos e identifique padrões.",
-  },
-  {
-    icon: Plug,
-    title: "Integração com ERP",
-    description: "Conecte com Omie, Colibri, Saipo, Teknisa e outros. Dados sincronizados automaticamente.",
+    title: "Projeções e Tendências",
+    description: "Visualize a evolução dos seus indicadores em gráficos interativos. Identifique padrões e antecipe cenários.",
   },
   {
     icon: ShoppingCart,
-    title: "Controle de Compras",
-    description: "Registre compras por categoria e veja o impacto no CMV em tempo real.",
+    title: "Gestão de Compras",
+    description: "Registre compras por categoria e veja o impacto direto no CMV e na margem de lucro do seu restaurante.",
   },
 ];
 
 const SolutionSection = () => {
   return (
-    <section id="solucao" className="py-24 relative bg-rook-beige/50 overflow-hidden">
+    <section id="solucao" className="py-24 relative bg-background overflow-hidden">
       {/* Background Pattern */}
       <div 
         className="absolute inset-0 opacity-20"
@@ -55,11 +55,11 @@ const SolutionSection = () => {
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-rook-cafe">
             Rook System:{" "}
-            <span className="text-rook-marrom">Inteligência que gera lucro</span>
+            <span className="text-rook-marrom">Visão completa do seu negócio</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Controle automático de CMV com inteligência artificial. 
-            O Rook prevê, alerta e orienta suas decisões em tempo real.
+            Análise de dados financeiros que transforma números em decisões. 
+            Controle de CMV, DRE automático, análise tributária e projeções — tudo em um só lugar.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ const SolutionSection = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-background rounded-2xl p-8 border border-border hover:border-rook-pingado/50 hover:shadow-lg transition-all duration-300 group"
+              className="bg-card rounded-2xl p-8 border border-border hover:border-rook-pingado/50 hover:shadow-lg transition-all duration-300 group"
             >
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-rook-pingado to-rook-marrom flex items-center justify-center mb-6 group-hover:shadow-lg transition-shadow">
                 <feature.icon className="w-7 h-7 text-primary-foreground" />

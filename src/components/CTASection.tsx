@@ -30,22 +30,22 @@ const CTASection = () => {
             />
             
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-primary-foreground">
-              Pare de perder dinheiro.{" "}
-              <span className="opacity-90">Comece hoje.</span>
+              Descubra quanto{" "}
+              <span className="opacity-90">sobra no seu restaurante.</span>
             </h2>
             
             <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto mb-10">
-              Junte-se a centenas de restaurantes que já estão economizando com o Rook System. 
-              Teste grátis, sem compromisso.
+              Faça o diagnóstico financeiro gratuito e tenha clareza sobre a saúde do seu negócio. 
+              Em 2 minutos, sem compromisso.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a href="https://app.rooksystem.com.br/registro">
+              <a href="https://diagnostico.rooksystem.com.br">
                 <Button 
                   size="xl" 
                   className="w-full sm:w-auto bg-background text-rook-marrom hover:bg-background/90 shadow-lg hover:shadow-xl"
                 >
-                  Começar Grátis Agora
+                  Fazer Diagnóstico Gratuito
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </a>
