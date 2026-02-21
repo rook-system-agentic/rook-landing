@@ -39,12 +39,12 @@ const faqs = [
   {
     question: "O plano Pawn é realmente grátis?",
     answer:
-      "Sim. O plano Pawn é 100% gratuito para sempre. Você tem acesso à calculadora básica de CMV com até 5 cálculos por mês. É o primeiro passo para começar a entender seus números sem nenhum compromisso financeiro.",
+      "Sim. O plano Pawn é 100% gratuito para sempre. Você tem acesso à calculadora básica de CMV com até 8 cálculos por mês e 1 diagnóstico parcial. É o primeiro passo para começar a entender seus números sem nenhum compromisso financeiro.",
   },
   {
     question: "Qual a diferença entre os planos Knight e Rook?",
     answer:
-      "O Knight (R$ 179,90/mês) oferece controle financeiro completo: cálculos ilimitados, DRE automático, alertas e análise tributária para 1 estabelecimento. O Rook (R$ 379,90/mês) adiciona diagnóstico financeiro completo, projeções e cenários, relatórios personalizados e suporte para até 5 estabelecimentos.",
+      "O Knight (R$ 179,90/mês) oferece controle financeiro completo: até 25 cálculos CMV/mês, 5 diagnósticos completos, DRE automático, alertas, análise tributária e histórico de 6 meses para 1 estabelecimento. O Rook (R$ 379,90/mês) adiciona cálculos e diagnósticos ilimitados, integração ERP, histórico completo, projeções e cenários, relatórios personalizados e suporte para até 5 estabelecimentos.",
   },
   {
     question: "Por que tantos restaurantes fecham?",
