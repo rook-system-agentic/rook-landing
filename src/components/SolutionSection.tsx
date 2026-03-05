@@ -1,42 +1,40 @@
-import { Calculator, BarChart3, Bell, LineChart, FileText, ShoppingCart } from "lucide-react";
+import { Calculator, FileText, Shield, BarChart3 } from "lucide-react";
 import pattern from "@/assets/pattern.png";
 
-const features = [
+const pillars = [
   {
     icon: Calculator,
-    title: "Controle de CMV",
-    description: "Acompanhe seu Custo de Mercadoria Vendida em tempo real. Saiba se está dentro da meta antes que vire prejuízo.",
+    label: "Pilar 1",
+    title: "Controle de CMV e Custos",
+    description: "Acompanhe seu Custo de Mercadoria Vendida em tempo real. Registre compras por categoria, defina metas por segmento e saiba se está dentro do ideal antes que pequenos desvios virem prejuízo.",
+    highlights: ["CMV por período e categoria", "Meta personalizada por segmento", "Alertas quando sair da meta"],
   },
   {
     icon: FileText,
-    title: "DRE Automático",
-    description: "Demonstrativo de Resultado gerado automaticamente. Visualize receita, custos, despesas e lucro de forma clara.",
+    label: "Pilar 2",
+    title: "Diagnóstico e DRE Automático",
+    description: "Tenha um Demonstrativo de Resultado do Exercício gerado automaticamente a partir dos seus dados. Visualize receita, custos, despesas e lucro de forma clara, com indicadores de saúde financeira.",
+    highlights: ["DRE completo e automático", "Health score do negócio", "Recomendações personalizadas"],
+  },
+  {
+    icon: Shield,
+    label: "Pilar 3",
+    title: "Saúde Fiscal e Integração SEFAZ",
+    description: "Conecte seu certificado digital A1 e tenha seus dados fiscais sempre atualizados. O Rook sincroniza com a Secretaria da Fazenda para manter sua base de documentos organizada e acessível.",
+    highlights: ["Conexão direta com a SEFAZ", "Documentos fiscais organizados", "CNAE e dados da empresa automáticos"],
   },
   {
     icon: BarChart3,
-    title: "Análise Tributária",
-    description: "Compare Simples Nacional, Lucro Presumido e Lucro Real. Descubra o regime mais vantajoso para seu faturamento.",
-  },
-  {
-    icon: Bell,
-    title: "Alertas Inteligentes",
-    description: "Receba notificações quando indicadores saírem da meta. Aja antes que pequenos desvios virem grandes problemas.",
-  },
-  {
-    icon: LineChart,
-    title: "Projeções e Tendências",
-    description: "Visualize a evolução dos seus indicadores em gráficos interativos. Identifique padrões e antecipe cenários.",
-  },
-  {
-    icon: ShoppingCart,
-    title: "Gestão de Compras",
-    description: "Registre compras por categoria e veja o impacto direto no CMV e na margem de lucro do seu restaurante.",
+    label: "Pilar 4",
+    title: "Simulador Tributário Avançado",
+    description: "Compare Simples Nacional, Lucro Presumido e Lucro Real com base nos seus próprios dados. Simule cenários com e sem créditos de PIS/COFINS para entender qual regime pode ser mais vantajoso.",
+    highlights: ["Comparativo entre 3 regimes", "Simulação com dados reais", "Histórico de simulações"],
   },
 ];
 
 const SolutionSection = () => {
   return (
-    <section id="solucao" className="py-24 relative bg-background overflow-hidden">
+    <section id="solucao" className="py-24 relative bg-rook-beige/50 overflow-hidden">
       {/* Background Pattern */}
       <div 
         className="absolute inset-0 opacity-20"
@@ -54,31 +52,42 @@ const SolutionSection = () => {
             A Solução
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-rook-cafe">
-            Rook System:{" "}
-            <span className="text-rook-marrom">Visão completa do seu negócio</span>
+            Visão completa.{" "}
+            <span className="text-rook-marrom">Do prato ao imposto.</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Análise de dados financeiros que transforma números em decisões. 
-            Controle de CMV, DRE automático, análise tributária e projeções — tudo em um só lugar.
+            O Rook conecta gestão de custos, análise financeira e planejamento tributário 
+            em uma única plataforma, projetada para restaurantes.
           </p>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
+        {/* 4 Pillars */}
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          {pillars.map((pillar, index) => (
             <div
               key={index}
-              className="bg-card rounded-2xl p-8 border border-border hover:border-rook-pingado/50 hover:shadow-lg transition-all duration-300 group"
+              className="bg-background rounded-2xl p-8 border border-border hover:border-rook-pingado/50 hover:shadow-lg transition-all duration-300 group"
             >
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-rook-pingado to-rook-marrom flex items-center justify-center mb-6 group-hover:shadow-lg transition-shadow">
-                <feature.icon className="w-7 h-7 text-primary-foreground" />
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-rook-pingado to-rook-marrom flex items-center justify-center flex-shrink-0 group-hover:shadow-lg transition-shadow">
+                  <pillar.icon className="w-7 h-7 text-primary-foreground" />
+                </div>
+                <div>
+                  <span className="text-xs font-semibold tracking-widest uppercase text-rook-pingado">{pillar.label}</span>
+                  <h3 className="text-xl font-bold text-rook-cafe">{pillar.title}</h3>
+                </div>
               </div>
-              <h3 className="text-xl font-bold mb-3 text-rook-cafe">
-                {feature.title}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {feature.description}
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                {pillar.description}
               </p>
+              <ul className="space-y-2">
+                {pillar.highlights.map((highlight, hIndex) => (
+                  <li key={hIndex} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="w-1.5 h-1.5 rounded-full bg-rook-pingado flex-shrink-0" />
+                    {highlight}
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

@@ -3,6 +3,15 @@ import logoHorizontal from "@/assets/logo-horizontal.png";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
+const navLinks = [
+  { href: "#problema", label: "O Problema" },
+  { href: "#solucao", label: "Solução" },
+  { href: "#como-funciona", label: "Como Funciona" },
+  { href: "#seguranca", label: "Segurança" },
+  { href: "#planos", label: "Planos" },
+  { href: "#faq", label: "FAQ" },
+];
+
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -17,22 +26,16 @@ const Header = () => {
           />
         </a>
 
-        <nav className="hidden md:flex items-center gap-8">
-          <a href="#problema" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-            O Problema
-          </a>
-          <a href="#diagnostico" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-            Diagnóstico
-          </a>
-          <a href="#solucao" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-            Solução
-          </a>
-          <a href="#planos" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-            Planos
-          </a>
-          <a href="#faq" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-            FAQ
-          </a>
+        <nav className="hidden lg:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -41,14 +44,15 @@ const Header = () => {
               Entrar
             </Button>
           </a>
-          <a href="https://diagnostico.rooksystem.com.br" className="hidden sm:block">
+          <a href="https://app.rooksystem.com.br/registro" className="hidden sm:block">
             <Button variant="rook" size="sm">
-              Diagnóstico Gratuito
+              Começar Grátis
             </Button>
           </a>
           <button
-            className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+            className="lg:hidden p-2 text-muted-foreground hover:text-foreground"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -57,52 +61,27 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-background border-t border-border/50 animate-fade-up">
+        <div className="lg:hidden bg-background border-t border-border/50 animate-fade-up">
           <nav className="container py-4 flex flex-col gap-3">
-            <a 
-              href="#problema" 
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              O Problema
-            </a>
-            <a 
-              href="#diagnostico" 
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Diagnóstico
-            </a>
-            <a 
-              href="#solucao" 
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Solução
-            </a>
-            <a 
-              href="#planos" 
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Planos
-            </a>
-            <a 
-              href="#faq" 
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              FAQ
-            </a>
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </a>
+            ))}
             <div className="flex flex-col gap-2 pt-3 border-t border-border/50">
               <a href="https://app.rooksystem.com.br/login">
                 <Button variant="ghost" size="sm" className="w-full">
                   Entrar
                 </Button>
               </a>
-              <a href="https://diagnostico.rooksystem.com.br">
+              <a href="https://app.rooksystem.com.br/registro">
                 <Button variant="rook" size="sm" className="w-full">
-                  Diagnóstico Gratuito
+                  Começar Grátis
                 </Button>
               </a>
             </div>

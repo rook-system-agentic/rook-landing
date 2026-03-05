@@ -9,47 +9,52 @@ const faqs = [
   {
     question: "O que é o Rook System?",
     answer:
-      "O Rook System é uma plataforma de gestão financeira desenvolvida especificamente para restaurantes. Ele analisa seus dados financeiros — receita, custos, despesas, impostos — e transforma em indicadores claros para você tomar decisões melhores. Não é contabilidade: é visão estratégica do seu negócio.",
+      "O Rook System é uma plataforma de gestão financeira e fiscal desenvolvida especificamente para restaurantes. Ele conecta controle de CMV, DRE automático, integração com a SEFAZ e simulação tributária em um só lugar, transformando seus dados em indicadores claros para decisões mais inteligentes.",
   },
   {
     question: "O que é CMV e por que devo controlá-lo?",
     answer:
-      "CMV (Custo de Mercadoria Vendida) é quanto você gasta em ingredientes e produtos para gerar suas vendas. É o maior custo variável de um restaurante. Quando o CMV sai do controle, o lucro desaparece — mesmo com o salão cheio. O ideal é manter entre 28% e 35% do faturamento, dependendo do porte do restaurante.",
+      "CMV (Custo de Mercadoria Vendida) é quanto você gasta em ingredientes e produtos para gerar suas vendas. É o maior custo variável de um restaurante. Quando o CMV sai do controle, o lucro desaparece — mesmo com o salão cheio. A faixa de referência varia entre 28% e 35% do faturamento, dependendo do porte e segmento do restaurante.",
   },
   {
-    question: "O que é o Diagnóstico Financeiro?",
+    question: "O Simulador Tributário substitui meu contador?",
     answer:
-      "É uma análise gratuita que gera um raio-x completo do seu restaurante em 2 minutos. Você informa receita, custos, despesas e dívidas, e recebe um DRE (Demonstrativo de Resultado), análise tributária comparativa entre regimes (Simples, Presumido e Real), indicadores de saúde financeira e recomendações personalizadas.",
+      "Não. O Simulador Tributário é uma ferramenta de apoio à decisão que permite comparar cenários entre Simples Nacional, Lucro Presumido e Lucro Real com base nos seus dados reais. Os resultados são estimativas para orientar conversas mais produtivas com seu contador. Recomendamos sempre a validação profissional antes de qualquer mudança de regime tributário.",
   },
   {
-    question: "O Rook usa Inteligência Artificial?",
+    question: "Como funciona a integração com a SEFAZ?",
     answer:
-      "O Rook é construído sobre uma base sólida de matemática estatística e analítica. Utilizamos modelos de análise de dados para gerar projeções, alertas e recomendações. O foco é na precisão dos cálculos e na relevância das análises para o seu negócio, não em buzzwords.",
+      "Ao conectar seu certificado digital A1 na plataforma, o Rook se comunica diretamente com a Secretaria da Fazenda para sincronizar seus documentos fiscais. O certificado é armazenado de forma criptografada e usado exclusivamente para essa comunicação autenticada. Seus dados fiscais ficam organizados e acessíveis dentro da plataforma.",
+  },
+  {
+    question: "Meus dados estão seguros?",
+    answer:
+      "Sim. Utilizamos criptografia AES-256 para dados em repouso e TLS 1.3 para dados em trânsito. A infraestrutura é hospedada na AWS com certificações de segurança. Além disso, oferecemos controle de acesso por perfil, logs de auditoria completos e estamos em conformidade com a LGPD.",
   },
   {
     question: "Preciso ter conhecimento técnico para usar?",
     answer:
-      "Não. O Rook foi projetado para ser simples e intuitivo. Você insere seus dados financeiros básicos e o sistema faz toda a análise automaticamente. Se tiver dúvidas, nosso suporte está disponível para ajudar.",
+      "Não. O Rook foi projetado para ser simples e intuitivo. Você insere seus dados financeiros básicos e o sistema faz toda a análise automaticamente. Dados como CNAE e data de abertura são preenchidos automaticamente a partir do CNPJ. Se tiver dúvidas, nosso suporte está disponível por email.",
+  },
+  {
+    question: "O plano Pawn é realmente grátis?",
+    answer:
+      "Sim. O plano Pawn é 100% gratuito, sem prazo de validade. Você tem acesso à calculadora básica de CMV com até 8 cálculos por mês e 1 diagnóstico parcial. É o primeiro passo para começar a entender seus números sem nenhum compromisso financeiro.",
+  },
+  {
+    question: "Qual a diferença entre os planos Knight e Rook?",
+    answer:
+      "O Knight (R$ 179,90/mês) oferece controle financeiro e fiscal completo: até 25 cálculos CMV/mês, 5 diagnósticos completos, DRE automático, alertas, Simulador Tributário Avançado, integração SEFAZ e histórico de 6 meses para 1 estabelecimento. O Rook (R$ 379,90/mês) adiciona cálculos e diagnósticos ilimitados, integração ERP, histórico completo, projeções e cenários, relatórios personalizados e suporte para até 5 estabelecimentos.",
+  },
+  {
+    question: "O que acontece depois que eu me cadastro?",
+    answer:
+      "Após o cadastro, você acessa imediatamente o painel do Rook. O primeiro passo é configurar seu restaurante (CNPJ, regime tributário) e importar seus dados de custos e receitas. Em poucos minutos, você já terá seu primeiro cálculo de CMV e poderá gerar um diagnóstico financeiro completo. Se tiver certificado digital, pode conectar a SEFAZ para sincronizar dados fiscais.",
   },
   {
     question: "Posso cancelar a qualquer momento?",
     answer:
       "Sim. Todos os planos são sem contrato de fidelidade e você pode cancelar quando quiser. Não há multas ou taxas de cancelamento. Seus dados ficam disponíveis por 30 dias após o cancelamento.",
-  },
-  {
-    question: "O plano Pawn é realmente grátis?",
-    answer:
-      "Sim. O plano Pawn é 100% gratuito para sempre. Você tem acesso à calculadora básica de CMV com até 8 cálculos por mês e 1 diagnóstico parcial. É o primeiro passo para começar a entender seus números sem nenhum compromisso financeiro.",
-  },
-  {
-    question: "Qual a diferença entre os planos Knight e Rook?",
-    answer:
-      "O Knight (R$ 179,90/mês) oferece controle financeiro completo: até 25 cálculos CMV/mês, 5 diagnósticos completos, DRE automático, alertas, análise tributária e histórico de 6 meses para 1 estabelecimento. O Rook (R$ 379,90/mês) adiciona cálculos e diagnósticos ilimitados, integração ERP, histórico completo, projeções e cenários, relatórios personalizados e suporte para até 5 estabelecimentos.",
-  },
-  {
-    question: "Por que tantos restaurantes fecham?",
-    answer:
-      "Em 2024, 397 mil restaurantes fecharam no Brasil. A principal causa não é falta de clientes — é falta de controle financeiro. Sem saber o CMV real, a margem de lucro e o impacto dos impostos, o dono toma decisões no escuro. O lucro líquido médio do setor não passa de 10%, e 55% dos restaurantes não geram lucro. O Rook existe para mudar essa realidade.",
   },
 ];
 

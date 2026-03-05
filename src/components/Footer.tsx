@@ -18,14 +18,17 @@ const Footer = () => {
 
             {/* Links */}
             <nav className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-              <a href="https://diagnostico.rooksystem.com.br" className="hover:text-rook-marrom transition-colors font-medium">
-                Diagnóstico Gratuito
-              </a>
               <a href="#solucao" className="hover:text-rook-marrom transition-colors font-medium">
-                Funcionalidades
+                Solução
+              </a>
+              <a href="#como-funciona" className="hover:text-rook-marrom transition-colors font-medium">
+                Como Funciona
+              </a>
+              <a href="#seguranca" className="hover:text-rook-marrom transition-colors font-medium">
+                Segurança
               </a>
               <a href="#planos" className="hover:text-rook-marrom transition-colors font-medium">
-                Preços
+                Planos
               </a>
               <a href="#faq" className="hover:text-rook-marrom transition-colors font-medium">
                 FAQ
@@ -55,7 +58,7 @@ const Footer = () => {
 
             {/* Copyright */}
             <p className="text-sm text-muted-foreground text-center md:text-right">
-              © 2025 Rook System. Todos os direitos reservados.<br />
+              © 2025-2026 Rook System. Todos os direitos reservados.<br />
               <span className="text-xs">CNPJ: 51.629.346/0001-94 | CCGN LTDA</span>
             </p>
           </div>

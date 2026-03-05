@@ -67,7 +67,7 @@ const plans: Plan[] = [
   },
   {
     name: "Knight",
-    description: "Controle financeiro completo",
+    description: "Controle financeiro e fiscal completo",
     icon: Star,
     featured: true,
     disabled: false,
@@ -77,11 +77,11 @@ const plans: Plan[] = [
       "5 diagnósticos completos/mês",
       "DRE automático",
       "Alertas em tempo real",
-      "Análise tributária",
+      "Simulador Tributário Avançado",
+      "Integração SEFAZ",
       "Histórico de 6 meses",
       "Benchmark completo",
       "Até 3 usuários",
-      "Suporte por email e chat",
     ],
     cta: "Assinar Knight",
     pricing: {

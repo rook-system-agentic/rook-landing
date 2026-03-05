@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, CheckCircle } from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle, Shield } from "lucide-react";
 import pattern from "@/assets/pattern.png";
 
 const HeroSection = () => {
@@ -21,32 +21,32 @@ const HeroSection = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border mb-8 animate-fade-up shadow-sm">
             <BarChart3 className="w-4 h-4 text-rook-marrom" />
-            <span className="text-sm text-muted-foreground font-medium">Gestão Financeira para Restaurantes</span>
+            <span className="text-sm text-muted-foreground font-medium">Gestão Financeira e Fiscal para Restaurantes</span>
           </div>
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6 animate-fade-up animation-delay-100 text-rook-cafe">
-            Você sabe quanto{" "}
-            <span className="text-rook-marrom">sobra</span>{" "}
+            Descubra o{" "}
+            <span className="text-rook-marrom">lucro real</span>{" "}
             <br className="hidden sm:block" />
-            no final do mês?
+            do seu restaurante
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 animate-fade-up animation-delay-200">
-            A maioria dos donos de restaurante{" "}
-            <span className="text-rook-marrom font-semibold">não sabe responder essa pergunta.</span>
+            Controle de custos, DRE automático e simulação tributária{" "}
+            <span className="text-rook-marrom font-semibold">em um só lugar.</span>
           </p>
 
           <p className="text-base text-muted-foreground max-w-xl mx-auto mb-10 animate-fade-up animation-delay-300">
-            O Rook analisa seus números, identifica onde o dinheiro está indo e mostra exatamente o que fazer para sobrar mais.
+            Tenha clareza sobre cada centavo que entra e sai do seu negócio, e simule cenários tributários para tomar decisões mais inteligentes.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 animate-fade-up animation-delay-400">
-            <a href="https://diagnostico.rooksystem.com.br">
+            <a href="https://app.rooksystem.com.br/registro">
               <Button variant="rook" size="xl" className="w-full sm:w-auto">
-                Fazer Diagnóstico Gratuito
+                Começar Grátis
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </a>
@@ -61,32 +61,36 @@ const HeroSection = () => {
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground animate-fade-up animation-delay-500">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-rook-verde" />
-              <span>Resultado em 2 minutos</span>
+              <span>Plano gratuito disponível</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-rook-verde" />
               <span>Sem cartão de crédito</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-rook-verde" />
-              <span>Dados 100% seguros</span>
+              <Shield className="w-4 h-4 text-rook-verde" />
+              <span>Dados protegidos com criptografia</span>
             </div>
           </div>
         </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-6 max-w-3xl mx-auto mt-20 animate-fade-up animation-delay-500">
-          <div className="text-center">
-            <div className="stat-number text-rook-marrom">397 mil</div>
-            <p className="text-sm text-muted-foreground mt-2 font-medium">Restaurantes fecharam em 2024</p>
+        {/* 4 Pillars Preview */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-20 animate-fade-up animation-delay-500">
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl p-5 border border-border text-center hover:border-rook-pingado/50 transition-all">
+            <div className="text-2xl md:text-3xl font-bold text-rook-marrom font-display mb-1">CMV</div>
+            <p className="text-xs md:text-sm text-muted-foreground">Controle de Custos</p>
           </div>
-          <div className="text-center">
-            <div className="stat-number text-rook-pingado">&lt; 10%</div>
-            <p className="text-sm text-muted-foreground mt-2 font-medium">Lucro líquido médio do setor</p>
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl p-5 border border-border text-center hover:border-rook-pingado/50 transition-all">
+            <div className="text-2xl md:text-3xl font-bold text-rook-marrom font-display mb-1">DRE</div>
+            <p className="text-xs md:text-sm text-muted-foreground">Diagnóstico Financeiro</p>
           </div>
-          <div className="text-center">
-            <div className="stat-number text-rook-terracota">55%</div>
-            <p className="text-sm text-muted-foreground mt-2 font-medium">Não geram lucro</p>
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl p-5 border border-border text-center hover:border-rook-pingado/50 transition-all">
+            <div className="text-2xl md:text-3xl font-bold text-rook-marrom font-display mb-1">SEFAZ</div>
+            <p className="text-xs md:text-sm text-muted-foreground">Saúde Fiscal</p>
+          </div>
+          <div className="bg-card/80 backdrop-blur-sm rounded-xl p-5 border border-border text-center hover:border-rook-pingado/50 transition-all">
+            <div className="text-2xl md:text-3xl font-bold text-rook-marrom font-display mb-1">Tributos</div>
+            <p className="text-xs md:text-sm text-muted-foreground">Simulador Tributário</p>
           </div>
         </div>
       </div>
