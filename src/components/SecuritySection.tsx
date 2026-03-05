@@ -80,15 +80,7 @@ const SecuritySection = () => {
           ))}
         </div>
 
-        {/* Trust Footer */}
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-background border border-border shadow-sm">
-            <Shield className="w-5 h-5 text-rook-verde" />
-            <span className="text-sm text-muted-foreground font-medium">
-              Infraestrutura hospedada na AWS com certificação SOC 2 e ISO 27001
-            </span>
-          </div>
-        </div>
+
       </div>
     </section>
   );
