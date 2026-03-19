@@ -9,12 +9,12 @@ const faqs = [
   {
     question: "O que é o Rook System?",
     answer:
-      "O Rook System é uma plataforma de gestão financeira e fiscal desenvolvida especificamente para restaurantes. Ele conecta controle de CMV, DRE automático, integração com a SEFAZ e simulação tributária em um só lugar, transformando seus dados em indicadores claros para decisões mais inteligentes.",
+      "O Rook System é uma plataforma de gestão financeira desenvolvida especificamente para restaurantes. Ele conecta controle de compras, resultado financeiro automático e simulação tributária em um só lugar, transformando seus dados em indicadores claros para decisões mais inteligentes.",
   },
   {
-    question: "O que é CMV e por que devo controlá-lo?",
+    question: "O que é CMV e por que devo controlar minhas compras?",
     answer:
-      "CMV (Custo de Mercadoria Vendida) é quanto você gasta em ingredientes e produtos para gerar suas vendas. É o maior custo variável de um restaurante. Quando o CMV sai do controle, o lucro desaparece — mesmo com o salão cheio. A faixa de referência varia entre 28% e 35% do faturamento, dependendo do porte e segmento do restaurante.",
+      "CMV (Custo de Mercadoria Vendida) representa quanto você gasta em ingredientes e produtos para gerar suas vendas. É o maior custo variável de um restaurante. Quando as compras saem do controle, o lucro desaparece — mesmo com o salão cheio. A faixa de referência varia entre 28% e 35% do faturamento, dependendo do porte e segmento do restaurante. O Rook te ajuda a acompanhar isso de perto.",
   },
   {
     question: "O Simulador Tributário substitui meu contador?",
@@ -22,14 +22,14 @@ const faqs = [
       "Não. O Simulador Tributário é uma ferramenta de apoio à decisão que permite comparar cenários entre Simples Nacional, Lucro Presumido e Lucro Real com base nos seus dados reais. Os resultados são estimativas para orientar conversas mais produtivas com seu contador. Recomendamos sempre a validação profissional antes de qualquer mudança de regime tributário.",
   },
   {
-    question: "Como funciona a integração com a SEFAZ?",
+    question: "Como o Rook usa documentos fiscais para validar meu faturamento?",
     answer:
-      "Ao conectar seu certificado digital A1 na plataforma, o Rook se comunica diretamente com a Secretaria da Fazenda para sincronizar seus documentos fiscais. O certificado é armazenado de forma criptografada e usado exclusivamente para essa comunicação autenticada. Seus dados fiscais ficam organizados e acessíveis dentro da plataforma.",
+      "Quando você habilita a alimentação automatizada, o Rook organiza seus documentos fiscais de forma segura e os utiliza para validar e complementar os dados financeiros que você informa. Isso garante mais precisão nos seus indicadores, sem que você precise fazer nada manualmente. Toda a comunicação é feita por conexão autenticada e criptografada.",
   },
   {
     question: "Meus dados estão seguros?",
     answer:
-      "Sim. Utilizamos criptografia AES-256 para dados em repouso e TLS 1.3 para dados em trânsito. A infraestrutura é hospedada na AWS com certificações de segurança. Além disso, oferecemos controle de acesso por perfil, logs de auditoria completos e estamos em conformidade com a LGPD.",
+      "Sim. Utilizamos criptografia AES-256 para dados em repouso e TLS 1.3 para dados em trânsito. Além disso, oferecemos controle de acesso por perfil, logs de auditoria completos e estamos em conformidade com a LGPD.",
   },
   {
     question: "Preciso ter conhecimento técnico para usar?",
@@ -44,12 +44,12 @@ const faqs = [
   {
     question: "Qual a diferença entre os planos Knight e Rook?",
     answer:
-      "O Knight (R$ 179,90/mês) oferece controle financeiro e fiscal completo: até 25 cálculos CMV/mês, 5 diagnósticos completos, DRE automático, alertas, Simulador Tributário Avançado, integração SEFAZ e histórico de 6 meses para 1 estabelecimento. O Rook (R$ 379,90/mês) adiciona cálculos e diagnósticos ilimitados, integração ERP, histórico completo, projeções e cenários, relatórios personalizados e suporte para até 5 estabelecimentos.",
+      "O Knight (R$ 179,90/mês) oferece controle financeiro completo: até 25 cálculos de compras/mês, 5 diagnósticos completos, resultado automático (DRE), alertas, Simulador Tributário, alimentação automatizada e histórico de 6 meses para 1 estabelecimento. O Rook (R$ 379,90/mês) adiciona cálculos e diagnósticos ilimitados, integração ERP, histórico completo, projeções e cenários, relatórios personalizados e suporte para até 5 estabelecimentos.",
   },
   {
     question: "O que acontece depois que eu me cadastro?",
     answer:
-      "Após o cadastro, você acessa imediatamente o painel do Rook. O primeiro passo é configurar seu restaurante (CNPJ, regime tributário) e importar seus dados de custos e receitas. Em poucos minutos, você já terá seu primeiro cálculo de CMV e poderá gerar um diagnóstico financeiro completo. Se tiver certificado digital, pode conectar a SEFAZ para sincronizar dados fiscais.",
+      "Após o cadastro, você acessa imediatamente o painel do Rook. O primeiro passo é configurar seu restaurante (CNPJ, regime tributário) e inserir seus dados de compras e receitas. Em poucos minutos, você já terá seu primeiro cálculo e poderá gerar um diagnóstico financeiro completo.",
   },
   {
     question: "Posso cancelar a qualquer momento?",
