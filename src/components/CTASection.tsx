@@ -32,7 +32,7 @@ const CTASection = () => {
           
           <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto mb-8">
             Comece gratuitamente e descubra o que seus números têm a dizer. 
-            Do controle de CMV à simulação tributária, tudo em um só lugar.
+            Do controle de compras à simulação tributária, tudo em um só lugar.
           </p>
 
           {/* Trust Points */}

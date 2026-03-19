@@ -5,20 +5,20 @@ const steps = [
   {
     number: "01",
     icon: Upload,
-    title: "Conecte seus dados",
-    description: "Importe suas planilhas, conecte seu ERP ou integre diretamente com a SEFAZ via certificado digital. Seus dados são carregados de forma segura em minutos.",
+    title: "Alimente seus dados",
+    description: "Insira seus dados financeiros de forma simples — manualmente ou de forma automatizada. Em poucos minutos, o Rook já começa a trabalhar por você.",
   },
   {
     number: "02",
     icon: FileBarChart,
     title: "Receba seu diagnóstico",
-    description: "A plataforma analisa seus números e gera um DRE completo, análise de CMV, health score e indicadores financeiros. Tudo automático, sem planilhas manuais.",
+    description: "A plataforma analisa seus números e gera um diagnóstico financeiro completo: resultado do exercício, análise de compras, indicadores de saúde e comparação com o mercado. Tudo automático.",
   },
   {
     number: "03",
     icon: Target,
-    title: "Simule e decida",
-    description: "Use o Simulador Tributário para comparar regimes fiscais com seus dados reais. Tome decisões baseadas em números, não em achismos.",
+    title: "Decida com clareza",
+    description: "Com os dados organizados, use o Simulador Tributário para comparar regimes fiscais e tome decisões baseadas em números reais, não em achismos.",
   },
 ];
 
@@ -63,8 +63,12 @@ const HowItWorksSection = () => {
           ))}
         </div>
 
-        {/* CTA */}
+        {/* Motivational Call + CTA */}
         <div className="text-center">
+          <p className="text-lg md:text-xl font-semibold text-rook-cafe mb-6 max-w-2xl mx-auto">
+            Você cuida do seu restaurante.{" "}
+            <span className="text-rook-marrom">Deixe o Rook te ajudar a chegar lá.</span>
+          </p>
           <a href="https://app.rooksystem.com.br/registro">
             <Button variant="rook" size="xl" className="group">
               Começar Grátis

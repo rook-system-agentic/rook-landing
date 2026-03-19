@@ -1,32 +1,32 @@
-import { Calculator, FileText, Shield, BarChart3 } from "lucide-react";
+import { Calculator, FileText, RefreshCw, BarChart3 } from "lucide-react";
 import pattern from "@/assets/pattern.png";
 
 const pillars = [
   {
     icon: Calculator,
     label: "Pilar 1",
-    title: "Controle de CMV e Custos",
-    description: "Acompanhe seu Custo de Mercadoria Vendida em tempo real. Registre compras por categoria, defina metas por segmento e saiba se está dentro do ideal antes que pequenos desvios virem prejuízo.",
-    highlights: ["CMV por período e categoria", "Meta personalizada por segmento", "Alertas quando sair da meta"],
+    title: "Controle de Compras e Custos",
+    description: "Acompanhe suas compras em tempo real. Registre-as por categoria, defina metas por segmento e saiba se está dentro do ideal antes que pequenos desvios virem prejuízo.",
+    highlights: ["Compras por período e categoria", "Meta personalizada (e sugerida) por segmento", "Alertas para quando saírem da meta"],
   },
   {
     icon: FileText,
     label: "Pilar 2",
-    title: "Diagnóstico e DRE Automático",
-    description: "Tenha um Demonstrativo de Resultado do Exercício gerado automaticamente a partir dos seus dados. Visualize receita, custos, despesas e lucro de forma clara, com indicadores de saúde financeira.",
-    highlights: ["DRE completo e automático", "Health score do negócio", "Recomendações personalizadas"],
+    title: "Diagnóstico Financeiro e Resultado",
+    description: "Tenha um demonstrativo de resultado do exercício (DRE) gerado automaticamente a partir dos seus dados. Visualize receita, custos, despesas e lucro de forma clara, com indicadores de saúde financeira.",
+    highlights: ["Resultado completo e automático", "Como está o seu negócio em comparação ao mercado", "Recomendações personalizadas"],
   },
   {
-    icon: Shield,
+    icon: RefreshCw,
     label: "Pilar 3",
-    title: "Saúde Fiscal e Integração SEFAZ",
-    description: "Conecte seu certificado digital A1 e tenha seus dados fiscais sempre atualizados. O Rook sincroniza com a Secretaria da Fazenda para manter sua base de documentos organizada e acessível.",
-    highlights: ["Conexão direta com a SEFAZ", "Documentos fiscais organizados", "CNAE e dados da empresa automáticos"],
+    title: "Alimentação Automatizada",
+    description: "A alimentação do sistema poderá ser manual, mas todos os dados poderão ser automatizados, aliviando seu tempo — que é o mais precioso.",
+    highlights: ["Documentos fiscais organizados", "Classificação das despesas automática"],
   },
   {
     icon: BarChart3,
     label: "Pilar 4",
-    title: "Simulador Tributário Avançado",
+    title: "Simulador Tributário",
     description: "Compare Simples Nacional, Lucro Presumido e Lucro Real com base nos seus próprios dados. Simule cenários com e sem créditos de PIS/COFINS para entender qual regime pode ser mais vantajoso.",
     highlights: ["Comparativo entre 3 regimes", "Simulação com dados reais", "Histórico de simulações"],
   },
@@ -53,10 +53,10 @@ const SolutionSection = () => {
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-rook-cafe">
             Visão completa.{" "}
-            <span className="text-rook-marrom">Do prato ao imposto.</span>
+            <span className="text-rook-marrom">Do prato ao lucro.</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            O Rook conecta gestão de custos, análise financeira e planejamento tributário 
+            O Rook conecta gestão de compras, análise financeira e planejamento tributário 
             em uma única plataforma, projetada para restaurantes.
           </p>
         </div>
