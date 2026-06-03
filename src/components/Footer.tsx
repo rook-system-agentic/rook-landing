@@ -7,9 +7,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div className="md:col-span-1">
-          <Link href="/" className="flex items-center gap-2 mb-4">
-            <Image src="/brand/rook-icon.png" alt="Rook" width={28} height={28} />
-            <span className="text-cream font-bold text-lg">ROOK</span>
+          <Link href="/" className="inline-block mb-4">
+            <Image src="/brand/rook-logo-horizontal.png" alt="Rook System" width={140} height={47} className="h-10 w-auto" />
           </Link>
           <p className="text-sm text-muted leading-relaxed">
             Sistema de gestão financeira para food service. Controle CMV, otimize compras e proteja sua margem.
