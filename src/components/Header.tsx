@@ -18,9 +18,8 @@ export default function Header() {
     <header className="fixed top-0 inset-x-0 z-50 bg-bg/95 backdrop-blur-md border-b border-border">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-[72px]">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5" aria-label="Rook System - Página inicial">
-          <Image src="/brand/rook-icon.png" alt="Rook" width={36} height={36} className="w-9 h-9" />
-          <span className="text-cream font-bold text-xl tracking-tight">ROOK</span>
+        <Link href="/" className="flex items-center" aria-label="Rook System - Página inicial">
+          <Image src="/brand/rook-logo-horizontal.png" alt="Rook — Visão | Estratégia | Controle" width={160} height={40} className="h-10 w-auto" />
         </Link>
 
         {/* Nav desktop */}
