@@ -1,81 +1,91 @@
+import Link from "next/link";
+
 export function ChessSection() {
   const pillars = [
     {
-      name: 'CMV',
-      description: 'Custo de Mercadoria Vendida por categoria, com rastreabilidade ate a NF-e de origem.',
-      score: 85,
+      icon: "♜",
+      name: "CMV",
+      desc: "Custo de Mercadoria Vendida por categoria NCM, com rastreabilidade até a nota fiscal.",
     },
     {
-      name: 'Compras',
-      description: 'Curva ABC de fornecedores, variacao de preco e oportunidades de renegociacao.',
-      score: 78,
+      icon: "♞",
+      name: "Compras",
+      desc: "Curva ABC de fornecedores, concentração de risco e evolução de preço unitário.",
     },
     {
-      name: 'Margem',
-      description: 'Margem bruta e operacional com DRE simplificado e tendencias mensais.',
-      score: 82,
+      icon: "♝",
+      name: "Impostos",
+      desc: "Carga tributária real sobre vendas, comparativo de regimes e simulação de migração.",
     },
     {
-      name: 'Estoque',
-      description: 'Giro de estoque, itens parados e alerta de vencimento por categoria.',
-      score: 74,
+      icon: "♛",
+      name: "Ocupação",
+      desc: "Aluguel, condomínio, utilities — quanto do faturamento é consumido pela estrutura.",
     },
     {
-      name: 'Receita',
-      description: 'Faturamento por canal, ticket medio e sazonalidade historica.',
-      score: 90,
+      icon: "♚",
+      name: "Pessoal",
+      desc: "Folha + encargos como % da receita, benchmark setorial e alertas de desvio.",
     },
     {
-      name: 'Fiscal',
-      description: 'Conformidade tributaria, regime otimizado e alertas de divergencia.',
-      score: 88,
+      icon: "♟",
+      name: "Endividamento",
+      desc: "Dívidas ativas, custo financeiro, projeção de quitação e impacto no fluxo de caixa.",
     },
-  ]
+  ];
 
   return (
-    <section className="py-24 lg:py-32" aria-labelledby="chess-heading">
-      <div className="section-container">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="section-label mb-4">Diagnostico Chess</p>
-          <h2 id="chess-heading" className="text-display-md">
-            6 pilares de{' '}
-            <span className="gold-gradient-text">saude financeira</span>
-          </h2>
-          <p className="mt-6 text-body-lg text-rook-text-muted">
-            O Chess e o diagnostico completo do seu restaurante. Cada pilar recebe um score de 0 a 100, formando uma visao holistica da saude do negocio.
-          </p>
-        </div>
+    <section
+      className="section"
+      aria-labelledby="chess-heading"
+      style={{ borderTop: "1px solid rgba(176,124,74,0.16)" }}
+    >
+      <div className="container-rook">
+        <p className="eyebrow mb-[22px]">— Os 6 pilares do Chess</p>
+        <h2 id="chess-heading" className="section-title">
+          Cada pilar é uma <em>camada de margem</em>.
+        </h2>
+        <p className="section-lede mb-16">
+          O Chess é o framework proprietário da Rook. Ele divide a saúde
+          financeira do restaurante em 6 dimensões independentes — e mostra onde
+          agir primeiro.
+        </p>
 
-        {/* Chess board grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {pillars.map((pillar) => (
-            <article key={pillar.name} className="card group relative overflow-hidden">
-              {/* Score indicator */}
-              <div className="absolute top-4 right-4">
-                <div className="w-12 h-12 rounded-full border-2 border-gold/30 flex items-center justify-center group-hover:border-gold transition-colors">
-                  <span className="text-body-sm font-bold text-gold">{pillar.score}</span>
-                </div>
-              </div>
-
-              <h3 className="text-display-sm font-bold text-rook-text mb-2 pr-16">
-                {pillar.name}
+        {/* 6 pillars grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[14px]">
+          {pillars.map((p) => (
+            <div
+              key={p.name}
+              className="rounded-rook border p-6 transition-all duration-300 hover:-translate-y-0.5"
+              style={{
+                background: "linear-gradient(160deg, #241A11 0%, #1A130C 100%)",
+                borderColor: "rgba(176,124,74,0.24)",
+              }}
+            >
+              <span className="text-[28px] mb-3 block">{p.icon}</span>
+              <h3
+                className="font-display font-medium text-[18px] tracking-[-0.01em] mb-2"
+                style={{ color: "#F5EDE0" }}
+              >
+                {p.name}
               </h3>
-              <p className="text-body-md text-rook-text-muted">
-                {pillar.description}
+              <p className="text-[13.5px] leading-[1.5] m-0" style={{ color: "#D8CCB8" }}>
+                {p.desc}
               </p>
-            </article>
+            </div>
           ))}
         </div>
 
-        {/* Overall score — GEO: dado citavel */}
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-4 px-8 py-4 bg-rook-surface border border-gold/30 rounded-rook-lg">
-            <span className="text-body-md text-rook-text-muted">Score Geral:</span>
-            <span className="text-display-sm text-gold font-bold">83/100</span>
-            <span className="text-body-sm text-accent-green font-medium px-2 py-1 bg-accent-green/10 rounded">Bom</span>
-          </div>
+        {/* CTA */}
+        <div className="mt-14 flex flex-wrap items-center gap-4">
+          <Link href="/funcionalidades" className="btn btn-primary btn-lg">
+            Ver funcionalidades completas
+          </Link>
+          <Link href="#contato" className="btn btn-ghost btn-lg">
+            Falar com vendas
+          </Link>
         </div>
       </div>
     </section>
-  )
+  );
 }

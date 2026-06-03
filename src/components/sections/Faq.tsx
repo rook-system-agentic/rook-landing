@@ -1,99 +1,110 @@
-'use client'
+"use client";
 
 const faqs = [
   {
-    question: 'O que e CMV e por que e tao importante para restaurantes?',
-    answer:
-      'CMV (Custo de Mercadoria Vendida) e o indicador que mede quanto voce gasta em insumos para produzir o que vende. Em restaurantes, o CMV ideal fica entre 28% e 35% do faturamento. Acima disso, sua margem esta sendo corroida — mesmo que o faturamento pareca alto. A Rook calcula seu CMV real com base em dados fiscais, nao em estimativas.',
+    q: "Preciso de contador para usar a Rook?",
+    a: "Não. A Rook foi desenhada para o gestor. Você importa as notas fiscais e o sistema faz a classificação, cálculo de CMV e geração de relatórios automaticamente. Seu contador pode acessar os dados quando necessário.",
   },
   {
-    question: 'Como a Rook e diferente de uma planilha ou ERP?',
-    answer:
-      'Planilhas dependem de input manual (propenso a erro) e ERPs sao generalistas. A Rook e especializada em food service: classifica automaticamente por categoria NCM, calcula CMV por grupo de produto, identifica tendencias e gera alertas. Tudo baseado em dados fiscais reais (XML de NF-e), nao em lancamentos manuais.',
+    q: "Quanto tempo leva para ver resultados?",
+    a: "O primeiro relatório fica pronto em minutos após a importação das notas. Com 3 meses de dados, as projeções e benchmarks ficam ainda mais precisos.",
   },
   {
-    question: 'Preciso de contador ou conhecimento tecnico para usar?',
-    answer:
-      'Nao. A Rook foi desenhada para donos de restaurante, nao para contadores. A interface e intuitiva, os relatorios sao em linguagem de negocios e o onboarding guiado leva menos de 10 minutos. Se voce sabe ler uma nota fiscal, sabe usar a Rook.',
+    q: "Funciona para qualquer tipo de restaurante?",
+    a: "Sim. A Rook atende desde operações single-unit até redes com múltiplas unidades. O sistema se adapta ao porte e complexidade do seu negócio.",
   },
   {
-    question: 'Meus dados estao seguros?',
-    answer:
-      'Sim. Usamos criptografia em transito (TLS 1.3) e em repouso (AES-256). Seus dados ficam em servidores no Brasil, com backup diario e acesso restrito por autenticacao multi-fator. Somos LGPD-compliant e nunca compartilhamos dados individuais.',
+    q: "Meus dados estão seguros?",
+    a: "100%. Infraestrutura em nuvem com criptografia em trânsito e em repouso, backups automáticos e conformidade com LGPD. Seus dados nunca são compartilhados.",
   },
   {
-    question: 'Quanto tempo leva para ver resultados?',
-    answer:
-      'Com 1 mes de dados fiscais importados, voce ja tem visibilidade completa do CMV por categoria. Com 3 meses, as tendencias e projecoes ficam confiaveis. Clientes reportam identificar oportunidades de economia de R$5k a R$15k/mes ja no primeiro relatorio.',
+    q: "Posso cancelar a qualquer momento?",
+    a: "Sim. Sem fidelidade, sem multa. Você pode exportar todos os seus dados a qualquer momento.",
   },
   {
-    question: 'Posso cancelar a qualquer momento?',
-    answer:
-      'Sim. Sem fidelidade, sem multa. Cancele quando quiser pelo proprio painel. Seus dados ficam disponiveis por 30 dias apos o cancelamento para exportacao.',
+    q: "Como funciona o plano gratuito?",
+    a: "O plano Pawn dá acesso à calculadora de CMV básica com limite de cálculos mensais. Ideal para conhecer a plataforma antes de assinar.",
   },
-]
+];
 
 export function FaqSection() {
   return (
-    <section className="py-24 lg:py-32" aria-labelledby="faq-heading">
+    <section
+      className="section"
+      aria-labelledby="faq-heading"
+      style={{ borderTop: "1px solid rgba(176,124,74,0.16)" }}
+    >
       {/* FAQ Schema for GEO */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
             mainEntity: faqs.map((faq) => ({
-              '@type': 'Question',
-              name: faq.question,
+              "@type": "Question",
+              name: faq.q,
               acceptedAnswer: {
-                '@type': 'Answer',
-                text: faq.answer,
+                "@type": "Answer",
+                text: faq.a,
               },
             })),
           }),
         }}
       />
 
-      <div className="section-container">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="section-label mb-4">FAQ</p>
-          <h2 id="faq-heading" className="text-display-md">
-            Perguntas frequentes
-          </h2>
-        </div>
-
-        <div className="max-w-3xl mx-auto space-y-4">
-          {faqs.map((faq) => (
-            <details
-              key={faq.question}
-              className="group border border-rook-border rounded-rook overflow-hidden"
+      <div className="container-rook">
+        <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-20">
+          {/* Left: Sticky CTA */}
+          <div className="lg:sticky lg:top-[100px] lg:self-start">
+            <p className="eyebrow mb-[22px]">— Perguntas frequentes</p>
+            <h2
+              id="faq-heading"
+              className="font-display font-medium text-[36px] leading-[1.1] tracking-[-0.015em] mb-4"
+              style={{ color: "#F5EDE0" }}
             >
-              <summary className="flex items-center justify-between p-6 cursor-pointer hover:bg-rook-surface/50 transition-colors">
-                <h3 className="text-body-lg font-medium text-rook-text pr-4 text-left">
-                  {faq.question}
-                </h3>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="faq-chevron flex-shrink-0 text-rook-text-dim"
-                >
-                  <polyline points="6,9 12,15 18,9" />
-                </svg>
-              </summary>
-              <div className="px-6 pb-6">
-                <p className="text-body-md text-rook-text-muted leading-relaxed">
-                  {faq.answer}
-                </p>
-              </div>
-            </details>
-          ))}
+              Ainda com dúvidas?
+            </h2>
+            <p className="text-[15px] leading-[1.55] mb-8" style={{ color: "#D8CCB8" }}>
+              Fale diretamente com nosso time. Sem chatbot, sem fila.
+            </p>
+            <a href="#contato" className="btn btn-primary btn-lg">
+              Falar com o time
+            </a>
+          </div>
+
+          {/* Right: FAQ items */}
+          <div className="flex flex-col">
+            {faqs.map((faq, i) => (
+              <details
+                key={i}
+                className="group"
+                style={{ borderBottom: "1px solid rgba(176,124,74,0.16)" }}
+              >
+                <summary className="flex items-center justify-between gap-4 py-5 cursor-pointer">
+                  <span
+                    className="font-display font-medium text-[16px] leading-[1.3]"
+                    style={{ color: "#F5EDE0" }}
+                  >
+                    {faq.q}
+                  </span>
+                  <span
+                    className="faq-icon flex-shrink-0 text-[20px] font-light"
+                    style={{ color: "#E79F4A" }}
+                  >
+                    +
+                  </span>
+                </summary>
+                <div className="pb-5 pr-8">
+                  <p className="text-[14.5px] leading-[1.6] m-0" style={{ color: "#D8CCB8" }}>
+                    {faq.a}
+                  </p>
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

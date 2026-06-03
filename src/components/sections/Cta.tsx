@@ -1,36 +1,49 @@
-import Link from 'next/link'
+import Link from "next/link";
 
 export function CtaSection() {
   return (
-    <section className="py-24 lg:py-32 bg-rook-surface relative overflow-hidden" aria-labelledby="cta-heading">
-      {/* Background accents */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-gold/5 rounded-full blur-3xl" aria-hidden="true" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-64 h-64 bg-gold/3 rounded-full blur-3xl" aria-hidden="true" />
-
-      <div className="section-container relative z-10">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 id="cta-heading" className="text-display-md md:text-display-lg">
-            Pare de adivinhar.{' '}
-            <span className="gold-gradient-text">Comece a controlar.</span>
-          </h2>
-          <p className="mt-6 text-body-lg text-rook-text-muted max-w-xl mx-auto">
-            Crie sua conta gratuita em menos de 2 minutos. Sem cartao de credito, sem compromisso. Veja onde esta o dinheiro do seu restaurante.
-          </p>
-
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="https://app.rooksystem.com.br/registro"
-              className="btn-primary text-lg px-10 py-4"
-            >
-              Comecar Gratis Agora
-            </Link>
-          </div>
-
-          <p className="mt-6 text-body-sm text-rook-text-dim">
-            Plano Pawn gratuito para sempre. Upgrade quando estiver pronto.
-          </p>
+    <section
+      className="section text-center"
+      aria-labelledby="cta-heading"
+      style={{
+        background: `
+          radial-gradient(ellipse 70% 50% at 50% 80%, rgba(229,76,0,0.10), transparent 70%),
+          #0F0A06
+        `,
+        borderTop: "1px solid rgba(176,124,74,0.16)",
+      }}
+    >
+      <div className="container-rook max-w-[680px]">
+        <p className="eyebrow mb-[22px]">— Comece agora</p>
+        <h2
+          id="cta-heading"
+          className="font-display font-medium m-0 mb-6"
+          style={{
+            fontSize: "clamp(36px, 5vw, 56px)",
+            lineHeight: "1.05",
+            letterSpacing: "-0.02em",
+            color: "#F5EDE0",
+          }}
+        >
+          Pronto para saber onde está o{" "}
+          <em className="italic font-normal" style={{ color: "#E79F4A" }}>
+            seu dinheiro
+          </em>
+          ?
+        </h2>
+        <p className="text-[17px] leading-[1.55] mb-10" style={{ color: "#D8CCB8" }}>
+          Comece grátis com o plano Pawn. Sem cartão de crédito, sem compromisso.
+          Quando estiver pronto, evolua para Knight ou Bishop.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/planos" className="btn btn-primary btn-xl">
+            Começar grátis
+          </Link>
+          <Link href="#contato" className="btn btn-ghost btn-xl">
+            Falar com vendas
+          </Link>
         </div>
       </div>
     </section>
-  )
+  );
 }

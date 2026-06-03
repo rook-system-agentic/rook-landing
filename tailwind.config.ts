@@ -1,87 +1,93 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    './src/**/*.{ts,tsx}',
-  ],
+  content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // Rook warm brown palette (dark-first)
+        /* Brand colors — manual oficial */
         rook: {
-          bg: '#1a1410',
-          surface: '#2a2118',
-          'surface-light': '#3d3228',
-          border: '#4a3d32',
-          'border-light': '#6b5a4a',
-          text: '#f5f0eb',
-          'text-muted': '#b8a99a',
-          'text-dim': '#8a7a6a',
+          cafe: "#351F07",
+          marrom: "#754A31",
+          pingado: "#B07C4A",
+          floresta: "#44604A",
+          terracota: "#E54C00",
+          "terracota-h": "#F87038",
+          ocre: "#E79F4A",
+          grafite: "#303030",
         },
-        gold: {
-          DEFAULT: '#c4a35a',
-          light: '#d4b86a',
-          dark: '#a88a3a',
-          muted: '#8b7340',
+        /* Dark surfaces */
+        bg: {
+          base: "#0F0A06",
+          soft: "#1A130C",
+          elevated: "#241A11",
+          deep: "rgba(7,5,3,0.6)",
         },
-        cream: {
-          DEFAULT: '#faf6f0',
-          dark: '#f0e8dc',
-          paper: '#f5efe5',
+        /* Cream paper (PDF demo section) */
+        paper: {
+          DEFAULT: "#F4ECDC",
+          deep: "#E9E0CB",
+          ink: "#2A1E12",
+          soft: "#5A4732",
+          rule: "rgba(42,30,18,0.16)",
         },
-        accent: {
-          green: '#4ade80',
-          red: '#ef4444',
-          blue: '#60a5fa',
+        /* Text on dark */
+        fg: {
+          primary: "#F5EDE0",
+          secondary: "#D8CCB8",
+          muted: "rgba(245,237,224,0.58)",
+          subtle: "rgba(245,237,224,0.34)",
+        },
+        /* Rules/borders */
+        rule: {
+          DEFAULT: "rgba(176,124,74,0.16)",
+          strong: "rgba(176,124,74,0.32)",
         },
       },
       fontFamily: {
-        display: ['Manrope', 'system-ui', 'sans-serif'],
-        body: ['Manrope', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        display: ['"Manrope"', '"Trebuchet MS"', "sans-serif"],
+        body: ['"Manrope"', '"Trebuchet MS"', "system-ui", "sans-serif"],
+        mono: ['"JetBrains Mono"', "ui-monospace", "monospace"],
+      },
+      maxWidth: {
+        container: "1240px",
       },
       fontSize: {
-        'display-xl': ['4.5rem', { lineHeight: '1.05', letterSpacing: '-0.02em', fontWeight: '800' }],
-        'display-lg': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'display-md': ['2.5rem', { lineHeight: '1.15', letterSpacing: '-0.01em', fontWeight: '700' }],
-        'display-sm': ['1.875rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
-        'body-lg': ['1.125rem', { lineHeight: '1.7' }],
-        'body-md': ['1rem', { lineHeight: '1.7' }],
-        'body-sm': ['0.875rem', { lineHeight: '1.6' }],
-        'label': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.05em', fontWeight: '600' }],
+        "hero-title": [
+          "clamp(48px, 7.4vw, 96px)",
+          { lineHeight: "0.95", letterSpacing: "-0.025em" },
+        ],
+        "section-title": [
+          "clamp(36px, 5vw, 60px)",
+          { lineHeight: "1.02", letterSpacing: "-0.02em" },
+        ],
       },
       borderRadius: {
-        'rook': '12px',
-        'rook-lg': '16px',
-        'rook-xl': '24px',
+        rook: "12px",
+        "rook-lg": "16px",
       },
       boxShadow: {
-        'rook': '0 4px 24px rgba(0, 0, 0, 0.3)',
-        'rook-lg': '0 8px 48px rgba(0, 0, 0, 0.4)',
-        'gold': '0 0 24px rgba(196, 163, 90, 0.2)',
+        mosaic: "0 18px 40px rgba(0,0,0,0.32)",
+        "btn-primary": "0 4px 14px rgba(229,76,0,0.32)",
+        "btn-primary-hover": "0 6px 20px rgba(229,76,0,0.42)",
       },
       animation: {
-        'fade-in': 'fadeIn 0.6s ease-out forwards',
-        'slide-up': 'slideUp 0.6s ease-out forwards',
-        'pulse-gold': 'pulseGold 2s ease-in-out infinite',
+        "page-enter": "pageEnter 0.4s cubic-bezier(0.2,0.7,0.2,1) both",
+        reveal: "rookReveal 0.8s cubic-bezier(0.2,0.7,0.2,1) both",
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+        pageEnter: {
+          from: { opacity: "0", transform: "translateY(12px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
         },
-        slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        pulseGold: {
-          '0%, 100%': { boxShadow: '0 0 24px rgba(196, 163, 90, 0.2)' },
-          '50%': { boxShadow: '0 0 48px rgba(196, 163, 90, 0.4)' },
+        rookReveal: {
+          from: { opacity: "0", transform: "translateY(16px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
         },
       },
     },
   },
   plugins: [],
-}
+};
 
-export default config
+export default config;

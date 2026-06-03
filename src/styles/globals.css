@@ -10,43 +10,104 @@
   }
 
   body {
-    @apply bg-rook-bg text-rook-text font-body;
+    @apply bg-bg-base text-fg-primary font-body;
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+
+  a {
+    color: inherit;
   }
 
   ::selection {
-    @apply bg-gold/30 text-rook-text;
+    background: rgba(229, 76, 0, 0.25);
+    color: #F5EDE0;
   }
 }
 
 @layer components {
-  .section-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  .container-rook {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 32px;
   }
 
+  /* Buttons */
+  .btn {
+    @apply font-body font-medium rounded-[6px] border border-transparent cursor-pointer no-underline inline-flex items-center transition-all duration-150;
+    font-size: 13px;
+    padding: 9px 16px;
+    gap: 6px;
+    letter-spacing: 0.005em;
+  }
   .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 
-           bg-gold text-rook-bg font-semibold rounded-rook
-           hover:bg-gold-light transition-all duration-200
-           shadow-gold hover:shadow-rook-lg;
+    background: #E54C00;
+    color: white;
+    box-shadow: 0 4px 14px rgba(229,76,0,0.32);
+  }
+  .btn-primary:hover {
+    background: #F87038;
+    box-shadow: 0 6px 20px rgba(229,76,0,0.42);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: #D8CCB8;
+    border-color: rgba(176,124,74,0.32);
+  }
+  .btn-ghost:hover {
+    color: #F5EDE0;
+    border-color: #B07C4A;
+  }
+  .btn-lg {
+    font-size: 14px;
+    padding: 13px 22px;
+    border-radius: 7px;
+  }
+  .btn-xl {
+    font-size: 15px;
+    padding: 16px 28px;
+    border-radius: 8px;
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3
-           border border-rook-border text-rook-text font-medium rounded-rook
-           hover:border-gold hover:text-gold transition-all duration-200;
+  /* Eyebrow labels */
+  .eyebrow {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    color: #E79F4A;
+    text-transform: uppercase;
+    font-weight: 500;
   }
 
-  .card {
-    @apply bg-rook-surface border border-rook-border rounded-rook-lg p-6
-           hover:border-rook-border-light transition-all duration-200;
+  /* Section titles */
+  .section-title {
+    font-family: "Manrope", "Trebuchet MS", sans-serif;
+    font-weight: 500;
+    font-size: clamp(36px, 5vw, 60px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    color: #F5EDE0;
+    margin: 0 0 24px;
+  }
+  .section-title em {
+    font-style: italic;
+    color: #E79F4A;
+    font-weight: 400;
   }
 
-  .gold-gradient-text {
-    @apply bg-gradient-to-r from-gold to-gold-light bg-clip-text text-transparent;
+  /* Section base */
+  .section {
+    padding: 120px 0;
+    position: relative;
   }
 
-  .section-label {
-    @apply text-label uppercase tracking-widest text-gold;
+  /* Section lede */
+  .section-lede {
+    font-size: 17px;
+    line-height: 1.55;
+    color: #D8CCB8;
+    max-width: 620px;
+    margin: 0;
   }
 }
 
@@ -56,32 +117,17 @@
   }
 }
 
-/* Smooth reveal animation for sections */
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 /* FAQ accordion */
 details summary {
   cursor: pointer;
   list-style: none;
 }
-
 details summary::-webkit-details-marker {
   display: none;
 }
-
-details[open] summary .faq-chevron {
-  transform: rotate(180deg);
+details[open] summary .faq-icon {
+  transform: rotate(45deg);
 }
-
-.faq-chevron {
-  transition: transform 0.2s ease-out;
+.faq-icon {
+  transition: transform 0.25s ease;
 }
