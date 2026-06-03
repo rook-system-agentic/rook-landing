@@ -236,55 +236,23 @@ export default function PrivacidadePage() {
           </h2>
           <p>
             Nós não vendemos seus dados pessoais. Compartilhamos informações apenas
-            com parceiros tecnológicos essenciais para a operação dos nossos
-            serviços:
+            com parceiros tecnológicos estritamente necessários para a operação dos
+            nossos serviços, nas seguintes categorias:
           </p>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="bg-[#1a1410]">
-                  <th className="text-left p-4 text-cream font-medium">
-                    Parceiro
-                  </th>
-                  <th className="text-left p-4 text-cream font-medium">
-                    Finalidade
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                <tr>
-                  <td className="p-4 text-cream font-medium">Vercel</td>
-                  <td className="p-4">
-                    Hospedagem da nossa landing page e aplicação.
-                  </td>
-                </tr>
-                <tr>
-                  <td className="p-4 text-cream font-medium">Supabase</td>
-                  <td className="p-4">
-                    Banco de dados e infraestrutura de backend.
-                  </td>
-                </tr>
-                <tr>
-                  <td className="p-4 text-cream font-medium">Stripe</td>
-                  <td className="p-4">
-                    Processamento de pagamentos e assinaturas.
-                  </td>
-                </tr>
-                <tr>
-                  <td className="p-4 text-cream font-medium">Google Analytics</td>
-                  <td className="p-4">
-                    Análise de tráfego e comportamento do usuário.
-                  </td>
-                </tr>
-                <tr>
-                  <td className="p-4 text-cream font-medium">Resend / N8N</td>
-                  <td className="p-4">
-                    Envio de emails transacionais e automações.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <ul className="list-disc pl-8 space-y-2">
+            <li>Hospedagem e infraestrutura de aplicação</li>
+            <li>Banco de dados e armazenamento seguro</li>
+            <li>Processamento de pagamentos e assinaturas</li>
+            <li>Análise de tráfego e comportamento do usuário</li>
+            <li>Envio de emails transacionais</li>
+          </ul>
+          <p>
+            Todos os parceiros são selecionados com base em critérios rigorosos de
+            segurança, conformidade com a LGPD e certificações internacionais
+            (ISO 27001, SOC 2). Nenhum parceiro tem acesso aos dados financeiros
+            e operacionais do seu negócio além do estritamente necessário para a
+            prestação do serviço.
+          </p>
 
           {/* 5. Seus Direitos */}
           <h2 className="text-2xl text-terracota font-semibold mt-12 mb-4">
@@ -302,7 +270,7 @@ export default function PrivacidadePage() {
           <p>
             Para exercer qualquer um desses direitos, entre em contato com nosso DPO
             através do email{" "}
-            <strong className="text-cream">contato@rooksystem.com.br</strong>.
+            <strong className="text-cream">juliana.abdala@abdalavega.adv.br</strong>.
           </p>
 
           {/* 6. Segurança */}
@@ -327,11 +295,11 @@ export default function PrivacidadePage() {
           </p>
           <ul className="list-disc pl-8 space-y-2">
             <li>
-              <strong className="text-cream">Nome:</strong> Gabriel Abdala
+              <strong className="text-cream">Responsável:</strong> Abdala Vega Advogados
             </li>
             <li>
               <strong className="text-cream">Email:</strong>{" "}
-              contato@rooksystem.com.br
+              juliana.abdala@abdalavega.adv.br
             </li>
           </ul>
 
