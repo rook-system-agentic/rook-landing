@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import MicrosoftClarity from "@/components/MicrosoftClarity";
 
 export const metadata: Metadata = {
   title: "Rook System — Gestão Financeira para Restaurantes",
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR">
       <body>
         <GoogleAnalytics />
+        <MicrosoftClarity />
         <Header />
         <main className="pt-[72px]">{children}</main>
         <Footer />
