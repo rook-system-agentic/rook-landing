@@ -113,7 +113,13 @@ async function fetchSupabasePosts(): Promise<BlogPost[]> {
 
 async function allPosts() {
   const remotePosts = await fetchSupabasePosts();
-  const posts = remotePosts.length > 0 ? remotePosts : localBlogPosts;
+  const postsBySlug = new Map(localBlogPosts.map((post) => [post.slug, post]));
+
+  for (const post of remotePosts) {
+    postsBySlug.set(post.slug, post);
+  }
+
+  const posts = Array.from(postsBySlug.values());
 
   return posts
     .filter((post) => post.status === "published")
