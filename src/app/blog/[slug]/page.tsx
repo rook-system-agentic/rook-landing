@@ -97,7 +97,7 @@ function jsonLd(post: Awaited<ReturnType<typeof getPostBySlug>>) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Inicio", item: `${siteUrl}/` },
+      { "@type": "ListItem", position: 1, name: "Início", item: `${siteUrl}/` },
       { "@type": "ListItem", position: 2, name: "Blog", item: `${siteUrl}/blog/` },
       { "@type": "ListItem", position: 3, name: post.title, item: url },
     ],
@@ -164,8 +164,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <FaqSection faqs={post.schemaFaq || []} />
 
           <section className="mt-14 rounded-2xl border border-border bg-white/[0.03] p-6">
-            <p className="section-label mb-3">— Proximo passo</p>
-            <h2 className="text-2xl font-bold text-cream mb-3">Quer enxergar estes numeros no seu restaurante?</h2>
+            <p className="section-label mb-3">— Próximo passo</p>
+            <h2 className="text-2xl font-bold text-cream mb-3">Quer enxergar estes números no seu restaurante?</h2>
             <p className="text-sm text-muted leading-relaxed mb-5">
               Comece pelo plano Pawn e use o Rook para transformar faturamento, compras e margem em uma leitura mais clara.
             </p>
@@ -191,4 +191,3 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     </>
   );
 }
-

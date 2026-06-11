@@ -28,7 +28,7 @@ export async function GET() {
       <channel>
         <title>Blog Rook System</title>
         <link>${escapeXml(`${siteUrl}/blog/`)}</link>
-        <description>Inteligencia financeira para restaurantes: CMV, DRE, compras, impostos e margem.</description>
+        <description>Inteligência financeira para restaurantes: CMV, DRE, compras, impostos e margem.</description>
         <language>pt-BR</language>
         <lastBuildDate>${new Date(latest).toUTCString()}</lastBuildDate>
         ${items}
@@ -42,4 +42,3 @@ export async function GET() {
     },
   });
 }
-

@@ -7,9 +7,9 @@ import { getBlogCategories, getPublishedPosts } from "@/lib/blog";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Blog Rook | Inteligencia financeira para restaurantes",
+  title: "Blog Rook | Inteligência financeira para restaurantes",
   description:
-    "Artigos sobre CMV, DRE, compras, impostos e gestao financeira para restaurantes. Conteudo editorial para transformar faturamento em lucro.",
+    "Artigos sobre CMV, DRE, compras, impostos e gestão financeira para restaurantes. Conteúdo editorial para transformar faturamento em lucro.",
   alternates: {
     canonical: "https://rooksystem.com.br/blog/",
     types: {
@@ -39,12 +39,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <p className="section-label mb-4">— Blog Rook</p>
           <div className="max-w-3xl">
             <h1 className="text-3xl lg:text-[2.8rem] font-bold leading-tight mb-5">
-              Inteligencia financeira para quem quer{" "}
+              Inteligência financeira para quem quer{" "}
               <em className="not-italic text-terracota">lucrar de verdade.</em>
             </h1>
             <p className="text-muted leading-relaxed">
-              Guias, metodos e analises para donos de restaurante que querem entender CMV, DRE, compras,
-              impostos e margem com clareza. Menos achismo, mais decisao em reais.
+              Guias, métodos e análises para donos de restaurante que querem entender CMV, DRE, compras,
+              impostos e margem com clareza. Menos achismo, mais decisão em reais.
             </p>
           </div>
         </div>
@@ -84,10 +84,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               <div className="card p-6 flex flex-col justify-between">
                 <div>
                   <p className="section-label mb-4">— Pulse do food service</p>
-                  <h2 className="text-2xl font-bold mb-3">Receba os proximos artigos.</h2>
+                  <h2 className="text-2xl font-bold mb-3">Receba os próximos artigos.</h2>
                   <p className="text-sm text-muted leading-relaxed mb-6">
-                    Uma curadoria direta sobre CMV, DRE, compras e gestao financeira para restaurantes.
-                    Sem spam, sem conteudo generico.
+                    Uma curadoria direta sobre CMV, DRE, compras e gestão financeira para restaurantes.
+                    Sem spam, sem conteúdo genérico.
                   </p>
                 </div>
                 <NewsletterForm />
@@ -99,7 +99,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           ) : (
             <div className="card p-8 text-center">
               <h2 className="text-2xl font-bold text-cream mb-3">Nenhum artigo publicado nesta categoria.</h2>
-              <p className="text-muted mb-6">Volte para todos os artigos ou assine a newsletter para receber os proximos.</p>
+              <p className="text-muted mb-6">Volte para todos os artigos ou assine a newsletter para receber os próximos.</p>
               <Link href="/blog/" className="btn-ghost">
                 Ver todos
               </Link>
