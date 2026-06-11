@@ -1,32 +1,10 @@
-import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
+import { isContentApiAuthorized } from "@/lib/content-api-auth";
 import { publishApprovedContentPack } from "@/lib/content-automation";
 import { isSupabaseAdminConfigured } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
-
-function safeEqual(value: string, expected: string) {
-  const valueBuffer = Buffer.from(value);
-  const expectedBuffer = Buffer.from(expected);
-  if (valueBuffer.length !== expectedBuffer.length) return false;
-  return timingSafeEqual(valueBuffer, expectedBuffer);
-}
-
-function getProvidedSecret(req: NextRequest) {
-  const authorization = req.headers.get("authorization");
-  if (authorization?.startsWith("Bearer ")) {
-    return authorization.slice("Bearer ".length).trim();
-  }
-
-  return req.headers.get("x-content-automation-secret") || "";
-}
-
-function isAuthorized(req: NextRequest) {
-  const expected = process.env.CONTENT_AUTOMATION_SECRET;
-  if (!expected) return false;
-  return safeEqual(getProvidedSecret(req), expected);
-}
 
 function revalidatePublishedPaths(results: Awaited<ReturnType<typeof publishApprovedContentPack>>["results"]) {
   revalidatePath("/blog");
@@ -45,7 +23,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "CONTENT_AUTOMATION_SECRET não configurado" }, { status: 503 });
   }
 
-  if (!isAuthorized(req)) {
+  if (!isContentApiAuthorized(req)) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
