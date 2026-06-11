@@ -990,3 +990,37 @@ curl -X POST https://www.rooksystem.com.br/api/content/publish \
   -H "Content-Type: application/json" \
   -d '{"contentPackId":"<content_pack_id>","actor":"gabriel"}'
 ```
+
+## Handoff manual-assistido
+
+Enquanto LinkedIn, Instagram e newsletter nao tiverem credenciais/API aprovadas, o conteudo social deve ser tratado como `manual_required`. Para facilitar a operacao, existe um endpoint protegido de handoff.
+
+### Endpoint
+
+```bash
+curl -X POST https://www.rooksystem.com.br/api/content/handoff \
+  -H "Authorization: Bearer <CONTENT_AUTOMATION_SECRET>" \
+  -H "Content-Type: application/json" \
+  -d '{"contentPackId":"<content_pack_id>"}'
+```
+
+Tambem e possivel consultar por `GET`:
+
+```bash
+curl "https://www.rooksystem.com.br/api/content/handoff?contentPackId=<content_pack_id>" \
+  -H "Authorization: Bearer <CONTENT_AUTOMATION_SECRET>"
+```
+
+### O que retorna
+
+O retorno inclui:
+
+- dados do `content_pack`;
+- uma lista de variacoes por canal;
+- texto pronto em `copyMarkdown`;
+- `assetBrief` e `assetUrl`, quando existirem;
+- status atual da variacao;
+- ultimo `publication_job` relacionado;
+- instrucoes operacionais por canal.
+
+Esse endpoint nao publica em redes sociais. Ele entrega o pacote pronto para copia, revisao final e publicacao manual enquanto as APIs externas nao estiverem disponiveis.
