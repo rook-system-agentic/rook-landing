@@ -17,26 +17,26 @@ const plans = [
   {
     name: "Knight",
     desc: "Para o restaurante que quer enxergar mais.",
-    monthly: 379.9,
-    badge: null,
+    monthly: 479.9,
+    badge: "Popular",
     cta: "Assinar Knight",
     href: "https://app.rooksystem.com.br/signup",
     note: "14 dias grátis · 1 CNPJ",
     prefix: "Tudo do Pawn, mais:",
     features: ["6 pilares completos com score", "Análise por pilar", "Relatório objetivo (todas as áreas)", "Análise comparativa MoM", "Suporte por e-mail"],
-    highlight: false,
+    highlight: true,
   },
   {
     name: "Rook",
     desc: "Gestão estratégica avançada.",
     monthly: 779.9,
-    badge: "Recomendado",
+    badge: "Em breve",
     cta: "Assinar Rook",
     href: "https://app.rooksystem.com.br/signup",
     note: "14 dias grátis · 1 CNPJ",
     prefix: "Tudo do Knight, mais:",
     features: ["Simulador tributário (4 regimes)", "Relatório anual estendido (11 pg.)", "Recomendações com impacto em R$", "Análise IA · SCI-R por pilar", "Atendimento prioritário"],
-    highlight: true,
+    highlight: false,
   },
   {
     name: "Chess",
@@ -79,7 +79,7 @@ export default function PlanosPage() {
               onClick={() => setAnnual(true)}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${annual ? "bg-terracota text-white" : "text-muted hover:text-cream"}`}
             >
-              Anual <span className="text-xs opacity-80">Economize 25%</span>
+              Anual <span className="text-xs opacity-80">Economize 15%</span>
             </button>
           </div>
 
@@ -101,7 +101,7 @@ export default function PlanosPage() {
                   <p className="text-2xl font-bold text-cream mb-1">R$ 0</p>
                 ) : (
                   <p className="text-2xl font-bold text-cream mb-1">
-                    R$ {(annual ? plan.monthly * 0.75 : plan.monthly).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {(annual ? plan.monthly * 0.85 : plan.monthly).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     <span className="text-sm font-normal text-muted">/mês</span>
                   </p>
                 )}
@@ -126,7 +126,7 @@ export default function PlanosPage() {
 
           <p className="text-xs text-muted mt-8 max-w-2xl mx-auto">
             <strong className="text-cream">Mensal:</strong> cartão de crédito recorrente, sem consumir limite. ·{" "}
-            <strong className="text-cream">Anual:</strong> pagamento à vista (cartão único ou Pix) com 25% de desconto sobre o valor consolidado.
+            <strong className="text-cream">Anual:</strong> pagamento à vista (cartão único ou Pix) com 15% de desconto sobre o valor consolidado.
           </p>
         </div>
       </section>
