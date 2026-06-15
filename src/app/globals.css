@@ -14,16 +14,66 @@
 }
 
 @layer components {
+  /* Section labels — monospace, small, wide tracking */
   .section-label {
-    @apply font-mono text-xs tracking-[0.2em] uppercase text-ocre;
+    @apply font-mono text-[11px] tracking-[0.2em] uppercase;
+    color: rgba(245, 237, 224, 0.58);
   }
+
+  /* Hero headline — massive, editorial */
+  .heading-hero {
+    @apply font-display font-medium text-cream;
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+  }
+  .heading-hero em {
+    font-style: italic;
+    color: #E79F4A;
+  }
+
+  /* Section headline — large, light weight */
+  .heading-section {
+    @apply font-display font-normal text-cream;
+    font-size: clamp(2rem, 4.5vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+  .heading-section em {
+    font-style: italic;
+    color: #E79F4A;
+  }
+
+  /* Subsection headline */
+  .heading-sub {
+    @apply font-display font-semibold text-cream;
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    line-height: 1.3;
+  }
+
+  /* Body text */
+  .text-body {
+    @apply font-display text-muted;
+    font-size: 17px;
+    line-height: 1.55;
+    max-width: 540px;
+  }
+
+  /* Buttons */
   .btn-primary {
     @apply inline-flex items-center justify-center px-7 py-3.5 bg-terracota text-white font-semibold text-[15px] rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5;
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center px-5 py-3 text-cream/80 font-medium text-[15px] rounded-lg border border-border transition-all hover:bg-white/5 hover:text-cream;
   }
+
+  /* Cards */
   .card {
     @apply bg-bg-card border border-border rounded-xl;
+  }
+
+  /* Section spacing */
+  .section-spacing {
+    @apply py-[120px];
   }
 }
