@@ -57,18 +57,18 @@ export default function PlanosPage() {
 
   return (
     <>
-      <section className="py-24">
+      <section className="section-spacing">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="section-label mb-4">— Planos</p>
-          <h1 className="text-3xl lg:text-[2.8rem] font-bold mb-4">
-            Invista no <em className="not-italic text-terracota">controle</em> do seu negócio.
+          <p className="section-label mb-6">— Planos</p>
+          <h1 className="heading-hero mb-6">
+            Invista no <em>controle</em> do seu negócio.
           </h1>
-          <p className="text-muted max-w-xl mx-auto mb-8">
+          <p className="text-body mx-auto text-center mb-10">
             Comece com o Pawn (grátis para sempre). Evolua quando o negócio crescer. Mensal recorrente ou anual com desconto.
           </p>
 
           {/* Toggle */}
-          <div className="inline-flex items-center gap-1 bg-bg-card border border-border rounded-full p-1 mb-12">
+          <div className="inline-flex items-center gap-1 bg-bg-card border border-border rounded-full p-1 mb-14">
             <button
               onClick={() => setAnnual(false)}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${!annual ? "bg-terracota text-white" : "text-muted hover:text-cream"}`}
@@ -124,7 +124,7 @@ export default function PlanosPage() {
             ))}
           </div>
 
-          <p className="text-xs text-muted mt-8 max-w-2xl mx-auto">
+          <p className="text-xs text-muted mt-10 max-w-2xl mx-auto">
             <strong className="text-cream">Mensal:</strong> cartão de crédito recorrente, sem consumir limite. ·{" "}
             <strong className="text-cream">Anual:</strong> pagamento à vista (cartão único ou Pix) com 25% de desconto sobre o valor consolidado.
           </p>
@@ -132,11 +132,11 @@ export default function PlanosPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 border-t border-border text-center">
-        <div className="max-w-2xl mx-auto px-6">
-          <p className="section-label mb-4">— Dúvidas sobre o produto?</p>
-          <h2 className="text-2xl font-bold mb-4">Veja como <em className="not-italic text-terracota">funciona.</em></h2>
-          <p className="text-muted mb-6">Sete módulos, calculadora interativa e relatório anual — tudo para entender e operar seu negócio.</p>
+      <section className="section-spacing border-t border-border text-center">
+        <div className="max-w-3xl mx-auto px-6">
+          <p className="section-label mb-6">— Dúvidas sobre o produto?</p>
+          <h2 className="heading-section mb-4">Veja como <em>funciona.</em></h2>
+          <p className="text-body mx-auto text-center mb-8">Sete módulos, calculadora interativa e relatório anual — tudo para entender e operar seu negócio.</p>
           <Link href="/funcionalidades/" className="btn-ghost">Explorar →</Link>
         </div>
       </section>

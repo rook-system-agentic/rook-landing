@@ -3,21 +3,21 @@ import Link from "next/link";
 /* ─── Hero ─── */
 function Hero() {
   return (
-    <section className="py-24 lg:py-32">
+    <section className="section-spacing">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
         {/* Left */}
         <div>
-          <p className="section-label mb-4">— Gestão financeira para donos de restaurante</p>
-          <h1 className="text-4xl lg:text-[3.5rem] font-bold leading-[1.1] mb-6">
-            Faturar não é <em className="not-italic text-terracota">lucrar.</em>
+          <p className="section-label mb-6">— Gestão financeira para donos de restaurante</p>
+          <h1 className="heading-hero mb-8">
+            Faturar não é <em>lucrar.</em>
           </h1>
-          <p className="text-lg text-muted leading-relaxed mb-8 max-w-lg">
+          <p className="text-body mb-8">
             Num setor que movimenta <strong className="text-cream">R$ 495 bilhões por ano</strong>, a maioria
             dos restaurantes mal passa de 10% de lucro — e seis em cada dez não chegam aos cinco anos.
             O que separa quem fatura de quem lucra são números que quase ninguém acompanha.{" "}
             <strong className="text-cream">O Rook coloca todos eles na sua frente.</strong>
           </p>
-          <p className="text-xs text-muted/70 mb-6">
+          <p className="text-xs text-muted/70 mb-6 font-mono">
             Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2022
           </p>
           <div className="flex flex-wrap gap-4 items-center">
@@ -53,7 +53,7 @@ function Hero() {
       </div>
 
       {/* Stats strip */}
-      <div className="max-w-7xl mx-auto px-6 mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-6 mt-20 grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { value: "R$ 495 bi", label: "O tamanho do setor", source: "Abrasel, 2025" },
           { value: "39%", label: "Controlam contas na planilha ou caderno", source: "Conta Simples + Visa, 2024" },
@@ -74,27 +74,29 @@ function Hero() {
 /* ─── Manifesto ─── */
 function Manifesto() {
   return (
-    <section className="py-24 border-t border-border">
+    <section className="section-spacing border-t border-border">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16">
         <div>
-          <p className="section-label mb-4">— A pergunta de quase todo dono de restaurante</p>
-          <h2 className="text-3xl lg:text-4xl font-bold leading-tight mb-6">
-            Você sabe quanto <em className="not-italic text-terracota">sobrou</em> no final do mês?
+          <p className="section-label mb-6">— A pergunta de quase todo dono de restaurante</p>
+          <h2 className="heading-section mb-8">
+            Você sabe quanto <em>sobrou</em> no final do mês?
           </h2>
-          <p className="text-muted leading-relaxed mb-4">
-            Movimento no caixa é uma <strong className="text-cream">sensação</strong>. Lucro é um{" "}
-            <strong className="text-cream">número</strong>. Entre os dois, o dinheiro passa por seis casas:
-            vendas, custos, impostos, despesas, dívidas e resultado. Em cada uma, a margem pode estar
-            escapando sem você ver.
-          </p>
-          <p className="text-muted leading-relaxed mb-4">
-            A maioria dos restaurantes joga sem enxergar o tabuleiro inteiro — planilha solta,
-            &ldquo;feeling&rdquo; do gerente, conversa com o contador uma vez por ano.
-          </p>
-          <p className="text-muted leading-relaxed">
-            O Rook põe as <strong className="text-cream">seis casas na mesma tela</strong> e mostra em qual
-            delas o seu dinheiro está indo embora.
-          </p>
+          <div className="text-body space-y-4">
+            <p>
+              Movimento no caixa é uma <strong className="text-cream">sensação</strong>. Lucro é um{" "}
+              <strong className="text-cream">número</strong>. Entre os dois, o dinheiro passa por seis casas:
+              vendas, custos, impostos, despesas, dívidas e resultado. Em cada uma, a margem pode estar
+              escapando sem você ver.
+            </p>
+            <p>
+              A maioria dos restaurantes joga sem enxergar o tabuleiro inteiro — planilha solta,
+              &ldquo;feeling&rdquo; do gerente, conversa com o contador uma vez por ano.
+            </p>
+            <p>
+              O Rook põe as <strong className="text-cream">seis casas na mesma tela</strong> e mostra em qual
+              delas o seu dinheiro está indo embora.
+            </p>
+          </div>
         </div>
         <div className="flex flex-col gap-5 justify-center">
           {[
@@ -124,18 +126,18 @@ function FAQ() {
     { q: "Preciso trocar o sistema que já uso?", a: "Não. O Rook não substitui seu PDV nem seu sistema de vendas — ele lê os seus dados e devolve a leitura financeira que eles não te dão." },
     { q: "De onde vêm os números do Rook?", a: "Das suas notas fiscais, das suas vendas e dos dados que você informa. Cada linha do diagnóstico tem origem rastreável — o tipo de número que seu contador também consegue conferir." },
     { q: "Posso testar antes de pagar?", a: "Sim. O plano Pawn é gratuito para sempre. Os planos pagos (Knight e Rook) têm 14 dias de teste sem compromisso — cancela com um clique, sem multa." },
-    { q: "Como funciona o pagamento?", a: "Cobrança mensal recorrente no cartão de crédito. Planos anuais têm 15% de desconto e são cobrados em parcela única. Nota fiscal emitida automaticamente." },
+    { q: "Como funciona o pagamento?", a: "Cobrança mensal recorrente no cartão de crédito. Planos anuais têm 25% de desconto e são cobrados em parcela única. Nota fiscal emitida automaticamente." },
     { q: "Posso cancelar quando quiser?", a: "Sim. Sem fidelidade, sem multa. Mensal cancela no mês seguinte, anual vale até o fim do período. Seus dados ficam salvos por 90 dias para reativação." },
   ];
 
   return (
-    <section className="py-24 border-t border-border">
+    <section className="section-spacing border-t border-border">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-[1fr_2fr] gap-16">
         {/* Left */}
         <div>
-          <p className="section-label mb-4">— Perguntas</p>
-          <h2 className="text-3xl font-bold mb-4">Antes de <em className="not-italic text-terracota">começar.</em></h2>
-          <p className="text-muted text-sm mb-6">As dúvidas mais comuns dos donos de restaurante que estão avaliando o Rook. Não encontrou o que precisa?</p>
+          <p className="section-label mb-6">— Perguntas</p>
+          <h2 className="heading-section mb-4">Antes de <em>começar.</em></h2>
+          <p className="text-body mb-6">As dúvidas mais comuns dos donos de restaurante que estão avaliando o Rook. Não encontrou o que precisa?</p>
           <a href="mailto:contato@rooksystem.com.br" className="btn-ghost text-sm">Enviar e-mail →</a>
         </div>
 
@@ -159,11 +161,11 @@ function FAQ() {
 /* ─── CTA ─── */
 function CTA() {
   return (
-    <section className="py-24 border-t border-border text-center">
-      <div className="max-w-2xl mx-auto px-6">
-        <p className="section-label mb-4">— Pronto para ver os seus números?</p>
-        <h2 className="text-3xl lg:text-4xl font-bold mb-4">Comece <em className="not-italic text-terracota">grátis.</em></h2>
-        <p className="text-muted mb-8">Plano Pawn sem cartão de crédito, sem limite de tempo. Quando quiser mais visão, evolua para Knight, Rook ou Chess.</p>
+    <section className="section-spacing border-t border-border text-center">
+      <div className="max-w-3xl mx-auto px-6">
+        <p className="section-label mb-6">— Pronto para ver os seus números?</p>
+        <h2 className="heading-section mb-4">Comece <em>grátis.</em></h2>
+        <p className="text-body mx-auto text-center mb-8">Plano Pawn sem cartão de crédito, sem limite de tempo. Quando quiser mais visão, evolua para Knight, Rook ou Chess.</p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link href="/planos/" className="btn-primary">Começar grátis →</Link>
           <Link href="/funcionalidades/" className="btn-ghost">Conhecer o produto</Link>

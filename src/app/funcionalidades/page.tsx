@@ -81,14 +81,13 @@ const modules = [
 /* ─── Modules Grid ─── */
 function ModulesGrid() {
   return (
-    <section className="py-24 border-t border-border">
+    <section className="section-spacing border-t border-border">
       <div className="max-w-7xl mx-auto px-6">
-        <p className="section-label mb-4">— Os 7 módulos</p>
-        <h2 className="text-3xl lg:text-[2.8rem] font-bold leading-tight mb-4 max-w-4xl">
-          Uma casa para cada parte do{" "}
-          <em className="not-italic text-terracota">seu dinheiro.</em>
+        <p className="section-label mb-6">— Os 7 módulos</p>
+        <h2 className="heading-section mb-4 max-w-4xl">
+          Uma casa para cada parte do <em>seu dinheiro.</em>
         </h2>
-        <p className="text-muted max-w-2xl mb-16">
+        <p className="text-body mb-16">
           Cada módulo responde uma pergunta que todo dono já se fez. Sem planilha,
           sem fórmula — os indicadores já chegam prontos e explicados.
         </p>
@@ -108,7 +107,7 @@ function ModulesGrid() {
                   {m.plan}
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-cream mb-2">{m.title}</h3>
+              <h3 className="heading-sub mb-2">{m.title}</h3>
               <p className="text-sm text-muted mb-4">{m.desc}</p>
               <ul className="space-y-2">
                 {m.bullets.map((b) => (
@@ -126,13 +125,15 @@ function ModulesGrid() {
         <div className="card p-8 border-terracota/20 bg-gradient-to-r from-bg-card to-bg-elevated">
           <div className="grid lg:grid-cols-[1fr_2fr] gap-8 items-start">
             <div>
-              <span className="font-mono text-sm font-bold text-terracota">
-                07 · CHESS
-              </span>
-              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-bg border border-border text-muted ml-3">
-                Chess
-              </span>
-              <h3 className="text-xl font-bold text-cream mt-3 mb-2">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="font-mono text-sm font-bold text-terracota">
+                  07 · CHESS
+                </span>
+                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-bg border border-border text-muted">
+                  Chess
+                </span>
+              </div>
+              <h3 className="heading-sub mb-2">
                 A rede inteira no mesmo tabuleiro
               </h3>
               <p className="text-sm text-muted">
@@ -174,13 +175,13 @@ function Calculator() {
   };
 
   return (
-    <section className="py-24 border-t border-border">
+    <section className="section-spacing border-t border-border">
       <div className="max-w-7xl mx-auto px-6">
-        <p className="section-label text-center mb-4">— Calculadora interativa</p>
-        <h2 className="text-3xl lg:text-4xl font-bold text-center mb-3">
-          Qual o impacto do CMV no seu <em className="not-italic text-terracota">lucro?</em>
+        <p className="section-label text-center mb-6">— Calculadora interativa</p>
+        <h2 className="heading-section text-center mb-4">
+          Qual o impacto do CMV no seu <em>lucro?</em>
         </h2>
-        <p className="text-muted text-center max-w-xl mx-auto mb-12">
+        <p className="text-body text-center mx-auto mb-12">
           Simule o potencial de economia ao otimizar seu Custo de Mercadoria Vendida
           para a faixa ideal do seu segmento.
         </p>
@@ -286,7 +287,7 @@ function Calculator() {
 /* ─── PDF / Relatório Anual ─── */
 function PdfDemo() {
   return (
-    <section className="py-24 border-t border-border">
+    <section className="section-spacing border-t border-border">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
         {/* Mock PDF pages */}
         <div className="grid grid-cols-2 gap-4">
@@ -296,7 +297,7 @@ function PdfDemo() {
               <span className="font-mono text-xs text-muted">Anual · 2025</span>
             </div>
             <p className="section-label mb-1">— Análise financeira</p>
-            <p className="text-sm font-semibold text-cream">Diagnóstico Anual</p>
+            <p className="text-sm font-semibold text-cream">Diagnóstico <strong>Anual</strong></p>
             <p className="text-xs text-muted mt-1">Restaurante Exemplo</p>
             <p className="text-[10px] text-muted mt-1">CNPJ 00.000.000/0001-00 · Simples Nacional · DF</p>
             <div className="mt-4 flex items-center gap-3">
@@ -336,12 +337,11 @@ function PdfDemo() {
 
         {/* Text */}
         <div>
-          <p className="section-label mb-4">— Relatório anual</p>
-          <h2 className="text-3xl font-bold mb-3">
-            O relatório que{" "}
-            <em className="not-italic text-terracota">seu contador respeita.</em>
+          <p className="section-label mb-6">— Relatório anual</p>
+          <h2 className="heading-section mb-4">
+            O relatório que <em>seu contador respeita.</em>
           </h2>
-          <p className="text-muted mb-6">
+          <p className="text-body mb-8">
             Onze páginas em A4, tipografia editorial e <strong className="text-cream">dados auditáveis</strong>.
             Para mandar ao banco, ao sócio, ao consultor — ou simplesmente abrir num domingo de manhã
             e entender onde está o restaurante.
@@ -387,14 +387,13 @@ function ChessExpanded() {
   ];
 
   return (
-    <section className="py-24 border-t border-border">
+    <section className="section-spacing border-t border-border">
       <div className="max-w-7xl mx-auto px-6">
-        <p className="section-label mb-4">— Plano Chess · Multi-CNPJ</p>
-        <h2 className="text-3xl lg:text-4xl font-bold mb-3">
-          Para quem comanda mais de{" "}
-          <em className="not-italic text-terracota">uma unidade.</em>
+        <p className="section-label mb-6">— Plano Chess · Multi-CNPJ</p>
+        <h2 className="heading-section mb-4">
+          Para quem comanda mais de <em>uma unidade.</em>
         </h2>
-        <p className="text-muted max-w-2xl mb-12">
+        <p className="text-body mb-12">
           Quando o negócio passa de uma loja para uma rede, o jogo muda — e a
           comparação entre unidades vira a ferramenta-chave.{" "}
           <strong className="text-cream">Chess</strong> coloca todas as filiais no mesmo tabuleiro.
@@ -464,14 +463,14 @@ function ChessExpanded() {
 /* ─── CTA ─── */
 function FuncCTA() {
   return (
-    <section className="py-24 border-t border-border">
-      <div className="max-w-3xl mx-auto px-6 flex flex-col lg:flex-row items-center justify-between gap-8">
+    <section className="section-spacing border-t border-border">
+      <div className="max-w-4xl mx-auto px-6 flex flex-col lg:flex-row items-center justify-between gap-8">
         <div>
-          <p className="section-label mb-3">— Pronto para ver os seus números?</p>
-          <h2 className="text-3xl font-bold mb-2">
-            Comece <em className="not-italic text-terracota">grátis.</em>
+          <p className="section-label mb-4">— Pronto para ver os seus números?</p>
+          <h2 className="heading-section mb-2">
+            Comece <em>grátis.</em>
           </h2>
-          <p className="text-muted">
+          <p className="text-body">
             Plano Pawn grátis para sempre. Quando quiser mais, evolua para Knight, Rook ou Chess.
           </p>
         </div>
@@ -488,15 +487,13 @@ export default function FuncionalidadesPage() {
   return (
     <>
       {/* Hero */}
-      <section className="py-24">
+      <section className="section-spacing">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="section-label mb-4">— Funcionalidades</p>
-          <h1 className="text-3xl lg:text-[2.8rem] font-bold leading-tight mb-6 max-w-4xl">
-            Sete módulos, um{" "}
-            <em className="not-italic text-terracota">único objetivo:</em>{" "}
-            mostrar onde está seu dinheiro.
+          <p className="section-label mb-6">— Funcionalidades</p>
+          <h1 className="heading-hero mb-8 max-w-5xl">
+            Sete módulos, um <em>único objetivo:</em> mostrar onde está seu dinheiro.
           </h1>
-          <p className="text-muted max-w-3xl text-lg">
+          <p className="text-body max-w-3xl">
             O dinheiro do restaurante passa por seis casas — vendas, compras, impostos,
             despesas, dívidas e resultado. O Rook tem um módulo para cada uma, e um sétimo
             para quem joga com várias unidades. Cada módulo com seus próprios indicadores,

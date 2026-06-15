@@ -10,13 +10,13 @@ export default function SobrePage() {
   return (
     <>
       {/* Hero */}
-      <section className="py-24">
+      <section className="section-spacing">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="section-label mb-4">— Sobre o Rook</p>
-          <h1 className="text-3xl lg:text-[3.2rem] font-bold leading-tight mb-6">
-            Visão. Estratégia. <em className="not-italic text-terracota">Controle.</em>
+          <p className="section-label mb-6">— Sobre o Rook</p>
+          <h1 className="heading-hero mb-8">
+            Visão. Estratégia. <em>Controle.</em>
           </h1>
-          <p className="text-muted max-w-2xl leading-relaxed">
+          <p className="text-body max-w-2xl">
             O Rook é um sistema de gestão para <strong className="text-cream">donos de food service</strong> — restaurantes, cafeterias, bares,
             padarias — que querem parar de operar no escuro. <strong className="text-cream">Faturar não é lucrar.</strong> A diferença entre o que
             entra no caixa e o que sobra no fim do mês é o nosso ponto de partida.
@@ -25,13 +25,13 @@ export default function SobrePage() {
       </section>
 
       {/* Nossa História */}
-      <section className="py-24 border-t border-border">
+      <section className="section-spacing border-t border-border">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="section-label mb-4">— Nossa história</p>
-          <h2 className="text-3xl lg:text-[2.8rem] font-bold mb-8 max-w-3xl">
-            O Rook começou em <em className="not-italic text-terracota">planilhas.</em>
+          <p className="section-label mb-6">— Nossa história</p>
+          <h2 className="heading-section mb-10 max-w-4xl">
+            O Rook começou em <em>planilhas.</em>
           </h2>
-          <div className="max-w-2xl space-y-6 text-muted leading-relaxed">
+          <div className="max-w-2xl space-y-6 text-muted leading-relaxed text-[17px]">
             <p>
               Por mais de 20 anos, nós fizemos o trabalho que quase ninguém quer fazer:
               entrar onde a operação está apertando e olhar os números sem romantizar,
@@ -42,7 +42,7 @@ export default function SobrePage() {
             <p>
               Quando começamos a olhar com atenção para restaurantes, vimos um padrão
               que se repetia: casa cheia, marca forte, bom faturamento e, mesmo assim, falta
-              de clareza. <em className="not-italic text-cream">&ldquo;Eu vendo bem, mas não sei para onde o dinheiro está indo.&rdquo;</em> A partir
+              de clareza. <em className="text-cream italic">&ldquo;Eu vendo bem, mas não sei para onde o dinheiro está indo.&rdquo;</em> A partir
               daí, decidimos fazer diferente — não criar mais uma planilha, mas transformar
               esse conhecimento em uma plataforma viva, que acompanha o negócio,
               organiza os dados e entrega direção.
@@ -57,13 +57,13 @@ export default function SobrePage() {
       </section>
 
       {/* Por que existimos */}
-      <section className="py-24 border-t border-border">
+      <section className="section-spacing border-t border-border">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="section-label mb-4">— Por que existimos</p>
-          <h2 className="text-3xl font-bold mb-6 max-w-3xl">
-            A maioria dos restaurantes fecha o mês <em className="not-italic text-terracota">sem saber onde está o dinheiro.</em>
+          <p className="section-label mb-6">— Por que existimos</p>
+          <h2 className="heading-section mb-6 max-w-4xl">
+            A maioria dos restaurantes fecha o mês <em>sem saber onde está o dinheiro.</em>
           </h2>
-          <p className="text-muted max-w-2xl mb-12 leading-relaxed">
+          <p className="text-body mb-16">
             O Rook traz a controladoria — a gestão financeira que normalmente só empresa
             grande tem — para a tela do dono de restaurante. Entre o pedido no salão e o
             lucro no fim do mês há seis casas: vendas, custos, impostos, despesas, dívidas
@@ -88,9 +88,9 @@ export default function SobrePage() {
                 desc: "Sem siglas, sem jargão técnico no diagnóstico. O Rook conta a história do seu negócio como um consultor experiente faria — situação, complicação, impacto, próximo passo.",
               },
             ].map((item) => (
-              <div key={item.n} className="card p-6">
-                <span className="text-terracota font-mono font-bold text-2xl">{item.n}</span>
-                <h3 className="text-cream font-semibold text-lg mt-3 mb-2">{item.title}</h3>
+              <div key={item.n} className="card p-8">
+                <span className="text-ocre font-mono font-bold text-3xl">{item.n}</span>
+                <h3 className="heading-sub mt-4 mb-3">{item.title}</h3>
                 <p className="text-sm text-muted leading-relaxed">{item.desc}</p>
               </div>
             ))}
@@ -99,33 +99,33 @@ export default function SobrePage() {
       </section>
 
       {/* O que defendemos */}
-      <section className="py-24 border-t border-border">
+      <section className="section-spacing border-t border-border">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="section-label mb-6">— O que defendemos</p>
-          <h2 className="text-2xl lg:text-3xl font-bold mb-6 max-w-3xl mx-auto leading-tight">
-            <span className="text-terracota">Visão</span> para enxergar.{" "}
-            <span className="text-terracota">Estratégia</span> para decidir.{" "}
-            <span className="text-terracota">Controle</span> para executar.
+          <p className="section-label mb-8">— O que defendemos</p>
+          <h2 className="heading-section max-w-4xl mx-auto mb-6">
+            <span className="text-ocre">Visão</span> para enxergar.{" "}
+            <span className="text-ocre">Estratégia</span> para decidir.{" "}
+            <span className="text-ocre">Controle</span> para executar.
           </h2>
-          <p className="text-muted max-w-2xl mx-auto mb-8 leading-relaxed">
+          <p className="text-body mx-auto text-center mb-10">
             O Rook transforma dados financeiros em <strong className="text-cream">informação prática</strong> para melhorar a
             gestão do seu restaurante.
           </p>
-          <p className="text-sm tracking-[0.3em] text-muted/60 uppercase font-medium">
-            Visão <span className="text-terracota mx-2">|</span> Estratégia <span className="text-terracota mx-2">|</span> Controle
+          <p className="font-mono text-sm tracking-[0.3em] text-muted/60 uppercase">
+            Visão <span className="text-ocre mx-3">|</span> Estratégia <span className="text-ocre mx-3">|</span> Controle
           </p>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-24 border-t border-border">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <section className="section-spacing border-t border-border">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div>
             <p className="section-label mb-4">— Conheça por dentro</p>
-            <h2 className="text-2xl lg:text-3xl font-bold mb-2">
-              Veja como o Rook <em className="not-italic text-terracota">funciona.</em>
+            <h2 className="heading-section mb-3">
+              Veja como o Rook <em>funciona.</em>
             </h2>
-            <p className="text-muted">Calculadora interativa, Relatório Anual editorial e Chess para redes multi-unidade.</p>
+            <p className="text-body">Calculadora interativa, Relatório Anual editorial e Chess para redes multi-unidade.</p>
           </div>
           <Link href="/funcionalidades/" className="btn-primary whitespace-nowrap">
             Explorar funcionalidades →
