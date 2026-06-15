@@ -7,33 +7,47 @@ function Hero() {
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
         {/* Left */}
         <div>
-          <p className="section-label mb-4">— Gestão financeira para food service</p>
+          <p className="section-label mb-4">— Gestão financeira para donos de restaurante</p>
           <h1 className="text-4xl lg:text-[3.5rem] font-bold leading-[1.1] mb-6">
             Faturar não é <em className="not-italic text-terracota">lucrar.</em>
           </h1>
           <p className="text-lg text-muted leading-relaxed mb-8 max-w-lg">
-            60% dos restaurantes fecham em 5 anos. 80% dos donos não sabem o CMV real.
-            A Rook mostra onde está o dinheiro — e o que fazer com ele.
+            Num setor que movimenta <strong className="text-cream">R$ 495 bilhões por ano</strong>, a maioria
+            dos restaurantes mal passa de 10% de lucro — e seis em cada dez não chegam aos cinco anos.
+            O que separa quem fatura de quem lucra são números que quase ninguém acompanha.{" "}
+            <strong className="text-cream">O Rook coloca todos eles na sua frente.</strong>
           </p>
-          <div className="flex flex-wrap gap-4">
+          <p className="text-xs text-muted/70 mb-6">
+            Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2022
+          </p>
+          <div className="flex flex-wrap gap-4 items-center">
             <Link href="/planos/" className="btn-primary">Começar grátis</Link>
-            <Link href="/funcionalidades/" className="btn-ghost">Ver funcionalidades</Link>
+            <Link href="/funcionalidades/" className="btn-ghost">Conhecer o produto</Link>
+            <span className="text-xs text-muted font-mono uppercase tracking-wider">Plano Pawn grátis para sempre</span>
           </div>
         </div>
 
         {/* Right — 3 product cards mosaic */}
         <div className="grid grid-cols-2 gap-4">
           <div className="card p-5 col-span-2">
-            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">Diagnóstico Anual</p>
-            <p className="text-sm text-muted">11 páginas · Score de 0 a 100 por área · Recomendações com impacto em R$</p>
+            <p className="font-mono text-xs text-muted uppercase tracking-wider mb-2">— Score do mês</p>
+            <div className="flex items-center gap-4">
+              <span className="text-4xl font-bold text-floresta">83</span>
+              <div>
+                <p className="text-sm font-semibold text-cream">Bom</p>
+                <p className="text-xs text-muted">4 de 6 pilares saudáveis</p>
+              </div>
+            </div>
           </div>
           <div className="card p-5">
-            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">Calculadora CMV</p>
-            <p className="text-sm text-muted">Simule economia em segundos</p>
+            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">— Recomendação</p>
+            <p className="text-xs text-muted mb-1">Migração para <strong className="text-cream">Lucro Presumido</strong> pode economizar</p>
+            <p className="text-xl font-bold text-floresta">R$ 124k<span className="text-xs text-muted font-normal"> / ano</span></p>
           </div>
           <div className="card p-5">
-            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">Chess Multi-CNPJ</p>
-            <p className="text-sm text-muted">Ranking entre filiais</p>
+            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">— Atenção</p>
+            <p className="text-xs text-muted mb-1"><strong className="text-cream">Top fornecedor</strong> concentra</p>
+            <p className="text-xl font-bold text-terracota">41%<span className="text-xs text-muted font-normal"> do CMV</span></p>
           </div>
         </div>
       </div>
@@ -41,14 +55,15 @@ function Hero() {
       {/* Stats strip */}
       <div className="max-w-7xl mx-auto px-6 mt-16 grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { value: "6", label: "Pilares de análise" },
-          { value: "11", label: "Páginas no relatório" },
-          { value: "4", label: "Regimes tributários" },
-          { value: "∞", label: "CNPJs no Chess" },
+          { value: "R$ 495 bi", label: "O tamanho do setor", source: "Abrasel, 2025" },
+          { value: "39%", label: "Controlam contas na planilha ou caderno", source: "Conta Simples + Visa, 2024" },
+          { value: "37%", label: "Com contas em atraso", source: "Abrasel, mai/2025" },
+          { value: "62,7%", label: "Das empresas fecham em 5 anos", source: "IBGE, 2022" },
         ].map((s) => (
           <div key={s.label} className="text-center">
-            <p className="text-3xl font-bold text-terracota">{s.value}</p>
+            <p className="text-2xl lg:text-3xl font-bold text-terracota">{s.value}</p>
             <p className="text-sm text-muted mt-1">{s.label}</p>
+            <p className="text-[10px] text-muted/60 mt-0.5 font-mono uppercase tracking-wider">{s.source}</p>
           </div>
         ))}
       </div>
@@ -62,28 +77,35 @@ function Manifesto() {
     <section className="py-24 border-t border-border">
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16">
         <div>
-          <p className="section-label mb-4">— O problema</p>
+          <p className="section-label mb-4">— A pergunta de quase todo dono de restaurante</p>
           <h2 className="text-3xl lg:text-4xl font-bold leading-tight mb-6">
-            Você sabe quanto <em className="not-italic text-terracota">sobrou</em> este mês?
+            Você sabe quanto <em className="not-italic text-terracota">sobrou</em> no final do mês?
           </h2>
           <p className="text-muted leading-relaxed mb-4">
-            Entre o pedido no salão e o lucro no bolso há seis camadas — vendas, custos, impostos,
-            despesas, endividamento, resultado — e cada uma pode estar corroendo a margem agora.
+            Movimento no caixa é uma <strong className="text-cream">sensação</strong>. Lucro é um{" "}
+            <strong className="text-cream">número</strong>. Entre os dois, o dinheiro passa por seis casas:
+            vendas, custos, impostos, despesas, dívidas e resultado. Em cada uma, a margem pode estar
+            escapando sem você ver.
+          </p>
+          <p className="text-muted leading-relaxed mb-4">
+            A maioria dos restaurantes joga sem enxergar o tabuleiro inteiro — planilha solta,
+            &ldquo;feeling&rdquo; do gerente, conversa com o contador uma vez por ano.
           </p>
           <p className="text-muted leading-relaxed">
-            Planilha em Excel, &ldquo;feeling&rdquo; do gerente, conversa solta com o contador uma vez por ano.
-            A maioria dos restaurantes opera no escuro. A Rook acende a luz.
+            O Rook põe as <strong className="text-cream">seis casas na mesma tela</strong> e mostra em qual
+            delas o seu dinheiro está indo embora.
           </p>
         </div>
-        <div className="flex flex-col gap-6 justify-center">
+        <div className="flex flex-col gap-5 justify-center">
           {[
-            { wrong: "Receita ≠ Lucro", right: "DRE mostra a diferença" },
-            { wrong: "CMV no achismo", right: "Benchmark por segmento" },
-            { wrong: "Imposto no automático", right: "Simulação de 4 regimes" },
+            { contrast: "Receita ≠ Lucro", desc: "O que entra no caixa não é o que fica no bolso. Entre os dois há 6 pilares — e qualquer um deles pode estar corroendo sua margem agora." },
+            { contrast: "Faturamento ≠ Resultado", desc: "Crescer 30% em vendas e perder dinheiro acontece todo mês em food service. Sem visão por linha de DRE, ninguém sabe explicar onde." },
+            { contrast: "Movimento ≠ Margem", desc: "Filas no salão, delivery cheio, ticket bom — e a margem real pode estar em 4%. Ou em 22%. A diferença muda decisões importantes." },
+            { contrast: "Dívida ≠ Estratégia", desc: "Financiamento pode ser alavanca ou armadilha. Sem saber quanto da receita a parcela consome, você só descobre qual dos dois quando o caixa aperta." },
           ].map((item) => (
-            <div key={item.wrong} className="card p-5 flex items-center gap-4">
-              <span className="text-red-400 font-mono text-sm line-through">{item.wrong}</span>
-              <span className="text-floresta font-mono text-sm">→ {item.right}</span>
+            <div key={item.contrast} className="card p-5">
+              <p className="font-semibold text-cream mb-1">{item.contrast}</p>
+              <p className="text-sm text-muted leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -95,12 +117,15 @@ function Manifesto() {
 /* ─── FAQ ─── */
 function FAQ() {
   const faqs = [
-    { q: "Preciso de contador para usar?", a: "Não. A Rook foi feita para o dono do restaurante. O relatório é claro o suficiente para você e auditável o suficiente para seu contador." },
-    { q: "Quanto tempo leva para configurar?", a: "Menos de 10 minutos. Você preenche os dados financeiros básicos e o diagnóstico é gerado automaticamente." },
-    { q: "Funciona para qualquer tipo de restaurante?", a: "Sim. Restaurantes, cafeterias, bares, padarias, dark kitchens — qualquer operação de food service." },
-    { q: "Posso cancelar a qualquer momento?", a: "Sim. Sem fidelidade, sem multa. Mensal cancela no mês seguinte, anual vale até o fim do período." },
-    { q: "Meus dados estão seguros?", a: "Infraestrutura em nuvem com criptografia em trânsito e em repouso. Seus dados financeiros nunca são compartilhados." },
-    { q: "O que acontece quando meu plano vence?", a: "Você volta para o plano Pawn (gratuito). Seus dados ficam salvos por 90 dias para reativação." },
+    { q: "Como funciona a Rook?", a: "O Rook organiza os dados financeiros e fiscais do seu restaurante, classifica cada linha com base em metodologia contábil e devolve um diagnóstico completo — DRE, score por pilar e recomendações com impacto em R$. Você lê o diagnóstico num domingo de manhã, sem planilhas, sem pedir nada para o contador." },
+    { q: "Funciona em qualquer cidade do Brasil?", a: "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O cálculo tributário considera a UF do estabelecimento automaticamente — você só precisa ter o cadastro do CNPJ correto." },
+    { q: "É seguro? Quem mais vê meus dados?", a: "Os dados são criptografados em trânsito (TLS 1.3) e em repouso (AES-256). Servidor brasileiro, infra AWS São Paulo. Cada empresa tem seu próprio ambiente isolado — ninguém vê seus números fora da sua equipe. O Rook está em adequação à LGPD desde o dia 1." },
+    { q: "Preciso mudar de contador?", a: "Não. O Rook é uma ferramenta de gestão para o dono — ele não substitui o contador, nem precisa dele para funcionar. O relatório PDF anual costuma ser bem recebido por contadores como insumo para o trabalho fiscal." },
+    { q: "Preciso trocar o sistema que já uso?", a: "Não. O Rook não substitui seu PDV nem seu sistema de vendas — ele lê os seus dados e devolve a leitura financeira que eles não te dão." },
+    { q: "De onde vêm os números do Rook?", a: "Das suas notas fiscais, das suas vendas e dos dados que você informa. Cada linha do diagnóstico tem origem rastreável — o tipo de número que seu contador também consegue conferir." },
+    { q: "Posso testar antes de pagar?", a: "Sim. O plano Pawn é gratuito para sempre. Os planos pagos (Knight e Rook) têm 14 dias de teste sem compromisso — cancela com um clique, sem multa." },
+    { q: "Como funciona o pagamento?", a: "Cobrança mensal recorrente no cartão de crédito. Planos anuais têm 15% de desconto e são cobrados em parcela única. Nota fiscal emitida automaticamente." },
+    { q: "Posso cancelar quando quiser?", a: "Sim. Sem fidelidade, sem multa. Mensal cancela no mês seguinte, anual vale até o fim do período. Seus dados ficam salvos por 90 dias para reativação." },
   ];
 
   return (
@@ -108,10 +133,10 @@ function FAQ() {
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-[1fr_2fr] gap-16">
         {/* Left */}
         <div>
-          <p className="section-label mb-4">— Perguntas frequentes</p>
-          <h2 className="text-3xl font-bold mb-4">Ainda tem <em className="not-italic text-terracota">dúvidas?</em></h2>
-          <p className="text-muted text-sm mb-6">Se não encontrar sua resposta aqui, fale com a gente.</p>
-          <a href="mailto:contato@rooksystem.com.br" className="btn-ghost text-sm">Falar com a equipe</a>
+          <p className="section-label mb-4">— Perguntas</p>
+          <h2 className="text-3xl font-bold mb-4">Antes de <em className="not-italic text-terracota">começar.</em></h2>
+          <p className="text-muted text-sm mb-6">As dúvidas mais comuns dos donos de restaurante que estão avaliando o Rook. Não encontrou o que precisa?</p>
+          <a href="mailto:contato@rooksystem.com.br" className="btn-ghost text-sm">Enviar e-mail →</a>
         </div>
 
         {/* Right — FAQ items */}
@@ -138,8 +163,11 @@ function CTA() {
       <div className="max-w-2xl mx-auto px-6">
         <p className="section-label mb-4">— Pronto para ver os seus números?</p>
         <h2 className="text-3xl lg:text-4xl font-bold mb-4">Comece <em className="not-italic text-terracota">grátis.</em></h2>
-        <p className="text-muted mb-8">Plano Pawn sem cartão de crédito. Quando quiser mais, evolua para Knight, Rook ou Chess.</p>
-        <Link href="/planos/" className="btn-primary">Ver planos →</Link>
+        <p className="text-muted mb-8">Plano Pawn sem cartão de crédito, sem limite de tempo. Quando quiser mais visão, evolua para Knight, Rook ou Chess.</p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Link href="/planos/" className="btn-primary">Começar grátis →</Link>
+          <Link href="/funcionalidades/" className="btn-ghost">Conhecer o produto</Link>
+        </div>
       </div>
     </section>
   );
