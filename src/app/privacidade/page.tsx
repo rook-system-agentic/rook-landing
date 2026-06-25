@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COMPANY_INFO } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade — Rook System",
@@ -24,13 +25,10 @@ export default function PrivacidadePage() {
             Bem-vindo à Política de Privacidade do Rook System. A sua privacidade
             e a segurança dos seus dados são de extrema importância para nós. Este
             documento explica como a{" "}
-            <strong className="text-cream">CCGN LTDA</strong>, pessoa jurídica de
+            <strong className="text-cream">{COMPANY_INFO.razaoSocial}</strong>, pessoa jurídica de
             direito privado, inscrita no CNPJ sob o nº{" "}
-            <strong className="text-cream">51.629.346/0001-94</strong>, com sede em{" "}
-            <strong className="text-cream">
-              SIG QUADRA 4 LOTE 75 BLOCO C PAVMTO PRIMEIRO SALA 03/04/05 PARTE 03,
-              Zona Industrial, Brasília-DF, CEP 70610-440
-            </strong>{" "}
+            <strong className="text-cream">{COMPANY_INFO.cnpj}</strong>, com sede em{" "}
+            <strong className="text-cream">{COMPANY_INFO.endereco}</strong>{" "}
             (doravante &quot;Rook System&quot;, &quot;nós&quot; ou
             &quot;nosso&quot;), coleta, usa, compartilha e protege as informações
             dos usuários (&quot;você&quot;) de nossa plataforma e serviços.

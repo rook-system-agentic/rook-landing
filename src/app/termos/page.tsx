@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { COMPANY_INFO } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Termos de Uso — Rook System",
@@ -18,7 +19,7 @@ export default function TermosPage() {
 
         <div className="prose-legal space-y-6 text-muted leading-relaxed">
           <p>
-            Bem-vindo ao Rook System! Estes Termos de Uso regem o seu acesso e uso da nossa plataforma de gestão financeira para restaurantes. Os Serviços são fornecidos pela <strong className="text-cream">CCGN LTDA</strong>, CNPJ <strong className="text-cream">51.629.346/0001-94</strong>.
+            Bem-vindo ao Rook System! Estes Termos de Uso regem o seu acesso e uso da nossa plataforma de gestão financeira para restaurantes. Os Serviços são fornecidos pela <strong className="text-cream">{COMPANY_INFO.razaoSocial}</strong>, CNPJ <strong className="text-cream">{COMPANY_INFO.cnpj}</strong>.
           </p>
 
           <h2 className="text-2xl text-terracota font-semibold mt-12 mb-4">1. Aceitação dos Termos</h2>
@@ -43,7 +44,7 @@ export default function TermosPage() {
 
           <h2 className="text-2xl text-terracota font-semibold mt-12 mb-4">5. Propriedade Intelectual</h2>
           <p>
-            O Rook System e todo o seu conteúdo são de propriedade exclusiva da CCGN LTDA. Você retém todos os direitos sobre os dados que insere na plataforma.
+            O Rook System e todo o seu conteúdo são de propriedade exclusiva da {COMPANY_INFO.razaoSocial}. Você retém todos os direitos sobre os dados que insere na plataforma.
           </p>
 
           <h2 className="text-2xl text-terracota font-semibold mt-12 mb-4">6. Limitação de Responsabilidade</h2>
