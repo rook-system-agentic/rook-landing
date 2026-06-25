@@ -9,7 +9,8 @@ const plans = [
     monthly: 0,
     badge: null,
     cta: "Começar grátis",
-    href: "https://app.rooksystem.com.br/signup",
+    href: "https://app.rooksystem.com.br/registro",
+    planKey: null as string | null,
     note: "Grátis para sempre · 1 CNPJ",
     features: ["3 pilares essenciais", "DRE resumida", "Relatório PDF objetivo (3 pg.)", "Cadastro de vendas e compras", "Suporte por documentação"],
     highlight: false,
@@ -20,7 +21,8 @@ const plans = [
     monthly: 479.9,
     badge: null,
     cta: "Assinar Knight",
-    href: "https://app.rooksystem.com.br/signup",
+    href: null as string | null,
+    planKey: "knight",
     note: "14 dias grátis · 1 CNPJ",
     prefix: "Tudo do Pawn, mais:",
     features: ["6 pilares completos com score", "Análise por pilar", "Relatório objetivo (todas as áreas)", "Análise comparativa MoM", "Suporte por e-mail"],
@@ -32,7 +34,8 @@ const plans = [
     monthly: 779.9,
     badge: "Recomendado",
     cta: "Assinar Rook",
-    href: "https://app.rooksystem.com.br/signup",
+    href: null as string | null,
+    planKey: "rook",
     note: "14 dias grátis · 1 CNPJ",
     prefix: "Tudo do Knight, mais:",
     features: ["Simulador tributário (4 regimes)", "Relatório anual estendido (11 pg.)", "Recomendações com impacto em R$", "Análise IA · SCI-R por pilar", "Atendimento prioritário"],
@@ -45,6 +48,7 @@ const plans = [
     badge: "Enterprise",
     cta: "Falar com Vendas",
     href: "#contato",
+    planKey: null as string | null,
     note: "Multi-CNPJ · descontos progressivos",
     prefix: "Tudo do Rook, em todas as unidades:",
     features: ["Painel consolidado do grupo", "Ranking automático por pilar", "Benchmark interno entre filiais", "Gestão de papéis (matriz × franqueado)", "Onboarding assistido"],
@@ -117,7 +121,14 @@ export default function PlanosPage() {
                   ))}
                 </ul>
 
-                <a href={plan.href} className={plan.highlight ? "btn-primary text-center" : "btn-ghost text-center"}>
+                <a
+                  href={
+                    plan.planKey
+                      ? `https://app.rooksystem.com.br/registro?plan=${plan.planKey}_${annual ? "annual" : "monthly"}`
+                      : plan.href ?? "#"
+                  }
+                  className={plan.highlight ? "btn-primary text-center" : "btn-ghost text-center"}
+                >
                   {plan.cta}
                 </a>
               </div>
