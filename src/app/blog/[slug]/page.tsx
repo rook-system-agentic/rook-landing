@@ -152,6 +152,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <ArticleMeta post={post} />
           </div>
 
+          {post.coverImageUrl && (
+            <figure className="mt-10 overflow-hidden rounded-2xl border border-border bg-white/[0.03]">
+              <img
+                src={post.coverImageUrl}
+                alt={post.coverImageAlt || post.title}
+                className="aspect-[3/2] w-full object-cover"
+              />
+            </figure>
+          )}
+
           {post.directAnswer && (
             <div className="my-10 rounded-2xl border border-terracota/30 bg-terracota/10 p-6">
               <p className="font-mono text-xs uppercase tracking-[0.2em] text-ocre mb-3">Resposta direta</p>

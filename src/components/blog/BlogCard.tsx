@@ -3,8 +3,25 @@ import type { BlogPost } from "@/lib/blog-types";
 import { formatBlogDate } from "@/lib/blog";
 
 export default function BlogCard({ post, featured = false }: { post: BlogPost; featured?: boolean }) {
+  const coverImageUrl = post.coverImageUrl?.trim();
+  const postHref = `/blog/${post.slug}/`;
+
   return (
     <article className={`card p-6 flex flex-col ${featured ? "lg:col-span-2" : ""}`}>
+      {coverImageUrl && (
+        <Link
+          href={postHref}
+          className="mb-5 block overflow-hidden rounded-lg border border-border bg-white/[0.03]"
+        >
+          <img
+            src={coverImageUrl}
+            alt={post.coverImageAlt || post.title}
+            className={`w-full object-cover ${featured ? "aspect-[16/7]" : "aspect-[3/2]"}`}
+            loading={featured ? "eager" : "lazy"}
+          />
+        </Link>
+      )}
+
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <span className="font-mono text-[11px] text-terracota uppercase tracking-wider">{post.category}</span>
         {post.publishedAt && <span className="text-xs text-muted">{formatBlogDate(post.publishedAt)}</span>}
@@ -12,7 +29,7 @@ export default function BlogCard({ post, featured = false }: { post: BlogPost; f
       </div>
 
       <h2 className={`${featured ? "text-2xl lg:text-3xl" : "text-xl"} font-bold leading-tight text-cream mb-3`}>
-        <Link href={`/blog/${post.slug}/`} className="hover:text-terracota transition-colors">
+        <Link href={postHref} className="hover:text-terracota transition-colors">
           {post.title}
         </Link>
       </h2>
@@ -28,10 +45,9 @@ export default function BlogCard({ post, featured = false }: { post: BlogPost; f
         ))}
       </div>
 
-      <Link href={`/blog/${post.slug}/`} className="mt-6 text-sm font-semibold text-terracota hover:text-ocre transition-colors">
+      <Link href={postHref} className="mt-6 text-sm font-semibold text-terracota hover:text-ocre transition-colors">
         Ler artigo →
       </Link>
     </article>
   );
 }
-
