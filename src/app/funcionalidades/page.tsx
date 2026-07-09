@@ -164,21 +164,17 @@ function ModulesGrid() {
 
 /* ─── Segments Data for Calculator ─── */
 const segmentsData = [
-  { name: "Restaurante à la carte", slug: "a_la_carte", defaultCmvTarget: 32.0, cmvMin: 30.9, cmvMax: 33.1, hasStudy: true },
-  { name: "Alta gastronomia (fine dining)", slug: "fine_dining", defaultCmvTarget: 27.5, cmvMin: 26.5, cmvMax: 28.5, hasStudy: true },
-  { name: "Self-service / Comida a quilo", slug: "self_service_kilo", defaultCmvTarget: 36.6, cmvMin: 35.3, cmvMax: 37.9, hasStudy: true },
-  { name: "Comida Italiana", slug: "italiana", defaultCmvTarget: 33.0, cmvMin: 31.8, cmvMax: 34.2, hasStudy: true },
-  { name: "Comida Japonesa / Sushi", slug: "japonesa_sushi", defaultCmvTarget: 35.8, cmvMin: 34.5, cmvMax: 37.1, hasStudy: true },
-  { name: "Pizzaria", slug: "pizzaria", defaultCmvTarget: 28.4, cmvMin: 27.4, cmvMax: 29.4, hasStudy: true },
-  { name: "Hamburgueria", slug: "hamburgueria", defaultCmvTarget: 31.7, cmvMin: 30.5, cmvMax: 32.8, hasStudy: true },
-  { name: "Lanchonete / Fast food", slug: "fast_food", defaultCmvTarget: 30.8, cmvMin: 29.6, cmvMax: 31.9, hasStudy: true },
-  { name: "Bar / Boteco", slug: "bar_boteco", defaultCmvTarget: 25.0, cmvMin: 24.1, cmvMax: 25.9, hasStudy: true },
-  { name: "Padaria / Cafeteria / Confeitaria", slug: "padaria_cafeteria", defaultCmvTarget: 34.8, cmvMin: 33.6, cmvMax: 36.1, hasStudy: true },
-  { name: "Delivery especializado", slug: "delivery_especializado", defaultCmvTarget: 30.3, cmvMin: 29.2, cmvMax: 31.4, hasStudy: true },
-  { name: "Churrascaria / Steakhouse", slug: "churrascaria", defaultCmvTarget: 31.4, cmvMin: 30.3, cmvMax: 32.6, hasStudy: false },
-  { name: "Açaí / Sorveteria", slug: "acai_sorveteria", defaultCmvTarget: 31.4, cmvMin: 30.3, cmvMax: 32.6, hasStudy: false },
-  { name: "Comida Árabe", slug: "comida_arabe", defaultCmvTarget: 31.4, cmvMin: 30.3, cmvMax: 32.6, hasStudy: false },
-  { name: "Outro", slug: "outro", defaultCmvTarget: 31.4, cmvMin: 30.3, cmvMax: 32.6, hasStudy: false }
+  { name: "Restaurante à la carte - Tradicional", slug: "a_la_carte", defaultCmvTarget: 32.0, cmvMin: 30.9, cmvMax: 33.1 },
+  { name: "Alta gastronomia (fine dining)", slug: "fine_dining", defaultCmvTarget: 27.5, cmvMin: 26.5, cmvMax: 28.5 },
+  { name: "Comida Italiana", slug: "italiana", defaultCmvTarget: 33.0, cmvMin: 31.8, cmvMax: 34.2 },
+  { name: "Comida Japonesa / Sushi", slug: "japonesa_sushi", defaultCmvTarget: 35.8, cmvMin: 34.5, cmvMax: 37.1 },
+  { name: "Self-service / Comida a quilo", slug: "self_service_kilo", defaultCmvTarget: 36.6, cmvMin: 35.3, cmvMax: 37.9 },
+  { name: "Pizzaria", slug: "pizzaria", defaultCmvTarget: 28.4, cmvMin: 27.4, cmvMax: 29.4 },
+  { name: "Hamburgueria", slug: "hamburgueria", defaultCmvTarget: 31.7, cmvMin: 30.5, cmvMax: 32.8 },
+  { name: "Lanchonete / Fast food", slug: "fast_food", defaultCmvTarget: 30.8, cmvMin: 29.6, cmvMax: 31.9 },
+  { name: "Bar / Boteco", slug: "bar_boteco", defaultCmvTarget: 25.0, cmvMin: 24.1, cmvMax: 25.9 },
+  { name: "Padaria / Cafeteria / Confeitaria", slug: "padaria_cafeteria", defaultCmvTarget: 34.8, cmvMin: 33.6, cmvMax: 36.1 },
+  { name: "Delivery especializado", slug: "delivery_especializado", defaultCmvTarget: 30.3, cmvMin: 29.2, cmvMax: 31.4 }
 ];
 
 /* ─── Calculator Section ─── */
@@ -267,11 +263,9 @@ function Calculator() {
               <span className="text-ocre font-semibold">{segment.defaultCmvTarget}%</span>.
               A faixa saudável recomendada fica entre{" "}
               <span className="text-ocre font-semibold">{segment.cmvMin}% e {segment.cmvMax}%</span> da receita líquida.
-              {segment.hasStudy && (
-                <span className="block mt-2 text-[10px] text-muted/60">
-                  * Fonte: Estudo Eraldo 2026 — benchmarks de redes com &gt;=10 restaurantes do segmento.
-                </span>
-              )}
+              <span className="block mt-2 text-[10px] text-muted/60">
+                * Fonte: Rook - Benchmark 2026
+              </span>
             </div>
 
             <button onClick={calcular} className="btn-primary w-full mt-6">
