@@ -162,16 +162,39 @@ function ModulesGrid() {
   );
 }
 
+/* ─── Segments Data for Calculator ─── */
+const segmentsData = [
+  { name: "Restaurante à la carte", slug: "a_la_carte", defaultCmvTarget: 32.0, cmvMin: 30.9, cmvMax: 33.1, hasStudy: true },
+  { name: "Alta gastronomia (fine dining)", slug: "fine_dining", defaultCmvTarget: 27.5, cmvMin: 26.5, cmvMax: 28.5, hasStudy: true },
+  { name: "Self-service / Comida a quilo", slug: "self_service_kilo", defaultCmvTarget: 36.6, cmvMin: 35.3, cmvMax: 37.9, hasStudy: true },
+  { name: "Comida Italiana", slug: "italiana", defaultCmvTarget: 33.0, cmvMin: 31.8, cmvMax: 34.2, hasStudy: true },
+  { name: "Comida Japonesa / Sushi", slug: "japonesa_sushi", defaultCmvTarget: 35.8, cmvMin: 34.5, cmvMax: 37.1, hasStudy: true },
+  { name: "Pizzaria", slug: "pizzaria", defaultCmvTarget: 28.4, cmvMin: 27.4, cmvMax: 29.4, hasStudy: true },
+  { name: "Hamburgueria", slug: "hamburgueria", defaultCmvTarget: 31.7, cmvMin: 30.5, cmvMax: 32.8, hasStudy: true },
+  { name: "Lanchonete / Fast food", slug: "fast_food", defaultCmvTarget: 30.8, cmvMin: 29.6, cmvMax: 31.9, hasStudy: true },
+  { name: "Bar / Boteco", slug: "bar_boteco", defaultCmvTarget: 25.0, cmvMin: 24.1, cmvMax: 25.9, hasStudy: true },
+  { name: "Padaria / Cafeteria / Confeitaria", slug: "padaria_cafeteria", defaultCmvTarget: 34.8, cmvMin: 33.6, cmvMax: 36.1, hasStudy: true },
+  { name: "Delivery especializado", slug: "delivery_especializado", defaultCmvTarget: 30.3, cmvMin: 29.2, cmvMax: 31.4, hasStudy: true },
+  { name: "Churrascaria / Steakhouse", slug: "churrascaria", defaultCmvTarget: 31.4, cmvMin: 30.3, cmvMax: 32.6, hasStudy: false },
+  { name: "Açaí / Sorveteria", slug: "acai_sorveteria", defaultCmvTarget: 31.4, cmvMin: 30.3, cmvMax: 32.6, hasStudy: false },
+  { name: "Comida Árabe", slug: "comida_arabe", defaultCmvTarget: 31.4, cmvMin: 30.3, cmvMax: 32.6, hasStudy: false },
+  { name: "Outro", slug: "outro", defaultCmvTarget: 31.4, cmvMin: 30.3, cmvMax: 32.6, hasStudy: false }
+];
+
 /* ─── Calculator Section ─── */
 function Calculator() {
   const [faturamento, setFaturamento] = useState(100000);
   const [cmv, setCmv] = useState(38);
-  const [result, setResult] = useState<{ economia: number; ideal: number } | null>(null);
+  const [selectedSegment, setSelectedSegment] = useState("a_la_carte");
+  const [result, setResult] = useState<{ economia: number; ideal: number; diferenca: number } | null>(null);
+
+  const segment = segmentsData.find(s => s.slug === selectedSegment) || segmentsData[0];
 
   const calcular = () => {
-    const ideal = 30;
-    const economiaAnual = ((cmv - ideal) / 100) * faturamento * 12;
-    setResult({ economia: economiaAnual, ideal });
+    const ideal = segment.defaultCmvTarget;
+    const diferenca = cmv - ideal;
+    const economiaAnual = (diferenca / 100) * faturamento * 12;
+    setResult({ economia: economiaAnual, ideal, diferenca });
   };
 
   return (
@@ -189,6 +212,27 @@ function Calculator() {
         <div className="grid lg:grid-cols-2 gap-8 items-start max-w-5xl mx-auto">
           {/* Form */}
           <div className="card p-8">
+            <label className="font-mono text-xs text-muted uppercase tracking-wider block mb-2">
+              Qual o segmento do seu restaurante?
+            </label>
+            <div className="flex items-center gap-2 bg-bg rounded-lg border border-border px-4 py-3 mb-6">
+              <select
+                value={selectedSegment}
+                onChange={(e) => {
+                  setSelectedSegment(e.target.value);
+                  setResult(null);
+                }}
+                className="bg-transparent text-cream text-base font-semibold w-full outline-none cursor-pointer"
+                style={{ colorScheme: "dark" }}
+              >
+                {segmentsData.map((s) => (
+                  <option key={s.slug} value={s.slug} className="bg-bg text-cream">
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <label className="font-mono text-xs text-muted uppercase tracking-wider block mb-2">
               Qual seu faturamento mensal?
             </label>
@@ -218,12 +262,17 @@ function Calculator() {
               <span>20%</span>
               <span>60%</span>
             </div>
-            <p className="text-xs text-muted mt-2">
-              Usamos <span className="text-ocre font-semibold">30%</span> como referência de cálculo.
-              A faixa saudável para à la carte fica entre{" "}
-              <span className="text-ocre font-semibold">28% e 35%</span> da receita líquida
-              — cada operação tem a sua.
-            </p>
+            <div className="text-xs text-muted mt-4 leading-relaxed">
+              CMV de referência para <strong className="text-cream">{segment.name}</strong>:{" "}
+              <span className="text-ocre font-semibold">{segment.defaultCmvTarget}%</span>.
+              A faixa saudável recomendada fica entre{" "}
+              <span className="text-ocre font-semibold">{segment.cmvMin}% e {segment.cmvMax}%</span> da receita líquida.
+              {segment.hasStudy && (
+                <span className="block mt-2 text-[10px] text-muted/60">
+                  * Fonte: Estudo Eraldo 2026 — benchmarks de redes com &gt;=10 restaurantes do segmento.
+                </span>
+              )}
+            </div>
 
             <button onClick={calcular} className="btn-primary w-full mt-6">
               Calcular potencial de economia
@@ -235,34 +284,68 @@ function Calculator() {
             {result ? (
               <>
                 <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">Resultado da simulação</p>
-                <p className="text-sm text-muted mb-4">
-                  Se você reduzir seu CMV de <span className="text-cream font-semibold">{cmv}%</span> para{" "}
-                  <span className="text-floresta font-semibold">{result.ideal}%</span>, a economia projetada é:
-                </p>
-                <p className="text-4xl font-bold text-floresta mb-2">
-                  R$ {result.economia.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}
-                </p>
-                <p className="text-sm text-muted">por ano em economia potencial</p>
-                <div className="mt-6 pt-6 border-t border-border">
-                  <p className="text-xs text-muted mb-3">Isso equivale a:</p>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-lg font-bold text-cream">
-                        R$ {(result.economia / 12).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}
+                {result.diferenca > 0 ? (
+                  <>
+                    <p className="text-sm text-muted mb-4">
+                      Seu CMV de <span className="text-cream font-semibold">{cmv}%</span> está{" "}
+                      <span className="text-terracota font-semibold">{result.diferenca.toFixed(1)}% acima</span> da meta ideal para{" "}
+                      <strong className="text-cream">{segment.name}</strong> ({result.ideal}%). A economia anual projetada é de:
+                    </p>
+                    <p className="text-4xl font-bold text-floresta mb-2">
+                      R$ {result.economia.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}
+                    </p>
+                    <p className="text-sm text-muted mb-6">em lucro líquido recuperado</p>
+                    
+                    <div className="bg-bg rounded-lg border border-border p-4 mb-6">
+                      <p className="text-xs text-muted leading-relaxed">
+                        <strong className="text-cream">O que isso significa?</strong> Ao otimizar as compras e fichas técnicas para atingir o benchmark, essa economia é revertida diretamente como margem líquida (lucro líquido que vai para o seu bolso), sem precisar vender uma única mesa a mais.
                       </p>
-                      <p className="text-xs text-muted">por mês</p>
                     </div>
-                    <div>
-                      <p className="text-lg font-bold text-cream">
-                        {(cmv - result.ideal).toFixed(0)}pp
+
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div>
+                        <p className="text-lg font-bold text-cream">
+                          R$ {(result.economia / 12).toLocaleString("pt-BR", { maximumFractionDigits: 0 })}
+                        </p>
+                        <p className="text-xs text-muted font-light">por mês recuperados</p>
+                      </div>
+                      <div>
+                        <p className="text-lg font-bold text-cream">
+                          +{result.diferenca.toFixed(1)}pp
+                        </p>
+                        <p className="text-xs text-muted font-light">de margem de lucro a mais</p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-12 h-12 rounded-full bg-floresta/10 border border-floresta/20 flex items-center justify-center mb-4">
+                      <svg width="24" height="24" fill="none" stroke="#44604A" strokeWidth="2.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h4 className="text-lg font-bold text-floresta mb-2">Operação de Alta Eficiência!</h4>
+                    <p className="text-sm text-muted mb-6 leading-relaxed">
+                      Parabéns! Seu CMV estimado de <span className="text-cream font-semibold">{cmv}%</span> já está abaixo ou na meta ideal do segmento (<span className="font-semibold text-floresta">{result.ideal}%</span>). Isso indica um excelente controle de compras e precificação.
+                    </p>
+                    <div className="bg-bg rounded-lg border border-border p-4 mb-6">
+                      <p className="text-xs text-muted leading-relaxed">
+                        <strong className="text-cream">O desafio agora é a constância:</strong> flutuações de preços de fornecedores e pequenos desperdícios diários podem corroer essa margem silenciosamente ao longo do mês.
                       </p>
-                      <p className="text-xs text-muted">de margem recuperada</p>
                     </div>
-                  </div>
+                  </>
+                )}
+                
+                <div className="pt-6 border-t border-border flex flex-col gap-4">
+                  <p className="text-xs text-muted leading-relaxed">
+                    Deixe as planilhas manuais para trás. O Rook calcula o seu CMV de forma 
+                    <strong className="text-cream"> 100% automática</strong>, conectando-se diretamente às suas notas fiscais de entrada (SEFAZ) 
+                    e seu faturamento (integração ERP).
+                  </p>
+                  <Link href="/planos/" className="btn-primary text-center w-full">
+                    Ativar controle automático grátis
+                  </Link>
                 </div>
-                <Link href="/planos/" className="btn-primary mt-6 text-center">
-                  Quero controlar meu CMV →
-                </Link>
               </>
             ) : (
               <div className="text-center">
@@ -272,8 +355,8 @@ function Calculator() {
                   </svg>
                 </div>
                 <p className="text-muted text-sm">
-                  Preencha os dados ao lado e clique em{" "}
-                  <strong className="text-cream">&ldquo;Calcular&rdquo;</strong> para ver o resultado.
+                  Selecione seu segmento, preencha os dados e clique em{" "}
+                  <strong className="text-cream">&ldquo;Calcular&rdquo;</strong> para projetar seu resultado.
                 </p>
               </div>
             )}
