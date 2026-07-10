@@ -36,7 +36,7 @@ export default function PrivacidadePage() {
 
           <p>
             Esta política se aplica à nossa landing page (www.rooksystem.com.br),
-            nossa aplicação web (app.rooksystem.com.br) e todos os serviços
+            nossa aplicação web (app.rook.com.br) e todos os serviços
             relacionados.
           </p>
 
