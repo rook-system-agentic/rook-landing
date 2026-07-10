@@ -9,7 +9,7 @@ const plans = [
     monthly: 0,
     badge: null,
     cta: "Começar grátis",
-    href: "https://app.rooksystem.com.br/registro",
+    href: "https://app.rook.com.br/registro",
     planKey: null as string | null,
     note: "Grátis para sempre · 1 CNPJ",
     features: ["3 pilares essenciais", "DRE resumida", "Relatório PDF objetivo (3 pg.)", "Cadastro de vendas e compras", "Suporte por documentação"],
@@ -124,7 +124,7 @@ export default function PlanosPage() {
                 <a
                   href={
                     plan.planKey
-                      ? `https://app.rooksystem.com.br/registro?plan=${plan.planKey}_${annual ? "annual" : "monthly"}`
+                      ? `https://app.rook.com.br/registro?plan=${plan.planKey}_${annual ? "annual" : "monthly"}`
                       : plan.href ?? "#"
                   }
                   className={plan.highlight ? "btn-primary text-center" : "btn-ghost text-center"}

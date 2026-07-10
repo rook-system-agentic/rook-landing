@@ -31,7 +31,7 @@ export default function Footer() {
           <h4 className="font-semibold text-cream text-sm mb-4">Empresa</h4>
           <ul className="space-y-2.5 text-sm text-muted">
             <li><Link href="/sobre/" className="hover:text-cream transition-colors">Sobre o Rook</Link></li>
-            <li><a href="https://app.rooksystem.com.br/login" className="hover:text-cream transition-colors">Entrar</a></li>
+            <li><a href="https://app.rook.com.br/login" className="hover:text-cream transition-colors">Entrar</a></li>
             <li><a href="mailto:contato@rooksystem.com.br" className="hover:text-cream transition-colors">Contato</a></li>
           </ul>
         </div>

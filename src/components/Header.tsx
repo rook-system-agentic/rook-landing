@@ -33,7 +33,7 @@ export default function Header() {
 
         {/* Actions */}
         <div className="hidden lg:flex items-center gap-4">
-          <a href="https://app.rooksystem.com.br/login" className="btn-ghost text-sm">Entrar</a>
+          <a href="https://app.rook.com.br/login" className="btn-ghost text-sm">Entrar</a>
           <Link href="/planos/" className="btn-primary text-sm">Começar grátis</Link>
         </div>
 
@@ -54,7 +54,7 @@ export default function Header() {
             </Link>
           ))}
           <div className="flex flex-col gap-2 pt-3 border-t border-border">
-            <a href="https://app.rooksystem.com.br/login" className="btn-ghost text-sm text-center">Entrar</a>
+            <a href="https://app.rook.com.br/login" className="btn-ghost text-sm text-center">Entrar</a>
             <Link href="/planos/" className="btn-primary text-sm text-center">Começar grátis</Link>
           </div>
         </nav>
