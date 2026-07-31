@@ -14,7 +14,7 @@ const modules = [
       "Ticket médio e evolução mês a mês",
       "Receita por colaborador",
     ],
-    plan: "Pawn",
+    plan: "Knight / Rook",
   },
   {
     n: "02",
@@ -26,7 +26,7 @@ const modules = [
       "Principais fornecedores e concentração",
       "Preço pago vs. histórico de compra",
     ],
-    plan: "Pawn",
+    plan: "Knight / Rook",
   },
   {
     n: "03",
@@ -38,7 +38,7 @@ const modules = [
       "Simulação de 4 regimes tributários",
       "Economia potencial em R$",
     ],
-    plan: "Knight",
+    plan: "Knight / Rook",
   },
   {
     n: "04",
@@ -50,7 +50,7 @@ const modules = [
       "Folha sobre receita",
       "Ocupação (aluguel + condomínio) sobre receita",
     ],
-    plan: "Knight",
+    plan: "Knight / Rook",
   },
   {
     n: "05",
@@ -62,7 +62,7 @@ const modules = [
       "Quanto da receita as parcelas consomem",
       "Capacidade de pagamento do negócio",
     ],
-    plan: "Knight",
+    plan: "Knight / Rook",
   },
   {
     n: "06",
@@ -74,7 +74,7 @@ const modules = [
       "Margem líquida e ponto de equilíbrio",
       "Nota de 0 a 100 em cada área",
     ],
-    plan: "Knight",
+    plan: "Knight / Rook",
   },
 ];
 
@@ -466,7 +466,7 @@ function ChessExpanded() {
   return (
     <section className="section-spacing border-t border-border">
       <div className="max-w-7xl mx-auto px-6">
-        <p className="section-label mb-6">— Plano Chess · Multi-CNPJ</p>
+        <p className="section-label mb-6">— Módulo Chess · Multi-CNPJ</p>
         <h2 className="heading-section mb-4">
           Para quem comanda mais de <em>uma unidade.</em>
         </h2>
@@ -493,7 +493,7 @@ function ChessExpanded() {
               </div>
             ))}
             <Link href="/planos/" className="btn-ghost inline-flex">
-              Conhecer o plano Chess →
+              Conhecer o módulo Chess →
             </Link>
           </div>
 
@@ -545,10 +545,10 @@ function FuncCTA() {
         <div>
           <p className="section-label mb-4">— Pronto para ver os seus números?</p>
           <h2 className="heading-section mb-2">
-            Comece <em>grátis.</em>
+            Teste por <em>7 dias.</em>
           </h2>
           <p className="text-body">
-            Plano Pawn grátis para sempre. Quando quiser mais, evolua para Knight, Rook ou Chess.
+            Escolha Knight ou Rook conforme o faturamento da unidade. Para grupos multiunidade, adicione o módulo Chess.
           </p>
         </div>
         <Link href="/planos/" className="btn-primary shrink-0">

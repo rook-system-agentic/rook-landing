@@ -21,9 +21,9 @@ function Hero() {
             Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2022
           </p>
           <div className="flex flex-wrap gap-4 items-center">
-            <Link href="/planos/" className="btn-primary">Começar grátis</Link>
+            <Link href="/planos/" className="btn-primary">Testar por 7 dias</Link>
             <Link href="/funcionalidades/" className="btn-ghost">Conhecer o produto</Link>
-            <span className="text-xs text-muted font-mono uppercase tracking-wider">Plano Pawn grátis para sempre</span>
+            <span className="text-xs text-muted font-mono uppercase tracking-wider">7 dias de teste · cartão obrigatório</span>
           </div>
         </div>
 
@@ -125,9 +125,9 @@ function FAQ() {
     { q: "Preciso mudar de contador?", a: "Não. O Rook é uma ferramenta de gestão para o dono — ele não substitui o contador, nem precisa dele para funcionar. O relatório PDF anual costuma ser bem recebido por contadores como insumo para o trabalho fiscal." },
     { q: "Preciso trocar o sistema que já uso?", a: "Não. O Rook não substitui seu PDV nem seu sistema de vendas — ele lê os seus dados e devolve a leitura financeira que eles não te dão." },
     { q: "De onde vêm os números do Rook?", a: "Das suas notas fiscais, das suas vendas e dos dados que você informa. Cada linha do diagnóstico tem origem rastreável — o tipo de número que seu contador também consegue conferir." },
-    { q: "Posso testar antes de pagar?", a: "Sim. O plano Pawn é gratuito para sempre. Os planos pagos (Knight e Rook) têm 14 dias de teste sem compromisso — cancela com um clique, sem multa." },
-    { q: "Como funciona o pagamento?", a: "Cobrança mensal recorrente no cartão de crédito. Planos anuais têm 25% de desconto e são cobrados em parcela única. Nota fiscal emitida automaticamente." },
-    { q: "Posso cancelar quando quiser?", a: "Sim. Sem fidelidade, sem multa. Mensal cancela no mês seguinte, anual vale até o fim do período. Seus dados ficam salvos por 90 dias para reativação." },
+    { q: "Posso testar antes de pagar?", a: "Sim. O período de teste dura 7 dias, é oferecido uma vez por Organização/CNPJ e exige um cartão válido. Se você cancelar antes do término, a primeira cobrança não será realizada." },
+    { q: "Como funciona o pagamento?", a: "A oferta padrão tem cobrança mensal recorrente em reais. Ao final do período de teste, a mensalidade do plano contratado é cobrada no meio de pagamento cadastrado." },
+    { q: "Posso cancelar quando quiser?", a: "Sim. O cancelamento pode ser solicitado pela plataforma ou pelo suporte, com antecedência mínima de 15 dias do fim do ciclo, e produz efeitos ao final do período pago." },
   ];
 
   return (
@@ -164,10 +164,10 @@ function CTA() {
     <section className="section-spacing border-t border-border text-center">
       <div className="max-w-3xl mx-auto px-6">
         <p className="section-label mb-6">— Pronto para ver os seus números?</p>
-        <h2 className="heading-section mb-4">Comece <em>grátis.</em></h2>
-        <p className="text-body mx-auto text-center mb-8">Plano Pawn sem cartão de crédito, sem limite de tempo. Quando quiser mais visão, evolua para Knight, Rook ou Chess.</p>
+        <h2 className="heading-section mb-4">Teste por <em>7 dias.</em></h2>
+        <p className="text-body mx-auto text-center mb-8">Escolha o plano adequado ao faturamento do seu estabelecimento. Organizações multiunidade também podem contratar o módulo Chess.</p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/planos/" className="btn-primary">Começar grátis →</Link>
+          <Link href="/planos/" className="btn-primary">Ver planos e testar →</Link>
           <Link href="/funcionalidades/" className="btn-ghost">Conhecer o produto</Link>
         </div>
       </div>
