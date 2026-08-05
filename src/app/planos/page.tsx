@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  CommercialLeadButton,
+  PlansCommercialExperience,
+} from "@/components/plans/PlansCommercialExperience";
+import {
   BILLING_CATALOG_REVALIDATE_SECONDS,
   getLandingBillingCatalog,
 } from "@/lib/billing-catalog-server";
@@ -12,12 +16,12 @@ export const metadata: Metadata = {
   title: "Planos Knight, Rook e Chess — Rook System",
   description:
     "Planos mensais do Rook System para restaurantes e grupos multiunidade, com 7 dias de utilização mediante cadastro do cartão.",
-  alternates: { canonical: "/planos/" },
+  alternates: { canonical: "https://www.rook.com.br/planos/" },
   openGraph: {
     title: "Planos Knight, Rook e Chess — Rook System",
     description:
       "Acesso completo com enquadramento por faturamento e Chess para organizações multiunidade.",
-    url: "https://rooksystem.com.br/planos/",
+    url: "https://www.rook.com.br/planos/",
     type: "website",
   },
 };
@@ -57,12 +61,9 @@ function CatalogUnavailable() {
           confirmados. Por segurança, não exibimos preços antigos nem iniciamos
           uma contratação.
         </p>
-        <a
-          href="mailto:contato@rooksystem.com.br?subject=Planos%20Rook%20System"
-          className="btn-ghost"
-        >
+        <CommercialLeadButton interest="general" className="btn-ghost">
           Falar com a equipe comercial
-        </a>
+        </CommercialLeadButton>
       </div>
     </section>
   );
@@ -93,7 +94,7 @@ export default async function PlanosPage() {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: "Planos mensais Rook System",
-    url: "https://rooksystem.com.br/planos/",
+    url: "https://www.rook.com.br/planos/",
     itemListElement: catalogResult.catalog.offers.map((offer, index) => ({
       "@type": "ListItem",
       position: index + 1,
@@ -106,7 +107,7 @@ export default async function PlanosPage() {
           "@type": "Offer",
           priceCurrency: offer.currency,
           price: (offer.unitAmountCents / 100).toFixed(2),
-          url: "https://rooksystem.com.br/planos/",
+          url: "https://www.rook.com.br/planos/",
         },
       },
     })),
@@ -132,85 +133,10 @@ export default async function PlanosPage() {
             recursos: está no faturamento bruto mensal de cada estabelecimento.
           </p>
 
-          <div
-            className="mx-auto mb-14 max-w-5xl rounded-2xl border border-border bg-card/60 p-5 md:p-7"
-            aria-label={`Limite de enquadramento: ${view.threshold} por mês`}
-          >
-            <div className="grid gap-4 text-left md:grid-cols-[1fr_auto_1fr] md:items-center">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-wider text-ocre">
-                  Até {view.threshold}/mês
-                </p>
-                <p className="mt-1 text-xl font-bold text-cream">Knight</p>
-              </div>
-              <div className="hidden h-14 w-px bg-terracota md:block" aria-hidden="true" />
-              <div className="md:text-right">
-                <p className="font-mono text-xs uppercase tracking-wider text-ocre">
-                  Acima de {view.threshold}/mês
-                </p>
-                <p className="mt-1 text-xl font-bold text-cream">Rook</p>
-              </div>
-            </div>
-            <div className="mt-5 flex items-center gap-3" aria-hidden="true">
-              <span className="h-2 flex-1 rounded-full bg-floresta" />
-              <span className="h-4 w-4 rounded-full border-4 border-bg bg-terracota ring-2 ring-terracota" />
-              <span className="h-2 flex-1 rounded-full bg-floresta" />
-            </div>
-            <p className="mt-4 text-center text-sm text-muted">
-              O limite define o plano; os dois lados mantêm acesso funcional completo.
-            </p>
-          </div>
-
-          <div className="grid gap-5 text-left md:grid-cols-2">
-            {view.basePlans.map((plan) => {
-              const isKnight = plan.productCode === "knight";
-              return (
-                <article key={plan.productCode} className="card flex h-full flex-col p-6 md:p-8">
-                  <p className="font-mono text-xs uppercase tracking-wider text-ocre">
-                    {isKnight
-                      ? `Faturamento até ${view.threshold}`
-                      : `Faturamento acima de ${view.threshold}`}
-                  </p>
-                  <h2 className="mt-3 text-3xl font-bold text-cream">
-                    {plan.displayName}
-                  </h2>
-                  <p className="mt-3 min-h-12 text-sm leading-relaxed text-muted">
-                    {plan.description}
-                  </p>
-                  <p className="mt-7 text-3xl font-bold text-cream">
-                    {plan.formattedPrice}
-                    <span className="ml-2 text-sm font-normal text-muted">
-                      /estabelecimento/mês
-                    </span>
-                  </p>
-                  <p className="mt-2 text-xs text-muted">
-                    Cobrança mensal recorrente em reais.
-                  </p>
-                  <ul className="mt-7 flex-1 space-y-3">
-                    {plan.publicFeatures.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2 text-sm text-muted">
-                        <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                    <li className="flex items-start gap-2 text-sm text-muted">
-                      <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
-                      <span>Mesma cobertura funcional de Knight e Rook</span>
-                    </li>
-                  </ul>
-                  <a
-                    href={`mailto:contato@rooksystem.com.br?subject=Interesse%20no%20plano%20${plan.displayName}`}
-                    className="btn-ghost mt-8 text-center"
-                  >
-                    Entrar na lista de interesse
-                  </a>
-                  <p className="mt-3 text-center text-xs text-muted">
-                    A contratação online permanece bloqueada até a validação final.
-                  </p>
-                </article>
-              );
-            })}
-          </div>
+          <PlansCommercialExperience
+            threshold={view.threshold}
+            basePlans={view.basePlans}
+          />
         </div>
       </section>
 
@@ -266,46 +192,43 @@ export default async function PlanosPage() {
                 A cobrança pode ser centralizada na matriz ou mantida por
                 restaurante, conforme a configuração escolhida pelo grupo.
               </p>
-              <a
-                href="mailto:contato@rooksystem.com.br?subject=Interesse%20no%20Chess"
+              <CommercialLeadButton
+                interest="chess"
+                interestLabel={view.chess.displayName}
                 className="btn-ghost mt-8 inline-flex"
               >
-                Falar sobre o Chess
-              </a>
+                Falar com especialista
+              </CommercialLeadButton>
             </div>
 
-            <div className="card overflow-hidden">
-              <div className="border-b border-border p-6">
-                <h3 className="text-xl font-bold text-cream">Desconto progressivo</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">
-                  Aplica-se aos itens Knight/Rook dos estabelecimentos ativos. A
-                  mensalidade Chess da organização não recebe esse desconto.
+            <div className="card p-6 md:p-8">
+              <p className="font-mono text-xs uppercase tracking-wider text-ocre">
+                Atendimento para grupos
+              </p>
+              <h3 className="mt-3 text-2xl font-bold text-cream">
+                Configuração assistida
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                A estrutura do grupo e a forma de cobrança são definidas com a
+                equipe comercial e registradas no atendimento.
+              </p>
+              <ul className="mt-7 space-y-4 text-sm text-muted">
+                {[
+                  "Mapeamento da matriz e das unidades do grupo",
+                  "Cobrança centralizada ou separada por restaurante",
+                  "Orientação comercial adequada à estrutura informada",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-7 border-t border-border pt-5">
+                <p className="text-xs leading-relaxed text-muted">
+                  O contato enviado nesta página fica registrado para
+                  acompanhamento da equipe Rook.
                 </p>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[420px] border-collapse text-left text-sm">
-                  <caption className="sr-only">
-                    Descontos por quantidade de estabelecimentos da organização
-                  </caption>
-                  <thead>
-                    <tr className="border-b border-border text-xs uppercase tracking-wider text-muted">
-                      <th scope="col" className="px-6 py-4 font-medium">Estabelecimentos</th>
-                      <th scope="col" className="px-6 py-4 text-right font-medium">Desconto nos planos-base</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {view.chessDiscountTiers.map((tier) => (
-                      <tr key={tier.unitRangeLabel} className="border-b border-border last:border-0">
-                        <th scope="row" className="px-6 py-4 font-medium text-cream">
-                          {tier.unitRangeLabel}
-                        </th>
-                        <td className="px-6 py-4 text-right font-semibold text-ocre">
-                          {tier.discountLabel}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             </div>
           </div>
@@ -320,7 +243,7 @@ export default async function PlanosPage() {
               Regras sem <em>letras miúdas.</em>
             </h2>
             <p className="text-body">
-              A contratação final sempre mostra plano, itens, descontos e a
+              A contratação final sempre mostra plano, itens e a
               data da primeira cobrança antes da confirmação.
             </p>
           </div>

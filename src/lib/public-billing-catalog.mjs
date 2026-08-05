@@ -118,64 +118,6 @@ function parseTrial(value) {
   };
 }
 
-function parseChessDiscount(value) {
-  assert(isRecord(value), "chessDiscount ausente");
-  assertExactKeys(value, ["appliesTo", "tiers"], "chessDiscount");
-  assert(
-    Array.isArray(value.appliesTo) &&
-      value.appliesTo.length === 2 &&
-      value.appliesTo.includes("knight") &&
-      value.appliesTo.includes("rook"),
-    "chessDiscount.appliesTo",
-  );
-  assert(Array.isArray(value.tiers) && value.tiers.length > 0, "chessDiscount.tiers");
-
-  let previousMax = 0;
-  let previousDiscountBps = -1;
-  const tiers = value.tiers.map((tier, index) => {
-    assert(isRecord(tier), `chessDiscount.tiers[${index}]`);
-    assertExactKeys(
-      tier,
-      ["minUnits", "maxUnits", "discountBps"],
-      `chessDiscount.tiers[${index}]`,
-    );
-    assert(
-      Number.isInteger(tier.minUnits) && tier.minUnits === previousMax + 1,
-      `chessDiscount.tiers[${index}].minUnits`,
-    );
-    assert(
-      tier.maxUnits === null ||
-        (Number.isInteger(tier.maxUnits) && tier.maxUnits >= tier.minUnits),
-      `chessDiscount.tiers[${index}].maxUnits`,
-    );
-    assert(
-      Number.isInteger(tier.discountBps) &&
-        tier.discountBps >= 0 &&
-        tier.discountBps <= 10_000,
-      `chessDiscount.tiers[${index}].discountBps`,
-    );
-    assert(
-      tier.discountBps >= previousDiscountBps,
-      `chessDiscount.tiers[${index}].discountBps deve ser progressivo`,
-    );
-    assert(
-      index === value.tiers.length - 1 || tier.maxUnits !== null,
-      "somente a última faixa pode ser aberta",
-    );
-    previousMax = tier.maxUnits ?? previousMax;
-    previousDiscountBps = tier.discountBps;
-
-    return {
-      minUnits: tier.minUnits,
-      maxUnits: tier.maxUnits,
-      discountBps: tier.discountBps,
-    };
-  });
-  assert(tiers.at(-1)?.maxUnits === null, "a última faixa deve ser aberta");
-
-  return { appliesTo: ["knight", "rook"], tiers };
-}
-
 function parseClassification(value) {
   assert(isRecord(value), "classification ausente");
   assertExactKeys(
@@ -202,7 +144,7 @@ export function parsePublicBillingCatalog(value) {
   assert(isRecord(value), "objeto raiz ausente");
   assertExactKeys(
     value,
-    ["release", "offers", "trial", "chessDiscount", "classification"],
+    ["release", "offers", "trial", "classification"],
     "catálogo",
   );
   assert(Array.isArray(value.offers) && value.offers.length === 3, "offers");
@@ -220,7 +162,6 @@ export function parsePublicBillingCatalog(value) {
     release: parseRelease(value.release),
     offers,
     trial: parseTrial(value.trial),
-    chessDiscount: parseChessDiscount(value.chessDiscount),
     classification: parseClassification(value.classification),
   };
 }
@@ -279,12 +220,6 @@ export function formatPriceBRL(unitAmountCents) {
   }).format(unitAmountCents / 100);
 }
 
-function formatUnitRange(minUnits, maxUnits) {
-  if (maxUnits === null) return `${minUnits} ou mais`;
-  if (minUnits === maxUnits) return `${minUnits}`;
-  return `${minUnits}–${maxUnits}`;
-}
-
 export function buildBillingCatalogViewModel(catalog) {
   const parsed = parsePublicBillingCatalog(catalog);
   const offersByCode = Object.fromEntries(
@@ -307,11 +242,5 @@ export function buildBillingCatalogViewModel(catalog) {
       ...offersByCode.chess,
       formattedPrice: formatPriceBRL(offersByCode.chess.unitAmountCents),
     },
-    chessDiscountTiers: parsed.chessDiscount.tiers.map((tier) => ({
-      ...tier,
-      unitRangeLabel: formatUnitRange(tier.minUnits, tier.maxUnits),
-      discountLabel:
-        tier.discountBps === 0 ? "Sem desconto" : `${tier.discountBps / 100}%`,
-    })),
   };
 }

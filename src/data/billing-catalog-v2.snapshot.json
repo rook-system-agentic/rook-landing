@@ -44,16 +44,6 @@
       "requiresPaymentMethod": true,
       "maxUsesPerOrganizationCnpj": 1
     },
-    "chessDiscount": {
-      "appliesTo": ["knight", "rook"],
-      "tiers": [
-        { "minUnits": 1, "maxUnits": 2, "discountBps": 0 },
-        { "minUnits": 3, "maxUnits": 3, "discountBps": 500 },
-        { "minUnits": 4, "maxUnits": 10, "discountBps": 1000 },
-        { "minUnits": 11, "maxUnits": 20, "discountBps": 2000 },
-        { "minUnits": 21, "maxUnits": null, "discountBps": 3000 }
-      ]
-    },
     "classification": {
       "metric": "monthly_revenue_cents",
       "currency": "BRL",

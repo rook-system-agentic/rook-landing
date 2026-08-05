@@ -19,14 +19,6 @@ export interface PublicBillingCatalog {
     requiresPaymentMethod: true;
     maxUsesPerOrganizationCnpj: 1;
   };
-  chessDiscount: {
-    appliesTo: ["knight", "rook"];
-    tiers: Array<{
-      minUnits: number;
-      maxUnits: number | null;
-      discountBps: number;
-    }>;
-  };
   classification: {
     metric: "monthly_revenue_cents";
     currency: "BRL";
@@ -48,13 +40,6 @@ export interface BillingCatalogViewModel {
   threshold: string;
   basePlans: Array<PublicBillingOffer & { formattedPrice: string }>;
   chess: PublicBillingOffer & { formattedPrice: string };
-  chessDiscountTiers: Array<{
-    minUnits: number;
-    maxUnits: number | null;
-    discountBps: number;
-    unitRangeLabel: string;
-    discountLabel: string;
-  }>;
 }
 
 export const MAX_BILLING_SNAPSHOT_AGE_MS: number;

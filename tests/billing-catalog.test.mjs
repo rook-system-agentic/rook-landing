@@ -27,19 +27,8 @@ test("snapshot público gera exatamente a oferta mensal exibida", () => {
   assert.equal(view.trialDays, 7);
   assert.equal(view.requiresPaymentMethod, true);
   assert.equal(view.threshold, "R$ 250.000,00");
-  assert.deepEqual(
-    view.chessDiscountTiers.map((tier) => [
-      tier.unitRangeLabel,
-      tier.discountLabel,
-    ]),
-    [
-      ["1–2", "Sem desconto"],
-      ["3", "5%"],
-      ["4–10", "10%"],
-      ["11–20", "20%"],
-      ["21 ou mais", "30%"],
-    ],
-  );
+  assert.equal("chessDiscount" in snapshot.catalog, false);
+  assert.equal("chessDiscountTiers" in view, false);
 });
 
 test("catálogo inválido usa o snapshot; ambos inválidos falham fechado", () => {
@@ -81,22 +70,31 @@ test("DTO rejeita Pawn, anual e campos internos do provedor", () => {
   leaked.offers[0].externalPriceId = "price_internal";
   assert.throws(() => parsePublicBillingCatalog(leaked));
 
-  const regressiveDiscount = structuredClone(snapshotCandidate.catalog);
-  regressiveDiscount.chessDiscount.tiers[3].discountBps = 500;
-  assert.throws(() => parsePublicBillingCatalog(regressiveDiscount));
+  const internalDiscountLeak = structuredClone(snapshotCandidate.catalog);
+  internalDiscountLeak.chessDiscount = {
+    appliesTo: ["knight", "rook"],
+    tiers: [{ minUnits: 1, maxUnits: null, discountBps: 500 }],
+  };
+  assert.throws(() => parsePublicBillingCatalog(internalDiscountLeak));
 });
 
-test("página é dirigida pelo snapshot e mantém checkout bloqueado", async () => {
-  const source = await readFile(
-    new URL("../src/app/planos/page.tsx", import.meta.url),
-    "utf8",
-  );
+test("página é dirigida pelo snapshot, capta leads e não expõe desconto Chess", async () => {
+  const [source, experience] = await Promise.all([
+    readFile(new URL("../src/app/planos/page.tsx", import.meta.url), "utf8"),
+    readFile(
+      new URL("../src/components/plans/PlansCommercialExperience.tsx", import.meta.url),
+      "utf8",
+    ),
+  ]);
 
   assert.match(source, /getLandingBillingCatalog/);
-  assert.match(source, /Entrar na lista de interesse/);
+  assert.match(source, /https:\/\/www\.rook\.com\.br\/planos\//);
+  assert.match(experience, /Falar com especialista/);
+  assert.match(experience, /api\/commercial-leads/);
   assert.doesNotMatch(source, /registro\?plan=/);
   assert.doesNotMatch(source, /\b(?:Pawn|anual|mais popular|Recomendado)\b/i);
   assert.doesNotMatch(source, /(?:479\.9|779\.9|279\.9)/);
+  assert.doesNotMatch(`${source}\n${experience}`, /chessDiscount|discountBps|Desconto progressivo/);
   assert.match(source, /snapshot validado em/);
   assert.match(source, /text-ocre/);
 });
