@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/sync-billing-catalog.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "billing:snapshot": "node scripts/sync-billing-catalog.mjs",
+    "test:billing": "node --test tests/billing-catalog.test.mjs"
   },
   "dependencies": {
     "@react-email/components": "^1.0.12",

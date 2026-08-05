@@ -1,130 +1,379 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  BILLING_CATALOG_REVALIDATE_SECONDS,
+  getLandingBillingCatalog,
+} from "@/lib/billing-catalog-server";
+import { buildBillingCatalogViewModel } from "@/lib/public-billing-catalog.mjs";
 
-const plans = [
-  {
-    name: "Knight",
-    desc: "Para estabelecimentos com faturamento bruto mensal de até R$ 250 mil.",
-    monthly: 479.9,
-    priceSuffix: "/estabelecimento/mês",
-    badge: null as string | null,
-    cta: "Testar Knight por 7 dias",
-    href: null as string | null,
-    planKey: "knight" as string | null,
-    note: "Teste único de 7 dias · cartão obrigatório",
-    prefix: "Acesso funcional completo da unidade:",
-    features: [
-      "Seis pilares financeiros com score",
-      "DRE, fluxo de caixa e indicadores",
-      "Análises comparativas e recomendações",
-      "Leitura de documentos e integrações habilitadas",
-      "Suporte pelos canais oficiais",
-    ],
-    highlight: false,
-  },
-  {
-    name: "Rook",
-    desc: "Para estabelecimentos com faturamento bruto mensal acima de R$ 250 mil.",
-    monthly: 779.9,
-    priceSuffix: "/estabelecimento/mês",
-    badge: "Recomendado" as string | null,
-    cta: "Testar Rook por 7 dias",
-    href: null as string | null,
-    planKey: "rook" as string | null,
-    note: "Teste único de 7 dias · cartão obrigatório",
-    prefix: "Acesso funcional completo da unidade:",
-    features: [
-      "Seis pilares financeiros com score",
-      "DRE, fluxo de caixa e indicadores",
-      "Análises comparativas e recomendações",
-      "Leitura de documentos e integrações habilitadas",
-      "Suporte pelos canais oficiais",
-    ],
-    highlight: true,
-  },
-  {
-    name: "Módulo Chess",
-    desc: "Consolidação e gestão para organizações com múltiplas unidades.",
-    monthly: 279.9,
-    priceSuffix: "/organização/mês",
-    badge: "Multiunidade" as string | null,
-    cta: "Falar sobre o Chess",
-    href: "mailto:contato@rooksystem.com.br?subject=Módulo%20Chess" as string | null,
-    planKey: null as string | null,
-    note: "Cobrado uma vez por grupo · adicional aos planos das unidades",
-    prefix: "Além do Knight ou Rook de cada estabelecimento:",
-    features: [
-      "Painel consolidado do grupo",
-      "Visão individual por estabelecimento",
-      "Comparação e ranking entre unidades",
-      "Gestão de acessos da organização",
-      "Vínculo auditável a um CNPJ mestre",
-    ],
-    highlight: false,
-  },
-];
+export const revalidate = BILLING_CATALOG_REVALIDATE_SECONDS;
 
-export default function PlanosPage() {
+export const metadata: Metadata = {
+  title: "Planos Knight, Rook e Chess — Rook System",
+  description:
+    "Planos mensais do Rook System para restaurantes e grupos multiunidade, com 7 dias de utilização mediante cadastro do cartão.",
+  alternates: { canonical: "/planos/" },
+  openGraph: {
+    title: "Planos Knight, Rook e Chess — Rook System",
+    description:
+      "Acesso completo com enquadramento por faturamento e Chess para organizações multiunidade.",
+    url: "https://rooksystem.com.br/planos/",
+    type: "website",
+  },
+};
+
+const DAY_IN_MS = 24 * 60 * 60 * 1_000;
+
+function formatDateBR(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "America/Sao_Paulo",
+  }).format(date);
+}
+
+function formatDateTimeBR(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+    timeZone: "America/Sao_Paulo",
+  }).format(date);
+}
+
+function CatalogUnavailable() {
+  return (
+    <section
+      className="section-spacing border-t border-border"
+      aria-labelledby="catalog-unavailable-title"
+    >
+      <div className="mx-auto max-w-3xl px-6 text-center">
+        <p className="section-label mb-6">— Catálogo em atualização</p>
+        <h2 id="catalog-unavailable-title" className="heading-section mb-4">
+          Valores temporariamente <em>indisponíveis.</em>
+        </h2>
+        <p className="text-body mx-auto mb-8 text-center">
+          O catálogo oficial e o último snapshot validado não puderam ser
+          confirmados. Por segurança, não exibimos preços antigos nem iniciamos
+          uma contratação.
+        </p>
+        <a
+          href="mailto:contato@rooksystem.com.br?subject=Planos%20Rook%20System"
+          className="btn-ghost"
+        >
+          Falar com a equipe comercial
+        </a>
+      </div>
+    </section>
+  );
+}
+
+export default async function PlanosPage() {
+  const catalogResult = await getLandingBillingCatalog();
+  if (!catalogResult.catalog) {
+    return (
+      <>
+        <section className="section-spacing">
+          <div className="mx-auto max-w-5xl px-6 text-center">
+            <p className="section-label mb-6">— Planos</p>
+            <h1 className="heading-hero mb-6">
+              A oferta certa começa por dados <em>confiáveis.</em>
+            </h1>
+          </div>
+        </section>
+        <CatalogUnavailable />
+      </>
+    );
+  }
+
+  const view = buildBillingCatalogViewModel(catalogResult.catalog);
+  const today = new Date();
+  const firstChargeDate = new Date(today.getTime() + view.trialDays * DAY_IN_MS);
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Planos mensais Rook System",
+    url: "https://rooksystem.com.br/planos/",
+    itemListElement: catalogResult.catalog.offers.map((offer, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Product",
+        name: offer.displayName,
+        description: offer.description,
+        brand: { "@type": "Brand", name: "Rook System" },
+        offers: {
+          "@type": "Offer",
+          priceCurrency: offer.currency,
+          price: (offer.unitAmountCents / 100).toFixed(2),
+          url: "https://rooksystem.com.br/planos/",
+        },
+      },
+    })),
+  };
+
   return (
     <>
-      <section className="section-spacing">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="section-label mb-6">— Planos</p>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schema).replace(/</g, "\\u003c"),
+        }}
+      />
+
+      <section className="section-spacing" data-catalog-release={view.releaseId}>
+        <div className="mx-auto max-w-7xl px-6 text-center">
+          <p className="section-label mb-6">— Planos mensais recorrentes</p>
           <h1 className="heading-hero mb-6">
-            Invista no <em>controle</em> do seu negócio.
+            O mesmo acesso. O enquadramento <em>certo.</em>
           </h1>
-          <p className="text-body mx-auto text-center mb-14">
-            Cada estabelecimento contrata Knight ou Rook conforme o próprio faturamento. A oferta padrão é mensal e inclui um teste único de 7 dias com cartão.
+          <p className="text-body mx-auto mb-12 text-center">
+            Knight e Rook entregam acesso completo. A diferença não está nos
+            recursos: está no faturamento bruto mensal de cada estabelecimento.
           </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 text-left">
-            {plans.map((plan) => (
-              <div key={plan.name} className={`card p-6 flex flex-col ${plan.highlight ? "ring-2 ring-terracota" : ""}`}>
-                {plan.badge && (
-                  <span className={`self-start text-xs font-semibold px-2.5 py-1 rounded-full mb-3 ${plan.highlight ? "bg-terracota/20 text-terracota" : "bg-ocre/20 text-ocre"}`}>
-                    {plan.badge}
-                  </span>
-                )}
-                <h3 className="text-xl font-bold text-cream">{plan.name}</h3>
-                <p className="text-sm text-muted mt-1 mb-4">{plan.desc}</p>
-
-                <p className="text-2xl font-bold text-cream mb-1">
-                  R$ {plan.monthly.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                  <span className="text-sm font-normal text-muted">{plan.priceSuffix}</span>
+          <div
+            className="mx-auto mb-14 max-w-5xl rounded-2xl border border-border bg-card/60 p-5 md:p-7"
+            aria-label={`Limite de enquadramento: ${view.threshold} por mês`}
+          >
+            <div className="grid gap-4 text-left md:grid-cols-[1fr_auto_1fr] md:items-center">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-wider text-ocre">
+                  Até {view.threshold}/mês
                 </p>
-                <p className="text-xs text-muted mb-6">{plan.note}</p>
-
-                <p className="text-xs text-ocre italic mb-2">{plan.prefix}</p>
-                <ul className="space-y-2 mb-6 flex-1">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm text-muted">
-                      <span className="text-floresta mt-0.5">✓</span>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <a
-                  href={plan.planKey ? `https://app.rook.com.br/registro?plan=${plan.planKey}_monthly` : plan.href ?? "#"}
-                  className={plan.highlight ? "btn-primary text-center" : "btn-ghost text-center"}
-                >
-                  {plan.cta}
-                </a>
+                <p className="mt-1 text-xl font-bold text-cream">Knight</p>
               </div>
-            ))}
+              <div className="hidden h-14 w-px bg-terracota md:block" aria-hidden="true" />
+              <div className="md:text-right">
+                <p className="font-mono text-xs uppercase tracking-wider text-ocre">
+                  Acima de {view.threshold}/mês
+                </p>
+                <p className="mt-1 text-xl font-bold text-cream">Rook</p>
+              </div>
+            </div>
+            <div className="mt-5 flex items-center gap-3" aria-hidden="true">
+              <span className="h-2 flex-1 rounded-full bg-floresta" />
+              <span className="h-4 w-4 rounded-full border-4 border-bg bg-terracota ring-2 ring-terracota" />
+              <span className="h-2 flex-1 rounded-full bg-floresta" />
+            </div>
+            <p className="mt-4 text-center text-sm text-muted">
+              O limite define o plano; os dois lados mantêm acesso funcional completo.
+            </p>
           </div>
 
-          <p className="text-xs text-muted mt-10 max-w-3xl mx-auto">
-            O módulo Chess não substitui os planos individuais: cada unidade mantém Knight ou Rook, e o Chess é cobrado uma única vez por grupo.
-          </p>
+          <div className="grid gap-5 text-left md:grid-cols-2">
+            {view.basePlans.map((plan) => {
+              const isKnight = plan.productCode === "knight";
+              return (
+                <article key={plan.productCode} className="card flex h-full flex-col p-6 md:p-8">
+                  <p className="font-mono text-xs uppercase tracking-wider text-ocre">
+                    {isKnight
+                      ? `Faturamento até ${view.threshold}`
+                      : `Faturamento acima de ${view.threshold}`}
+                  </p>
+                  <h2 className="mt-3 text-3xl font-bold text-cream">
+                    {plan.displayName}
+                  </h2>
+                  <p className="mt-3 min-h-12 text-sm leading-relaxed text-muted">
+                    {plan.description}
+                  </p>
+                  <p className="mt-7 text-3xl font-bold text-cream">
+                    {plan.formattedPrice}
+                    <span className="ml-2 text-sm font-normal text-muted">
+                      /estabelecimento/mês
+                    </span>
+                  </p>
+                  <p className="mt-2 text-xs text-muted">
+                    Cobrança mensal recorrente em reais.
+                  </p>
+                  <ul className="mt-7 flex-1 space-y-3">
+                    {plan.publicFeatures.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2 text-sm text-muted">
+                        <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                    <li className="flex items-start gap-2 text-sm text-muted">
+                      <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
+                      <span>Mesma cobertura funcional de Knight e Rook</span>
+                    </li>
+                  </ul>
+                  <a
+                    href={`mailto:contato@rooksystem.com.br?subject=Interesse%20no%20plano%20${plan.displayName}`}
+                    className="btn-ghost mt-8 text-center"
+                  >
+                    Entrar na lista de interesse
+                  </a>
+                  <p className="mt-3 text-center text-xs text-muted">
+                    A contratação online permanece bloqueada até a validação final.
+                  </p>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      <section className="section-spacing border-t border-border text-center">
-        <div className="max-w-3xl mx-auto px-6">
-          <p className="section-label mb-6">— Dúvidas sobre o produto?</p>
-          <h2 className="heading-section mb-4">Veja como <em>funciona.</em></h2>
-          <p className="text-body mx-auto text-center mb-8">Conheça os módulos e indicadores que ajudam a entender e operar o seu negócio.</p>
-          <Link href="/funcionalidades/" className="btn-ghost">Explorar →</Link>
+      <section className="section-spacing border-t border-border" aria-labelledby="trial-title">
+        <div className="mx-auto grid max-w-7xl gap-8 px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+          <div>
+            <p className="section-label mb-6">— Antes da primeira cobrança</p>
+            <h2 id="trial-title" className="heading-section mb-5">
+              {view.trialDays} dias para usar. <em>Com data clara.</em>
+            </h2>
+            <p className="text-body">
+              O cartão é cadastrado no início. Se o período começasse hoje,
+              {" "}em {formatDateBR(today)}, a primeira cobrança estaria prevista para
+              {" "}<strong className="text-cream">{formatDateBR(firstChargeDate)}</strong>.
+              A data definitiva será mostrada no checkout antes da confirmação.
+            </p>
+          </div>
+          <div className="card grid gap-5 p-6 sm:grid-cols-3">
+            {[
+              ["01", "Cartão cadastrado", "Obrigatório para iniciar o período de utilização."],
+              ["02", `${view.trialDays} dias de uso`, "Uma utilização por Organização/CNPJ."],
+              ["03", "Cobrança mensal", "Começa na data exibida no checkout, salvo cancelamento anterior."],
+            ].map(([step, title, description]) => (
+              <div key={step}>
+                <p className="font-mono text-xs text-terracota">{step}</p>
+                <h3 className="mt-2 font-semibold text-cream">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-spacing border-t border-border" aria-labelledby="chess-title">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+            <div>
+              <p className="section-label mb-6">— Adicional multiunidade</p>
+              <h2 id="chess-title" className="heading-section mb-5">
+                Chess organiza o grupo. <em>Unidade por unidade.</em>
+              </h2>
+              <p className="text-body mb-6">
+                {view.chess.description} Cada estabelecimento mantém Knight ou
+                Rook, e a organização adiciona uma mensalidade Chess.
+              </p>
+              <p className="text-3xl font-bold text-cream">
+                {view.chess.formattedPrice}
+                <span className="ml-2 text-sm font-normal text-muted">
+                  /organização/mês
+                </span>
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-muted">
+                A cobrança pode ser centralizada na matriz ou mantida por
+                restaurante, conforme a configuração escolhida pelo grupo.
+              </p>
+              <a
+                href="mailto:contato@rooksystem.com.br?subject=Interesse%20no%20Chess"
+                className="btn-ghost mt-8 inline-flex"
+              >
+                Falar sobre o Chess
+              </a>
+            </div>
+
+            <div className="card overflow-hidden">
+              <div className="border-b border-border p-6">
+                <h3 className="text-xl font-bold text-cream">Desconto progressivo</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">
+                  Aplica-se aos itens Knight/Rook dos estabelecimentos ativos. A
+                  mensalidade Chess da organização não recebe esse desconto.
+                </p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[420px] border-collapse text-left text-sm">
+                  <caption className="sr-only">
+                    Descontos por quantidade de estabelecimentos da organização
+                  </caption>
+                  <thead>
+                    <tr className="border-b border-border text-xs uppercase tracking-wider text-muted">
+                      <th scope="col" className="px-6 py-4 font-medium">Estabelecimentos</th>
+                      <th scope="col" className="px-6 py-4 text-right font-medium">Desconto nos planos-base</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {view.chessDiscountTiers.map((tier) => (
+                      <tr key={tier.unitRangeLabel} className="border-b border-border last:border-0">
+                        <th scope="row" className="px-6 py-4 font-medium text-cream">
+                          {tier.unitRangeLabel}
+                        </th>
+                        <td className="px-6 py-4 text-right font-semibold text-ocre">
+                          {tier.discountLabel}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-spacing border-t border-border" aria-labelledby="faq-title">
+        <div className="mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-[1fr_2fr]">
+          <div>
+            <p className="section-label mb-6">— Perguntas</p>
+            <h2 id="faq-title" className="heading-section mb-4">
+              Regras sem <em>letras miúdas.</em>
+            </h2>
+            <p className="text-body">
+              A contratação final sempre mostra plano, itens, descontos e a
+              data da primeira cobrança antes da confirmação.
+            </p>
+          </div>
+          <div className="space-y-4">
+            {[
+              [
+                "Posso escolher Knight mesmo acima do limite?",
+                `Não. Até ${view.threshold} de faturamento bruto mensal, o enquadramento é Knight; acima desse valor, é Rook. Os dois possuem acesso funcional completo.`,
+              ],
+              [
+                "Como funciona a regra dos três meses?",
+                "A regra prevista para reenquadramento usa três meses completos e consecutivos. Enquanto o processo automático não estiver ativado, qualquer mudança é acompanhada pela equipe e comunicada antes de produzir efeito.",
+              ],
+              [
+                "Como é feita a cobrança do Chess?",
+                "Chess é uma mensalidade adicional por organização. Cada estabelecimento mantém seu item Knight ou Rook; o grupo pode centralizar o pagamento na matriz ou manter cobranças por restaurante.",
+              ],
+              [
+                "Quando ocorre a primeira cobrança?",
+                `Depois dos ${view.trialDays} dias, na data mostrada no checkout. Se o período começasse hoje, a previsão seria ${formatDateBR(firstChargeDate)}.`,
+              ],
+              [
+                "Posso cancelar antes de pagar?",
+                "Sim. O cancelamento anterior ao fim do período de utilização impede a primeira cobrança, conforme os termos apresentados na contratação.",
+              ],
+              [
+                "E os clientes que já usam o Rook?",
+                "Qualquer migração será comunicada individualmente. Não haverá troca silenciosa de plano ou cobrança sem aviso e rastreabilidade.",
+              ],
+            ].map(([question, answer]) => (
+              <details key={question} className="card group p-5">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 font-semibold text-cream">
+                  {question}
+                  <span className="text-xl text-ocre transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-muted">{answer}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-border py-10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            Oferta exibida: <strong className="text-cream">{view.releaseId}</strong>
+            {catalogResult.source === "snapshot" && catalogResult.snapshotGeneratedAt
+              ? ` · snapshot validado em ${formatDateTimeBR(new Date(catalogResult.snapshotGeneratedAt))}`
+              : " · catálogo publicado"}
+          </p>
+          <Link href="/funcionalidades/" className="text-cream underline-offset-4 hover:underline">
+            Conhecer as funcionalidades →
+          </Link>
         </div>
       </section>
     </>
