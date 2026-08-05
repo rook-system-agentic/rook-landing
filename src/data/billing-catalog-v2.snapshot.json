@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-08-05T12:18:49Z",
+  "sourceUrl": "https://app.rook.com.br/api/billing/catalog",
+  "catalog": {
+    "release": {
+      "key": "p0-monthly",
+      "version": 1,
+      "effectiveFrom": "2026-07-30T03:00:00+00:00"
+    },
+    "offers": [
+      {
+        "productCode": "knight",
+        "displayName": "Knight",
+        "description": "Acesso completo para estabelecimentos com faturamento mensal de ate R$ 250 mil.",
+        "productKind": "base_plan",
+        "billingInterval": "month",
+        "currency": "BRL",
+        "unitAmountCents": 47990,
+        "publicFeatures": ["Acesso completo a plataforma"]
+      },
+      {
+        "productCode": "rook",
+        "displayName": "Rook",
+        "description": "Acesso completo para estabelecimentos com faturamento mensal acima de R$ 250 mil.",
+        "productKind": "base_plan",
+        "billingInterval": "month",
+        "currency": "BRL",
+        "unitAmountCents": 77990,
+        "publicFeatures": ["Acesso completo a plataforma"]
+      },
+      {
+        "productCode": "chess",
+        "displayName": "Chess",
+        "description": "Add-on organizacional para consolidacao multiunidade.",
+        "productKind": "organization_add_on",
+        "billingInterval": "month",
+        "currency": "BRL",
+        "unitAmountCents": 27990,
+        "publicFeatures": ["Consolidacao multiunidade"]
+      }
+    ],
+    "trial": {
+      "durationDays": 7,
+      "requiresPaymentMethod": true,
+      "maxUsesPerOrganizationCnpj": 1
+    },
+    "chessDiscount": {
+      "appliesTo": ["knight", "rook"],
+      "tiers": [
+        { "minUnits": 1, "maxUnits": 2, "discountBps": 0 },
+        { "minUnits": 3, "maxUnits": 3, "discountBps": 500 },
+        { "minUnits": 4, "maxUnits": 10, "discountBps": 1000 },
+        { "minUnits": 11, "maxUnits": 20, "discountBps": 2000 },
+        { "minUnits": 21, "maxUnits": null, "discountBps": 3000 }
+      ]
+    },
+    "classification": {
+      "metric": "monthly_revenue_cents",
+      "currency": "BRL",
+      "knightMaxMonthlyRevenueCents": 25000000
+    }
+  }
+}

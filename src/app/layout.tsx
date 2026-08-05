@@ -7,6 +7,7 @@ import MicrosoftClarity from "@/components/MicrosoftClarity";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://rooksystem.com.br"),
   title: "Rook System — Gestão Financeira para Restaurantes",
   description:
     "Controle CMV, otimize compras e proteja sua margem. Sistema de gestão financeira para food service com diagnóstico, relatório anual e painel multi-unidade.",
