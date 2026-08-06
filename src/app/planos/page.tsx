@@ -135,7 +135,7 @@ export default async function PlanosPage() {
           <div className="card grid gap-5 p-6 sm:grid-cols-3">
             {[
               ["01", "Cartão cadastrado", "Obrigatório para iniciar o período de utilização."],
-              ["02", `${view.trialDays} dias de uso`, "Uma utilização por Organização/CNPJ."],
+              ["02", `${view.trialDays} dias de uso`, "Uma utilização por Empresa/CNPJ."],
               ["03", "Cobrança mensal", "Começa na data exibida no checkout, salvo cancelamento anterior."],
             ].map(([step, title, description]) => (
               <div key={step}>
