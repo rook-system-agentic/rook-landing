@@ -7,7 +7,7 @@ function Hero() {
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
         {/* Left */}
         <div>
-          <p className="section-label mb-6">— Gestão financeira para donos de restaurante</p>
+          <p className="section-label mb-6">— Inteligência financeira para donos de restaurante</p>
           <h1 className="heading-hero mb-8">
             Faturar não é <em>lucrar.</em>
           </h1>
@@ -102,8 +102,8 @@ function Manifesto() {
           {[
             { contrast: "Receita ≠ Lucro", desc: "O que entra no caixa não é o que fica no bolso. Entre os dois há 6 pilares — e qualquer um deles pode estar corroendo sua margem agora." },
             { contrast: "Faturamento ≠ Resultado", desc: "Crescer 30% em vendas e perder dinheiro acontece todo mês em food service. Sem visão por linha de DRE, ninguém sabe explicar onde." },
-            { contrast: "Movimento ≠ Margem", desc: "Filas no salão, delivery cheio, ticket bom — e a margem real pode estar em 4%. Ou em 22%. A diferença muda decisões importantes." },
-            { contrast: "Dívida ≠ Estratégia", desc: "Financiamento pode ser alavanca ou armadilha. Sem saber quanto da receita a parcela consome, você só descobre qual dos dois quando o caixa aperta." },
+            { contrast: "Movimento ≠ Margem", desc: "Filas no salão, delivery cheio, ticket bom — e a margem real pode ser positiva ou negativa. A diferença muda decisões importantes." },
+            { contrast: "Dívida ≠ Estratégia", desc: "Financiamento pode ser alavanca ou armadilha. Sem saber quanto da receita você precisa para amortizar a dívida, o resultado é o aumento insustentável do endividamento." },
           ].map((item) => (
             <div key={item.contrast} className="card p-5">
               <p className="font-semibold text-cream mb-1">{item.contrast}</p>
@@ -119,13 +119,12 @@ function Manifesto() {
 /* ─── FAQ ─── */
 function FAQ() {
   const faqs = [
-    { q: "Como funciona a Rook?", a: "O Rook organiza os dados financeiros e fiscais do seu restaurante, classifica cada linha com base em metodologia contábil e devolve um diagnóstico completo — DRE, score por pilar e recomendações com impacto em R$. Você lê o diagnóstico num domingo de manhã, sem planilhas, sem pedir nada para o contador." },
+    { q: "Como funciona a Rook?", a: "O Rook coleta, analisa e interpreta os dados financeiros e fiscais do seu restaurante, classificando cada linha com base em metodologia contábil e traduzindo tudo em um diagnóstico. Pelo fluxo de caixa ou pelo DRE, você recebe recomendações direcionadas à construção do seu lucro." },
     { q: "Funciona em qualquer cidade do Brasil?", a: "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O cálculo tributário considera a UF do estabelecimento automaticamente — você só precisa ter o cadastro do CNPJ correto." },
-    { q: "É seguro? Quem mais vê meus dados?", a: "Os dados são criptografados em trânsito (TLS 1.3) e em repouso (AES-256). Servidor brasileiro, infra AWS São Paulo. Cada empresa tem seu próprio ambiente isolado — ninguém vê seus números fora da sua equipe. O Rook está em adequação à LGPD desde o dia 1." },
-    { q: "Preciso mudar de contador?", a: "Não. O Rook é uma ferramenta de gestão para o dono — ele não substitui o contador, nem precisa dele para funcionar. O relatório PDF anual costuma ser bem recebido por contadores como insumo para o trabalho fiscal." },
-    { q: "Preciso trocar o sistema que já uso?", a: "Não. O Rook não substitui seu PDV nem seu sistema de vendas — ele lê os seus dados e devolve a leitura financeira que eles não te dão." },
-    { q: "De onde vêm os números do Rook?", a: "Das suas notas fiscais, das suas vendas e dos dados que você informa. Cada linha do diagnóstico tem origem rastreável — o tipo de número que seu contador também consegue conferir." },
-    { q: "Posso testar antes de pagar?", a: "Sim. O período de teste dura 7 dias, é oferecido uma vez por Organização/CNPJ e exige um cartão válido. Se você cancelar antes do término, a primeira cobrança não será realizada." },
+    { q: "É seguro? Quem mais vê meus dados?", a: "Os dados são criptografados em trânsito (TLS 1.3) e em repouso (AES-256). Cada empresa tem seu próprio ambiente isolado — ninguém vê seus números fora da sua equipe. O Rook está adequado à LGPD." },
+    { q: "Preciso mudar de contador?", a: "Não. O Rook é uma inteligência de performance para o dono — ele não substitui o contador, nem precisa dele para funcionar." },
+    { q: "Preciso trocar o sistema que já uso?", a: "Não. O Rook não substitui seu PDV ou ERP — nossa metodologia lê seus dados e traduz seu resultado. Para aumentar ainda mais a nossa capacidade de análise, possuímos integração com os principais ERPs do mercado." },
+    { q: "Posso testar antes de pagar?", a: "Sim. O período de teste dura 7 dias, é oferecido uma vez por Empresa/CNPJ e exige um cartão válido. Se você cancelar antes do término, a primeira cobrança não será realizada." },
     { q: "Como funciona o pagamento?", a: "A oferta padrão tem cobrança mensal recorrente em reais. Ao final do período de teste, a mensalidade do plano contratado é cobrada no meio de pagamento cadastrado." },
     { q: "Posso cancelar quando quiser?", a: "Sim. O cancelamento pode ser solicitado pela plataforma ou pelo suporte, com antecedência mínima de 15 dias do fim do ciclo, e produz efeitos ao final do período pago." },
   ];

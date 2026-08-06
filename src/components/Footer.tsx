@@ -12,7 +12,7 @@ export default function Footer() {
             <Image src="/brand/rook-logo-horizontal.png" alt="Rook System" width={140} height={47} className="h-10 w-auto" />
           </Link>
           <p className="text-sm text-muted leading-relaxed">
-            Sistema de gestão financeira para food service. Controle CMV, otimize compras e proteja sua margem.
+            Inteligência Financeira para Food Service.
           </p>
         </div>
 
