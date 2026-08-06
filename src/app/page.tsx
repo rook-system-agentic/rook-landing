@@ -20,34 +20,34 @@ function Hero() {
           <p className="text-xs text-muted/70 mb-6 font-mono">
             Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2022
           </p>
-          <div className="flex flex-wrap gap-4 items-center">
-            <Link href="/planos/" className="btn-primary">Testar por 7 dias</Link>
-            <Link href="/funcionalidades/" className="btn-ghost">Conhecer o produto</Link>
-            <span className="text-xs text-muted font-mono uppercase tracking-wider">7 dias de teste · cartão obrigatório</span>
-          </div>
+
         </div>
 
-        {/* Right — 3 product cards mosaic */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="card p-5 col-span-2">
-            <p className="font-mono text-xs text-muted uppercase tracking-wider mb-2">— Score do mês</p>
-            <div className="flex items-center gap-4">
-              <span className="text-4xl font-bold text-floresta">83</span>
-              <div>
-                <p className="text-sm font-semibold text-cream">Bom</p>
-                <p className="text-xs text-muted">4 de 6 pilares saudáveis</p>
-              </div>
-            </div>
+        {/* Right — Module highlights */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="card p-5">
+            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Vendas</p>
+            <ul className="space-y-1.5 text-sm text-muted">
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Faturamento diário, semanal e mensal</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Ticket médio e volume de transações</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Projeção de receita do mês</li>
+            </ul>
           </div>
           <div className="card p-5">
-            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">— Recomendação</p>
-            <p className="text-xs text-muted mb-1">Migração para <strong className="text-cream">Lucro Presumido</strong> pode economizar</p>
-            <p className="text-xl font-bold text-floresta">R$ 124k<span className="text-xs text-muted font-normal"> / ano</span></p>
+            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Compras e CMV</p>
+            <ul className="space-y-1.5 text-sm text-muted">
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>CMV real vs. meta por período</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Curva ABC de fornecedores</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Orçamento disponível para compras</li>
+            </ul>
           </div>
           <div className="card p-5">
-            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">— Atenção</p>
-            <p className="text-xs text-muted mb-1"><strong className="text-cream">Top fornecedor</strong> concentra</p>
-            <p className="text-xl font-bold text-terracota">41%<span className="text-xs text-muted font-normal"> do CMV</span></p>
+            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— DRE e Resultado</p>
+            <ul className="space-y-1.5 text-sm text-muted">
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>DRE gerencial automático</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Score de saúde financeira (6 pilares)</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Recomendações com impacto em R$</li>
+            </ul>
           </div>
         </div>
       </div>
