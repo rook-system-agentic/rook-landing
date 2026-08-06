@@ -4,6 +4,7 @@ import {
   CommercialLeadButton,
   PlansCommercialExperience,
 } from "@/components/plans/PlansCommercialExperience";
+import { TrialDateEstimate } from "@/components/plans/TrialDateEstimate";
 import {
   BILLING_CATALOG_REVALIDATE_SECONDS,
   getLandingBillingCatalog,
@@ -25,17 +26,6 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
-
-const DAY_IN_MS = 24 * 60 * 60 * 1_000;
-
-function formatDateBR(date: Date) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    timeZone: "America/Sao_Paulo",
-  }).format(date);
-}
 
 function formatDateTimeBR(date: Date) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -88,8 +78,6 @@ export default async function PlanosPage() {
   }
 
   const view = buildBillingCatalogViewModel(catalogResult.catalog);
-  const today = new Date();
-  const firstChargeDate = new Date(today.getTime() + view.trialDays * DAY_IN_MS);
   const schema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -149,10 +137,7 @@ export default async function PlanosPage() {
               {view.trialDays} dias para usar. <em>Com data clara.</em>
             </h2>
             <p className="text-body">
-              O cartão é cadastrado no início. Se o período começasse hoje,
-              {" "}em {formatDateBR(today)}, a primeira cobrança estaria prevista para
-              {" "}<strong className="text-cream">{formatDateBR(firstChargeDate)}</strong>.
-              A data definitiva será mostrada no checkout antes da confirmação.
+              <TrialDateEstimate trialDays={view.trialDays} />
             </p>
           </div>
           <div className="card grid gap-5 p-6 sm:grid-cols-3">
@@ -268,7 +253,11 @@ export default async function PlanosPage() {
               ],
               [
                 "Quando ocorre a primeira cobrança?",
-                `Depois dos ${view.trialDays} dias, na data mostrada no checkout. Se o período começasse hoje, a previsão seria ${formatDateBR(firstChargeDate)}.`,
+                <TrialDateEstimate
+                  key="trial-date-faq"
+                  trialDays={view.trialDays}
+                  context="faq"
+                />,
               ],
               [
                 "Posso cancelar antes de pagar?",
@@ -279,7 +268,7 @@ export default async function PlanosPage() {
                 "Qualquer migração será comunicada individualmente. Não haverá troca silenciosa de plano ou cobrança sem aviso e rastreabilidade.",
               ],
             ].map(([question, answer]) => (
-              <details key={question} className="card group p-5">
+              <details key={String(question)} className="card group p-5">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 font-semibold text-cream">
                   {question}
                   <span className="text-xl text-ocre transition-transform group-open:rotate-45" aria-hidden="true">+</span>

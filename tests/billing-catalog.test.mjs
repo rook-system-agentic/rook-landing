@@ -7,6 +7,7 @@ import {
   parsePublicBillingCatalog,
   resolvePublicBillingCatalog,
 } from "../src/lib/public-billing-catalog.mjs";
+import { buildTrialDateEstimate } from "../src/lib/trial-date-estimate.mjs";
 import snapshotCandidate from "../src/data/billing-catalog-v2.snapshot.json" with {
   type: "json",
 };
@@ -29,6 +30,24 @@ test("snapshot público gera exatamente a oferta mensal exibida", () => {
   assert.equal(view.threshold, "R$ 250.000,00");
   assert.equal("chessDiscount" in snapshot.catalog, false);
   assert.equal("chessDiscountTiers" in view, false);
+});
+
+test("estimativa do trial usa o dia corrente de São Paulo, não a data do build", () => {
+  assert.deepEqual(
+    buildTrialDateEstimate(7, new Date("2026-08-06T12:00:00.000Z")),
+    {
+      startDate: "06/08/2026",
+      firstChargeDate: "13/08/2026",
+    },
+  );
+
+  assert.deepEqual(
+    buildTrialDateEstimate(7, new Date("2026-08-06T01:30:00.000Z")),
+    {
+      startDate: "05/08/2026",
+      firstChargeDate: "12/08/2026",
+    },
+  );
 });
 
 test("catálogo inválido usa o snapshot; ambos inválidos falham fechado", () => {
@@ -79,10 +98,14 @@ test("DTO rejeita Pawn, anual e campos internos do provedor", () => {
 });
 
 test("página é dirigida pelo snapshot, capta leads e não expõe desconto Chess", async () => {
-  const [source, experience] = await Promise.all([
+  const [source, experience, trialDateEstimate] = await Promise.all([
     readFile(new URL("../src/app/planos/page.tsx", import.meta.url), "utf8"),
     readFile(
       new URL("../src/components/plans/PlansCommercialExperience.tsx", import.meta.url),
+      "utf8",
+    ),
+    readFile(
+      new URL("../src/components/plans/TrialDateEstimate.tsx", import.meta.url),
       "utf8",
     ),
   ]);
@@ -101,4 +124,8 @@ test("página é dirigida pelo snapshot, capta leads e não expõe desconto Ches
   assert.doesNotMatch(`${source}\n${experience}`, /chessDiscount|discountBps|Desconto progressivo/);
   assert.match(source, /snapshot validado em/);
   assert.match(source, /text-ocre/);
+  assert.match(source, /TrialDateEstimate/);
+  assert.doesNotMatch(source, /const today = new Date\(\)/);
+  assert.match(trialDateEstimate, /useEffect/);
+  assert.match(trialDateEstimate, /buildTrialDateEstimate/);
 });
