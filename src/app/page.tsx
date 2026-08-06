@@ -123,7 +123,7 @@ function FAQ() {
     { q: "Funciona em qualquer cidade do Brasil?", a: "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O cálculo tributário considera a UF do estabelecimento automaticamente — você só precisa ter o cadastro do CNPJ correto." },
     { q: "É seguro? Quem mais vê meus dados?", a: "Os dados são criptografados em trânsito (TLS 1.3) e em repouso (AES-256). Cada empresa tem seu próprio ambiente isolado — ninguém vê seus números fora da sua equipe. O Rook está adequado à LGPD." },
     { q: "Preciso mudar de contador?", a: "Não. O Rook é uma inteligência de performance para o dono — ele não substitui o contador, nem precisa dele para funcionar." },
-    { q: "Preciso trocar o sistema que já uso?", a: "Não. O Rook não substitui seu PDV ou ERP — nossa metodologia lê seus dados e traduz seu resultado. Para aumentar ainda mais a nossa capacidade de análise, possuímos integração com os principais ERPs do mercado." },
+    { q: "Preciso trocar o sistema que já uso?", a: "Não. O Rook não substitui seu PDV ou ERP — nossa metodologia lê seus dados e traduz seu resultado. Para aumentar ainda mais a nossa capacidade de análise, possuímos integração com os principais ERPs do mercado.", cta: { label: "Caso seu ERP ainda não tenha integração, solicite aqui.", href: "mailto:contato@rooksystem.com.br?subject=Solicita%C3%A7%C3%A3o%20de%20integra%C3%A7%C3%A3o%20com%20ERP" } },
     { q: "Posso testar antes de pagar?", a: "Sim. O período de teste dura 7 dias, é oferecido uma vez por Empresa/CNPJ e exige um cartão válido. Se você cancelar antes do término, a primeira cobrança não será realizada." },
     { q: "Como funciona o pagamento?", a: "A oferta padrão tem cobrança mensal recorrente em reais. Ao final do período de teste, a mensalidade do plano contratado é cobrada no meio de pagamento cadastrado." },
     { q: "Posso cancelar quando quiser?", a: "Sim. O cancelamento pode ser solicitado pela plataforma ou pelo suporte, com antecedência mínima de 15 dias do fim do ciclo, e produz efeitos ao final do período pago." },
@@ -149,6 +149,11 @@ function FAQ() {
                 <span className="text-ocre group-open:rotate-45 transition-transform text-xl">+</span>
               </summary>
               <p className="mt-3 text-sm text-muted leading-relaxed">{f.a}</p>
+              {f.cta && (
+                <a href={f.cta.href} className="mt-3 inline-block text-sm text-ocre hover:text-cream transition-colors underline underline-offset-4">
+                  {f.cta.label}
+                </a>
+              )}
             </details>
           ))}
         </div>
