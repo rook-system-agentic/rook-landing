@@ -78,7 +78,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-[72px]">
         {/* Logo */}
         <Link href="/" className="flex items-center" aria-label="Rook System - Página inicial">
-          <Image src="/brand/rook-logo-horizontal.png" alt="Rook — Visão | Estratégia | Controle" width={160} height={40} className="h-10 w-auto dark:brightness-100 brightness-0" />
+          <Image src="/brand/rook-logo-horizontal-light.png" alt="Rook — Visão | Estratégia | Controle" width={160} height={40} className="h-10 w-auto dark:hidden" />
+          <Image src="/brand/rook-logo-horizontal.png" alt="Rook — Visão | Estratégia | Controle" width={160} height={40} className="h-10 w-auto hidden dark:block" />
         </Link>
 
         {/* Nav desktop */}
