@@ -27,14 +27,6 @@ export const metadata: Metadata = {
   },
 };
 
-function formatDateTimeBR(date: Date) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-    timeZone: "America/Sao_Paulo",
-  }).format(date);
-}
-
 function CatalogUnavailable() {
   return (
     <section
@@ -281,13 +273,7 @@ export default async function PlanosPage() {
       </section>
 
       <section className="border-t border-border py-10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            Oferta exibida: <strong className="text-cream">{view.releaseId}</strong>
-            {catalogResult.source === "snapshot" && catalogResult.snapshotGeneratedAt
-              ? ` · snapshot validado em ${formatDateTimeBR(new Date(catalogResult.snapshotGeneratedAt))}`
-              : " · catálogo publicado"}
-          </p>
+        <div className="mx-auto flex max-w-7xl justify-end px-6 text-xs text-muted">
           <Link href="/funcionalidades/" className="text-cream underline-offset-4 hover:underline">
             Conhecer as funcionalidades →
           </Link>

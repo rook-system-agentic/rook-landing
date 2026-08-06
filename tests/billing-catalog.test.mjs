@@ -122,7 +122,8 @@ test("página é dirigida pelo snapshot, capta leads e não expõe desconto Ches
   assert.doesNotMatch(source, /\b(?:Pawn|anual|mais popular|Recomendado)\b/i);
   assert.doesNotMatch(source, /(?:479\.9|779\.9|279\.9)/);
   assert.doesNotMatch(`${source}\n${experience}`, /chessDiscount|discountBps|Desconto progressivo/);
-  assert.match(source, /snapshot validado em/);
+  assert.doesNotMatch(source, /Oferta exibida:/);
+  assert.match(source, /Conhecer as funcionalidades/);
   assert.match(source, /text-ocre/);
   assert.match(source, /TrialDateEstimate/);
   assert.doesNotMatch(source, /const today = new Date\(\)/);
