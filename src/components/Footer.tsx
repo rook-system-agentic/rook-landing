@@ -4,14 +4,14 @@ import { COMPANY_INFO } from "@/lib/company";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-bg">
+    <footer className="border-t" style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-bg)" }}>
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div className="md:col-span-1">
           <Link href="/" className="inline-block mb-4">
             <Image src="/brand/rook-logo-horizontal.png" alt="Rook System" width={140} height={47} className="h-10 w-auto" />
           </Link>
-          <p className="text-sm text-muted leading-relaxed">
+          <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
             Inteligência Financeira para Food Service.
           </p>
         </div>

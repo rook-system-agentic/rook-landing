@@ -5,11 +5,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @layer base {
+  :root {
+    --color-bg: #FAFAF8;
+    --color-bg-card: #FFFFFF;
+    --color-bg-elevated: #F5F0EB;
+    --color-text-primary: #1A1310;
+    --color-text-muted: #6B5E52;
+    --color-border: rgba(26, 19, 16, 0.12);
+    --color-cream: #1A1310;
+    --color-section-label: rgba(26, 19, 16, 0.55);
+    --color-header-bg: rgba(250, 250, 248, 0.95);
+    --color-btn-ghost-border: rgba(26, 19, 16, 0.15);
+    --color-btn-ghost-text: rgba(26, 19, 16, 0.75);
+    --color-btn-ghost-hover-bg: rgba(0, 0, 0, 0.04);
+  }
+
+  .dark {
+    --color-bg: #0F0A06;
+    --color-bg-card: #1A1310;
+    --color-bg-elevated: #241C16;
+    --color-text-primary: #F5F0EB;
+    --color-text-muted: #A89A8C;
+    --color-border: rgba(168, 154, 140, 0.15);
+    --color-cream: #F5F0EB;
+    --color-section-label: rgba(245, 237, 224, 0.58);
+    --color-header-bg: rgba(15, 10, 6, 0.95);
+    --color-btn-ghost-border: rgba(168, 154, 140, 0.15);
+    --color-btn-ghost-text: rgba(245, 240, 235, 0.8);
+    --color-btn-ghost-hover-bg: rgba(255, 255, 255, 0.05);
+  }
+
   html { scroll-behavior: smooth; }
   body {
-    @apply bg-bg text-cream font-display antialiased;
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    @apply font-display antialiased;
     font-size: 16px;
     line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
@@ -17,12 +50,13 @@
   /* Section labels — monospace, small, wide tracking */
   .section-label {
     @apply font-mono text-[11px] tracking-[0.2em] uppercase;
-    color: rgba(245, 237, 224, 0.58);
+    color: var(--color-section-label);
   }
 
   /* Hero headline — massive, editorial */
   .heading-hero {
-    @apply font-display font-medium text-cream;
+    @apply font-display font-medium;
+    color: var(--color-cream);
     font-size: clamp(2.5rem, 6vw, 5.5rem);
     line-height: 0.95;
     letter-spacing: -0.025em;
@@ -34,7 +68,8 @@
 
   /* Section headline — large, light weight */
   .heading-section {
-    @apply font-display font-normal text-cream;
+    @apply font-display font-normal;
+    color: var(--color-cream);
     font-size: clamp(2rem, 4.5vw, 4.5rem);
     line-height: 1.05;
     letter-spacing: -0.015em;
@@ -46,14 +81,16 @@
 
   /* Subsection headline */
   .heading-sub {
-    @apply font-display font-semibold text-cream;
+    @apply font-display font-semibold;
+    color: var(--color-cream);
     font-size: clamp(1.25rem, 2vw, 1.5rem);
     line-height: 1.3;
   }
 
   /* Body text */
   .text-body {
-    @apply font-display text-muted;
+    @apply font-display;
+    color: var(--color-text-muted);
     font-size: 17px;
     line-height: 1.55;
     max-width: 540px;
@@ -64,16 +101,31 @@
     @apply inline-flex items-center justify-center px-7 py-3.5 bg-terracota text-white font-semibold text-[15px] rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center px-5 py-3 text-cream/80 font-medium text-[15px] rounded-lg border border-border transition-all hover:bg-white/5 hover:text-cream;
+    @apply inline-flex items-center justify-center px-5 py-3 font-medium text-[15px] rounded-lg transition-all;
+    color: var(--color-btn-ghost-text);
+    border: 1px solid var(--color-btn-ghost-border);
+  }
+  .btn-ghost:hover {
+    background-color: var(--color-btn-ghost-hover-bg);
+    color: var(--color-cream);
   }
 
   /* Cards */
   .card {
-    @apply bg-bg-card border border-border rounded-xl;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    @apply rounded-xl;
   }
 
   /* Section spacing */
   .section-spacing {
     @apply py-[120px];
   }
+
+  /* Theme-aware text utilities */
+  .text-cream { color: var(--color-cream) !important; }
+  .text-muted { color: var(--color-text-muted) !important; }
+  .bg-bg { background-color: var(--color-bg) !important; }
+  .bg-bg-card { background-color: var(--color-bg-card) !important; }
+  .border-border { border-color: var(--color-border) !important; }
 }
