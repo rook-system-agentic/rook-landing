@@ -14,6 +14,7 @@ import type { CommercialInterest } from "@/lib/commercial-lead-validation.mjs";
 import type { BillingCatalogViewModel } from "@/lib/public-billing-catalog.mjs";
 
 type BasePlan = BillingCatalogViewModel["basePlans"][number];
+type ChessPlan = BillingCatalogViewModel["chess"];
 type FieldErrors = Partial<Record<"name" | "company" | "email" | "phone" | "cnpj", string>>;
 
 const inputClassName =
@@ -320,11 +321,14 @@ export function CommercialLeadButton({
 export function PlansCommercialExperience({
   threshold,
   basePlans,
+  chess,
 }: {
   threshold: string;
   basePlans: BasePlan[];
+  chess: ChessPlan;
 }) {
   const [selectedPlan, setSelectedPlan] = useState<"knight" | "rook">("knight");
+  const [hasMultipleUnits, setHasMultipleUnits] = useState<boolean | null>(null);
   const selected = basePlans.find((plan) => plan.productCode === selectedPlan) ?? basePlans[0];
 
   if (!selected) return null;
@@ -355,50 +359,124 @@ export function PlansCommercialExperience({
         </p>
       </div>
 
-      <article
-        key={selected.productCode}
-        className="card relative mx-auto flex h-full max-w-3xl flex-col border-ocre p-6 ring-1 ring-ocre/70 md:p-8"
-        aria-current="true"
-      >
-        <p className="absolute right-5 top-5 rounded-full bg-ocre/15 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-ocre">
-          Plano indicado
-        </p>
-        <p className="pr-28 font-mono text-xs uppercase tracking-wider text-ocre">
-          {selected.productCode === "knight"
-            ? `Até ${threshold}`
-            : `Acima de ${threshold}`}
-        </p>
-        <h2 className="mt-3 text-3xl font-bold text-cream">{selected.displayName}</h2>
-        <p className="mt-3 text-sm leading-relaxed text-muted">
-          {selected.description}
-        </p>
-        <p className="mt-7 text-3xl font-bold text-cream">
-          {selected.formattedPrice}
-          <span className="ml-2 text-sm font-normal text-muted">
-            /estabelecimento/mês
-          </span>
-        </p>
-        <p className="mt-2 text-xs text-muted">Cobrança mensal recorrente em reais.</p>
-        <ul className="mt-7 space-y-3">
-          {selected.publicFeatures.map((feature) => (
-            <li key={feature} className="flex items-start gap-2 text-sm text-muted">
-              <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
-              <span>{feature}</span>
-            </li>
-          ))}
-          <li className="flex items-start gap-2 text-sm text-muted">
-            <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
-            <span>Mesma cobertura funcional de Knight e Rook</span>
-          </li>
-        </ul>
-        <CommercialLeadButton
-          interest={selected.productCode === "knight" ? "knight" : "rook"}
-          interestLabel={selected.displayName}
-          className="btn-primary mt-8 text-center"
+      <div className="mx-auto grid max-w-5xl gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,0.85fr)] lg:items-stretch">
+        <article
+          key={selected.productCode}
+          className="card relative flex h-full flex-col border-ocre p-6 ring-1 ring-ocre/70 md:p-8"
+          aria-current="true"
         >
-          Falar com especialista
-        </CommercialLeadButton>
-      </article>
+          <p className="absolute right-5 top-5 rounded-full bg-ocre/15 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-ocre">
+            Plano indicado
+          </p>
+          <p className="pr-28 font-mono text-xs uppercase tracking-wider text-ocre">
+            {selected.productCode === "knight"
+              ? `Até ${threshold}`
+              : `Acima de ${threshold}`}
+          </p>
+          <h2 className="mt-3 text-3xl font-bold text-cream">{selected.displayName}</h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            {selected.description}
+          </p>
+          <p className="mt-7 text-3xl font-bold text-cream">
+            {selected.formattedPrice}
+            <span className="ml-2 text-sm font-normal text-muted">
+              /estabelecimento/mês
+            </span>
+          </p>
+          <p className="mt-2 text-xs text-muted">Cobrança mensal recorrente em reais.</p>
+          <ul className="mt-7 space-y-3">
+            {selected.publicFeatures.map((feature) => (
+              <li key={feature} className="flex items-start gap-2 text-sm text-muted">
+                <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
+                <span>{feature}</span>
+              </li>
+            ))}
+            <li className="flex items-start gap-2 text-sm text-muted">
+              <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
+              <span>Mesma cobertura funcional de Knight e Rook</span>
+            </li>
+          </ul>
+          <CommercialLeadButton
+            interest={selected.productCode === "knight" ? "knight" : "rook"}
+            interestLabel={selected.displayName}
+            className="btn-primary mt-8 text-center"
+          >
+            Falar com especialista
+          </CommercialLeadButton>
+        </article>
+
+        <aside
+          className="card relative flex h-full flex-col overflow-hidden border-ocre/40 bg-[linear-gradient(145deg,rgba(231,159,74,0.09),rgba(255,255,255,0.015)_52%)] p-6 md:p-8"
+          aria-labelledby="chess-bridge-title"
+        >
+          <div className="absolute inset-y-0 left-0 w-1 bg-ocre/70" aria-hidden="true" />
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-ocre">
+            Chess · adicional opcional ao {selected.displayName}
+          </p>
+          <h2 id="chess-bridge-title" className="mt-3 text-2xl font-bold text-cream">
+            Seu negócio tem mais de uma unidade?
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            Essa resposta indica se o Chess faz sentido para a estrutura do seu grupo.
+          </p>
+
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row" role="group" aria-label="Número de unidades do negócio">
+            <button
+              type="button"
+              className={`btn-ghost flex-1 ${hasMultipleUnits === true ? "border-ocre bg-ocre/10 text-cream" : ""}`}
+              aria-pressed={hasMultipleUnits === true}
+              onClick={() => setHasMultipleUnits(true)}
+            >
+              Sim, tenho um grupo
+            </button>
+            <button
+              type="button"
+              className={`btn-ghost flex-1 ${hasMultipleUnits === false ? "border-ocre bg-ocre/10 text-cream" : ""}`}
+              aria-pressed={hasMultipleUnits === false}
+              onClick={() => setHasMultipleUnits(false)}
+            >
+              Não, uma unidade
+            </button>
+          </div>
+
+          <div className="mt-6 flex flex-1 flex-col border-t border-border pt-6" aria-live="polite">
+            {hasMultipleUnits === null ? (
+              <p className="text-sm leading-relaxed text-muted">
+                Se houver duas ou mais unidades, mostramos como o Chess complementa o plano indicado.
+              </p>
+            ) : hasMultipleUnits ? (
+              <>
+                <h3 className="text-lg font-semibold text-cream">
+                  Chess conecta a visão do grupo.
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted">
+                  É o adicional mensal que organiza matriz e restaurantes em uma visão multiunidade. Cada estabelecimento mantém seu Knight ou Rook; o Chess acrescenta o acompanhamento do grupo.
+                </p>
+                <p className="mt-5 text-sm text-muted">
+                  Adicional de <strong className="text-base text-cream">{chess.formattedPrice}</strong>
+                  <span className="ml-1">/organização/mês</span>
+                </p>
+                <a
+                  href="#chess-details"
+                  className="btn-ghost mt-6 text-center"
+                  aria-controls="chess-details"
+                >
+                  Conhecer o Chess
+                </a>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-semibold text-cream">
+                  Seu plano indicado já atende esta estrutura.
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted">
+                  Para uma única unidade, siga com {selected.displayName}. O Chess pode ser avaliado depois, se o negócio crescer para uma operação multiunidade.
+                </p>
+              </>
+            )}
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

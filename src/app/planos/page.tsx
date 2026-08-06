@@ -136,6 +136,7 @@ export default async function PlanosPage() {
           <PlansCommercialExperience
             threshold={view.threshold}
             basePlans={view.basePlans}
+            chess={view.chess}
           />
         </div>
       </section>
@@ -170,7 +171,11 @@ export default async function PlanosPage() {
         </div>
       </section>
 
-      <section className="section-spacing border-t border-border" aria-labelledby="chess-title">
+      <section
+        id="chess-details"
+        className="section-spacing scroll-mt-24 border-t border-border"
+        aria-labelledby="chess-title"
+      >
         <div className="mx-auto max-w-7xl px-6">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div>

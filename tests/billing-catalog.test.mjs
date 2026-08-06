@@ -90,6 +90,10 @@ test("página é dirigida pelo snapshot, capta leads e não expõe desconto Ches
   assert.match(source, /getLandingBillingCatalog/);
   assert.match(source, /https:\/\/www\.rook\.com\.br\/planos\//);
   assert.match(experience, /Falar com especialista/);
+  assert.match(experience, /Seu negócio tem mais de uma unidade\?/);
+  assert.match(experience, /Conhecer o Chess/);
+  assert.match(experience, /href="#chess-details"/);
+  assert.match(source, /id="chess-details"/);
   assert.match(experience, /api\/commercial-leads/);
   assert.doesNotMatch(source, /registro\?plan=/);
   assert.doesNotMatch(source, /\b(?:Pawn|anual|mais popular|Recomendado)\b/i);
