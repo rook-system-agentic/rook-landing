@@ -14,12 +14,12 @@ const sections = [
   ["5. Serviços de terceiros", "O site pode conter links ou recursos mantidos por terceiros. O Rook System não controla esses ambientes e não responde por sua disponibilidade, conteúdo ou práticas."],
   ["6. Disponibilidade", "Empregamos esforços razoáveis para manter o site disponível e seguro, mas podem ocorrer interrupções, manutenções ou falhas externas."],
   ["7. Privacidade", "O tratamento de dados pessoais relacionados ao site segue a nossa Política de Privacidade. Ao enviar um formulário, você declara que as informações fornecidas são verdadeiras e que está autorizado a compartilhá-las."],
-  ["8. Legislação e contato", "Estes termos são regidos pelas leis brasileiras. Dúvidas podem ser encaminhadas para contato@rooksystem.com.br."],
+  ["8. Legislação e contato", "Estes termos são regidos pelas leis brasileiras. Dúvidas podem ser encaminhadas para contato@rook.com.br."],
 ];
 
 export default function TermosPage() {
   return (
-    <main className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-bg">
       <article className="max-w-4xl mx-auto px-6 py-20">
         <header className="text-center mb-16 pb-10 border-b border-border">
           <h1 className="text-3xl md:text-4xl font-bold text-cream tracking-wide uppercase">Termos de Uso do Site</h1>
@@ -27,9 +27,25 @@ export default function TermosPage() {
         </header>
         <div className="prose-legal space-y-6 text-muted leading-relaxed">
           <p>Este site é mantido pela <strong className="text-cream">{COMPANY_INFO.razaoSocial}</strong>, CNPJ <strong className="text-cream">{COMPANY_INFO.cnpj}</strong>.</p>
-          {sections.map(([title, text]) => <section key={title}><h2 className="text-2xl text-terracota font-semibold mt-12 mb-4">{title}</h2><p>{text}</p></section>)}
+          {sections.map(([title, text]) => (
+            <section key={title} id={title.startsWith("8") ? "contato" : undefined}>
+              <h2 className="text-2xl text-terracota font-semibold mt-12 mb-4">{title}</h2>
+              <p>
+                {title.startsWith("8") ? (
+                  <>
+                    Estes termos são regidos pelas leis brasileiras. Dúvidas podem ser encaminhadas para{" "}
+                    <a href="mailto:contato@rook.com.br" className="text-cream underline hover:text-terracota transition-colors">
+                      contato@rook.com.br
+                    </a>.
+                  </>
+                ) : (
+                  text
+                )}
+              </p>
+            </section>
+          ))}
         </div>
       </article>
-    </main>
+    </div>
   );
 }
