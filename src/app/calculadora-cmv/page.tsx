@@ -55,7 +55,7 @@ export default function CalculadoraCmvPage() {
               Abandone as planilhas manuais.
             </h3>
             <p className="text-muted max-w-xl mx-auto mb-6 text-sm">
-              O <strong>Rook System</strong> conecta-se diretamente à SEFAZ e ao seu ERP para calcular o seu CMV real, ficha técnica e margem de lucro em tempo real — 100% automático.
+              O <strong>Rook System</strong> consolida automaticamente suas compras, vendas e fichas técnicas para calcular seu CMV real e margem de lucro em tempo real.
             </p>
             <div className="flex justify-center">
               <Link href="/planos/" className="btn-primary">
