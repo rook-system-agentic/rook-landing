@@ -7,15 +7,15 @@ function Hero() {
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
         {/* Left */}
         <div>
-          <p className="section-label mb-6">— O Sistema de Gestão para Restaurante Focado em Lucro Real</p>
+          <p className="section-label mb-6">— Sistema de Inteligência Financeira e Gestão para Restaurantes</p>
           <h1 className="heading-hero mb-8">
-            Sistema de Gestão para Restaurante onde <em>Faturar é Lucrar.</em>
+            Faturar não é <em>lucrar.</em>
           </h1>
           <p className="text-body mb-8">
             Num setor que movimenta <strong className="text-cream">R$ 495 bilhões por ano</strong>, a maioria
             dos restaurantes mal passa de 10% de lucro — e seis em cada dez não chegam aos cinco anos.
             O que separa quem fatura de quem lucra são números que quase ninguém acompanha.{" "}
-            <strong className="text-cream">O Rook é o sistema de gestão para restaurante que coloca todos eles na sua frente.</strong>
+            <strong className="text-cream">O Rook é o sistema de inteligência financeira para restaurante que coloca todos eles na sua frente.</strong>
           </p>
           <p className="text-xs text-muted/70 mb-6 font-mono">
             Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2022
