@@ -20,7 +20,7 @@ const sections = [
 
 export default function PrivacidadePage() {
   return (
-    <main className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-bg">
       <article className="max-w-4xl mx-auto px-6 py-20">
         <header className="text-center mb-16 pb-10 border-b border-border">
           <h1 className="text-3xl md:text-4xl font-bold text-cream tracking-wide uppercase">Política de Privacidade</h1>
@@ -29,9 +29,14 @@ export default function PrivacidadePage() {
         <div className="prose-legal space-y-6 text-muted leading-relaxed">
           <p>A <strong className="text-cream">{COMPANY_INFO.razaoSocial}</strong>, CNPJ <strong className="text-cream">{COMPANY_INFO.cnpj}</strong>, é responsável pelos tratamentos em que define finalidade e meios. Esta página apresenta informações gerais, sem expor arquitetura, fornecedores específicos ou controles internos.</p>
           {sections.map(([title, text]) => <section key={title}><h2 className="text-2xl text-terracota font-semibold mt-12 mb-4">{title}</h2><p>{text}</p></section>)}
-          <p className="mt-12 pt-6 border-t border-border"><strong className="text-cream">Canal de privacidade:</strong> contato@rooksystem.com.br</p>
+          <p className="mt-12 pt-6 border-t border-border">
+            <strong className="text-cream">Canal de privacidade:</strong>{" "}
+            <a href="mailto:contato@rook.com.br" className="text-cream underline hover:text-terracota transition-colors">
+              contato@rook.com.br
+            </a>
+          </p>
         </div>
       </article>
-    </main>
+    </div>
   );
 }
