@@ -8,10 +8,11 @@ import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://rook.com.br"),
-  title: "Sistema de Gestão para Restaurante | Rook System",
+  title: "Rook System — Inteligência Financeira e Gestão para Restaurantes",
   description:
-    "Sistema de gestão para restaurante com controle de CMV, ficha técnica, DRE em tempo real e inteligência financeira para food service.",
+    "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, ficha técnica automática, DRE em tempo real e análise preditiva de compras e vendas.",
   keywords: [
+    "sistema de inteligência financeira para restaurantes",
     "sistema de gestão para restaurante",
     "sistema de gestão para restaurantes",
     "sistema para restaurante",
@@ -26,8 +27,8 @@ export const metadata: Metadata = {
     canonical: "https://rook.com.br",
   },
   openGraph: {
-    title: "Sistema de Gestão para Restaurante | Rook System",
-    description: "Controle CMV, otimize compras e proteja a margem do seu restaurante.",
+    title: "Rook System — Inteligência Financeira e Gestão para Restaurantes",
+    description: "Controle CMV, otimize compras e proteja a margem do seu restaurante com inteligência financeira.",
     url: "https://rook.com.br",
     siteName: "Rook System",
     type: "website",
