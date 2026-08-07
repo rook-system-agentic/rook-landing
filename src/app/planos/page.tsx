@@ -239,6 +239,10 @@ export default async function PlanosPage() {
                 `Não. Até ${view.threshold} de faturamento bruto mensal, o enquadramento é Knight; acima desse valor, é Rook. Os dois possuem acesso funcional completo.`,
               ],
               [
+                "Posso escolher Knight mesmo estando no Lucro Presumido?",
+                "Não. O plano segue o regime tributário do CNPJ, não é uma escolha: Simples Nacional entra no Knight, Lucro Presumido entra no Rook. Essa regra é automática, mas não existe desvantagem em estar em nenhum dos dois. Knight e Rook têm exatamente o mesmo acesso, função por função. A única coisa que muda é o valor da mensalidade, porque reflete o custo de atender empresas em cada regime.",
+              ],
+              [
                 "Como funciona a regra dos três meses?",
                 "A regra prevista para reenquadramento usa três meses completos e consecutivos. Enquanto o processo automático não estiver ativado, qualquer mudança é acompanhada pela equipe e comunicada antes de produzir efeito.",
               ],
