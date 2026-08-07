@@ -289,7 +289,7 @@ function GateSection({
             <InputField label="Nome do restaurante" value={data.restaurantName} onChange={v => update("restaurantName", v)} required placeholder="Ex: Restaurante Sabor & Arte" />
             <InputField label="Seu nome" value={data.responsibleName} onChange={v => update("responsibleName", v)} required placeholder="Nome do responsável" />
             <InputField label="Email" type="email" value={data.email} onChange={v => update("email", v)} required placeholder="seu@email.com" />
-            <InputField label="WhatsApp" type="tel" value={data.phone} onChange={v => update("phone", v)} required placeholder="(61) 99999-9999" />
+            <PhoneInput label="WhatsApp" value={data.phone} onChange={v => update("phone", v)} required placeholder="(61) 99999-9999" />
             <div>
               <label className="font-mono text-[10px] text-muted uppercase tracking-wider block mb-1">Segmento</label>
               <select
@@ -558,6 +558,42 @@ function InputField({
         onChange={e => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
+        className="w-full bg-bg rounded-lg border border-border px-4 py-3 text-sm outline-none placeholder:text-muted/50"
+        style={{ color: "var(--color-text-primary)" }}
+      />
+    </div>
+  );
+}
+
+function PhoneInput({
+  label, value, onChange, required = false, placeholder = "",
+}: {
+  label: string; value: string; onChange: (v: string) => void;
+  required?: boolean; placeholder?: string;
+}) {
+  function formatPhone(raw: string): string {
+    const digits = raw.replace(/\D/g, "").slice(0, 11);
+    if (digits.length === 0) return "";
+    if (digits.length <= 2) return `(${digits}`;
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const formatted = formatPhone(e.target.value);
+    onChange(formatted);
+  }
+
+  return (
+    <div>
+      {label && <label className="font-mono text-[10px] text-muted uppercase tracking-wider block mb-1">{label}</label>}
+      <input
+        type="tel"
+        value={value}
+        onChange={handleChange}
+        required={required}
+        placeholder={placeholder}
+        maxLength={15}
         className="w-full bg-bg rounded-lg border border-border px-4 py-3 text-sm outline-none placeholder:text-muted/50"
         style={{ color: "var(--color-text-primary)" }}
       />
