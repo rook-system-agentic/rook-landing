@@ -54,8 +54,8 @@ export default function CalculadoraCmvPage() {
             <h3 className="heading-section text-2xl mb-3">
               Abandone as planilhas manuais.
             </h3>
-            <p className="text-muted max-w-xl mx-auto mb-6 text-sm">
-              O <strong>Rook System</strong> consolida automaticamente suas compras, vendas e fichas técnicas para calcular seu CMV real e margem de lucro em tempo real.
+            <p className="text-muted max-w-xl mx-auto mb-6 text-sm leading-relaxed">
+              O <strong>Rook System</strong> consolida de forma automatizada os dados financeiros e operacionais do seu restaurante para apoiar a sua tomada de decisão. Com essa inteligência, apresentamos o seu CMV real e comparamos o desempenho do seu negócio com os benchmarks do seu setor.
             </p>
             <div className="flex justify-center">
               <Link href="/planos/" className="btn-primary">
