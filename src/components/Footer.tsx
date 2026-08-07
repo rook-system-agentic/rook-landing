@@ -22,6 +22,7 @@ export default function Footer() {
           <h4 className="font-semibold text-cream text-sm mb-4">Produto</h4>
           <ul className="space-y-2.5 text-sm text-muted">
             <li><Link href="/funcionalidades/" className="hover:text-cream transition-colors">Funcionalidades</Link></li>
+            <li><Link href="/calculadora-cmv/" className="hover:text-cream transition-colors">Calculadora CMV Grátis</Link></li>
             <li><Link href="/planos/" className="hover:text-cream transition-colors">Planos</Link></li>
             <li><Link href="/blog/" className="hover:text-cream transition-colors">Blog</Link></li>
           </ul>
@@ -33,7 +34,7 @@ export default function Footer() {
           <ul className="space-y-2.5 text-sm text-muted">
             <li><Link href="/sobre/" className="hover:text-cream transition-colors">Sobre o Rook</Link></li>
             <li><a href="https://app.rook.com.br/login" className="hover:text-cream transition-colors">Entrar</a></li>
-            <li><a href="mailto:contato@rooksystem.com.br" className="hover:text-cream transition-colors">Contato</a></li>
+            <li><a href="mailto:contato@rook.com.br" className="hover:text-cream transition-colors">Contato</a></li>
           </ul>
         </div>
 

@@ -6,6 +6,7 @@ import Image from "next/image";
 const navLinks = [
   { href: "/", label: "Início" },
   { href: "/funcionalidades/", label: "Funcionalidades" },
+  { href: "/calculadora-cmv/", label: "Calculadora CMV" },
   { href: "/planos/", label: "Planos" },
   { href: "/sobre/", label: "Sobre o Rook" },
   { href: "/blog/", label: "Blog" },
