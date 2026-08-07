@@ -64,7 +64,7 @@ interface ResultData {
 
 /* ─── Helpers ─── */
 function formatCurrency(value: number): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function getAbVariant(): "A" | "B" {
