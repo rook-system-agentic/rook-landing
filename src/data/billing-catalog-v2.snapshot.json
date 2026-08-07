@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-05T12:18:49Z",
+  "generatedAt": "2026-08-07T01:26:58.824Z",
   "sourceUrl": "https://app.rook.com.br/api/billing/catalog",
   "catalog": {
     "release": {
@@ -16,7 +16,9 @@
         "billingInterval": "month",
         "currency": "BRL",
         "unitAmountCents": 47990,
-        "publicFeatures": ["Acesso completo a plataforma"]
+        "publicFeatures": [
+          "Acesso completo a plataforma"
+        ]
       },
       {
         "productCode": "rook",
@@ -26,7 +28,9 @@
         "billingInterval": "month",
         "currency": "BRL",
         "unitAmountCents": 77990,
-        "publicFeatures": ["Acesso completo a plataforma"]
+        "publicFeatures": [
+          "Acesso completo a plataforma"
+        ]
       },
       {
         "productCode": "chess",
@@ -36,7 +40,9 @@
         "billingInterval": "month",
         "currency": "BRL",
         "unitAmountCents": 27990,
-        "publicFeatures": ["Consolidacao multiunidade"]
+        "publicFeatures": [
+          "Consolidacao multiunidade"
+        ]
       }
     ],
     "trial": {

@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "PerplexityBot", allow: "/" },
       { userAgent: "Google-Extended", allow: "/" },
     ],
-    sitemap: "https://rooksystem.com.br/sitemap.xml",
+    sitemap: "https://rook.com.br/sitemap.xml",
   };
 }
