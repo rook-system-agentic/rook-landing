@@ -3,6 +3,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import GoogleAdsPixel from "@/components/GoogleAdsPixel";
+import MetaPixel from "@/components/MetaPixel";
 import MicrosoftClarity from "@/components/MicrosoftClarity";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -76,6 +78,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <GoogleAnalytics />
+        <GoogleAdsPixel />
+        <MetaPixel />
         <MicrosoftClarity />
         <Header />
         <main className="pt-[72px]">{children}</main>
