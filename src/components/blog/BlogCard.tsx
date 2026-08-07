@@ -1,31 +1,37 @@
+'use client';
+
 import Link from "next/link";
 import type { BlogPost } from "@/lib/blog-types";
 import { formatBlogDate } from "@/lib/blog";
 
 export default function BlogCard({ post, featured = false }: { post: BlogPost; featured?: boolean }) {
-  const coverImageUrl = post.coverImageUrl?.trim();
+  const coverImageUrl = post.coverImageUrl?.trim() || "/og-image-blog-template.png";
   const postHref = `/blog/${post.slug}/`;
 
   return (
     <article className={`card p-6 flex flex-col ${featured ? "lg:col-span-2" : ""}`}>
-      {coverImageUrl && (
-        <Link
-          href={postHref}
-          className="mb-5 block overflow-hidden rounded-lg border border-border bg-white/[0.03]"
-        >
-          <img
-            src={coverImageUrl}
-            alt={post.coverImageAlt || post.title}
-            className={`w-full object-cover ${featured ? "aspect-[16/7]" : "aspect-[3/2]"}`}
-            loading={featured ? "eager" : "lazy"}
-          />
-        </Link>
-      )}
+      <Link
+        href={postHref}
+        className="mb-5 block overflow-hidden rounded-lg border border-border bg-terracota/5 hover:border-terracota/30 transition-colors"
+      >
+        <img
+          src={coverImageUrl}
+          alt={post.coverImageAlt || post.title}
+          className={`w-full object-cover ${featured ? "aspect-[16/7]" : "aspect-[3/2]"}`}
+          loading={featured ? "eager" : "lazy"}
+          onError={(e) => {
+            const target = e.currentTarget;
+            if (!target.src.endsWith("/og-image-blog-template.png")) {
+              target.src = "/og-image-blog-template.png";
+            }
+          }}
+        />
+      </Link>
 
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <span className="font-mono text-[11px] text-terracota uppercase tracking-wider">{post.category}</span>
         {post.publishedAt && <span className="text-xs text-muted">{formatBlogDate(post.publishedAt)}</span>}
-        <span className="text-xs text-muted">{post.readingTimeMin} min</span>
+        <span className="text-xs text-muted font-medium">• {post.readingTimeMin} min de leitura</span>
       </div>
 
       <h2 className={`${featured ? "text-2xl lg:text-3xl" : "text-xl"} font-bold leading-tight text-cream mb-3`}>
