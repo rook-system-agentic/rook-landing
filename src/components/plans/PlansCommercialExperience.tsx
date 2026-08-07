@@ -11,6 +11,7 @@ import {
 } from "react";
 import { solveCommercialLeadChallenge } from "@/lib/commercial-lead-challenge-client.mjs";
 import type { CommercialInterest } from "@/lib/commercial-lead-validation.mjs";
+import { buildDirectCheckoutHref } from "@/lib/direct-checkout-link.mjs";
 import type { BillingCatalogViewModel } from "@/lib/public-billing-catalog.mjs";
 
 type BasePlan = BillingCatalogViewModel["basePlans"][number];
@@ -396,13 +397,12 @@ export function PlansCommercialExperience({
               <span>Mesma cobertura funcional de Knight e Rook</span>
             </li>
           </ul>
-          <CommercialLeadButton
-            interest={selected.productCode === "knight" ? "knight" : "rook"}
-            interestLabel={selected.displayName}
+          <a
+            href={buildDirectCheckoutHref(selected.productCode)}
             className="btn-primary mt-8 text-center"
           >
-            Falar com especialista
-          </CommercialLeadButton>
+            Testar por 7 dias
+          </a>
         </article>
 
         <aside

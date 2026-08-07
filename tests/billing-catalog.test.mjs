@@ -7,6 +7,7 @@ import {
   parsePublicBillingCatalog,
   resolvePublicBillingCatalog,
 } from "../src/lib/public-billing-catalog.mjs";
+import { buildDirectCheckoutHref } from "../src/lib/direct-checkout-link.mjs";
 import { buildTrialDateEstimate } from "../src/lib/trial-date-estimate.mjs";
 import snapshotCandidate from "../src/data/billing-catalog-v2.snapshot.json" with {
   type: "json",
@@ -47,6 +48,22 @@ test("estimativa do trial usa o dia corrente de São Paulo, não a data do build
       startDate: "05/08/2026",
       firstChargeDate: "12/08/2026",
     },
+  );
+});
+
+test("checkout direto aceita somente as faixas Knight e Rook", () => {
+  for (const revenueBand of ["knight", "rook"]) {
+    const checkoutUrl = new URL(buildDirectCheckoutHref(revenueBand));
+
+    assert.equal(checkoutUrl.origin, "https://app.rook.com.br");
+    assert.equal(checkoutUrl.pathname, "/contratar");
+    assert.deepEqual([...checkoutUrl.searchParams], [["revenue_band", revenueBand]]);
+  }
+
+  assert.throws(() => buildDirectCheckoutHref("chess"), /Faixa de faturamento inválida/);
+  assert.throws(
+    () => buildDirectCheckoutHref("rook&redirect=https://example.com"),
+    /Faixa de faturamento inválida/,
   );
 });
 
@@ -97,7 +114,7 @@ test("DTO rejeita Pawn, anual e campos internos do provedor", () => {
   assert.throws(() => parsePublicBillingCatalog(internalDiscountLeak));
 });
 
-test("página é dirigida pelo snapshot, capta leads e não expõe desconto Chess", async () => {
+test("página usa checkout direto em Knight/Rook e reserva o CRM para Chess", async () => {
   const [source, experience, trialDateEstimate] = await Promise.all([
     readFile(new URL("../src/app/planos/page.tsx", import.meta.url), "utf8"),
     readFile(
@@ -112,12 +129,20 @@ test("página é dirigida pelo snapshot, capta leads e não expõe desconto Ches
 
   assert.match(source, /getLandingBillingCatalog/);
   assert.match(source, /https:\/\/www\.rook\.com\.br\/planos\//);
-  assert.match(experience, /Falar com especialista/);
+  assert.match(experience, /href=\{buildDirectCheckoutHref\(selected\.productCode\)\}/);
+  assert.match(experience, />\s*Testar por 7 dias\s*<\/a>/);
+  assert.doesNotMatch(experience, /interest=\{selected\.productCode/);
   assert.match(experience, /Seu negócio tem mais de uma unidade\?/);
   assert.match(experience, /Conhecer o Chess/);
   assert.match(experience, /href="#chess-details"/);
   assert.match(source, /id="chess-details"/);
   assert.match(experience, /api\/commercial-leads/);
+  assert.equal(
+    [...`${source}\n${experience}`.matchAll(/<CommercialLeadButton\b/g)].length,
+    1,
+  );
+  assert.match(source, /<CommercialLeadButton\s+interest="chess"/);
+  assert.doesNotMatch(source, /<CommercialLeadButton\s+interest="general"/);
   assert.doesNotMatch(source, /registro\?plan=/);
   assert.doesNotMatch(source, /\b(?:Pawn|anual|mais popular|Recomendado)\b/i);
   assert.doesNotMatch(source, /(?:479\.9|779\.9|279\.9)/);
