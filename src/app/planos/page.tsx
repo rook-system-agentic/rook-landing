@@ -43,9 +43,12 @@ function CatalogUnavailable() {
           confirmados. Por segurança, não exibimos preços antigos nem iniciamos
           uma contratação.
         </p>
-        <CommercialLeadButton interest="general" className="btn-ghost">
+        <a
+          href="mailto:contato@rooksystem.com.br?subject=Cat%C3%A1logo%20de%20planos%20Rook"
+          className="btn-ghost inline-flex"
+        >
           Falar com a equipe comercial
-        </CommercialLeadButton>
+        </a>
       </div>
     </section>
   );
