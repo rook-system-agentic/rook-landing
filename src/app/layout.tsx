@@ -46,12 +46,36 @@ const jsonLd = {
       "url": "https://rook.com.br",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, iOS, Android",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "BRL"
-      },
-      "description": "Sistema de gestão para restaurante com controle de CMV, ficha técnica e inteligência financeira."
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Knight",
+          "price": "479.90",
+          "priceCurrency": "BRL",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://rook.com.br/planos/",
+          "description": "Plano para restaurantes com faturamento mensal de at\u00e9 R$ 250 mil. Acesso completo \u00e0 plataforma. 7 dias de teste gr\u00e1tis."
+        },
+        {
+          "@type": "Offer",
+          "name": "Rook",
+          "price": "779.90",
+          "priceCurrency": "BRL",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://rook.com.br/planos/",
+          "description": "Plano para restaurantes com faturamento mensal acima de R$ 250 mil. Acesso completo \u00e0 plataforma. 7 dias de teste gr\u00e1tis."
+        },
+        {
+          "@type": "Offer",
+          "name": "Chess",
+          "price": "279.90",
+          "priceCurrency": "BRL",
+          "priceValidUntil": "2027-12-31",
+          "url": "https://rook.com.br/planos/",
+          "description": "Add-on organizacional para consolida\u00e7\u00e3o multiunidade (redes e franquias)."
+        }
+      ],
+      "description": "Sistema de intelig\u00eancia financeira e gest\u00e3o para restaurantes. Controle CMV, DRE gerencial autom\u00e1tico, score de sa\u00fade financeira e recomenda\u00e7\u00f5es com impacto em R$."
     },
     {
       "@type": "Organization",
