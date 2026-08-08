@@ -110,20 +110,22 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {open && (
-        <nav className="lg:hidden px-6 py-4 flex flex-col gap-3" style={{ backgroundColor: "var(--color-bg)", borderTop: "1px solid var(--color-border)" }}>
-          {navLinks.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="text-[15px] py-2" style={{ color: "var(--color-btn-ghost-text)" }}>
-              {l.label}
-            </Link>
-          ))}
-          <div className="flex flex-col gap-2 pt-3" style={{ borderTop: "1px solid var(--color-border)" }}>
-            <a href="https://app.rook.com.br/login" className="btn-ghost text-sm text-center">Entrar</a>
-            <Link href="/planos/" className="btn-primary text-sm text-center">Testar por 7 dias</Link>
-          </div>
-        </nav>
-      )}
+      {/* Mobile menu — always in DOM for crawlers/SEO, toggled via CSS */}
+      <nav
+        className={`lg:hidden px-6 py-4 flex flex-col gap-3 ${open ? "" : "hidden"}`}
+        style={{ backgroundColor: "var(--color-bg)", borderTop: "1px solid var(--color-border)" }}
+        aria-label="Menu de navegação mobile"
+      >
+        {navLinks.map((l) => (
+          <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="text-[15px] py-2" style={{ color: "var(--color-btn-ghost-text)" }}>
+            {l.label}
+          </Link>
+        ))}
+        <div className="flex flex-col gap-2 pt-3" style={{ borderTop: "1px solid var(--color-border)" }}>
+          <a href="https://app.rook.com.br/login" className="btn-ghost text-sm text-center">Entrar</a>
+          <Link href="/planos/" className="btn-primary text-sm text-center">Testar por 7 dias</Link>
+        </div>
+      </nav>
     </header>
   );
 }
