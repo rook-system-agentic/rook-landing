@@ -23,6 +23,7 @@ export default function Footer() {
           <ul className="space-y-2.5 text-sm text-muted">
             <li><Link href="/funcionalidades/" className="hover:text-cream transition-colors">Funcionalidades</Link></li>
             <li><Link href="/calculadora-cmv/" className="hover:text-cream transition-colors">Calculadora CMV Grátis</Link></li>
+            <li><Link href="/diagnostico/" className="hover:text-cream transition-colors">Diagnóstico Financeiro</Link></li>
             <li><Link href="/planos/" className="hover:text-cream transition-colors">Planos</Link></li>
             <li><Link href="/blog/" className="hover:text-cream transition-colors">Blog</Link></li>
           </ul>
