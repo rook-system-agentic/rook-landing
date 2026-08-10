@@ -4,7 +4,10 @@ import Link from "next/link";
 function Hero() {
   return (
     <section className="section-spacing">
-      <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+      {/* items-start: com quatro cards a coluna direita ficou ~300px mais alta
+          que a esquerda, e o items-center empurrava o título 154px para baixo,
+          abrindo um vazio acima da manchete. */}
+      <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-start">
         {/* Left */}
         <div>
           <p className="section-label mb-6">— Sistema de Inteligência Financeira e Gestão para Restaurantes</p>
@@ -26,27 +29,36 @@ function Hero() {
         {/* Right — Module highlights */}
         <div className="grid grid-cols-1 gap-4">
           <div className="card p-5">
-            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Vendas</p>
+            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Vendas e Tributos</p>
             <ul className="space-y-1.5 text-sm text-muted">
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Faturamento diário, semanal e mensal</li>
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Ticket médio e volume de transações</li>
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Projeção de receita do mês</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Faturamento diário, semanal e mensal, com pacote completo de indicadores de performance</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Projeções ajustadas de suporte ao planejamento operacional</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Comunicação ativa via WhatsApp para acompanhamento diário, semanal e mensal</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Validação mensal do cálculo apresentado pela sua contabilidade</li>
             </ul>
           </div>
           <div className="card p-5">
-            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Compras e CMV</p>
+            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Compras (CMV)</p>
             <ul className="space-y-1.5 text-sm text-muted">
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>CMV real vs. meta por período</li>
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Curva ABC de fornecedores</li>
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Orçamento disponível para compras</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Compras diárias, semanais e mensais com pacote completo de indicadores de performance e controle</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>CMV real vs. meta por período, com limite de compras</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Monitoramento de preços dos insumos com alerta de inflação</li>
             </ul>
           </div>
           <div className="card p-5">
-            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— DRE e Resultado</p>
+            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Despesas</p>
             <ul className="space-y-1.5 text-sm text-muted">
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>DRE gerencial automático</li>
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Score de saúde financeira (6 pilares)</li>
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Recomendações com impacto em R$</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Despesas com vendas — análise e comparação com benchmarking</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Despesas com pessoal — monitoramento do CMO com indicadores de produtividade</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Despesas administrativas — clareza sobre ocupação, serviços, manutenções e gastos gerais</li>
+            </ul>
+          </div>
+          <div className="card p-5">
+            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Resultados</p>
+            <ul className="space-y-1.5 text-sm text-muted">
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>DRE gerencial, fluxo de caixa e projeções</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Score de saúde financeira e liquidez</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Open Finance com análise de endividamento</li>
             </ul>
           </div>
         </div>
