@@ -148,7 +148,11 @@ function PricingSummary() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        {/* Os DOIS planos base — a escolha é entre eles, por faixa de
+            faturamento. O Chess não entra aqui: ele soma a um destes, e num
+            grid de três colunas iguais aparecia como a opção mais barata da
+            linha, que é o oposto do que ele é. */}
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {/* Knight */}
           <div className="card p-6 text-center">
             <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">Knight</p>
@@ -168,15 +172,24 @@ function PricingSummary() {
             </p>
             <p className="text-xs text-muted/70 mt-2">Acesso completo à plataforma</p>
           </div>
+        </div>
 
-          {/* Chess */}
-          <div className="card p-6 text-center">
-            <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">Chess</p>
-            <p className="text-3xl font-bold text-cream">R$ 279,90<span className="text-sm font-normal text-muted">/mês</span></p>
-            <p className="text-sm text-muted mt-3 leading-relaxed">
-              Add-on para organizações multiunidade (redes e franquias).
+        {/* Chess — add-on. O "+" antes do preço é o que diz, sem precisar de
+            explicação, que este valor SOMA ao do plano escolhido. */}
+        <div className="max-w-3xl mx-auto mt-6">
+          <div className="card p-5 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+            <div className="flex-1 text-center sm:text-left">
+              <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">
+                Chess · Add-on
+              </p>
+              <p className="text-sm text-muted leading-relaxed">
+                Para redes e franquias: consolidação de grupo e visão multiunidade,
+                somada ao plano escolhido acima.
+              </p>
+            </div>
+            <p className="text-2xl font-bold text-cream text-center sm:text-right whitespace-nowrap">
+              + R$ 279,90<span className="text-sm font-normal text-muted">/mês</span>
             </p>
-            <p className="text-xs text-muted/70 mt-2">Consolidação de grupo</p>
           </div>
         </div>
 
