@@ -1,6 +1,13 @@
 import Link from "next/link";
 
 /* ─── Hero ─── */
+const STATS = [
+  { value: "R$ 495 bi", label: "O tamanho do setor", source: "Abrasel, 2025" },
+  { value: "39%", label: "Controlam contas na planilha ou caderno", source: "Conta Simples + Visa, 2024" },
+  { value: "37%", label: "Com contas em atraso", source: "Abrasel, mai/2025" },
+  { value: "62,7%", label: "Das empresas fecham em 5 anos", source: "IBGE, 2022" },
+];
+
 function Hero() {
   return (
     <section className="section-spacing">
@@ -24,6 +31,19 @@ function Hero() {
             Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2022
           </p>
 
+          {/* Números do setor — ficavam numa faixa solta abaixo do hero. Com os
+              quatro cards de módulos a coluna direita ficou ~300px mais alta, e
+              sobrava um vazio aqui embaixo; trazê-los para dentro dele equilibra
+              as colunas e encurta a página. */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-8 mt-10">
+            {STATS.map((s) => (
+              <div key={s.label}>
+                <p className="text-2xl lg:text-3xl font-bold text-terracota">{s.value}</p>
+                <p className="text-sm text-muted mt-1">{s.label}</p>
+                <p className="text-[10px] text-muted/60 mt-0.5 font-mono uppercase tracking-wider">{s.source}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Right — Module highlights */}
@@ -62,22 +82,6 @@ function Hero() {
             </ul>
           </div>
         </div>
-      </div>
-
-      {/* Stats strip */}
-      <div className="max-w-7xl mx-auto px-6 mt-20 grid grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          { value: "R$ 495 bi", label: "O tamanho do setor", source: "Abrasel, 2025" },
-          { value: "39%", label: "Controlam contas na planilha ou caderno", source: "Conta Simples + Visa, 2024" },
-          { value: "37%", label: "Com contas em atraso", source: "Abrasel, mai/2025" },
-          { value: "62,7%", label: "Das empresas fecham em 5 anos", source: "IBGE, 2022" },
-        ].map((s) => (
-          <div key={s.label} className="text-center">
-            <p className="text-2xl lg:text-3xl font-bold text-terracota">{s.value}</p>
-            <p className="text-sm text-muted mt-1">{s.label}</p>
-            <p className="text-[10px] text-muted/60 mt-0.5 font-mono uppercase tracking-wider">{s.source}</p>
-          </div>
-        ))}
       </div>
     </section>
   );
