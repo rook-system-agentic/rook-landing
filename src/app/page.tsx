@@ -138,13 +138,13 @@ function PricingSummary() {
     <section className="section-spacing border-t border-border" aria-labelledby="pricing-title">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
-          <p className="section-label mb-6">— Planos e pre\u00E7os</p>
+          <p className="section-label mb-6">— Planos e preços</p>
           <h2 id="pricing-title" className="heading-section mb-4">
             Quanto custa o <em>Rook?</em>
           </h2>
           <p className="text-body mx-auto text-center">
-            O enquadramento \u00E9 por faturamento bruto mensal. Ambos os planos entregam acesso completo \u00E0 plataforma.
-            Teste gr\u00E1tis por 7 dias.
+            O enquadramento é por faturamento bruto mensal. Ambos os planos entregam acesso completo à plataforma.
+            Teste grátis por 7 dias.
           </p>
         </div>
 
@@ -152,36 +152,36 @@ function PricingSummary() {
           {/* Knight */}
           <div className="card p-6 text-center">
             <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">Knight</p>
-            <p className="text-3xl font-bold text-cream">R$ 479,90<span className="text-sm font-normal text-muted">/m\u00EAs</span></p>
+            <p className="text-3xl font-bold text-cream">R$ 479,90<span className="text-sm font-normal text-muted">/mês</span></p>
             <p className="text-sm text-muted mt-3 leading-relaxed">
-              Para estabelecimentos com faturamento mensal de at\u00E9 R$ 250 mil.
+              Para estabelecimentos com faturamento mensal de até R$ 250 mil.
             </p>
-            <p className="text-xs text-muted/70 mt-2">Acesso completo \u00E0 plataforma</p>
+            <p className="text-xs text-muted/70 mt-2">Acesso completo à plataforma</p>
           </div>
 
           {/* Rook */}
           <div className="card p-6 text-center border-terracota/30">
             <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">Rook</p>
-            <p className="text-3xl font-bold text-cream">R$ 779,90<span className="text-sm font-normal text-muted">/m\u00EAs</span></p>
+            <p className="text-3xl font-bold text-cream">R$ 779,90<span className="text-sm font-normal text-muted">/mês</span></p>
             <p className="text-sm text-muted mt-3 leading-relaxed">
               Para estabelecimentos com faturamento mensal acima de R$ 250 mil.
             </p>
-            <p className="text-xs text-muted/70 mt-2">Acesso completo \u00E0 plataforma</p>
+            <p className="text-xs text-muted/70 mt-2">Acesso completo à plataforma</p>
           </div>
 
           {/* Chess */}
           <div className="card p-6 text-center">
             <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-2">Chess</p>
-            <p className="text-3xl font-bold text-cream">R$ 279,90<span className="text-sm font-normal text-muted">/m\u00EAs</span></p>
+            <p className="text-3xl font-bold text-cream">R$ 279,90<span className="text-sm font-normal text-muted">/mês</span></p>
             <p className="text-sm text-muted mt-3 leading-relaxed">
-              Add-on para organiza\u00E7\u00F5es multiunidade (redes e franquias).
+              Add-on para organizações multiunidade (redes e franquias).
             </p>
-            <p className="text-xs text-muted/70 mt-2">Consolida\u00E7\u00E3o de grupo</p>
+            <p className="text-xs text-muted/70 mt-2">Consolidação de grupo</p>
           </div>
         </div>
 
         <div className="text-center mt-8">
-          <Link href="/planos/" className="btn-primary">Ver detalhes e contratar \u2192</Link>
+          <Link href="/planos/" className="btn-primary">Ver detalhes e contratar →</Link>
         </div>
       </div>
     </section>
@@ -191,15 +191,15 @@ function PricingSummary() {
 /* ─── FAQ ─── */
 function FAQ() {
   const faqs = [
-    { q: "Quanto custa o Rook System?", a: "O Rook tem dois planos base: Knight (R$ 479,90/m\u00EAs) para restaurantes com faturamento de at\u00E9 R$ 250 mil/m\u00EAs, e Rook (R$ 779,90/m\u00EAs) para faturamento acima de R$ 250 mil/m\u00EAs. Ambos oferecem acesso completo \u00E0 plataforma. Para redes e franquias, h\u00E1 o add-on Chess (R$ 279,90/m\u00EAs por organiza\u00E7\u00E3o). Todos incluem 7 dias de teste gr\u00E1tis." },
-    { q: "Como funciona a Rook?", a: "O Rook coleta, analisa e interpreta os dados financeiros e fiscais do seu restaurante, classificando cada linha com base em metodologia cont\u00E1bil e traduzindo tudo em um diagn\u00F3stico. Pelo fluxo de caixa ou pelo DRE, voc\u00EA recebe recomenda\u00E7\u00F5es direcionadas \u00E0 constru\u00E7\u00E3o do seu lucro." },
-    { q: "Funciona em qualquer cidade do Brasil?", a: "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O c\u00E1lculo tribut\u00E1rio considera a UF do estabelecimento automaticamente \u2014 voc\u00EA s\u00F3 precisa ter o cadastro do CNPJ correto." },
-    { q: "\u00C9 seguro? Quem mais v\u00EA meus dados?", a: "Os dados s\u00E3o criptografados em tr\u00E2nsito (TLS 1.3) e em repouso (AES-256). Cada empresa tem seu pr\u00F3prio ambiente isolado \u2014 ningu\u00E9m v\u00EA seus n\u00FAmeros fora da sua equipe. O Rook est\u00E1 adequado \u00E0 LGPD." },
-    { q: "Preciso mudar de contador?", a: "N\u00E3o. O Rook \u00E9 uma intelig\u00EAncia de performance para o dono \u2014 ele n\u00E3o substitui o contador, nem precisa dele para funcionar." },
-    { q: "Preciso trocar o sistema que j\u00E1 uso?", a: "N\u00E3o. O Rook n\u00E3o substitui seu PDV ou ERP \u2014 nossa metodologia l\u00EA seus dados e traduz seu resultado. Para aumentar ainda mais a nossa capacidade de an\u00E1lise, possu\u00EDmos integra\u00E7\u00E3o com os principais ERPs do mercado.", cta: { label: "Caso seu ERP ainda n\u00E3o tenha integra\u00E7\u00E3o, solicite aqui.", href: "mailto:contato@rooksystem.com.br?subject=Solicita%C3%A7%C3%A3o%20de%20integra%C3%A7%C3%A3o%20com%20ERP" } },
-    { q: "Posso testar antes de pagar?", a: "Sim. O per\u00EDodo de teste dura 7 dias, \u00E9 oferecido uma vez por Empresa/CNPJ e exige um cart\u00E3o v\u00E1lido. Se voc\u00EA cancelar antes do t\u00E9rmino, a primeira cobran\u00E7a n\u00E3o ser\u00E1 realizada." },
-    { q: "Como funciona o pagamento?", a: "A oferta padr\u00E3o tem cobran\u00E7a mensal recorrente em reais. O plano Knight custa R$ 479,90/m\u00EAs e o Rook custa R$ 779,90/m\u00EAs. Ao final do per\u00EDodo de teste de 7 dias, a mensalidade do plano contratado \u00E9 cobrada no meio de pagamento cadastrado." },
-    { q: "Posso cancelar quando quiser?", a: "Sim. O cancelamento pode ser solicitado pela plataforma ou pelo suporte, com anteced\u00EAncia m\u00EDnima de 15 dias do fim do ciclo, e produz efeitos ao final do per\u00EDodo pago." },
+    { q: "Quanto custa o Rook System?", a: "O Rook tem dois planos base: Knight (R$ 479,90/mês) para restaurantes com faturamento de até R$ 250 mil/mês, e Rook (R$ 779,90/mês) para faturamento acima de R$ 250 mil/mês. Ambos oferecem acesso completo à plataforma. Para redes e franquias, há o add-on Chess (R$ 279,90/mês por organização). Todos incluem 7 dias de teste grátis." },
+    { q: "Como funciona a Rook?", a: "O Rook coleta, analisa e interpreta os dados financeiros e fiscais do seu restaurante, classificando cada linha com base em metodologia contábil e traduzindo tudo em um diagnóstico. Pelo fluxo de caixa ou pelo DRE, você recebe recomendações direcionadas à construção do seu lucro." },
+    { q: "Funciona em qualquer cidade do Brasil?", a: "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O cálculo tributário considera a UF do estabelecimento automaticamente — você só precisa ter o cadastro do CNPJ correto." },
+    { q: "É seguro? Quem mais vê meus dados?", a: "Os dados são criptografados em trânsito (TLS 1.3) e em repouso (AES-256). Cada empresa tem seu próprio ambiente isolado — ninguém vê seus números fora da sua equipe. O Rook está adequado à LGPD." },
+    { q: "Preciso mudar de contador?", a: "Não. O Rook é uma inteligência de performance para o dono — ele não substitui o contador, nem precisa dele para funcionar." },
+    { q: "Preciso trocar o sistema que já uso?", a: "Não. O Rook não substitui seu PDV ou ERP — nossa metodologia lê seus dados e traduz seu resultado. Para aumentar ainda mais a nossa capacidade de análise, possuímos integração com os principais ERPs do mercado.", cta: { label: "Caso seu ERP ainda não tenha integração, solicite aqui.", href: "mailto:contato@rooksystem.com.br?subject=Solicita%C3%A7%C3%A3o%20de%20integra%C3%A7%C3%A3o%20com%20ERP" } },
+    { q: "Posso testar antes de pagar?", a: "Sim. O período de teste dura 7 dias, é oferecido uma vez por Empresa/CNPJ e exige um cartão válido. Se você cancelar antes do término, a primeira cobrança não será realizada." },
+    { q: "Como funciona o pagamento?", a: "A oferta padrão tem cobrança mensal recorrente em reais. O plano Knight custa R$ 479,90/mês e o Rook custa R$ 779,90/mês. Ao final do período de teste de 7 dias, a mensalidade do plano contratado é cobrada no meio de pagamento cadastrado." },
+    { q: "Posso cancelar quando quiser?", a: "Sim. O cancelamento pode ser solicitado pela plataforma ou pelo suporte, com antecedência mínima de 15 dias do fim do ciclo, e produz efeitos ao final do período pago." },
   ];
 
   return (

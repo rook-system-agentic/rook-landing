@@ -54,7 +54,7 @@ const jsonLd = {
           "priceCurrency": "BRL",
           "priceValidUntil": "2027-12-31",
           "url": "https://rook.com.br/planos/",
-          "description": "Plano para restaurantes com faturamento mensal de at\u00e9 R$ 250 mil. Acesso completo \u00e0 plataforma. 7 dias de teste gr\u00e1tis."
+          "description": "Plano para restaurantes com faturamento mensal de até R$ 250 mil. Acesso completo à plataforma. 7 dias de teste grátis."
         },
         {
           "@type": "Offer",
@@ -63,7 +63,7 @@ const jsonLd = {
           "priceCurrency": "BRL",
           "priceValidUntil": "2027-12-31",
           "url": "https://rook.com.br/planos/",
-          "description": "Plano para restaurantes com faturamento mensal acima de R$ 250 mil. Acesso completo \u00e0 plataforma. 7 dias de teste gr\u00e1tis."
+          "description": "Plano para restaurantes com faturamento mensal acima de R$ 250 mil. Acesso completo à plataforma. 7 dias de teste grátis."
         },
         {
           "@type": "Offer",
@@ -72,10 +72,10 @@ const jsonLd = {
           "priceCurrency": "BRL",
           "priceValidUntil": "2027-12-31",
           "url": "https://rook.com.br/planos/",
-          "description": "Add-on organizacional para consolida\u00e7\u00e3o multiunidade (redes e franquias)."
+          "description": "Add-on organizacional para consolidação multiunidade (redes e franquias)."
         }
       ],
-      "description": "Sistema de intelig\u00eancia financeira e gest\u00e3o para restaurantes. Controle CMV, DRE gerencial autom\u00e1tico, score de sa\u00fade financeira e recomenda\u00e7\u00f5es com impacto em R$."
+      "description": "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, DRE gerencial automático, score de saúde financeira e recomendações com impacto em R$."
     },
     {
       "@type": "Organization",
@@ -91,7 +91,7 @@ const jsonLd = {
           "name": "Quanto custa o Rook System?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "O Rook tem dois planos base: Knight (R$ 479,90/m\u00eas) para restaurantes com faturamento de at\u00e9 R$ 250 mil/m\u00eas, e Rook (R$ 779,90/m\u00eas) para faturamento acima de R$ 250 mil/m\u00eas. Ambos oferecem acesso completo \u00e0 plataforma. Para redes e franquias, h\u00e1 o add-on Chess (R$ 279,90/m\u00eas por organiza\u00e7\u00e3o). Todos incluem 7 dias de teste gr\u00e1tis."
+            "text": "O Rook tem dois planos base: Knight (R$ 479,90/mês) para restaurantes com faturamento de até R$ 250 mil/mês, e Rook (R$ 779,90/mês) para faturamento acima de R$ 250 mil/mês. Ambos oferecem acesso completo à plataforma. Para redes e franquias, há o add-on Chess (R$ 279,90/mês por organização). Todos incluem 7 dias de teste grátis."
           }
         },
         {
@@ -99,7 +99,7 @@ const jsonLd = {
           "name": "Como funciona o Rook System?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "O Rook coleta, analisa e interpreta os dados financeiros e fiscais do seu restaurante, classificando cada linha com base em metodologia cont\u00e1bil e traduzindo tudo em um diagn\u00f3stico. Pelo fluxo de caixa ou pelo DRE, voc\u00ea recebe recomenda\u00e7\u00f5es direcionadas \u00e0 constru\u00e7\u00e3o do seu lucro."
+            "text": "O Rook coleta, analisa e interpreta os dados financeiros e fiscais do seu restaurante, classificando cada linha com base em metodologia contábil e traduzindo tudo em um diagnóstico. Pelo fluxo de caixa ou pelo DRE, você recebe recomendações direcionadas à construção do seu lucro."
           }
         },
         {
@@ -107,15 +107,15 @@ const jsonLd = {
           "name": "Posso testar o Rook antes de pagar?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Sim. O per\u00edodo de teste dura 7 dias, \u00e9 oferecido uma vez por Empresa/CNPJ e exige um cart\u00e3o v\u00e1lido. Se voc\u00ea cancelar antes do t\u00e9rmino, a primeira cobran\u00e7a n\u00e3o ser\u00e1 realizada."
+            "text": "Sim. O período de teste dura 7 dias, é oferecido uma vez por Empresa/CNPJ e exige um cartão válido. Se você cancelar antes do término, a primeira cobrança não será realizada."
           }
         },
         {
           "@type": "Question",
-          "name": "Preciso trocar o sistema que j\u00e1 uso?",
+          "name": "Preciso trocar o sistema que já uso?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "N\u00e3o. O Rook n\u00e3o substitui seu PDV ou ERP. Nossa metodologia l\u00ea seus dados e traduz seu resultado. Possu\u00edmos integra\u00e7\u00e3o com os principais ERPs do mercado."
+            "text": "Não. O Rook não substitui seu PDV ou ERP. Nossa metodologia lê seus dados e traduz seu resultado. Possuímos integração com os principais ERPs do mercado."
           }
         },
         {
@@ -123,7 +123,7 @@ const jsonLd = {
           "name": "O Rook funciona em qualquer cidade do Brasil?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O c\u00e1lculo tribut\u00e1rio considera a UF do estabelecimento automaticamente."
+            "text": "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O cálculo tributário considera a UF do estabelecimento automaticamente."
           }
         }
       ]
