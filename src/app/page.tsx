@@ -5,7 +5,7 @@ const STATS = [
   { value: "R$ 495 bi", label: "O tamanho do setor", source: "Abrasel, 2025" },
   { value: "39%", label: "Controlam contas na planilha ou caderno", source: "Conta Simples + Visa, 2024" },
   { value: "37%", label: "Com contas em atraso", source: "Abrasel, mai/2025" },
-  { value: "62,7%", label: "Das empresas fecham em 5 anos", source: "IBGE, 2022" },
+  { value: "62,7%", label: "Das empresas fecham em 5 anos", source: "IBGE, 2024" },
 ];
 
 function Hero() {
@@ -28,7 +28,7 @@ function Hero() {
             <strong className="text-cream">O Rook é o sistema de inteligência financeira para restaurante que coloca todos eles na sua frente.</strong>
           </p>
           <p className="text-xs text-muted/70 mb-6 font-mono">
-            Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2022
+            Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2024
           </p>
 
           {/* Números do setor — ficavam numa faixa solta abaixo do hero. Com os
