@@ -117,10 +117,9 @@ function Manifesto() {
         </div>
         <div className="flex flex-col gap-5 justify-center">
           {[
-            { contrast: "Receita ≠ Lucro", desc: "O que entra no caixa não é o que fica no bolso. Entre os dois há 6 pilares — e qualquer um deles pode estar corroendo sua margem agora." },
-            { contrast: "Faturamento ≠ Resultado", desc: "Crescer 30% em vendas e perder dinheiro acontece todo mês em food service. Sem visão por linha de DRE, ninguém sabe explicar onde." },
-            { contrast: "Movimento ≠ Margem", desc: "Filas no salão, delivery cheio, ticket bom — e a margem real pode ser positiva ou negativa. A diferença muda decisões importantes." },
-            { contrast: "Dívida ≠ Estratégia", desc: "Financiamento pode ser alavanca ou armadilha. Sem saber quanto da receita você precisa para amortizar a dívida, o resultado é o aumento insustentável do endividamento." },
+            { contrast: "Receita ≠ Lucro", desc: "O que entra no caixa não é o que fica no bolso — entre os dois há 6 etapas. Crescer 30% em vendas e ainda assim perder dinheiro acontece todo mês em food service: sem visão por linha de DRE, ninguém sabe em qual etapa a margem se perdeu." },
+            { contrast: "Movimento ≠ Margem", desc: "Filas no salão, delivery cheio, ticket bom — e a margem real pode ser positiva ou negativa. Decidir pelo número certo, e não pela sensação de movimento, muda o resultado do mês inteiro." },
+            { contrast: "Dívida ≠ Estratégia", desc: "Financiamento pode ser alavanca ou armadilha. Sem saber o porquê do endividamento e sem ter a certeza de como pagá-lo, o resultado é a queima insustentável de caixa." },
           ].map((item) => (
             <div key={item.contrast} className="card p-5">
               <p className="font-semibold text-cream mb-1">{item.contrast}</p>
