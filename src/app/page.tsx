@@ -99,18 +99,19 @@ function Manifesto() {
           </h2>
           <div className="text-body space-y-4">
             <p>
-              Movimento no caixa é uma <strong className="text-cream">sensação</strong>. Lucro é um{" "}
-              <strong className="text-cream">número</strong>. Entre os dois, o dinheiro passa por seis casas:
+              Movimento no caixa é uma <strong className="text-cream">percepção</strong>. Lucro é{" "}
+              <strong className="text-cream">uma realidade</strong>. Entre os dois, o dinheiro passa por seis etapas:
               vendas, impostos, custos, despesas, dívidas e resultado. Em cada uma, a margem pode estar
               escapando sem você ver.
             </p>
             <p>
-              A maioria dos restaurantes joga sem enxergar o tabuleiro inteiro — planilha solta,
-              &ldquo;feeling&rdquo; do gerente, conversa com o contador uma vez por ano.
+              A maioria dos restaurantes joga sem enxergar o tabuleiro e sem uma estratégia clara
+              para ganhar o jogo — planilhas superficiais, &ldquo;feeling&rdquo; do gerente, sem
+              fundamento econômico, financeiro ou contábil.
             </p>
             <p>
-              O Rook põe as <strong className="text-cream">seis casas na mesma tela</strong> e mostra em qual
-              delas o seu dinheiro está indo embora.
+              O Rook organiza as <strong className="text-cream">seis etapas na mesma tela</strong>, trazendo
+              visão, estratégia e controle.
             </p>
           </div>
         </div>
