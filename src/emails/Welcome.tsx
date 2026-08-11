@@ -18,7 +18,7 @@ export function WelcomeEmail({
 
   return (
     <EmailLayout
-      preview="Bem-vindo à newsletter da Rook System — controladoria para restaurantes."
+      preview="Bem-vindo à newsletter do Rook System — controladoria para restaurantes."
       unsubscribeUrl={unsubscribeUrl}
     >
       <Heading style={styles.h1}>
@@ -37,7 +37,7 @@ export function WelcomeEmail({
       </Text>
       <Section style={{ textAlign: "center", margin: "8px 0 4px" }}>
         <Button style={styles.button} href={ctaUrl}>
-          Ler o blog da Rook
+          Ler o blog do Rook
         </Button>
       </Section>
     </EmailLayout>

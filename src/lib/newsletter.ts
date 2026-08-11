@@ -49,20 +49,20 @@ type TemplateEntry = {
 const TEMPLATES: Record<TemplateName, TemplateEntry> = {
   welcome: {
     component: WelcomeEmail,
-    subject: () => "Bem-vindo à newsletter da Rook 👋",
+    subject: () => "Bem-vindo à newsletter do Rook 👋",
   },
   content_alert: {
     component: ContentAlertEmail,
-    subject: (props) => `Novo no blog da Rook: ${props.title}`,
+    subject: (props) => `Novo no blog do Rook: ${props.title}`,
   },
   weekly_digest: {
     component: WeeklyDigestEmail,
     subject: (props) =>
-      props.subject || `Resumo da semana na Rook${props.periodLabel ? ` · ${props.periodLabel}` : ""} 📊`,
+      props.subject || `Resumo da semana no Rook${props.periodLabel ? ` · ${props.periodLabel}` : ""} 📊`,
   },
   reengagement: {
     component: ReengagementEmail,
-    subject: () => "Faz um tempo… tem novidade na Rook 📉",
+    subject: () => "Faz um tempo… tem novidade no Rook 📉",
   },
 };
 

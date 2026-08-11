@@ -54,7 +54,7 @@ function Hero() {
               <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Faturamento diário, semanal e mensal, com pacote completo de indicadores de performance</li>
               <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Projeções ajustadas de suporte ao planejamento operacional</li>
               <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Comunicação ativa via WhatsApp para acompanhamento diário, semanal e mensal</li>
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Validação mensal do cálculo apresentado pela sua contabilidade</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Análise mensal dos impostos apurados</li>
             </ul>
           </div>
           <div className="card p-5">
@@ -101,7 +101,7 @@ function Manifesto() {
             <p>
               Movimento no caixa é uma <strong className="text-cream">sensação</strong>. Lucro é um{" "}
               <strong className="text-cream">número</strong>. Entre os dois, o dinheiro passa por seis casas:
-              vendas, custos, impostos, despesas, dívidas e resultado. Em cada uma, a margem pode estar
+              vendas, impostos, custos, despesas, dívidas e resultado. Em cada uma, a margem pode estar
               escapando sem você ver.
             </p>
             <p>
@@ -204,8 +204,8 @@ function PricingSummary() {
 /* ─── FAQ ─── */
 function FAQ() {
   const faqs = [
-    { q: "Quanto custa o Rook System?", a: "O Rook tem dois planos base: Knight (R$ 479,90/mês) para restaurantes com faturamento de até R$ 250 mil/mês, e Rook (R$ 779,90/mês) para faturamento acima de R$ 250 mil/mês. Ambos oferecem acesso completo à plataforma. Para redes e franquias, há o add-on Chess (R$ 279,90/mês por organização). Todos incluem 7 dias de teste grátis." },
-    { q: "Como funciona a Rook?", a: "O Rook coleta, analisa e interpreta os dados financeiros e fiscais do seu restaurante, classificando cada linha com base em metodologia contábil e traduzindo tudo em um diagnóstico. Pelo fluxo de caixa ou pelo DRE, você recebe recomendações direcionadas à construção do seu lucro." },
+    { q: "Quanto custa o Rook System?", a: "O Rook tem dois planos base: Knight (R$ 479,90/mês) para restaurantes com faturamento de até R$ 250 mil/mês, e Rook (R$ 779,90/mês) para faturamento acima de R$ 250 mil/mês. Ambos oferecem acesso completo à plataforma. Para redes e franquias, há o add-on Chess (R$ 279,90/mês por grupo econômico). Todos incluem 7 dias de teste grátis." },
+    { q: "Como funciona o Rook?", a: "O Rook coleta, analisa e interpreta os dados financeiros e fiscais do seu restaurante, classificando cada linha com base em metodologia contábil e traduzindo tudo em um diagnóstico. Pelo fluxo de caixa ou pelo DRE, você recebe recomendações direcionadas à construção do seu lucro." },
     { q: "Funciona em qualquer cidade do Brasil?", a: "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O cálculo tributário considera a UF do estabelecimento automaticamente — você só precisa ter o cadastro do CNPJ correto." },
     { q: "É seguro? Quem mais vê meus dados?", a: "Os dados são criptografados em trânsito (TLS 1.3) e em repouso (AES-256). Cada empresa tem seu próprio ambiente isolado — ninguém vê seus números fora da sua equipe. O Rook está adequado à LGPD." },
     { q: "Preciso mudar de contador?", a: "Não. O Rook é uma inteligência de performance para o dono — ele não substitui o contador, nem precisa dele para funcionar." },

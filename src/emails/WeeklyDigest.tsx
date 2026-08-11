@@ -28,7 +28,7 @@ export function WeeklyDigestEmail({
 
   return (
     <EmailLayout
-      preview={`Resumo da semana na Rook${periodLabel ? ` · ${periodLabel}` : ""}`}
+      preview={`Resumo da semana no Rook${periodLabel ? ` · ${periodLabel}` : ""}`}
       unsubscribeUrl={unsubscribeUrl}
     >
       <Heading style={styles.h1}>Resumo da semana 📊</Heading>

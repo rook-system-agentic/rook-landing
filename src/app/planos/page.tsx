@@ -248,7 +248,7 @@ export default async function PlanosPage() {
               ],
               [
                 "Como é feita a cobrança do Chess?",
-                "Chess é uma mensalidade adicional por organização. Cada estabelecimento mantém seu item Knight ou Rook; o grupo pode centralizar o pagamento na matriz ou manter cobranças por restaurante.",
+                "Chess é uma mensalidade adicional por grupo econômico. Cada estabelecimento mantém seu item Knight ou Rook; o grupo pode centralizar o pagamento na matriz ou manter cobranças por restaurante.",
               ],
               [
                 "Quando ocorre a primeira cobrança?",

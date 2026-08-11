@@ -74,7 +74,7 @@ export default function NewsletterForm() {
           className="mt-0.5 accent-terracota"
         />
         <span>
-          Concordo em receber e-mails da Rook System e com o tratamento dos meus dados
+          Concordo em receber e-mails do Rook System e com o tratamento dos meus dados
           conforme a{" "}
           <a href="/privacidade" className="text-ocre underline">
             Política de Privacidade
