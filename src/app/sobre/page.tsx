@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Sobre o Rook | Rook System",
-  description: "A Rook é um sistema de gestão para donos de food service que querem parar de operar no escuro. Conheça nossa história.",
+  description: "O Rook é um sistema de gestão para donos de food service que querem parar de operar no escuro. Conheça nossa história.",
 };
 
 export default function SobrePage() {
@@ -66,7 +66,7 @@ export default function SobrePage() {
           <p className="text-body mb-16">
             O Rook traz a controladoria — a gestão financeira que normalmente só empresa
             grande tem — para a tela do dono de restaurante. Entre o pedido no salão e o
-            lucro no fim do mês há seis casas: vendas, custos, impostos, despesas, dívidas
+            lucro no fim do mês há seis casas: vendas, impostos, custos, despesas, dívidas
             e resultado. Cada uma pode estar corroendo a margem agora.
           </p>
 

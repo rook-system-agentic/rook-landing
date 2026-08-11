@@ -18,7 +18,7 @@ export function ReengagementEmail({
 
   return (
     <EmailLayout
-      preview="Faz um tempo que a gente não se fala — tem novidade na Rook."
+      preview="Faz um tempo que a gente não se fala — tem novidade no Rook."
       unsubscribeUrl={unsubscribeUrl}
     >
       <Heading style={styles.h1}>

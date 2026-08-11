@@ -24,7 +24,7 @@ export function ContentAlertEmail({
 
   return (
     <EmailLayout
-      preview={`Novo no blog da Rook: ${title}`}
+      preview={`Novo no blog do Rook: ${title}`}
       unsubscribeUrl={unsubscribeUrl}
     >
       {category ? (
