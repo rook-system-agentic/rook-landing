@@ -22,10 +22,10 @@ function Hero() {
             Faturar não é <em>lucrar.</em>
           </h1>
           <p className="text-body mb-8">
-            Num setor que movimenta <strong className="text-cream">R$ 495 bilhões por ano</strong>, a maioria
-            dos restaurantes mal alcança o lucro — e seis em cada dez não chegam aos cinco anos de vida.
-            O que separa quem fatura de quem lucra são números que quase ninguém acompanha.{" "}
-            <strong className="text-cream">O Rook é o sistema de inteligência financeira para restaurante que coloca todos eles na sua frente.</strong>
+            Num setor que movimenta <strong className="text-cream">R$ 495 bilhões por ano</strong>, aproximadamente
+            60% dos bares e restaurantes não geram lucro. O que separa as empresas que sobrevivem
+            das que lucram e prosperam é a gestão pelos números corretos.{" "}
+            <strong className="text-cream">O Rook é a inteligência financeira que te apoia na coleta, análise e interpretação desses dados.</strong>
           </p>
           <p className="text-xs text-muted/70 mb-6 font-mono">
             Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2024
