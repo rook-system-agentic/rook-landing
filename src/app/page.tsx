@@ -69,16 +69,16 @@ function Hero() {
             <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Despesas</p>
             <ul className="space-y-1.5 text-sm text-muted">
               <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Despesas com vendas — análise e comparação com benchmarking</li>
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Despesas com pessoal — monitoramento do CMO com indicadores de produtividade</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Despesas com pessoal — monitoramento do Custo de Mão de Obra (CMO) com indicadores de produtividade</li>
               <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Despesas administrativas — clareza sobre ocupação, serviços, manutenções e gastos gerais</li>
             </ul>
           </div>
           <div className="card p-5">
             <p className="font-mono text-xs text-ocre uppercase tracking-wider mb-3">— Resultados</p>
             <ul className="space-y-1.5 text-sm text-muted">
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>DRE gerencial, fluxo de caixa e projeções</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>DRE gerencial, fluxo de caixa realizado e projeções de receita e compras</li>
               <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Score de saúde financeira e liquidez</li>
-              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Open Finance com análise de endividamento</li>
+              <li className="flex items-start gap-2"><span className="text-floresta mt-0.5">✓</span>Análise de endividamento</li>
             </ul>
           </div>
         </div>
