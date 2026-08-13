@@ -83,18 +83,27 @@ export default function LpPartners() {
         </div>
       </div>
 
-      {/* A faixa sangra até a borda da tela — é o que faz ela parecer contínua. */}
+      {/*
+        A faixa sangra até a borda da tela — é o que faz ela parecer contínua.
+
+        Três trilhas: a primeira é a real, as outras duas são cópias marcadas
+        `aria-hidden` (sem isso, um leitor de tela anunciaria cada parceiro três
+        vezes). O porquê de serem três, e não duas, está no CSS: é a largura
+        mínima para o laço não abrir buraco numa tela larga.
+      */}
       <div className="lp-marquee mt-16" aria-label="Sistemas integrados ao Rook">
         <ul className="lp-marquee-track">
           {PARTNERS.map((p) => (
             <PartnerPlate key={p.name} p={p} />
           ))}
         </ul>
-        <ul className="lp-marquee-track" aria-hidden="true">
-          {PARTNERS.map((p) => (
-            <PartnerPlate key={`${p.name}-clone`} p={p} />
-          ))}
-        </ul>
+        {[1, 2].map((n) => (
+          <ul className="lp-marquee-track" aria-hidden="true" key={n}>
+            {PARTNERS.map((p) => (
+              <PartnerPlate key={`${p.name}-clone-${n}`} p={p} />
+            ))}
+          </ul>
+        ))}
       </div>
     </section>
   );

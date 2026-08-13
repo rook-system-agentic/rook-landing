@@ -298,11 +298,24 @@
     mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   }
 
+  /*
+   * A trilha tem a largura do próprio conteúdo — nada de `min-width: 100%`.
+   *
+   * Com `min-width: 100%` cada trilha era esticada até a largura da tela e as
+   * placas ficavam empacotadas à esquerda, abrindo um vazio no fim de cada
+   * uma. Em 1.920px isso dava mais de 500px de buraco entre a última placa de
+   * uma trilha e a primeira da seguinte.
+   *
+   * São três trilhas, e não duas, por aritmética: cada uma mede ~1.352px
+   * (7 placas de 176px + 6 vãos de 20px). A animação desloca uma trilha
+   * inteira, então o conteúdo precisa cobrir deslocamento + largura da tela.
+   * Com duas trilhas isso dá 2.724px, insuficiente para uma tela de 1.920px.
+   * Com três, 4.096px — cobre com folga até telas ultrawide.
+   */
   .lp-marquee-track {
     display: flex;
     flex-shrink: 0;
     gap: 20px;
-    min-width: 100%;
     padding: 0;
     margin: 0;
     list-style: none;
