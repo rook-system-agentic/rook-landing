@@ -46,11 +46,26 @@ export function Sparkline() {
   const h = 64;
   const max = Math.max(...DAILY_REVENUE);
   const min = Math.min(...DAILY_REVENUE);
-  const pts = DAILY_REVENUE.map((v, i) => {
-    const x = (i / (DAILY_REVENUE.length - 1)) * w;
-    const y = h - ((v - min) / (max - min)) * (h - 8) - 4;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
+  const coords = DAILY_REVENUE.map((v, i) => ({
+    x: (i / (DAILY_REVENUE.length - 1)) * w,
+    y: h - ((v - min) / (max - min)) * (h - 8) - 4,
+  }));
+  const pts = coords.map((c) => `${c.x.toFixed(1)},${c.y.toFixed(1)}`);
+
+  /*
+   * O desenho progressivo é feito com uma cortina (`clip-path`) sobre o SVG
+   * inteiro, e não com `stroke-dasharray`.
+   *
+   * Tracejado não funciona aqui, e o motivo é sutil: com
+   * `vectorEffect="non-scaling-stroke"` o navegador mede o tracejado em pixels
+   * de tela, enquanto o comprimento da polilinha existe em unidades do
+   * viewBox. Como `preserveAspectRatio="none"` estica o eixo X, os dois nunca
+   * batem — e o traço aparece com buracos. Com `pathLength` normalizado o
+   * sintoma é o mesmo.
+   *
+   * A cortina é imune a isso: revela linha e área juntas, da esquerda para a
+   * direita, independente de escala.
+   */
 
   return (
     <div>
@@ -64,18 +79,20 @@ export function Sparkline() {
       </div>
       <svg
         viewBox={`0 0 ${w} ${h}`}
-        className="h-16 w-full"
+        className="lp-spark h-16 w-full"
         preserveAspectRatio="none"
         role="img"
         aria-label="Faturamento diário das últimas duas semanas, em tendência de alta"
       >
         <polyline
+          className="lp-spark-area"
           points={`0,${h} ${pts.join(" ")} ${w},${h}`}
           fill={TERRACOTA}
           opacity="0.08"
           stroke="none"
         />
         <polyline
+          className="lp-spark-line"
           points={pts.join(" ")}
           fill="none"
           stroke={TERRACOTA}
@@ -118,11 +135,13 @@ export function CmvBar() {
         aria-label={`CMV real de ${num(real)}% contra meta de ${num(meta)}%`}
       >
         <div
-          className="absolute inset-y-0 left-0 rounded-full"
+          className="lp-grow-bar absolute inset-y-0 left-0 rounded-full"
           style={{ width: `${(real / scaleMax) * 100}%`, backgroundColor: TERRACOTA }}
         />
+        {/* A meta entra depois da barra: o cruzamento precisa ser lido como
+            evento, não como estado que já estava lá. */}
         <div
-          className="absolute inset-y-[-4px] w-[2px]"
+          className="lp-meta-line absolute inset-y-[-4px] w-[2px]"
           style={{ left: `${(meta / scaleMax) * 100}%`, backgroundColor: "var(--lp-ink)" }}
         />
       </div>
@@ -151,7 +170,7 @@ export function ExpenseBars() {
       role="img"
       aria-label="Despesas por grupo, como percentual da receita"
     >
-      {EXPENSE_ROWS.map((r) => (
+      {EXPENSE_ROWS.map((r, i) => (
         <div key={r.label}>
           <div className="mb-1 flex items-baseline justify-between">
             <span className="text-[11px]" style={{ color: "var(--lp-muted)" }}>
@@ -163,8 +182,12 @@ export function ExpenseBars() {
           </div>
           <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: "var(--lp-elevated)" }}>
             <div
-              className="h-full rounded-full"
-              style={{ width: `${(r.pct / scaleMax) * 100}%`, backgroundColor: "var(--lp-accent)" }}
+              className="lp-grow-bar h-full rounded-full"
+              style={{
+                width: `${(r.pct / scaleMax) * 100}%`,
+                backgroundColor: "var(--lp-accent)",
+                animationDelay: `${i * 110}ms`,
+              }}
             />
           </div>
         </div>
@@ -196,11 +219,11 @@ export function DreLines() {
         <span>{EXEMPLO_DRE.receita.toLocaleString("pt-BR")}</span>
       </div>
 
-      {EXEMPLO_DRE.linhas.map((l) => (
+      {EXEMPLO_DRE.linhas.map((l, i) => (
         <div
           key={l.label}
-          className="flex items-baseline justify-between py-1"
-          style={{ color: "var(--lp-muted)" }}
+          className="lp-dre-row flex items-baseline justify-between py-1"
+          style={{ color: "var(--lp-muted)", animationDelay: `${(i + 1) * 90}ms` }}
         >
           <span>
             <span className="mr-1">−</span>

@@ -1,6 +1,7 @@
 import { HERO, HERO_PARAGRAPH, SECTOR_STATS, MODULES } from "@/lib/lp-content";
 import Rich from "./LpRich";
 import Reveal from "./LpReveal";
+import LpCountUp from "./LpCountUp";
 import { MODULE_VISUALS } from "./LpDataParts";
 
 /**
@@ -64,7 +65,9 @@ export default function LpHero() {
                         lineHeight: 1.1,
                       }}
                     >
-                      {s.value}
+                      {/* Renderiza o valor final no HTML servido; a contagem
+                          só assume depois de montar. Ver LpCountUp. */}
+                      <LpCountUp value={s.value} />
                     </p>
                     <p className="mt-1 text-sm" style={{ color: "var(--lp-ink)" }}>
                       {s.label}

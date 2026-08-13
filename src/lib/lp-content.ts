@@ -194,6 +194,45 @@ export const CONTRASTS: readonly Contrast[] = [
   },
 ];
 
+/* ─── Parceiros e integrações ─── */
+
+export interface Partner {
+  name: string;
+  categoria: string;
+  /**
+   * Caminho em `public/partners/`. `null` renderiza o nome em tipografia.
+   *
+   * A ausência de arquivo não é lacuna a esconder: é o estado de quem ainda
+   * não teve o logo obtido de fonte oficial. Basta colocar o arquivo e
+   * preencher este campo para o logo aparecer.
+   */
+  logo: string | null;
+  /** Dimensões intrínsecas do arquivo, para reservar espaço e não deslocar o layout. */
+  w?: number;
+  h?: number;
+}
+
+export const PARTNERS: readonly Partner[] = [
+  { name: "Omie", categoria: "ERP", logo: "/partners/omie.png", w: 134, h: 46 },
+  { name: "Conta Azul", categoria: "ERP", logo: "/partners/conta-azul.svg", w: 139, h: 18 },
+  { name: "Saipos", categoria: "PDV", logo: "/partners/saipos.svg", w: 161, h: 51 },
+  { name: "iFood", categoria: "Delivery", logo: "/partners/ifood.png", w: 270, h: 270 },
+  { name: "Cardápio Web", categoria: "Delivery", logo: "/partners/cardapio-web.png", w: 810, h: 525 },
+  { name: "Stone", categoria: "Adquirente", logo: "/partners/stone.png", w: 152, h: 44 },
+  // Sem arquivo: userede.com.br responde 302 e não entrega o SVG. Colocar em
+  // public/partners/rede.svg e preencher `logo` faz o logo aparecer sozinho.
+  { name: "Rede", categoria: "Adquirente", logo: null },
+];
+
+export const PARTNERS_SECTION = {
+  label: "— Integrações",
+  headlinePlain: "Funciona com o que você ",
+  headlineEmphasis: "já usa.",
+  intro:
+    "O Rook não substitui seu PDV, seu ERP ou sua maquininha. Ele lê o que esses sistemas já produzem, cruza com os documentos fiscais e devolve o resultado traduzido.",
+  ctaLabel: "Não encontrou o seu sistema? Solicite a integração →",
+} as const;
+
 /* ─── Planos ─── */
 
 export interface Plan {

@@ -1,0 +1,101 @@
+import Image from "next/image";
+import { PARTNERS, PARTNERS_SECTION, CONTACT_EMAIL, type Partner } from "@/lib/lp-content";
+import LpPartnersDiagram from "./LpPartnersDiagram";
+
+/**
+ * Um parceiro na faixa.
+ *
+ * A placa é branca nos dois temas, de propósito. Logo de terceiro não se
+ * recolore nem se aplica filtro — quase todo manual de marca proíbe, e é o que
+ * mantém o uso defensável. Placa clara atrás resolve o contraste no tema
+ * escuro sem tocar no logo.
+ *
+ * Parceiro sem arquivo cai no nome em tipografia. Não é buraco: é o estado de
+ * quem ainda não teve o logo obtido de fonte oficial, e some sozinho quando o
+ * arquivo chegar.
+ */
+function PartnerPlate({ p }: { p: Partner }) {
+  return (
+    <li className="lp-partner shrink-0" aria-label={`${p.name} — ${p.categoria}`}>
+      <div className="lp-partner-plate">
+        {p.logo ? (
+          <Image
+            src={p.logo}
+            alt={p.name}
+            width={p.w ?? 140}
+            height={p.h ?? 44}
+            className="max-h-9 w-auto max-w-[116px] object-contain"
+          />
+        ) : (
+          <span className="text-xl font-semibold tracking-tight text-[#1a1a1a]">{p.name}</span>
+        )}
+      </div>
+      <p className="lp-label mt-3 text-center">{p.categoria}</p>
+    </li>
+  );
+}
+
+/**
+ * Seção de integrações.
+ *
+ * Responde à dúvida que trava compra — "vai funcionar com o que eu já uso?" —
+ * antes de a página falar de preço.
+ *
+ * A faixa é um marquee em CSS puro, com a lista duplicada para o laço não ter
+ * emenda. A cópia é marcada `aria-hidden`, senão um leitor de tela anunciaria
+ * cada parceiro duas vezes. Com `prefers-reduced-motion`, o CSS transforma a
+ * faixa numa grade estática — nenhum parceiro fica fora de vista.
+ */
+export default function LpPartners() {
+  return (
+    <section
+      className="overflow-hidden py-20 lg:py-28"
+      style={{ borderTop: "1px solid var(--lp-line)" }}
+      aria-labelledby="partners-title"
+    >
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1fr]">
+          <div>
+            <p className="lp-label mb-4">{PARTNERS_SECTION.label}</p>
+            <h2
+              id="partners-title"
+              className="mb-5 font-display font-extrabold"
+              style={{
+                color: "var(--lp-ink)",
+                fontSize: "clamp(2rem, 4.2vw, 3.4rem)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              {PARTNERS_SECTION.headlinePlain}
+              <span style={{ color: "#e54c00" }}>{PARTNERS_SECTION.headlineEmphasis}</span>
+            </h2>
+            <p className="lp-body mb-6">{PARTNERS_SECTION.intro}</p>
+            <a
+              href={`mailto:${CONTACT_EMAIL}?subject=Solicita%C3%A7%C3%A3o%20de%20integra%C3%A7%C3%A3o`}
+              className="btn-ghost text-sm"
+            >
+              {PARTNERS_SECTION.ctaLabel}
+            </a>
+          </div>
+
+          <LpPartnersDiagram />
+        </div>
+      </div>
+
+      {/* A faixa sangra até a borda da tela — é o que faz ela parecer contínua. */}
+      <div className="lp-marquee mt-16" aria-label="Sistemas integrados ao Rook">
+        <ul className="lp-marquee-track">
+          {PARTNERS.map((p) => (
+            <PartnerPlate key={p.name} p={p} />
+          ))}
+        </ul>
+        <ul className="lp-marquee-track" aria-hidden="true">
+          {PARTNERS.map((p) => (
+            <PartnerPlate key={`${p.name}-clone`} p={p} />
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}

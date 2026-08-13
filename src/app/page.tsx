@@ -1,6 +1,7 @@
 import LpHero from "@/components/lp/LpHero";
 import LpFunnel from "@/components/lp/LpFunnel";
 import LpManifesto from "@/components/lp/LpManifesto";
+import LpPartners from "@/components/lp/LpPartners";
 import LpPricing from "@/components/lp/LpPricing";
 import LpFaq from "@/components/lp/LpFaq";
 import LpCta from "@/components/lp/LpCta";
@@ -24,9 +25,13 @@ import LpCta from "@/components/lp/LpCta";
 export default function HomePage() {
   return (
     <div data-lp-home>
+      {/* Progresso de leitura. Puramente decorativo — daí o aria-hidden — e
+          invisível onde o navegador não tem timeline de scroll no CSS. */}
+      <div className="lp-progress" aria-hidden="true" />
       <LpHero />
       <LpFunnel />
       <LpManifesto />
+      <LpPartners />
       <LpPricing />
       <LpFaq />
       <LpCta />

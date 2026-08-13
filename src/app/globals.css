@@ -285,6 +285,118 @@
   }
 }
 
+@layer components {
+  /* ── Faixa de parceiros ────────────────────────────────────────────────── */
+
+  .lp-marquee {
+    display: flex;
+    gap: 20px;
+    overflow: hidden;
+    /* Some nas bordas em vez de cortar seco: é o que faz a faixa parecer
+       contínua em vez de uma lista que acabou. */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  .lp-marquee-track {
+    display: flex;
+    flex-shrink: 0;
+    gap: 20px;
+    min-width: 100%;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    animation: lp-marquee 46s linear infinite;
+  }
+
+  .lp-marquee:hover .lp-marquee-track,
+  .lp-marquee:focus-within .lp-marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes lp-marquee {
+    to {
+      transform: translateX(calc(-100% - 20px));
+    }
+  }
+
+  .lp-partner-plate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 176px;
+    height: 72px;
+    padding: 0 16px;
+    border-radius: 12px;
+    /*
+     * Branca nos dois temas, de propósito. Logo de terceiro não se recolore
+     * nem se filtra — quase todo manual de marca proíbe, e é o que mantém o
+     * uso defensável. A placa resolve o contraste no escuro sem tocar no logo.
+     */
+    background-color: #ffffff;
+    border: 1px solid rgba(16, 21, 28, 0.09);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .lp-partner:hover .lp-partner-plate {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.14);
+  }
+
+  /* ── Barra de progresso de leitura ─────────────────────────────────────── */
+
+  /*
+   * Só existe onde a timeline de scroll do CSS existe. Sem suporte, some — e
+   * some inteira, em vez de virar uma faixa parada em zero fingindo que a
+   * página não rolou. Zero JavaScript: nenhum listener de scroll, nenhum
+   * trabalho por frame.
+   *
+   * Fica acima do header (z-50) de propósito.
+   */
+  .lp-progress {
+    display: none;
+  }
+  @supports (animation-timeline: scroll()) {
+    .lp-progress {
+      display: block;
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 60;
+      height: 2px;
+      transform-origin: 0 50%;
+      background: linear-gradient(90deg, #e54c00, #e79f4a);
+      animation: lp-progress linear;
+      animation-timeline: scroll();
+    }
+    @keyframes lp-progress {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+  }
+
+  /* ── Pulso do diagrama ─────────────────────────────────────────────────── */
+
+  .lp-diagram-pulse {
+    stroke-dasharray: 26 420;
+    stroke-dashoffset: 446;
+    animation: lp-diagram-pulse 3.4s linear infinite;
+  }
+  @keyframes lp-diagram-pulse {
+    to {
+      stroke-dashoffset: -26;
+    }
+  }
+
+  /* Acompanha o alvoX do LpPartnersDiagram — se um mudar, o outro muda. */
+  .lp-diagram-core {
+    transform-origin: 380px 104px;
+    animation: lp-diagram-core 3.4s ease-in-out infinite;
+  }
+  @keyframes lp-diagram-core {
+    0%, 70%, 100% { transform: scale(1); }
+    82% { transform: scale(1.045); }
+  }
+}
+
 @layer utilities {
   /*
    * Revelação ao rolar.
@@ -304,6 +416,59 @@
         opacity: 0;
         transform: translateY(18px);
       }
+    }
+
+    /*
+     * Os gráficos do hero se constroem quando entram na tela.
+     *
+     * Todos disparam a partir da classe `lp-in`, que o <Reveal> coloca no
+     * ancestral no momento da interseção — nenhum componente novo de estado.
+     * E, como sempre nesta página, o estado de repouso é o estado final:
+     * gráfico completo. Se a animação não rodar, o dado está lá inteiro.
+     */
+    /*
+     * O gráfico se desenha por cortina, não por tracejado.
+     *
+     * `stroke-dasharray` é a técnica óbvia e não serve aqui: com
+     * `vectorEffect="non-scaling-stroke"` o tracejado é medido em pixels de
+     * tela, enquanto o caminho vive em unidades do viewBox esticado por
+     * `preserveAspectRatio="none"`. Os dois nunca batem e o traço sai com
+     * buracos. A cortina é imune à escala, e ainda revela linha e área juntas
+     * — que era o outro problema a resolver.
+     *
+     * `backwards` em vez de `both`: terminado o movimento, o elemento volta ao
+     * estilo base, então o repouso nunca depende do último quadro.
+     */
+    [data-lp-home] .lp-in .lp-spark {
+      animation: lpSparkWipe 1.2s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    }
+    @keyframes lpSparkWipe {
+      from {
+        clip-path: inset(0 100% 0 0);
+      }
+    }
+
+    @keyframes lpFade {
+      from { opacity: 0; }
+    }
+
+    [data-lp-home] .lp-in .lp-grow-bar {
+      transform-origin: left center;
+      animation: lpGrow 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    @keyframes lpGrow {
+      from { transform: scaleX(0); }
+    }
+
+    [data-lp-home] .lp-in .lp-meta-line {
+      animation: lpFade 0.4s ease 0.75s both;
+    }
+
+    [data-lp-home] .lp-in .lp-dre-row {
+      animation: lpDreRow 0.5s ease both;
+    }
+    @keyframes lpDreRow {
+      from { transform: translateY(-6px); }
     }
 
     [data-lp-home] .lp-funnel-bar {
@@ -328,6 +493,39 @@
     }
     [data-lp-home] .lp-card:hover {
       transform: none;
+    }
+
+    /*
+     * A faixa para de correr e vira grade. O ponto não é congelar o movimento
+     * e deixar metade dos parceiros fora da tela — é mostrar todos, parados.
+     * Por isso a trilha ganha quebra de linha e a cópia duplicada some.
+     */
+    [data-lp-home] .lp-marquee {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    [data-lp-home] .lp-marquee-track {
+      animation: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 20px;
+    }
+    [data-lp-home] .lp-marquee-track[aria-hidden="true"] {
+      display: none;
+    }
+    [data-lp-home] .lp-partner-plate {
+      transition: none;
+    }
+    [data-lp-home] .lp-partner:hover .lp-partner-plate {
+      transform: none;
+    }
+
+    /* O traço cinza do diagrama continua lá; só o pulso some. */
+    [data-lp-home] .lp-diagram-pulse {
+      display: none;
+    }
+    [data-lp-home] .lp-diagram-core {
+      animation: none;
     }
   }
 }
