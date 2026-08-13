@@ -84,7 +84,7 @@ function ModulesGrid() {
   return (
     <section className="section-spacing border-t border-border">
       <div className="max-w-7xl mx-auto px-6">
-        <p className="section-label mb-6">— Os 7 módulos</p>
+        <p className="section-label mb-6">— Os 6 módulos</p>
         <h2 className="heading-section mb-4 max-w-4xl">
           Uma casa para cada parte do <em>seu dinheiro.</em>
         </h2>
@@ -390,12 +390,12 @@ export default function FuncionalidadesPage() {
         <div className="max-w-7xl mx-auto px-6">
           <p className="section-label mb-6">— Funcionalidades</p>
           <h1 className="heading-hero mb-8 max-w-5xl">
-            Sete módulos, um <em>único objetivo:</em> mostrar onde está seu dinheiro.
+            Seis módulos, um <em>único objetivo:</em> mostrar onde está seu dinheiro.
           </h1>
           <p className="text-body max-w-3xl">
             O dinheiro do restaurante passa por seis casas — vendas, compras, impostos,
-            despesas, dívidas e resultado. O Rook tem um módulo para cada uma, e um sétimo
-            para quem joga com várias unidades. Cada módulo com seus próprios indicadores,
+            despesas, dívidas e resultado. O Rook tem um módulo para cada uma.
+            Cada módulo com seus próprios indicadores,
             e cada área com uma <strong className="text-cream">nota de 0 a 100</strong>.
           </p>
         </div>
