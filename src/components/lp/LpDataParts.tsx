@@ -1,3 +1,5 @@
+import { EXEMPLO_DRE } from "@/lib/lp-content";
+
 /**
  * As peças de interface que aparecem dentro dos módulos do hero.
  *
@@ -5,17 +7,39 @@
  * existir na tela, então a página serve renderizada e o buscador vê o mesmo
  * que o visitante.
  *
- * ⚠️ NÚMEROS: são plausíveis para um restaurante de porte médio e internamente
- * consistentes (o DRE fecha: 412.800 − 141.178 − 207.226 = 64.396), mas NÃO são
- * dados de cliente. Precisam do aval de quem conhece a operação antes de a
- * página ir ao ar — um mini-dashboard com números que um dono de restaurante
- * não reconhece derruba credibilidade em vez de construir.
+ * NÚMEROS: os quatro gráficos e o funil descrevem o MESMO restaurante no MESMO
+ * período, e tudo é derivado de `EXEMPLO_DRE`. Nada aqui é digitado à mão — se
+ * um percentual mudar lá, os valores em reais e o texto de apoio acompanham.
+ * É o que impede a página de dizer duas coisas sobre o mesmo dinheiro.
+ *
+ * Validado por Daniel em 13/08/2026 como reconhecível para a operação. Ainda é
+ * exemplo, não é cliente.
  */
 
 const TERRACOTA = "#e54c00";
 
-/** Faturamento diário das últimas duas semanas, em milhares de reais. */
-const DAILY_REVENUE = [8.2, 9.6, 11.4, 10.1, 13.8, 16.2, 14.9, 8.9, 10.4, 12.1, 11.6, 15.3, 17.1, 15.8];
+const pctDe = (label: string) =>
+  EXEMPLO_DRE.linhas.find((l) => l.label === label)!.pct;
+
+const reais = (pct: number) =>
+  Math.round((EXEMPLO_DRE.receita * pct) / 100).toLocaleString("pt-BR");
+
+const num = (n: number, casas = 1) =>
+  n.toFixed(casas).replace(".", ",");
+
+/**
+ * Faturamento diário das últimas duas semanas, em milhares de reais.
+ *
+ * A média da série é ~13,8 mil/dia, que é justamente a receita mensal de
+ * `EXEMPLO_DRE` dividida por 30. O ritmo semanal (fim de semana mais forte) é
+ * o que se espera de um restaurante — uma série lisa denunciaria dado
+ * inventado na hora.
+ */
+const DAILY_REVENUE = [9.0, 10.6, 12.5, 11.1, 15.2, 17.8, 16.4, 9.8, 11.4, 13.3, 12.8, 16.8, 18.8, 17.4];
+
+const ultimaSemana = DAILY_REVENUE.slice(7).reduce((a, b) => a + b, 0);
+const semanaAnterior = DAILY_REVENUE.slice(0, 7).reduce((a, b) => a + b, 0);
+const variacaoSemanal = (ultimaSemana / semanaAnterior - 1) * 100;
 
 export function Sparkline() {
   const w = 260;
@@ -32,10 +56,10 @@ export function Sparkline() {
     <div>
       <div className="mb-1 flex items-baseline justify-between">
         <span className="font-mono text-lg font-semibold" style={{ color: "var(--lp-ink)" }}>
-          R$ 15,8 mil
+          R$ {num(DAILY_REVENUE[DAILY_REVENUE.length - 1])} mil
         </span>
         <span className="font-mono text-[11px]" style={{ color: "var(--lp-accent)" }}>
-          ▲ 6,1% vs. semana anterior
+          ▲ {num(variacaoSemanal)}% vs. semana anterior
         </span>
       </div>
       <svg
@@ -73,25 +97,25 @@ export function Sparkline() {
 
 /** CMV real cruzando a linha de meta — o gráfico que define o produto. */
 export function CmvBar() {
-  const real = 34.2;
-  const meta = 32.0;
+  const real = pctDe("CMV");
+  const meta = real - 2.0;
   const scaleMax = 45;
 
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between">
         <span className="font-mono text-lg font-semibold" style={{ color: TERRACOTA }}>
-          34,2%
+          {num(real)}%
         </span>
         <span className="font-mono text-[11px]" style={{ color: "var(--lp-muted)" }}>
-          meta 32,0%
+          meta {num(meta)}%
         </span>
       </div>
       <div
         className="relative h-3 w-full overflow-hidden rounded-full"
         style={{ backgroundColor: "var(--lp-elevated)" }}
         role="img"
-        aria-label="CMV real de 34,2% contra meta de 32%"
+        aria-label={`CMV real de ${num(real)}% contra meta de ${num(meta)}%`}
       >
         <div
           className="absolute inset-y-0 left-0 rounded-full"
@@ -106,20 +130,21 @@ export function CmvBar() {
         className="mt-2 font-mono text-[10px] uppercase tracking-wider"
         style={{ color: "var(--lp-muted)" }}
       >
-        2,2 p.p. acima da meta no período
+        {num(real - meta)} p.p. acima da meta no período
       </p>
     </div>
   );
 }
 
+/** Abertura das despesas. Soma exatamente o percentual de Despesas do DRE. */
 const EXPENSE_ROWS = [
-  { label: "Vendas", pct: 12.4 },
-  { label: "Pessoal", pct: 28.1 },
-  { label: "Administrativas", pct: 9.7 },
+  { label: "Vendas", pct: 8.0 },
+  { label: "Pessoal", pct: 20.0 },
+  { label: "Administrativas", pct: 8.0 },
 ];
 
 export function ExpenseBars() {
-  const scaleMax = 35;
+  const scaleMax = 25;
   return (
     <div
       className="space-y-2.5"
@@ -133,7 +158,7 @@ export function ExpenseBars() {
               {r.label}
             </span>
             <span className="font-mono text-[11px] font-semibold" style={{ color: "var(--lp-ink)" }}>
-              {r.pct.toString().replace(".", ",")}%
+              {num(r.pct)}%
             </span>
           </div>
           <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: "var(--lp-elevated)" }}>
@@ -148,28 +173,43 @@ export function ExpenseBars() {
   );
 }
 
-const DRE_ROWS = [
-  { label: "Receita", value: "412.800", sign: "" },
-  { label: "CMV", value: "141.178", sign: "−" },
-  { label: "Despesas", value: "207.226", sign: "−" },
-];
-
+/**
+ * DRE gerencial fechando em resultado.
+ *
+ * As quatro deduções e a margem vêm de `EXEMPLO_DRE` — inclusive a linha de
+ * impostos, que a primeira versão omitia. Era um erro de verdade: a página
+ * inteira defende que o dinheiro passa por seis etapas e que impostos são a
+ * segunda, e o gráfico que deveria provar isso pulava a etapa.
+ */
 export function DreLines() {
+  const resultado = Math.round(
+    (EXEMPLO_DRE.receita * EXEMPLO_DRE.margemPct) / 100,
+  ).toLocaleString("pt-BR");
+
   return (
     <div className="font-mono text-[12px]" role="img" aria-label="DRE gerencial do período">
-      {DRE_ROWS.map((r) => (
+      <div
+        className="flex items-baseline justify-between py-1"
+        style={{ color: "var(--lp-muted)" }}
+      >
+        <span>Receita</span>
+        <span>{EXEMPLO_DRE.receita.toLocaleString("pt-BR")}</span>
+      </div>
+
+      {EXEMPLO_DRE.linhas.map((l) => (
         <div
-          key={r.label}
+          key={l.label}
           className="flex items-baseline justify-between py-1"
           style={{ color: "var(--lp-muted)" }}
         >
           <span>
-            {r.sign && <span className="mr-1">{r.sign}</span>}
-            {r.label}
+            <span className="mr-1">−</span>
+            {l.label}
           </span>
-          <span>{r.value}</span>
+          <span>{reais(l.pct)}</span>
         </div>
       ))}
+
       <div
         className="mt-1 flex items-baseline justify-between pt-2"
         style={{ borderTop: "1px solid var(--lp-line)" }}
@@ -178,11 +218,11 @@ export function DreLines() {
           = Resultado
         </span>
         <span className="font-semibold" style={{ color: "var(--lp-accent)" }}>
-          64.396
+          {resultado}
         </span>
       </div>
       <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: "var(--lp-muted)" }}>
-        margem 15,6% no mês
+        margem {num(EXEMPLO_DRE.margemPct)}% no mês
       </p>
     </div>
   );

@@ -102,17 +102,46 @@ export const MODULES: readonly ModuleBlock[] = [
  * As seis etapas pelas quais o dinheiro passa, encenadas como funil.
  *
  * Não acrescenta informação: encena o parágrafo do manifesto sobre a margem
- * escapando a cada etapa. Os percentuais são ilustrativos e servem à narrativa
- * da queda — não são a DRE de nenhum cliente.
+ * escapando a cada etapa.
+ *
+ * Cada valor é o que SOBRA depois da etapa, e a série é a mesma DRE que o
+ * módulo "Resultados" do hero mostra em números — ver EXEMPLO_DRE abaixo. As
+ * duas peças ficam a poucos pixels uma da outra na página; se contarem
+ * histórias diferentes sobre o mesmo dinheiro, um contador percebe em dez
+ * segundos.
+ *
+ * "dívidas" e "resultado" fecham no mesmo 15% de propósito: depois de pagar as
+ * dívidas, o que sobra É o resultado. A última barra tem tratamento visual
+ * próprio para ler como destino, não como mais uma dedução.
  */
 export const FUNNEL_STAGES: readonly { stage: string; remaining: number }[] = [
   { stage: "vendas", remaining: 100 },
   { stage: "impostos", remaining: 91 },
   { stage: "custos", remaining: 60 },
   { stage: "despesas", remaining: 24 },
-  { stage: "dívidas", remaining: 18 },
+  { stage: "dívidas", remaining: 15 },
   { stage: "resultado", remaining: 15 },
 ];
+
+/**
+ * O restaurante-exemplo da home. Um só, um período só — todos os quatro
+ * gráficos do hero e o funil saem daqui.
+ *
+ * Validado por Daniel em 13/08/2026 como reconhecível para a operação. Ainda
+ * é exemplo, não é cliente: se algum dia for ancorado em dado medido, trocar
+ * aqui e conferir se o funil continua fechando.
+ */
+export const EXEMPLO_DRE = {
+  receita: 412_800,
+  linhas: [
+    { label: "Impostos", pct: 9.0 },
+    { label: "CMV", pct: 31.0 },
+    { label: "Despesas", pct: 36.0 },
+    { label: "Dívidas", pct: 9.0 },
+  ],
+  /** 100 − 9 − 31 − 36 − 9. Confira contra a última etapa do funil. */
+  margemPct: 15.0,
+} as const;
 
 /* ─── Manifesto ─── */
 
