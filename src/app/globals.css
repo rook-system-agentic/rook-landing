@@ -129,3 +129,205 @@
   .bg-bg-card { background-color: var(--color-bg-card) !important; }
   .border-border { border-color: var(--color-border) !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   HOME v4 — "Produto vivo" com o funil das seis etapas
+
+   A paleta nova vale SÓ na home. O Header e o Footer vivem no layout, fora do
+   `children`, então um wrapper na página não os alcançaria — por isso o escopo
+   é `body:has([data-lp-home])`: a home marca o atributo e o body inteiro adota
+   a paleta, Header e Footer junto. Nenhuma outra rota é tocada.
+
+   Onde `:has()` não existe, o cabeçalho apenas mantém a paleta antiga. Nada
+   quebra.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+  body:has([data-lp-home]) {
+    --color-bg: #f7f8fa;
+    --color-bg-card: #ffffff;
+    --color-bg-elevated: #eef1f5;
+    --color-text-primary: #10151c;
+    --color-text-muted: #5a6675;
+    --color-border: rgba(16, 21, 28, 0.1);
+    --color-cream: #10151c;
+    --color-section-label: rgba(16, 21, 28, 0.55);
+    --color-header-bg: rgba(247, 248, 250, 0.92);
+    --color-btn-ghost-border: rgba(16, 21, 28, 0.15);
+    --color-btn-ghost-text: rgba(16, 21, 28, 0.75);
+
+    /* Espelho consumido pelas seções da home. */
+    --lp-bg: var(--color-bg);
+    --lp-surface: var(--color-bg-card);
+    --lp-elevated: var(--color-bg-elevated);
+    --lp-ink: var(--color-text-primary);
+    --lp-muted: var(--color-text-muted);
+    --lp-line: var(--color-border);
+    --lp-accent: #2e7d32;
+  }
+
+  /* Escuro mais leve para a vista: os fundos sobem alguns tons em vez do quase
+     preto. Decisão tomada na revisão do v4. */
+  .dark body:has([data-lp-home]),
+  body.dark:has([data-lp-home]) {
+    --color-bg: #141b23;
+    --color-bg-card: #1d2631;
+    --color-bg-elevated: #27323f;
+    --color-text-primary: #eef3f8;
+    --color-text-muted: #8fa0b2;
+    --color-border: rgba(143, 160, 178, 0.16);
+    --color-cream: #eef3f8;
+    --color-section-label: rgba(238, 243, 248, 0.58);
+    --color-header-bg: rgba(20, 27, 35, 0.92);
+    --color-btn-ghost-border: rgba(143, 160, 178, 0.18);
+    --color-btn-ghost-text: rgba(238, 243, 248, 0.8);
+    --lp-accent: #4caf50;
+  }
+
+  /* A faixa do funil é a única seção quente da página — é o contraste que faz
+     a queda de margem parecer outra coisa que não mais uma seção. */
+  [data-lp-funnel] {
+    --lp-bg: #1d1712;
+    --lp-surface: #292019;
+    --lp-elevated: #352a21;
+    --lp-ink: #f7f2ea;
+    --lp-muted: #a2968a;
+    --lp-line: rgba(162, 150, 138, 0.18);
+    --lp-accent: #e79f4a;
+  }
+
+  /* No tema escuro a página inteira já é escura: o funil deixa de precisar do
+     contraste e volta ao fundo das outras seções. */
+  .dark [data-lp-funnel] {
+    --lp-bg: #141b23;
+    --lp-surface: #1d2631;
+    --lp-elevated: #27323f;
+    --lp-ink: #eef3f8;
+    --lp-muted: #8fa0b2;
+    --lp-line: rgba(143, 160, 178, 0.16);
+  }
+}
+
+@layer components {
+  /* Fundamentos de leitura e acessibilidade — valem para a home inteira. */
+  [data-lp-home] h1,
+  [data-lp-home] h2,
+  [data-lp-home] h3 {
+    text-wrap: balance;
+  }
+  [data-lp-home] p {
+    text-wrap: pretty;
+  }
+  [data-lp-home] :focus-visible {
+    outline: 2px solid #e54c00;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  [data-lp-home] .lp-label {
+    @apply font-mono text-[11px] uppercase tracking-[0.2em];
+    color: var(--lp-muted);
+  }
+
+  [data-lp-home] .lp-body {
+    color: var(--lp-muted);
+    font-size: 17px;
+    line-height: 1.55;
+    max-width: 540px;
+  }
+
+  [data-lp-home] .lp-strong {
+    color: var(--lp-ink);
+    font-weight: 600;
+  }
+
+  /* Cartão de seção. Uma classe só, em vez de repetir três declarações inline
+     em seis componentes. */
+  [data-lp-home] .lp-card {
+    background-color: var(--lp-surface);
+    border: 1px solid var(--lp-line);
+    @apply rounded-xl;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  [data-lp-home] .lp-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(229, 76, 0, 0.35);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+  }
+  .dark [data-lp-home] .lp-card:hover {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  /* FAQ em <details> nativo — preservado de propósito, é o que faz o buscador
+     indexar as respostas. A abertura anima onde o navegador suporta. */
+  [data-lp-home] summary {
+    cursor: pointer;
+    transition: color 0.18s ease;
+  }
+  [data-lp-home] summary:hover {
+    color: #e54c00;
+  }
+  [data-lp-home] details[open] {
+    background-color: color-mix(in srgb, var(--lp-elevated) 55%, transparent);
+  }
+  @supports (interpolate-size: allow-keywords) {
+    [data-lp-home] details {
+      interpolate-size: allow-keywords;
+    }
+    [data-lp-home] details::details-content {
+      height: 0;
+      overflow: clip;
+      transition: height 0.3s ease, content-visibility 0.3s ease allow-discrete;
+    }
+    [data-lp-home] details[open]::details-content {
+      height: auto;
+    }
+  }
+}
+
+@layer utilities {
+  /*
+   * Revelação ao rolar.
+   *
+   * A classe `lp-in` é adicionada por JavaScript no momento em que o elemento
+   * entra na tela. Antes disso ele está VISÍVEL e no lugar — sem JS, ou com o
+   * observador desligado, a página inteira aparece normalmente. Foi uma escolha
+   * deliberada: numa página de conversão, conteúdo que depende de um gatilho
+   * para existir é conteúdo que às vezes não existe.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-lp-home] .lp-in {
+      animation: lpRise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    @keyframes lpRise {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+    }
+
+    [data-lp-home] .lp-funnel-bar {
+      transform-origin: center;
+    }
+    [data-lp-home] .lp-in .lp-funnel-bar {
+      animation: lpFunnelBar 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    @keyframes lpFunnelBar {
+      from {
+        transform: translateX(-50%) scaleX(0);
+        opacity: 0.4;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-lp-home] .lp-card,
+    [data-lp-home] .btn-primary,
+    [data-lp-home] .btn-ghost {
+      transition: none;
+    }
+    [data-lp-home] .lp-card:hover {
+      transform: none;
+    }
+  }
+}
