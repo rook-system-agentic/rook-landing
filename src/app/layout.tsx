@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import AppHandoffTracker from "@/components/AppHandoffTracker";
+import CookieConsent from "@/components/CookieConsent";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
@@ -148,6 +149,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppHandoffTracker />
         <Header />
         <main className="pt-[72px]">{children}</main>
+        <CookieConsent />
         <Footer />
         <Analytics />
       </body>
