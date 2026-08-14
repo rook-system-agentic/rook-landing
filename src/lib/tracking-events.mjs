@@ -8,9 +8,13 @@
  * ou à Meta — é proibido no contrato das duas e é exposição de LGPD.
  *
  * Uma convenção ("não mande dado pessoal") depende de todo mundo lembrar. Uma
- * allowlist que lança exceção quebra o teste e o build de quem esquecer. Por
- * isso o campo desconhecido é erro, e não um campo silenciosamente ignorado:
- * ignorar em silêncio deixaria o autor achar que o dado foi enviado.
+ * allowlist que lança exceção torna o erro visível em vez de um campo
+ * silenciosamente ignorado — ignorar em silêncio deixaria o autor achar que o
+ * dado foi enviado. Isso NÃO quebra teste nem build: track() aceita
+ * Record<string, string> (TypeScript não barra a chamada), o CI não roda tsc
+ * nem build, e nenhum teste exercita os quatro pontos de chamada reais. Quem
+ * é enforçado é o visitante, em produção — por isso track() (em track.ts)
+ * captura essa exceção antes que ela chegue a quem chama.
  */
 
 export const TRACKING_EVENTS = Object.freeze({
