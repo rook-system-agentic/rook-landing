@@ -21,10 +21,13 @@ export default function LpFunnel() {
       data-lp-funnel
       className="py-20 lg:py-28"
       style={{
-        backgroundColor: "var(--lp-bg)",
+        // Fundo elevado, não invertido: separa a seção sem trocar o tema no
+        // meio da leitura. As réguas são terracota fixo, e não `--lp-accent`,
+        // porque no tema claro o accent é verde — a borda sairia verde.
+        backgroundColor: "var(--lp-elevated)",
         color: "var(--lp-ink)",
-        borderTop: "1px solid color-mix(in srgb, var(--lp-accent) 28%, transparent)",
-        borderBottom: "1px solid color-mix(in srgb, var(--lp-accent) 28%, transparent)",
+        borderTop: "1px solid rgba(229, 76, 0, 0.30)",
+        borderBottom: "1px solid rgba(229, 76, 0, 0.30)",
       }}
       aria-label="As seis etapas pelas quais o dinheiro passa"
     >
@@ -61,9 +64,11 @@ export default function LpFunnel() {
                       }}
                     />
                   </span>
+                  {/* Terracota, não ocre: no tema claro o ocre fica de baixo
+                      contraste sobre o fundo elevado. */}
                   <span
                     className="w-14 shrink-0 text-right font-mono text-sm font-semibold"
-                    style={{ color: last ? "#e79f4a" : "var(--lp-muted)" }}
+                    style={{ color: last ? "#e54c00" : "var(--lp-muted)" }}
                   >
                     {j.remaining}%
                   </span>

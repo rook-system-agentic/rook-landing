@@ -184,28 +184,16 @@
     --lp-accent: #4caf50;
   }
 
-  /* A faixa do funil é a única seção quente da página — é o contraste que faz
-     a queda de margem parecer outra coisa que não mais uma seção. */
-  [data-lp-funnel] {
-    --lp-bg: #1d1712;
-    --lp-surface: #292019;
-    --lp-elevated: #352a21;
-    --lp-ink: #f7f2ea;
-    --lp-muted: #a2968a;
-    --lp-line: rgba(162, 150, 138, 0.18);
-    --lp-accent: #e79f4a;
-  }
-
-  /* No tema escuro a página inteira já é escura: o funil deixa de precisar do
-     contraste e volta ao fundo das outras seções. */
-  .dark [data-lp-funnel] {
-    --lp-bg: #141b23;
-    --lp-surface: #1d2631;
-    --lp-elevated: #27323f;
-    --lp-ink: #eef3f8;
-    --lp-muted: #8fa0b2;
-    --lp-line: rgba(143, 160, 178, 0.16);
-  }
+  /*
+   * O funil acompanha o tema da página: claro no claro, escuro no escuro.
+   *
+   * A primeira versão fazia dele uma faixa sempre escura, para contrastar. A
+   * separação agora vem do fundo elevado e das réguas em terracota — sem
+   * inverter o tema no meio da leitura.
+   *
+   * Por isso ele não redefine token nenhum: herda tudo. O que a seção precisa
+   * de específico está no componente.
+   */
 }
 
 @layer components {
