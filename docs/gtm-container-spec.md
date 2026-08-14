@@ -25,13 +25,15 @@ leva condição de hostname. Tag sem condição dispara também no app, que já 
 
 ## Tags
 
+> 📌 **Templates necessários:** As quatro tags `Meta - *` usam o tipo "Pixel do Facebook", que não é nativo do GTM. Antes de criar essas tags, instale o template oficial "Meta Pixel" pela Galeria de Templates da comunidade (ícone de Lego, no canto superior direito). Alternativa: use tags de HTML personalizado com o código do pixel.
+
 | Nome | Tipo | ID | Gatilho | Observação |
 | :-- | :-- | :-- | :-- | :-- |
-| `GA4 - configuração LP` | Google Tag | `G-M93QYWQ84F` | `LP - todas as páginas` | Manda a LP para a propriedade unificada |
-| `GA4 - generate_lead` | Evento GA4 | — | `LP - lead comercial` | Parâmetro `plano` = `dlv - plano` |
-| `GA4 - diagnostic_complete` | Evento GA4 | — | `LP - diagnóstico concluído` | Parâmetro `ab_variant` = `dlv - ab_variant` |
-| `GA4 - newsletter_signup` | Evento GA4 | — | `LP - newsletter` | Sem parâmetro |
-| `GA4 - app_handoff` | Evento GA4 | — | `LP - saída para o app` | Parâmetro `destino` = `dlv - destino` |
+| `GA4 - configuração LP` | Google Tag | `G-M93QYWQ84F` | `LP - todas as páginas` | Parâmetro `page_type` = `{{dlv - page_type}}`. Permite separar no relatório entre home, planos, blog, diagnóstico e calculadora sem depender da URL. Manda a LP para a propriedade unificada. |
+| `GA4 - generate_lead` | Evento GA4 | `GA4 - configuração LP` | `LP - lead comercial` | Tag de configuração: `GA4 - configuração LP`. Parâmetro `plano` = `dlv - plano` |
+| `GA4 - diagnostic_complete` | Evento GA4 | `GA4 - configuração LP` | `LP - diagnóstico concluído` | Tag de configuração: `GA4 - configuração LP`. Parâmetro `ab_variant` = `dlv - ab_variant` |
+| `GA4 - newsletter_signup` | Evento GA4 | `GA4 - configuração LP` | `LP - newsletter` | Tag de configuração: `GA4 - configuração LP`. Sem parâmetro. |
+| `GA4 - app_handoff` | Evento GA4 | `GA4 - configuração LP` | `LP - saída para o app` | Tag de configuração: `GA4 - configuração LP`. Parâmetro `destino` = `dlv - destino` |
 | `Meta - PageView` | Pixel do Facebook | `1088278284898303` | `LP - todas as páginas` | |
 | `Meta - Lead` | Pixel do Facebook | `1088278284898303` | `LP - lead comercial` | Evento `Lead` |
 | `Meta - CompleteRegistration` | Pixel do Facebook | `1088278284898303` | `LP - diagnóstico concluído` | Evento `CompleteRegistration` — **não** usar `Lead`, para não misturar intenção comercial com uso de ferramenta |
