@@ -67,7 +67,7 @@ export default function CookieConsent() {
               setVisivel(false);
             }}
           >
-            Só o essencial
+            Recusar anúncios
           </button>
           <button
             type="button"
