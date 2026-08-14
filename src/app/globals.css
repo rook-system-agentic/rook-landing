@@ -453,6 +453,24 @@
       from { opacity: 0; }
     }
 
+    /* O gráfico "Receita ≠ Lucro" entra pela mesma cortina, mais lenta: as
+       duas curvas se afastando é o argumento, e ele precisa de tempo para
+       ser lido. */
+    [data-lp-home] .lp-in .lp-gap {
+      animation: lpSparkWipe 1.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    }
+
+    /* Os sete dias do teste preenchem um a um. */
+    [data-lp-home] .lp-in .lp-dia {
+      animation: lpDia 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+    }
+    @keyframes lpDia {
+      from {
+        transform: scale(0.2);
+        opacity: 0;
+      }
+    }
+
     [data-lp-home] .lp-in .lp-grow-bar {
       transform-origin: left center;
       animation: lpGrow 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;

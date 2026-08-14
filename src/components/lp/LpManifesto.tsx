@@ -1,6 +1,7 @@
 import { MANIFESTO, MANIFESTO_PARAGRAPHS, CONTRASTS } from "@/lib/lp-content";
 import Rich from "./LpRich";
 import Reveal from "./LpReveal";
+import LpGapChart from "./LpGapChart";
 
 /**
  * Manifesto.
@@ -13,8 +14,11 @@ export default function LpManifesto() {
   return (
     <section className="py-20 lg:py-28" style={{ borderTop: "1px solid var(--lp-line)" }}>
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-12 max-w-3xl">
-          <p className="lp-label mb-4">{MANIFESTO.label}</p>
+        {/* Texto e gráfico lado a lado: a seção afirma que receita e lucro são
+            coisas diferentes, e o gráfico mostra a distância entre as duas. */}
+        <div className="mb-12 grid items-center gap-12 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <p className="lp-label mb-4">{MANIFESTO.label}</p>
           <h2
             className="mb-6 font-display font-extrabold"
             style={{
@@ -28,13 +32,18 @@ export default function LpManifesto() {
             <span style={{ color: "#e54c00" }}>{MANIFESTO.headlineEmphasis}</span>
             {MANIFESTO.headlineTail}
           </h2>
-          <div className="space-y-4">
-            {MANIFESTO_PARAGRAPHS.map((p, i) => (
-              <p key={i} className="lp-body">
-                <Rich paragraph={p} />
-              </p>
-            ))}
+            <div className="space-y-4">
+              {MANIFESTO_PARAGRAPHS.map((p, i) => (
+                <p key={i} className="lp-body">
+                  <Rich paragraph={p} />
+                </p>
+              ))}
+            </div>
           </div>
+
+          <Reveal className="lg:col-span-5">
+            <LpGapChart />
+          </Reveal>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-3">
