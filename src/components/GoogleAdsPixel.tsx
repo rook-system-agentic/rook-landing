@@ -1,5 +1,6 @@
 "use client";
 import Script from "next/script";
+import { isTrackingEnabled } from "@/lib/tracking";
 
 /**
  * Google Ads Conversion Tracking (gtag.js)
@@ -12,6 +13,9 @@ import Script from "next/script";
 const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
 export default function GoogleAdsPixel() {
+  // Homologação não rastreia. Ver src/lib/tracking.ts.
+  if (!isTrackingEnabled()) return null;
+
   if (!GOOGLE_ADS_ID) return null;
 
   return (

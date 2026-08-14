@@ -1,10 +1,14 @@
 "use client";
 
 import Script from "next/script";
+import { isTrackingEnabled } from "@/lib/tracking";
 
 const GA_MEASUREMENT_ID = "G-PM4DF3FFMN";
 
 export default function GoogleAnalytics() {
+  // Homologação não rastreia. Ver src/lib/tracking.ts.
+  if (!isTrackingEnabled()) return null;
+
   return (
     <>
       <Script
