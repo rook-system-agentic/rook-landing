@@ -69,33 +69,34 @@ Facebook" (ver nota de templates acima), que o GTM trata como tag de
 terceiro: sem configuração explícita, disparam do mesmo jeito mesmo com a
 publicidade recusada.
 
+⚠️ **Ordem: a checagem de consentimento abaixo só pode ser marcada depois
+que o PR do consentimento estiver em produção.** Se for marcada antes do
+deploy, as tags da Meta e a de `Google Ads - conversão` passam a exigir um
+sinal de consentimento (`ad_storage`) que o site ainda não emite — e param
+de disparar em silêncio, inclusive para visitantes que aceitariam a
+publicidade. Quem ler com pressa e for direto à instrução abaixo, sem
+conferir a ordem, desliga as tags de propósito. A sequência correta:
+
+1. Publicar o contêiner completo (seção "Ordem de publicação" acima) e
+   mergear o PR do código de consentimento.
+2. Confirmar em produção que o Consent Mode está emitindo `ad_storage` e que
+   o banner de cookies funciona.
+3. Só então marcar a checagem de consentimento (`ad_storage`) nas quatro
+   tags `Meta - *` e na tag `Google Ads - conversão`, como descrito abaixo.
+
 Em cada uma das quatro tags `Meta - *`: abrir o editor da tag →
 Configurações avançadas → Configurações de consentimento → marcar "Exigir
 consentimento adicional para disparo desta tag" → adicionar `ad_storage`.
 Sem isso, o pixel dispara mesmo quando o visitante clica em "Recusar anúncios".
 
-⚠️ **`Google Ads - conversão` recebe a mesma checagem, mas não silencia por
-completo.** Marque "Exigir consentimento adicional para disparo desta tag" →
+`Google Ads - conversão` recebe a mesma checagem, mas não silencia por
+completo. Marque "Exigir consentimento adicional para disparo desta tag" →
 `ad_storage` nela também, igual às quatro da Meta. Isso reduz o disparo — a
 tag deixa de rodar quando o consentimento é negado, dentro do GTM. Mas por
 desenho do próprio Consent Mode, o `gtag` do Google Ads envia, à parte do
 GTM, um ping sem cookie para modelagem de conversão mesmo com `ad_storage`
 negado. Não existe checagem que feche essa porta — é comportamento do
 Google, não do contêiner.
-
-⚠️ **Ordem: este passo só pode ser feito depois que o PR do consentimento
-estiver em produção.** Se a checagem acima for marcada antes do deploy, as
-tags da Meta e a de `Google Ads - conversão` passam a exigir um sinal de
-consentimento (`ad_storage`) que o site ainda não emite — e param de disparar
-em silêncio, inclusive para visitantes que aceitariam a publicidade. A
-sequência correta:
-
-1. Publicar o contêiner completo (seção "Ordem de publicação" acima) e
-   mergear o PR do código de consentimento.
-2. Confirmar em produção que o Consent Mode está emitindo `ad_storage` e que
-   o banner de cookies funciona.
-3. Só então voltar ao GTM e marcar a checagem de consentimento (`ad_storage`)
-   nas quatro tags `Meta - *` e na tag `Google Ads - conversão`.
 
 Sem o passo 3, a página de privacidade — que diz que sem consentimento a Meta
 e o Google Ads não gravam cookies nem usam os dados para publicidade —
