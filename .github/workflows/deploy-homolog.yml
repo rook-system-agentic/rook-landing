@@ -52,10 +52,16 @@ jobs:
         # O k3s não enxerga o daemon do docker: são armazenamentos separados.
         # Sem este passo o pod fica em ErrImageNeverPull mesmo com a imagem
         # construída na mesma máquina.
+        #
+        # O wrapper `rook-image-import` é o ÚNICO comando que o gha-runner pode
+        # executar como root (/etc/sudoers.d/gha-runner). `sudo k3s ctr ...`
+        # direto falha — foi verificado com `sudo -l` antes do primeiro deploy.
+        # Ele não aceita argumento: lê o tar por stdin e importa.
         run: |
           set -euo pipefail
           docker save "ghcr.io/rook-system-agentic/rook-lp:sha-${GITHUB_SHA}" \
-            | sudo k3s ctr images import -
+            | sudo /usr/local/bin/rook-image-import
+          echo "importado: rook-lp:sha-${GITHUB_SHA}"
 
   deploy:
     name: Rollout no k3s
