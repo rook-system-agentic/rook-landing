@@ -1,0 +1,98 @@
+# ============================================================
+# rook-landing em homologação — lp-homolog.rooksystem.com.br
+#
+# Vive no mesmo namespace dos outros três apps (rook-homolog), servido pelo
+# mesmo ingress-nginx e pelo mesmo Origin Certificate curinga de
+# *.rooksystem.com.br. Não há cert-manager no cluster.
+#
+# A imagem é construída no runner da própria VPS e fica no containerd local,
+# daí `imagePullPolicy: IfNotPresent` — não há pull do GHCR no rollout.
+# ============================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rook-lp
+  namespace: rook-homolog
+  labels:
+    app.kubernetes.io/name: rook-lp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rook-lp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-lp
+    spec:
+      containers:
+        - name: lp
+          image: ghcr.io/rook-system-agentic/rook-lp:dev
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          envFrom:
+            # Criado fora do git. Ver k8s/homolog/README.md.
+            - secretRef:
+                name: rook-lp-secrets
+          env:
+            - name: NEXT_PUBLIC_ENV
+              value: homolog
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rook-lp
+  namespace: rook-homolog
+spec:
+  selector:
+    app.kubernetes.io/name: rook-lp
+  ports:
+    - port: 80
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rook-lp
+  namespace: rook-homolog
+  # Sem `configuration-snippet` aqui: o admission webhook do ingress-nginx
+  # recusa a anotação ("Snippet directives are disabled by the Ingress
+  # administrator"), que é o padrão seguro das versões recentes. O primeiro
+  # deploy morreu exatamente nisso.
+  #
+  # O `X-Robots-Tag: noindex` e o robots.txt de homologação passaram a ser
+  # responsabilidade da aplicação (next.config.mjs e src/app/robots.ts). É
+  # melhor assim: viaja com o código, é versionado, e não depende de uma
+  # permissão do cluster que pode mudar sem aviso.
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: lp-homolog.rooksystem.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rook-lp
+                port:
+                  number: 80

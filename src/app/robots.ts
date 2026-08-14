@@ -1,6 +1,12 @@
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
+  // Homologação recusa todo robô. O cabeçalho X-Robots-Tag (next.config.mjs)
+  // cobre o que já foi rastreado; isto impede o rastreamento começar.
+  if (process.env.NEXT_PUBLIC_ENV === "homolog") {
+    return { rules: [{ userAgent: "*", disallow: "/" }] };
+  }
+
   return {
     rules: [
       { userAgent: "*", allow: "/" },

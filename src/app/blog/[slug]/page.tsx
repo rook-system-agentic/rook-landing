@@ -84,7 +84,12 @@ function jsonLd(post: Awaited<ReturnType<typeof getPostBySlug>>) {
       url: siteUrl,
       logo: {
         "@type": "ImageObject",
-        url: `${siteUrl}/brand/rook-logo-horizontal.png`,
+        // A versão `-light` é a colorida, e é a que serve para dado
+        // estruturado: `rook-logo-horizontal.png` passou a ser o logo BRANCO,
+        // usado só no tema escuro. Antes os dois arquivos eram idênticos e
+        // isso não fazia diferença; agora faria, e o Google receberia um logo
+        // invisível. O layout.tsx já apontava para o `-light`.
+        url: `${siteUrl}/brand/rook-logo-horizontal-light.png`,
       },
     },
     mainEntityOfPage: url,
