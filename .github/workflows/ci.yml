@@ -1,0 +1,43 @@
+name: CI
+
+# POR QUE ESTE WORKFLOW EXISTE
+#
+# Até 14/08/2026 este repositório tinha testes em tests/*.test.mjs e nenhum
+# workflow que os executasse. Teste que o CI não roda não existe: ele passa a
+# ser um arquivo que alguém precisa lembrar de rodar na própria máquina.
+#
+# A regra que mais depende disso é a allowlist de src/lib/tracking-events.mjs,
+# que impede dado pessoal de chegar ao GA4 e à Meta.
+
+on:
+  pull_request:
+    branches: [homolog, main]
+  push:
+    branches: [homolog, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Habilitar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Rodar testes
+        run: pnpm test:ci
