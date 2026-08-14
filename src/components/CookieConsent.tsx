@@ -69,7 +69,7 @@ export default function CookieConsent() {
           Usamos cookies para medir o uso do site e, com a sua autorização, para
           personalizar anúncios. Você pode recusar os anúncios e continuar
           navegando normalmente.{" "}
-          <Link href="/privacidade/" className="text-ocre underline underline-offset-2">
+          <Link href="/privacidade/" className="text-cream underline hover:text-terracota transition-colors">
             Política de privacidade
           </Link>
           .
