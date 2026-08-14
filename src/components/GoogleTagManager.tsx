@@ -37,8 +37,11 @@ export default function GoogleTagManager() {
     var salvo=null;
     try{
       var bruto=JSON.parse(localStorage.getItem(${JSON.stringify(CONSENT_STORAGE_KEY)}));
-      var valido=bruto && typeof bruto==='object' && Object.keys(bruto).length===chaves.length && chaves.every(function(c){return valores.indexOf(bruto[c])!==-1;});
-      if(valido){salvo=bruto;}
+      var valido=bruto && typeof bruto==='object' && chaves.every(function(c){return valores.indexOf(bruto[c])!==-1;});
+      if(valido){
+        salvo={};
+        for(var i=0;i<chaves.length;i++){salvo[chaves[i]]=bruto[chaves[i]];}
+      }
     }catch(e){}
     gtag('consent','default', salvo || ${JSON.stringify(defaultConsentState())});
     window.dataLayer.push(${JSON.stringify({
