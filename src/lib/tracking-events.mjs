@@ -50,14 +50,24 @@ export function buildTrackingEvent(name, payload = {}) {
   return { event: name, ...payload };
 }
 
+/**
+ * Compara `caminho` contra `segmento` respeitando fronteira de segmento de
+ * rota: casa o segmento inteiro (`/planos`) ou o segmento seguido de `/`
+ * (`/planos/assinatura`), nunca um prefixo textual solto. Sem isso,
+ * `/planos-antigos` seria lido como `/planos`.
+ */
+function casaSegmentoDeRota(caminho, segmento) {
+  return caminho === segmento || caminho.startsWith(`${segmento}/`);
+}
+
 export function resolvePageType(pathname) {
   const caminho = String(pathname ?? "").replace(/\/+$/, "");
 
   if (caminho === "") return "home";
-  if (caminho.startsWith("/planos")) return "planos";
-  if (caminho.startsWith("/blog")) return "blog";
-  if (caminho.startsWith("/diagnostico")) return "diagnostico";
-  if (caminho.startsWith("/calculadora-cmv")) return "calculadora";
+  if (casaSegmentoDeRota(caminho, "/planos")) return "planos";
+  if (casaSegmentoDeRota(caminho, "/blog")) return "blog";
+  if (casaSegmentoDeRota(caminho, "/diagnostico")) return "diagnostico";
+  if (casaSegmentoDeRota(caminho, "/calculadora-cmv")) return "calculadora";
 
   return "institucional";
 }
@@ -89,7 +99,9 @@ export function resolveAppHandoff(href, currentHref) {
 
   if (url.hostname !== APP_HOST) return null;
 
-  return url.pathname.includes("contratar") ? "contratar" : "login";
+  return casaSegmentoDeRota(url.pathname.replace(/\/+$/, ""), "/contratar")
+    ? "contratar"
+    : "login";
 }
 
 export function pushTrackingEvent(name, payload = {}, { enabled = false, target } = {}) {
