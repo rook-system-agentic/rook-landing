@@ -1,0 +1,43 @@
+name: Base Guard
+
+# O fluxo de entrega é `branch de trabalho → homolog → main`. Este check
+# reprova PR que pule a homologação.
+#
+# Existe porque errar é o caminho de menor resistência: `gh pr create` sem
+# `--base` aponta para a branch default (`main`). Sem este guard, uma feature
+# vai para produção sem nunca ter sido vista em homologação — e a Vercel
+# publica a `main` automaticamente.
+#
+# Espelha rook-system/.github/workflows/guard-main-source.yml.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  base-guard:
+    name: Origem permitida para main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conferir a branch de origem
+        env:
+          ORIGEM: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          echo "PR de '$ORIGEM' para 'main'."
+          case "$ORIGEM" in
+            homolog|hotfix/*|revert-*)
+              echo "Origem permitida."
+              ;;
+            *)
+              echo "::error::PR para main só é aceito vindo de 'homolog', 'hotfix/*' ou 'revert-*'."
+              echo "::error::Esta veio de '$ORIGEM'."
+              echo "::error::"
+              echo "::error::O fluxo é: branch de trabalho → homolog → main. Abra o PR"
+              echo "::error::com --base homolog. Se já abriu contra main, rebaseie sobre"
+              echo "::error::origin/homolog antes de trocar a base, senão o diff carrega"
+              echo "::error::os commits que main tem a mais."
+              exit 1
+              ;;
+          esac
