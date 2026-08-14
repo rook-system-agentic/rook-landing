@@ -25,10 +25,20 @@ declare global {
  * empurra o objeto `arguments`, e é esse formato que o Consent Mode espera.
  * Se `gtag` não existir, o contêiner não subiu — e aí não há consentimento a
  * atualizar, só o valor a persistir para a próxima visita.
+ *
+ * O `localStorage.setItem` fica em try/catch: em Safari com "bloquear todos
+ * os cookies", em webview restrita e em iframe com armazenamento
+ * particionado, esse acesso lança. Falha em persistir não pode impedir o
+ * banner de sumir da tela — o consentimento já foi aplicado à sessão pelo
+ * `gtag` acima; só a lembrança para a próxima visita se perde.
  */
 function atualizarConsentimento(estado: Record<string, string>) {
   window.gtag?.("consent", "update", estado);
-  localStorage.setItem(CONSENT_STORAGE_KEY, serializeConsentState(estado));
+  try {
+    localStorage.setItem(CONSENT_STORAGE_KEY, serializeConsentState(estado));
+  } catch {
+    // Sem persistência, o visitante só vê o banner de novo na próxima visita.
+  }
 }
 
 export default function CookieConsent() {
@@ -36,7 +46,13 @@ export default function CookieConsent() {
 
   useEffect(() => {
     if (!isTrackingEnabled()) return;
-    const salvo = parseConsentState(localStorage.getItem(CONSENT_STORAGE_KEY));
+    let salvo = null;
+    try {
+      salvo = parseConsentState(localStorage.getItem(CONSENT_STORAGE_KEY));
+    } catch {
+      // Mesmo risco de exceção da escrita acima, na leitura: trata como se
+      // não houvesse nada salvo e mostra o banner, sem derrubar a página.
+    }
     if (!salvo) setVisivel(true);
   }, []);
 
