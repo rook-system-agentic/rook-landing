@@ -24,7 +24,7 @@ export default function PrivacidadePage() {
       <article className="max-w-4xl mx-auto px-6 py-20">
         <header className="text-center mb-16 pb-10 border-b border-border">
           <h1 className="text-3xl md:text-4xl font-bold text-cream tracking-wide uppercase">Política de Privacidade</h1>
-          <p className="text-muted mt-4 italic">Última atualização: 31 de julho de 2026</p>
+          <p className="text-muted mt-4 italic">Última atualização: 14 de agosto de 2026</p>
         </header>
         <div className="prose-legal space-y-6 text-muted leading-relaxed">
           <p>A <strong className="text-cream">{COMPANY_INFO.razaoSocial}</strong>, CNPJ <strong className="text-cream">{COMPANY_INFO.cnpj}</strong>, é responsável pelos tratamentos em que define finalidade e meios. Esta página apresenta informações gerais, sem expor arquitetura, fornecedores específicos ou controles internos.</p>

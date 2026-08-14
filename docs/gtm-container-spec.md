@@ -54,3 +54,39 @@ No GA4, marcar como evento-chave (conversão): `generate_lead` e
 
 Isso troca a medição num instante só: sem janela sem medição e sem janela
 medindo em dobro.
+
+## Consentimento por tag: a Meta exige configuração manual
+
+As tags `GA4 - configuração LP`, `GA4 - generate_lead`,
+`GA4 - diagnostic_complete`, `GA4 - newsletter_signup`, `GA4 - app_handoff` e
+`Google Ads - conversão` são nativas do Google e respeitam o sinal do Consent
+Mode sozinhas — **nenhuma configuração adicional é necessária nelas.**
+
+**As quatro tags `Meta - PageView`, `Meta - Lead`,
+`Meta - CompleteRegistration` e `Meta - Subscribe` NÃO respeitam o Consent
+Mode automaticamente.** Elas usam o template de comunidade "Pixel do
+Facebook" (ver nota de templates acima), que o GTM trata como tag de
+terceiro: sem configuração explícita, disparam do mesmo jeito mesmo com a
+publicidade recusada.
+
+Em cada uma das quatro tags `Meta - *`: abrir o editor da tag →
+Configurações avançadas → Configurações de consentimento → marcar "Exigir
+consentimento adicional para disparo desta tag" → adicionar `ad_storage`.
+Sem isso, o pixel dispara mesmo quando o visitante clica em "Só o essencial".
+
+⚠️ **Ordem: este passo só pode ser feito depois que o PR do consentimento
+estiver em produção.** Se a checagem acima for marcada antes do deploy, as
+quatro tags da Meta passam a exigir um sinal de consentimento (`ad_storage`)
+que o site ainda não emite — e param de disparar em silêncio, inclusive para
+visitantes que aceitariam a publicidade. A sequência correta:
+
+1. Publicar o contêiner completo (seção "Ordem de publicação" acima) e
+   mergear o PR do código de consentimento.
+2. Confirmar em produção que o Consent Mode está emitindo `ad_storage` e que
+   o banner de cookies funciona.
+3. Só então voltar ao GTM e marcar a checagem de consentimento (`ad_storage`)
+   nas quatro tags `Meta - *`.
+
+Sem o passo 3, a página de privacidade — que diz que a publicidade "só é
+ativada com o seu consentimento" — descreve a intenção, não o comportamento
+real do pixel da Meta.
