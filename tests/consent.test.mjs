@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   CONSENT_STORAGE_KEY,
+  CONSENT_KEYS,
+  CONSENT_VALUES,
   defaultConsentState,
   grantedConsentState,
   parseConsentState,
@@ -72,4 +74,18 @@ test("campo extra e descartado, devolvendo exatamente as quatro chaves", () => {
 
 test("a chave de armazenamento e estavel", () => {
   assert.equal(CONSENT_STORAGE_KEY, "rook-consent");
+});
+
+test("CONSENT_KEYS e CONSENT_VALUES ficam coerentes com defaultConsentState, para nao divergir da validacao inline do script GTM", () => {
+  assert.deepEqual(
+    [...CONSENT_KEYS].sort(),
+    Object.keys(defaultConsentState()).sort(),
+  );
+
+  for (const valor of Object.values(defaultConsentState())) {
+    assert.ok(
+      CONSENT_VALUES.includes(valor),
+      `valor padrao "${valor}" deveria estar em CONSENT_VALUES`,
+    );
+  }
 });

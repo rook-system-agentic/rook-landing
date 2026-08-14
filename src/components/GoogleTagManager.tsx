@@ -6,6 +6,8 @@ import { isTrackingEnabled } from "@/lib/tracking";
 import { resolvePageType } from "@/lib/tracking-events.mjs";
 import {
   CONSENT_STORAGE_KEY,
+  CONSENT_KEYS,
+  CONSENT_VALUES,
   defaultConsentState,
 } from "@/lib/consent.mjs";
 
@@ -30,8 +32,14 @@ export default function GoogleTagManager() {
   const consentBootstrap = `
     window.dataLayer=window.dataLayer||[];
     function gtag(){dataLayer.push(arguments);}
+    var chaves=${JSON.stringify(CONSENT_KEYS)};
+    var valores=${JSON.stringify(CONSENT_VALUES)};
     var salvo=null;
-    try{salvo=JSON.parse(localStorage.getItem(${JSON.stringify(CONSENT_STORAGE_KEY)}));}catch(e){}
+    try{
+      var bruto=JSON.parse(localStorage.getItem(${JSON.stringify(CONSENT_STORAGE_KEY)}));
+      var valido=bruto && typeof bruto==='object' && Object.keys(bruto).length===chaves.length && chaves.every(function(c){return valores.indexOf(bruto[c])!==-1;});
+      if(valido){salvo=bruto;}
+    }catch(e){}
     gtag('consent','default', salvo || ${JSON.stringify(defaultConsentState())});
     window.dataLayer.push(${JSON.stringify({
       page_type: resolvePageType(pathname),

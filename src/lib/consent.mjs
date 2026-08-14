@@ -14,14 +14,14 @@
 
 export const CONSENT_STORAGE_KEY = "rook-consent";
 
-const CHAVES = Object.freeze([
+export const CONSENT_KEYS = Object.freeze([
   "ad_storage",
   "ad_user_data",
   "ad_personalization",
   "analytics_storage",
 ]);
 
-const VALORES = Object.freeze(["granted", "denied"]);
+export const CONSENT_VALUES = Object.freeze(["granted", "denied"]);
 
 export function defaultConsentState() {
   return {
@@ -33,7 +33,7 @@ export function defaultConsentState() {
 }
 
 export function grantedConsentState() {
-  return Object.fromEntries(CHAVES.map((chave) => [chave, "granted"]));
+  return Object.fromEntries(CONSENT_KEYS.map((chave) => [chave, "granted"]));
 }
 
 export function serializeConsentState(estado) {
@@ -52,7 +52,11 @@ export function parseConsentState(bruto) {
 
   if (!candidato || typeof candidato !== "object") return null;
 
-  const valido = CHAVES.every((chave) => VALORES.includes(candidato[chave]));
+  const valido = CONSENT_KEYS.every((chave) =>
+    CONSENT_VALUES.includes(candidato[chave]),
+  );
 
-  return valido ? Object.fromEntries(CHAVES.map((c) => [c, candidato[c]])) : null;
+  return valido
+    ? Object.fromEntries(CONSENT_KEYS.map((c) => [c, candidato[c]]))
+    : null;
 }
