@@ -72,7 +72,7 @@ publicidade recusada.
 Em cada uma das quatro tags `Meta - *`: abrir o editor da tag →
 Configurações avançadas → Configurações de consentimento → marcar "Exigir
 consentimento adicional para disparo desta tag" → adicionar `ad_storage`.
-Sem isso, o pixel dispara mesmo quando o visitante clica em "Só o essencial".
+Sem isso, o pixel dispara mesmo quando o visitante clica em "Recusar anúncios".
 
 ⚠️ **`Google Ads - conversão` recebe a mesma checagem, mas não silencia por
 completo.** Marque "Exigir consentimento adicional para disparo desta tag" →
