@@ -41,8 +41,9 @@ export default function PrivacidadePage() {
                   </p>
                   <p>
                     <strong className="text-cream">Publicidade.</strong> Meta Pixel e Google Ads, para medir e direcionar campanhas.
-                    Só são ativados com o seu consentimento, pedido no primeiro acesso. Recusar não
-                    limita nenhuma funcionalidade do site.
+                    Sem o seu consentimento, eles não gravam cookies nem usam seus dados para publicidade;
+                    o consentimento é pedido no primeiro acesso. Recusar não limita nenhuma funcionalidade do
+                    site.
                   </p>
                   <p>
                     Você pode rever sua escolha a qualquer momento limpando os dados do site no seu
