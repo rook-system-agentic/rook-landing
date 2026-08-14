@@ -35,9 +35,10 @@ export default function PrivacidadePage() {
                 <>
                   <p>Usamos cookies de duas naturezas:</p>
                   <p>
-                    <strong className="text-cream">Medição de audiência.</strong> Google Analytics e Microsoft Clarity, para entender
-                    como o site é usado e o que precisa melhorar. A base legal é o legítimo
-                    interesse (art. 7º, IX, da LGPD), e os dados são tratados de forma agregada.
+                    <strong className="text-cream">Medição de audiência.</strong> Google Analytics, Microsoft Clarity e Vercel
+                    Analytics, para entender como o site é usado e o que precisa melhorar. A base legal é o
+                    legítimo interesse (art. 7º, IX, da LGPD). O Microsoft Clarity grava a navegação da sessão,
+                    com os campos preenchidos em formulários mascarados.
                   </p>
                   <p>
                     <strong className="text-cream">Publicidade.</strong> Meta Pixel e Google Ads, para medir e direcionar campanhas.
