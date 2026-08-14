@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GoogleTagManager from "@/components/GoogleTagManager";
+import AppHandoffTracker from "@/components/AppHandoffTracker";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
@@ -144,6 +145,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <GoogleTagManager />
+        <AppHandoffTracker />
         <Header />
         <main className="pt-[72px]">{children}</main>
         <Footer />

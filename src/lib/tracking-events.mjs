@@ -58,6 +58,36 @@ export function resolvePageType(pathname) {
   return "institucional";
 }
 
+const APP_HOST = "app.rook.com.br";
+
+/**
+ * Decide se um clique é uma saída da LP para o app, e para qual destino.
+ *
+ * Só existem hoje dois links reais para app.rook.com.br: "Entrar" (Header e
+ * Footer) e o checkout direto de /planos (`buildDirectCheckoutHref`, que
+ * sempre aponta para /contratar com querystring). Por isso qualquer link para
+ * o app host que não seja /contratar é tratado como login — não há um
+ * terceiro destino para classificar.
+ *
+ * Retorna null quando o clique não é uma saída para o app: host diferente de
+ * app.rook.com.br, href vazio/ausente, ou URL que a WHATWG URL não consegue
+ * parsear (nunca lança — um clique de verdade não pode quebrar a página).
+ */
+export function resolveAppHandoff(href, currentHref) {
+  if (!href) return null;
+
+  let url;
+  try {
+    url = new URL(href, currentHref);
+  } catch {
+    return null;
+  }
+
+  if (url.hostname !== APP_HOST) return null;
+
+  return url.pathname.includes("contratar") ? "contratar" : "login";
+}
+
 export function pushTrackingEvent(name, payload = {}, { enabled = false, target } = {}) {
   if (!enabled) return false;
 

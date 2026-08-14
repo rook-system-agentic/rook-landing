@@ -4,6 +4,7 @@ import {
   TRACKING_EVENTS,
   buildTrackingEvent,
   pushTrackingEvent,
+  resolveAppHandoff,
   resolvePageType,
 } from "../src/lib/tracking-events.mjs";
 
@@ -70,4 +71,43 @@ test("empurra para o dataLayer quando o rastreamento esta ligado", () => {
   });
   assert.equal(enviado, true);
   assert.deepEqual(target.dataLayer, [{ event: "app_handoff", destino: "contratar" }]);
+});
+
+test("resolve saida para o app: checkout direto vira contratar", () => {
+  assert.equal(
+    resolveAppHandoff(
+      "https://app.rook.com.br/contratar?revenue_band=knight",
+      "https://rook.com.br/planos/",
+    ),
+    "contratar",
+  );
+});
+
+test("resolve saida para o app: link de entrar vira login", () => {
+  assert.equal(
+    resolveAppHandoff("https://app.rook.com.br/login", "https://rook.com.br/"),
+    "login",
+  );
+});
+
+test("nao resolve saida para o app quando o host e diferente", () => {
+  assert.equal(
+    resolveAppHandoff("https://www.rook.com.br/planos", "https://rook.com.br/"),
+    null,
+  );
+});
+
+test("nao resolve saida para o app com href relativo", () => {
+  assert.equal(resolveAppHandoff("/planos", "https://rook.com.br/"), null);
+});
+
+test("nao resolve saida para o app com href vazio", () => {
+  assert.equal(resolveAppHandoff("", "https://rook.com.br/"), null);
+  assert.equal(resolveAppHandoff(null, "https://rook.com.br/"), null);
+  assert.equal(resolveAppHandoff(undefined, "https://rook.com.br/"), null);
+});
+
+test("nao lanca excecao e retorna null para href malformado", () => {
+  assert.doesNotThrow(() => resolveAppHandoff("http://", "https://rook.com.br/planos/"));
+  assert.equal(resolveAppHandoff("http://", "https://rook.com.br/planos/"), null);
 });
