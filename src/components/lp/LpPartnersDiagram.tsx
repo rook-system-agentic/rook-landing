@@ -45,6 +45,12 @@ export default function LpPartnersDiagram({ className = "" }: { className?: stri
       role="img"
       aria-label="Diagrama: dados de PDV, ERP, delivery, maquininha, SEFAZ, Open Finance e planilhas convergindo para o Rook, e o gestor acessando tudo por um lugar só"
     >
+      <defs>
+        <filter id="lp-sombra-nucleo" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="3" stdDeviation="6" floodColor="#000000" floodOpacity="0.16" />
+        </filter>
+      </defs>
+
       {ORIGENS.map((label, i) => {
         const y = PRIMEIRO_Y + i * ESPACO_Y;
         // Curva em S: sai reto da origem, curva no meio, chega reto no núcleo.
@@ -109,27 +115,57 @@ export default function LpPartnersDiagram({ className = "" }: { className?: stri
         ACESSO ÚNICO
       </text>
 
-      {/* Núcleo: o Rook. Losango, que é a forma da marca. */}
+      {/*
+        Núcleo: a marca de verdade, não mais um losango desenhado.
+
+        Duas artes, uma por tema — a colorida some no escuro e a branca some no
+        claro, então não há versão única que sirva. A troca é por CSS
+        (`lp-marca-clara` / `lp-marca-escura`), e não por JavaScript, para não
+        haver instante em que a marca errada apareça.
+
+        A placa circular por baixo é o que garante contraste: o ícone fica
+        sempre sobre a superfície do tema, com sombra suave separando-o do
+        fundo da seção.
+      */}
       <g className="lp-diagram-core">
-        <rect
-          x={NUCLEO_X - 26}
-          y={EIXO_Y - 26}
-          width="52"
-          height="52"
-          rx="12"
-          transform={`rotate(45 ${NUCLEO_X} ${EIXO_Y})`}
-          fill="#e54c00"
+        <circle
+          cx={NUCLEO_X}
+          cy={EIXO_Y}
+          r="40"
+          fill="var(--lp-surface)"
+          stroke="var(--lp-line)"
+          strokeWidth="1.5"
+          filter="url(#lp-sombra-nucleo)"
         />
-        <text
-          x={NUCLEO_X}
-          y={EIXO_Y + 5}
-          textAnchor="middle"
-          fill="#ffffff"
-          style={{ font: "700 15px var(--font-display, system-ui)", letterSpacing: "-0.02em" }}
-        >
-          Rook
-        </text>
+        <image
+          className="lp-marca-clara"
+          href="/brand/rook-icon.png"
+          x={NUCLEO_X - 29}
+          y={EIXO_Y - 30}
+          width="58"
+          height="60"
+        />
+        <image
+          className="lp-marca-escura"
+          href="/brand/rook-icon-branco.png"
+          x={NUCLEO_X - 29}
+          y={EIXO_Y - 30}
+          width="58"
+          height="60"
+        />
       </g>
+
+      {/* "Rook" acima, e não no meio: o centro do ícone é escuro e engoliria o
+          texto no tema claro. */}
+      <text
+        x={NUCLEO_X}
+        y={EIXO_Y - 52}
+        textAnchor="middle"
+        fill="var(--lp-ink)"
+        style={{ font: "700 17px var(--font-display, system-ui)", letterSpacing: "-0.02em" }}
+      >
+        Rook
+      </text>
       <text
         x={NUCLEO_X}
         y={EIXO_Y + 58}

@@ -384,6 +384,21 @@
     }
   }
 
+  /*
+   * A marca do núcleo do diagrama tem duas artes, uma por tema: a colorida
+   * some no escuro e a branca some no claro. A troca é por CSS para não haver
+   * instante em que a arte errada apareça — com JavaScript haveria.
+   */
+  .lp-marca-escura {
+    display: none;
+  }
+  .dark .lp-marca-clara {
+    display: none;
+  }
+  .dark .lp-marca-escura {
+    display: block;
+  }
+
   /* Acompanha NUCLEO_X/EIXO_Y do LpPartnersDiagram — se um mudar, o outro muda. */
   .lp-diagram-core {
     transform-origin: 330px 169px;
