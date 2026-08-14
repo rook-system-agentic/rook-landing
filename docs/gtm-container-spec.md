@@ -29,7 +29,7 @@ leva condição de hostname. Tag sem condição dispara também no app, que já 
 
 | Nome | Tipo | ID | Gatilho | Observação |
 | :-- | :-- | :-- | :-- | :-- |
-| `GA4 - configuração LP` | Google Tag | `G-M93QYWQ84F` | `LP - todas as páginas` | Parâmetro `page_type` = `{{dlv - page_type}}`. Permite separar no relatório entre home, planos, blog, diagnóstico e calculadora sem depender da URL. Manda a LP para a propriedade unificada. |
+| `GA4 - configuração LP` | Google Tag | `G-M93QYWQ84F` | `LP - todas as páginas` | Parâmetro `page_type` = `{{dlv - page_type}}`. O `Header` navega com `next/link` (troca de rota sem recarregar o documento): o gatilho de visualização de página dispara uma vez por carregamento, e o script que empurra `page_type` não reexecuta na troca de rota. Hoje isso separa no relatório pela **página de entrada da sessão**, não página a página durante a navegação. Manda a LP para a propriedade unificada. |
 | `GA4 - generate_lead` | Evento GA4 | `GA4 - configuração LP` | `LP - lead comercial` | Tag de configuração: `GA4 - configuração LP`. Parâmetro `plano` = `dlv - plano` |
 | `GA4 - diagnostic_complete` | Evento GA4 | `GA4 - configuração LP` | `LP - diagnóstico concluído` | Tag de configuração: `GA4 - configuração LP`. Parâmetro `ab_variant` = `dlv - ab_variant` |
 | `GA4 - newsletter_signup` | Evento GA4 | `GA4 - configuração LP` | `LP - newsletter` | Tag de configuração: `GA4 - configuração LP`. Sem parâmetro. |
@@ -104,3 +104,15 @@ pixel da Meta. Para o Google Ads, mesmo com o passo 3 feito, o ping sem
 cookie da modelagem de conversão continua: a página não promete o contrário,
 porque fala em não gravar cookie e não usar dado para publicidade, não em não
 emitir nenhum sinal.
+
+## Pendências
+
+- **Separação por página real, não só por página de entrada.** Hoje
+  `GA4 - configuração LP` produz um `page_view` por sessão, com `page_type`
+  da página em que o visitante chegou, congelado pelo resto da visita — a
+  navegação entre `/`, `/planos`, `/blog`, `/diagnostico` e
+  `/calculadora-cmv` troca de rota via `next/link`, sem recarregar o
+  documento, e nem o gatilho de visualização de página nem o script que
+  empurra `page_type` reexecutam nessa troca. Medir página a página
+  exigiria um gatilho de **History Change** no contêiner, mais um push de
+  `page_type` na troca de rota (fora do escopo desta entrega).
