@@ -54,8 +54,22 @@ export default function LpPartners() {
       aria-labelledby="partners-title"
     >
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1fr]">
-          <div>
+        {/*
+          O diagrama leva a coluna maior: são sete origens mais o núcleo e o
+          gestor, e em meia coluna os rótulos ficam ilegíveis.
+
+          Grade de 12 com `col-span`, que é o idioma comum do Tailwind e
+          dispensa valor arbitrário.
+
+          Nota para quem for depurar layout aqui: se uma classe nova parecer
+          "não existir", desconfie do servidor de desenvolvimento antes do
+          código. O observador do Tailwind trava depois de muitas edições
+          seguidas e para de emitir classes novas, enquanto as que já existiam
+          continuam funcionando — o sintoma é um grid que cai para uma coluna
+          sem erro nenhum. `rm -rf .next` e reiniciar resolve.
+        */}
+        <div className="grid items-center gap-12 lg:grid-cols-12">
+          <div className="lg:col-span-5">
             <p className="lp-label mb-4">{PARTNERS_SECTION.label}</p>
             <h2
               id="partners-title"
@@ -79,7 +93,7 @@ export default function LpPartners() {
             </a>
           </div>
 
-          <LpPartnersDiagram />
+          <LpPartnersDiagram className="lg:col-span-7" />
         </div>
       </div>
 

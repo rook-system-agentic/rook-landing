@@ -387,9 +387,9 @@
     }
   }
 
-  /* Acompanha o alvoX do LpPartnersDiagram — se um mudar, o outro muda. */
+  /* Acompanha NUCLEO_X/EIXO_Y do LpPartnersDiagram — se um mudar, o outro muda. */
   .lp-diagram-core {
-    transform-origin: 380px 104px;
+    transform-origin: 330px 169px;
     animation: lp-diagram-core 3.4s ease-in-out infinite;
   }
   @keyframes lp-diagram-core {
