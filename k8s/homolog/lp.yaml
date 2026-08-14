@@ -74,11 +74,15 @@ kind: Ingress
 metadata:
   name: rook-lp
   namespace: rook-homolog
-  annotations:
-    # Homologação não deve ser indexada. Sem isto, o Google pode ranquear
-    # lp-homolog acima do site real e canibalizar a busca por "Rook System".
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers "X-Robots-Tag: noindex, nofollow";
+  # Sem `configuration-snippet` aqui: o admission webhook do ingress-nginx
+  # recusa a anotação ("Snippet directives are disabled by the Ingress
+  # administrator"), que é o padrão seguro das versões recentes. O primeiro
+  # deploy morreu exatamente nisso.
+  #
+  # O `X-Robots-Tag: noindex` e o robots.txt de homologação passaram a ser
+  # responsabilidade da aplicação (next.config.mjs e src/app/robots.ts). É
+  # melhor assim: viaja com o código, é versionado, e não depende de uma
+  # permissão do cluster que pode mudar sem aviso.
 spec:
   ingressClassName: nginx
   rules:
