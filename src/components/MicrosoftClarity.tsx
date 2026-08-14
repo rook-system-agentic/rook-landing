@@ -1,10 +1,14 @@
 "use client";
 
 import Script from "next/script";
+import { isTrackingEnabled } from "@/lib/tracking";
 
 const CLARITY_ID = "x4y25y8xz4";
 
 export default function MicrosoftClarity() {
+  // Homologação não rastreia. Ver src/lib/tracking.ts.
+  if (!isTrackingEnabled()) return null;
+
   if (process.env.NODE_ENV !== "production") {
     return null;
   }

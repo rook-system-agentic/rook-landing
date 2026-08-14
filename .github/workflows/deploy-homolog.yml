@@ -1,0 +1,119 @@
+name: Deploy — Homologação (k3s)
+
+# POR QUE ESTE WORKFLOW EXISTE
+#
+# `homolog` é a branch de integração deste repositório e alimenta o ambiente de
+# homologação numa VPS com k3s, ao lado do app, do ADM e do Marketing OS.
+# Produção continua na Vercel, a partir da `main` — este workflow NÃO toca
+# produção.
+#
+# ⚠️ A IMAGEM CONSTRUÍDA AQUI NÃO É PROMOVÍVEL PARA PRODUÇÃO.
+# Os `NEXT_PUBLIC_*` entram no bundle do browser em tempo de build, e aqui
+# declaram o ambiente como homologação — o que desliga o rastreamento (ver
+# src/lib/tracking.ts). Promover o artefato publicaria um site que não mede
+# nada. O que se promove é código, pela branch.
+#
+# A imagem fica no containerd local da VPS; não há push nem pull do GHCR para o
+# rollout. Espelha o padrão de rook-system/.github/workflows/deploy-homolog.yml.
+
+on:
+  push:
+    branches: [homolog]
+    # Sem filtro de `paths`, deliberadamente: qualquer merge na homolog publica
+    # em homologação. O ambiente deve refletir a branch, não um subconjunto de
+    # caminhos que alguém precisa lembrar de manter.
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-homolog-lp
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build da imagem
+    runs-on: [self-hosted, linux, x64, rook-vps]
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir imagem
+        run: |
+          set -euo pipefail
+          docker build \
+            -f Dockerfile \
+            --build-arg NEXT_PUBLIC_ENV=homolog \
+            --build-arg NEXT_PUBLIC_SITE_URL=https://lp-homolog.rooksystem.com.br \
+            -t "ghcr.io/rook-system-agentic/rook-lp:sha-${GITHUB_SHA}" \
+            .
+
+      - name: Importar no containerd do k3s
+        # O k3s não enxerga o daemon do docker: são armazenamentos separados.
+        # Sem este passo o pod fica em ErrImageNeverPull mesmo com a imagem
+        # construída na mesma máquina.
+        run: |
+          set -euo pipefail
+          docker save "ghcr.io/rook-system-agentic/rook-lp:sha-${GITHUB_SHA}" \
+            | sudo k3s ctr images import -
+
+  deploy:
+    name: Rollout no k3s
+    runs-on: [self-hosted, linux, x64, rook-vps]
+    timeout-minutes: 15
+    needs: [build]
+    permissions:
+      contents: read
+    env:
+      # Injetado só neste job, para um kubectl solto em outro workflow que caia
+      # neste runner não alcançar o cluster por acidente.
+      KUBECONFIG: /opt/actions-runner/.kube/config
+      NS: rook-homolog
+    steps:
+      - name: Recusar disparo fora da homolog
+        if: github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/homolog'
+        run: |
+          echo "::error::deploy-homolog só pode ser disparado a partir da branch homolog."
+          echo "::error::Disparado de '${{ github.ref }}'. Publicar outra branch em"
+          echo "::error::homologação sobrescreveria o ambiente com código não integrado."
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - name: Reconciliar manifesto com a imagem do commit
+        run: |
+          set -euo pipefail
+          # A substituição acontece ANTES do apply: aplicar com :dev e depois
+          # `set image` geraria dois rollouts e um ReplicaSet órfão.
+          sed -i "s|\(image: ghcr.io/rook-system-agentic/rook-lp\):dev|\1:sha-${GITHUB_SHA}|" \
+            k8s/homolog/lp.yaml
+          grep -h 'image: ghcr.io' k8s/homolog/lp.yaml
+          # Aplicar o manifesto inteiro, e não só trocar a imagem: correção de
+          # probe ou de ingress commitada precisa chegar ao cluster junto.
+          kubectl -n "$NS" apply -f k8s/homolog/lp.yaml
+
+      - name: Rollout com rollback em falha
+        run: |
+          set -euo pipefail
+          if ! kubectl -n "$NS" rollout status deploy/rook-lp --timeout=180s; then
+            echo "::error::Rollout falhou. Revertendo para a revisão anterior."
+            kubectl -n "$NS" rollout undo deploy/rook-lp || true
+            kubectl -n "$NS" rollout status deploy/rook-lp --timeout=120s || true
+            kubectl -n "$NS" describe deploy/rook-lp | tail -30
+            kubectl -n "$NS" logs -l app.kubernetes.io/name=rook-lp --tail=60 || true
+            exit 1
+          fi
+
+      - name: Confirmar que o site responde
+        # Rollout concluído não é o mesmo que página servindo: o pod pode subir
+        # e o ingress não rotear. Este passo é a prova de que a URL funciona.
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 10); do
+            code=$(curl -s -o /dev/null -m 10 -w '%{http_code}' https://lp-homolog.rooksystem.com.br/ || echo 000)
+            echo "tentativa $i: HTTP $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 6
+          done
+          echo "::error::lp-homolog.rooksystem.com.br não respondeu 200 após o rollout."
+          exit 1
