@@ -4,6 +4,12 @@ import Script from "next/script";
 import { usePathname } from "next/navigation";
 import { isTrackingEnabled } from "@/lib/tracking";
 import { resolvePageType } from "@/lib/tracking-events.mjs";
+import {
+  CONSENT_STORAGE_KEY,
+  CONSENT_KEYS,
+  CONSENT_VALUES,
+  defaultConsentState,
+} from "@/lib/consent.mjs";
 
 const GTM_ID = "GTM-M8ZJ3WTV";
 
@@ -23,17 +29,31 @@ export default function GoogleTagManager() {
 
   if (!isTrackingEnabled()) return null;
 
-  const dataLayerBootstrap = `window.dataLayer=window.dataLayer||[];window.dataLayer.push(${JSON.stringify(
-    {
+  const consentBootstrap = `
+    window.dataLayer=window.dataLayer||[];
+    function gtag(){dataLayer.push(arguments);}
+    var chaves=${JSON.stringify(CONSENT_KEYS)};
+    var valores=${JSON.stringify(CONSENT_VALUES)};
+    var salvo=null;
+    try{
+      var bruto=JSON.parse(localStorage.getItem(${JSON.stringify(CONSENT_STORAGE_KEY)}));
+      var valido=bruto && typeof bruto==='object' && chaves.every(function(c){return valores.indexOf(bruto[c])!==-1;});
+      if(valido){
+        salvo={};
+        for(var i=0;i<chaves.length;i++){salvo[chaves[i]]=bruto[chaves[i]];}
+      }
+    }catch(e){}
+    gtag('consent','default', salvo || ${JSON.stringify(defaultConsentState())});
+    window.dataLayer.push(${JSON.stringify({
       page_type: resolvePageType(pathname),
       environment: "production",
-    },
-  )});`;
+    })});
+  `;
 
   return (
     <>
       <Script id="gtm-data-layer" strategy="beforeInteractive">
-        {dataLayerBootstrap}
+        {consentBootstrap}
       </Script>
       <Script id="gtm-container" strategy="afterInteractive">
         {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`}

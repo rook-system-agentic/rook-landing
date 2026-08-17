@@ -29,7 +29,7 @@ leva condição de hostname. Tag sem condição dispara também no app, que já 
 
 | Nome | Tipo | ID | Gatilho | Observação |
 | :-- | :-- | :-- | :-- | :-- |
-| `GA4 - configuração LP` | Google Tag | `G-M93QYWQ84F` | `LP - todas as páginas` | Parâmetro `page_type` = `{{dlv - page_type}}`. Permite separar no relatório entre home, planos, blog, diagnóstico e calculadora sem depender da URL. Manda a LP para a propriedade unificada. |
+| `GA4 - configuração LP` | Google Tag | `G-M93QYWQ84F` | `LP - todas as páginas` | Parâmetro `page_type` = `{{dlv - page_type}}`. O `Header` navega com `next/link` (troca de rota sem recarregar o documento): o gatilho de visualização de página dispara uma vez por carregamento, e o script que empurra `page_type` não reexecuta na troca de rota. Hoje isso separa no relatório pela **página de entrada da sessão**, não página a página durante a navegação. Manda a LP para a propriedade unificada. |
 | `GA4 - generate_lead` | Evento GA4 | `GA4 - configuração LP` | `LP - lead comercial` | Tag de configuração: `GA4 - configuração LP`. Parâmetro `plano` = `dlv - plano` |
 | `GA4 - diagnostic_complete` | Evento GA4 | `GA4 - configuração LP` | `LP - diagnóstico concluído` | Tag de configuração: `GA4 - configuração LP`. Parâmetro `ab_variant` = `dlv - ab_variant` |
 | `GA4 - newsletter_signup` | Evento GA4 | `GA4 - configuração LP` | `LP - newsletter` | Tag de configuração: `GA4 - configuração LP`. Sem parâmetro. |
@@ -54,3 +54,66 @@ No GA4, marcar como evento-chave (conversão): `generate_lead` e
 
 Isso troca a medição num instante só: sem janela sem medição e sem janela
 medindo em dobro.
+
+## Consentimento por tag: a Meta exige configuração manual
+
+As tags `GA4 - configuração LP`, `GA4 - generate_lead`,
+`GA4 - diagnostic_complete`, `GA4 - newsletter_signup` e `GA4 - app_handoff`
+são nativas do Google e respeitam o sinal do Consent Mode sozinhas —
+nenhuma configuração adicional é necessária nelas.
+
+**As quatro tags `Meta - PageView`, `Meta - Lead`,
+`Meta - CompleteRegistration` e `Meta - Subscribe` NÃO respeitam o Consent
+Mode automaticamente.** Elas usam o template de comunidade "Pixel do
+Facebook" (ver nota de templates acima), que o GTM trata como tag de
+terceiro: sem configuração explícita, disparam do mesmo jeito mesmo com a
+publicidade recusada.
+
+⚠️ **Ordem: a checagem de consentimento abaixo só pode ser marcada depois
+que o PR do consentimento estiver em produção.** Se for marcada antes do
+deploy, as tags da Meta e a de `Google Ads - conversão` passam a exigir um
+sinal de consentimento (`ad_storage`) que o site ainda não emite — e param
+de disparar em silêncio, inclusive para visitantes que aceitariam a
+publicidade. Quem ler com pressa e for direto à instrução abaixo, sem
+conferir a ordem, desliga as tags de propósito. A sequência correta:
+
+1. Publicar o contêiner completo (seção "Ordem de publicação" acima) e
+   mergear o PR do código de consentimento.
+2. Confirmar em produção que o Consent Mode está emitindo `ad_storage` e que
+   o banner de cookies funciona.
+3. Só então marcar a checagem de consentimento (`ad_storage`) nas quatro
+   tags `Meta - *` e na tag `Google Ads - conversão`, como descrito abaixo.
+
+Em cada uma das quatro tags `Meta - *`: abrir o editor da tag →
+Configurações avançadas → Configurações de consentimento → marcar "Exigir
+consentimento adicional para disparo desta tag" → adicionar `ad_storage`.
+Sem isso, o pixel dispara mesmo quando o visitante clica em "Recusar anúncios".
+
+`Google Ads - conversão` recebe a mesma checagem, mas não silencia por
+completo. Marque "Exigir consentimento adicional para disparo desta tag" →
+`ad_storage` nela também, igual às quatro da Meta. Isso reduz o disparo — a
+tag deixa de rodar quando o consentimento é negado, dentro do GTM. Mas por
+desenho do próprio Consent Mode, o `gtag` do Google Ads envia, à parte do
+GTM, um ping sem cookie para modelagem de conversão mesmo com `ad_storage`
+negado. Não existe checagem que feche essa porta — é comportamento do
+Google, não do contêiner.
+
+Sem o passo 3, a página de privacidade — que diz que sem consentimento a Meta
+e o Google Ads não gravam cookies nem usam os dados para publicidade —
+descreve uma promessa que a configuração do contêiner ainda não cumpre para o
+pixel da Meta. Para o Google Ads, mesmo com o passo 3 feito, o ping sem
+cookie da modelagem de conversão continua: a página não promete o contrário,
+porque fala em não gravar cookie e não usar dado para publicidade, não em não
+emitir nenhum sinal.
+
+## Pendências
+
+- **Separação por página real, não só por página de entrada.** Hoje
+  `GA4 - configuração LP` produz um `page_view` por sessão, com `page_type`
+  da página em que o visitante chegou, congelado pelo resto da visita — a
+  navegação entre `/`, `/planos`, `/blog`, `/diagnostico` e
+  `/calculadora-cmv` troca de rota via `next/link`, sem recarregar o
+  documento, e nem o gatilho de visualização de página nem o script que
+  empurra `page_type` reexecutam nessa troca. Medir página a página
+  exigiria um gatilho de **History Change** no contêiner, mais um push de
+  `page_type` na troca de rota (fora do escopo desta entrega).

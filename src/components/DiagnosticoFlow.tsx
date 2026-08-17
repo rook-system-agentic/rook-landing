@@ -152,8 +152,12 @@ export function DiagnosticoFlow() {
 
     setResult(resultData);
     setStep("result");
-    track(TRACKING_EVENTS.diagnostic, { ab_variant: abVariant });
+    // sendToSupabase primeiro: a gravação do lead não pode depender do
+    // rastreamento. sendToSupabase é async e não é aguardado aqui, mas o
+    // fetch() já é disparado de forma síncrona antes do primeiro `await`
+    // dentro dela — o pedido de rede começa antes de track() rodar.
     sendToSupabase(resultData, cmo);
+    track(TRACKING_EVENTS.diagnostic, { ab_variant: abVariant });
   }
 
   async function sendToSupabase(resultData: ResultData, cmo: number) {

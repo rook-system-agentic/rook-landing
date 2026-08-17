@@ -53,6 +53,17 @@ test("resolve o tipo de pagina a partir do pathname", () => {
   assert.equal(resolvePageType("/privacidade/"), "institucional");
 });
 
+test("resolve o tipo de pagina exige fronteira de segmento, nao prefixo textual solto", () => {
+  assert.equal(resolvePageType("/planos-antigos"), "institucional");
+  assert.equal(resolvePageType("/planos-antigos/"), "institucional");
+  assert.equal(resolvePageType("/blogueiro"), "institucional");
+  assert.equal(resolvePageType("/diagnostico-financeiro"), "institucional");
+  assert.equal(resolvePageType("/calculadora-cmv-antiga"), "institucional");
+  // com fronteira, continua casando
+  assert.equal(resolvePageType("/planos"), "planos");
+  assert.equal(resolvePageType("/planos/assinatura"), "planos");
+});
+
 test("nao empurra nada quando o rastreamento esta desligado", () => {
   const target = {};
   const enviado = pushTrackingEvent(TRACKING_EVENTS.newsletter, {}, {
@@ -110,4 +121,19 @@ test("nao resolve saida para o app com href vazio", () => {
 test("nao lanca excecao e retorna null para href malformado", () => {
   assert.doesNotThrow(() => resolveAppHandoff("http://", "https://rook.com.br/planos/"));
   assert.equal(resolveAppHandoff("http://", "https://rook.com.br/planos/"), null);
+});
+
+test("resolve saida para o app exige fronteira de segmento em /contratar", () => {
+  assert.equal(
+    resolveAppHandoff("https://app.rook.com.br/contratar-consultoria", "https://rook.com.br/"),
+    "login",
+  );
+  assert.equal(
+    resolveAppHandoff("https://app.rook.com.br/contratar/knight", "https://rook.com.br/"),
+    "contratar",
+  );
+  assert.equal(
+    resolveAppHandoff("https://app.rook.com.br/contratar/", "https://rook.com.br/"),
+    "contratar",
+  );
 });
