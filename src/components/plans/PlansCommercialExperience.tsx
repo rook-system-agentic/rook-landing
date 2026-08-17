@@ -13,6 +13,7 @@ import { solveCommercialLeadChallenge } from "@/lib/commercial-lead-challenge-cl
 import type { CommercialInterest } from "@/lib/commercial-lead-validation.mjs";
 import { buildDirectCheckoutHref } from "@/lib/direct-checkout-link.mjs";
 import type { BillingCatalogViewModel } from "@/lib/public-billing-catalog.mjs";
+import { track, TRACKING_EVENTS } from "@/lib/track";
 
 type BasePlan = BillingCatalogViewModel["basePlans"][number];
 type ChessPlan = BillingCatalogViewModel["chess"];
@@ -98,6 +99,7 @@ function CommercialLeadDialog({
 
       form.reset();
       setStatus("success");
+      track(TRACKING_EVENTS.lead, { plano: interest });
     } catch {
       setMessage("Erro de conexão. Verifique sua internet e tente novamente.");
       setStatus("error");

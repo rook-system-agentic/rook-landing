@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
-import GoogleAdsPixel from "@/components/GoogleAdsPixel";
-import MetaPixel from "@/components/MetaPixel";
-import MicrosoftClarity from "@/components/MicrosoftClarity";
+import GoogleTagManager from "@/components/GoogleTagManager";
+import AppHandoffTracker from "@/components/AppHandoffTracker";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
@@ -146,10 +144,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <GoogleAnalytics />
-        <GoogleAdsPixel />
-        <MetaPixel />
-        <MicrosoftClarity />
+        <GoogleTagManager />
+        <AppHandoffTracker />
         <Header />
         <main className="pt-[72px]">{children}</main>
         <Footer />
