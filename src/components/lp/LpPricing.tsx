@@ -74,7 +74,9 @@ export default function LpPricing() {
                 <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--lp-muted)" }}>
                   {plan.description}
                 </p>
-                <p className="mt-2 text-xs" style={{ color: "var(--lp-muted)", opacity: 0.7 }}>
+                {/* Sem `opacity`: com 0.7 a nota do plano media 3,07:1 no claro
+                    e 3,55:1 no escuro. O cinza cru mede 5,85:1 e 5,71:1. */}
+                <p className="mt-2 text-xs" style={{ color: "var(--lp-muted)" }}>
                   {plan.note}
                 </p>
               </div>

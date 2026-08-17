@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteUrl } from "@/lib/site-origin";
 
 export const metadata: Metadata = {
   title: "Funcionalidades do Rook System — 6 Módulos de Inteligência Financeira",
@@ -14,12 +15,12 @@ export const metadata: Metadata = {
     "controle de impostos restaurante",
     "sistema financeiro food service",
   ],
-  alternates: { canonical: "https://rook.com.br/funcionalidades/" },
+  alternates: { canonical: siteUrl("/funcionalidades/") },
   openGraph: {
     title: "Funcionalidades do Rook System — 6 Módulos de Inteligência Financeira",
     description:
       "Vendas, Compras/CMV, Impostos, Despesas, Dívidas e Resultado. Tudo na mesma tela para o dono de restaurante.",
-    url: "https://rook.com.br/funcionalidades/",
+    url: siteUrl("/funcionalidades/"),
     type: "website",
   },
 };

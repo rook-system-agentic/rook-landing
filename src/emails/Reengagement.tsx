@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Button, Heading, Hr, Section, Text } from "@react-email/components";
 import { EmailLayout, styles } from "./components/Layout";
+import { siteUrl } from "@/lib/site-origin";
 
 export type ReengagementEmailProps = {
   name?: string | null;
@@ -11,7 +12,7 @@ export type ReengagementEmailProps = {
 /** ROO-139 · Bloco 2 — reengajamento de lead inativo (30+ dias). */
 export function ReengagementEmail({
   name,
-  ctaUrl = "https://rooksystem.com.br/blog",
+  ctaUrl = siteUrl("/blog/"),
   unsubscribeUrl,
 }: ReengagementEmailProps) {
   const firstName = name?.trim().split(/\s+/)[0];

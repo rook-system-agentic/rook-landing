@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { track, TRACKING_EVENTS } from "@/lib/track";
 
 const inputCls =
   "w-full bg-bg-card border border-border rounded-lg px-4 py-3 text-sm text-cream placeholder:text-muted outline-none focus:border-terracota transition-colors";
@@ -24,6 +25,7 @@ export default function NewsletterForm() {
       });
       if (res.ok) {
         setStatus("success");
+        track(TRACKING_EVENTS.newsletter);
         setEmail("");
         setName("");
         setConsent(false);
