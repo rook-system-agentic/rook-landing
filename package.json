@@ -11,6 +11,7 @@
     "billing:snapshot": "node scripts/sync-billing-catalog.mjs",
     "test": "node --test tests/*.test.mjs",
     "test:billing": "node --test tests/billing-catalog.test.mjs",
+    "test:blog": "node --test tests/blog-source.test.mjs",
     "test:commercial-leads": "node --test tests/commercial-leads.test.mjs",
     "test:ci": "node --test tests/tracking-events.test.mjs"
   },

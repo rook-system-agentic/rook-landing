@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import NewsletterForm from "@/components/NewsletterForm";
 import BlogCard from "@/components/blog/BlogCard";
-import { getBlogCategories, getPublishedPosts } from "@/lib/blog";
+import { resolveBlogListState } from "@/lib/blog-source.mjs";
+import { getBlogCategories, getBlogSourceStatus, getPublishedPosts } from "@/lib/blog";
 import { siteUrl } from "@/lib/site-origin";
 
 export const revalidate = 60;
@@ -19,6 +20,54 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Os três jeitos de a lista estar vazia. Eles são diferentes para quem lê:
+ * um pede outro filtro, o outro pede paciência, o terceiro só avisa que ainda
+ * não há conteúdo. Nenhum deles pode dizer "não há artigo" quando a verdade é
+ * "não conseguimos carregar os artigos" (ROO-1116).
+ */
+function EmptyState({ state }: { state: "category-empty" | "catalog-empty" | "source-unavailable" }) {
+  if (state === "source-unavailable") {
+    return (
+      <div className="card p-8 text-center">
+        <h2 className="text-2xl font-bold text-cream mb-3">Não conseguimos carregar os artigos agora.</h2>
+        <p className="text-muted mb-6">
+          O problema é do nosso lado e costuma durar poucos minutos. Tente atualizar a página — ou
+          assine a newsletter para receber os próximos artigos direto no e-mail.
+        </p>
+        <Link href="/blog/" className="btn-ghost">
+          Tentar de novo
+        </Link>
+      </div>
+    );
+  }
+
+  if (state === "category-empty") {
+    return (
+      <div className="card p-8 text-center">
+        <h2 className="text-2xl font-bold text-cream mb-3">Nenhum artigo publicado nesta categoria.</h2>
+        <p className="text-muted mb-6">Volte para todos os artigos ou assine a newsletter para receber os próximos.</p>
+        <Link href="/blog/" className="btn-ghost">
+          Ver todos
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card p-8 text-center">
+      <h2 className="text-2xl font-bold text-cream mb-3">Ainda não publicamos nenhum artigo.</h2>
+      <p className="text-muted mb-6">
+        O primeiro conteúdo sobre CMV, DRE, compras e margem sai em breve. Assine a newsletter para
+        ser avisado quando chegar.
+      </p>
+      <Link href="/" className="btn-ghost">
+        Voltar ao início
+      </Link>
+    </div>
+  );
+}
+
 type BlogPageProps = {
   searchParams?: {
     category?: string;
@@ -27,11 +76,22 @@ type BlogPageProps = {
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const selectedCategory = searchParams?.category;
-  const [posts, categories] = await Promise.all([
+  const [posts, categories, sourceStatus] = await Promise.all([
     getPublishedPosts({ category: selectedCategory }),
     getBlogCategories(),
+    getBlogSourceStatus(),
   ]);
   const [featuredPost, ...otherPosts] = posts;
+
+  // ROO-1116 — a lista vazia tinha uma explicação só, e ela era falsa em dois
+  // dos três casos: dizia "nesta categoria" mesmo sem filtro, e dizia
+  // "nenhum artigo publicado" quando na verdade não tínhamos conseguido
+  // perguntar. Regra e justificativa em `resolveBlogListState`.
+  const listState = resolveBlogListState({
+    postCount: posts.length,
+    hasCategoryFilter: Boolean(selectedCategory),
+    status: sourceStatus,
+  });
 
   return (
     <>
@@ -79,9 +139,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
       <section className="py-16 border-t border-border">
         <div className="max-w-7xl mx-auto px-6">
-          {featuredPost ? (
+          {listState === "has-posts" ? (
             <div className="grid lg:grid-cols-2 gap-5">
-              <BlogCard post={featuredPost} featured />
+              {featuredPost && <BlogCard post={featuredPost} featured />}
               <div className="card p-6 flex flex-col justify-between">
                 <div>
                   <p className="section-label mb-4">— Pulse do food service</p>
@@ -98,13 +158,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               ))}
             </div>
           ) : (
-            <div className="card p-8 text-center">
-              <h2 className="text-2xl font-bold text-cream mb-3">Nenhum artigo publicado nesta categoria.</h2>
-              <p className="text-muted mb-6">Volte para todos os artigos ou assine a newsletter para receber os próximos.</p>
-              <Link href="/blog/" className="btn-ghost">
-                Ver todos
-              </Link>
-            </div>
+            <EmptyState state={listState} />
           )}
         </div>
       </section>
