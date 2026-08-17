@@ -35,15 +35,31 @@ export default function MetaPixel() {
           fbq('track', 'PageView');
         `}
       </Script>
-      <noscript>
-        <img
-          height="1"
-          width="1"
-          style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
-          alt=""
-        />
-      </noscript>
+      {/*
+        O pixel de fallback vai como HTML cru, e não como <img> de React.
+        POR QUÊ (ROO-1124)
+
+        Escrito como <img> de JSX, o Next enxergava a imagem mesmo dentro do
+        <noscript> e emitia
+          <link rel="preload" as="image" href="https://www.facebook.com/tr?...">
+        como PRIMEIRA tag do <head> — antes até da folha de estilo. Medido em
+        produção em 17/08/2026: o celular abria conexão com o facebook.com
+        (DNS + TLS) na frente do CSS que pinta a tela, para buscar um pixel que
+        só faz sentido quando o JavaScript está desligado.
+
+        Efeito colateral que isso também corrige: com JavaScript ligado o
+        PageView era disparado DUAS vezes — uma pelo preload do pixel, outra
+        pelo fbq abaixo. O Meta contava a mesma visita em dobro.
+
+        Em `dangerouslySetInnerHTML` o React não cria o elemento, então o
+        varredor de preload do Next não tem o que encontrar. Sem JavaScript o
+        navegador continua renderizando o <noscript> normalmente.
+      */}
+      <noscript
+        dangerouslySetInnerHTML={{
+          __html: `<img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1" />`,
+        }}
+      />
     </>
   );
 }

@@ -9,8 +9,8 @@ export default function Footer() {
         {/* Brand */}
         <div className="md:col-span-1">
           <Link href="/" className="inline-block mb-4">
-            <Image src="/brand/rook-logo-horizontal-light.png" alt="Rook System" width={139} height={47} className="h-10 w-auto dark:hidden" />
-            <Image src="/brand/rook-logo-horizontal.png" alt="Rook System" width={144} height={47} className="h-10 w-auto hidden dark:block" />
+            <Image src="/brand/rook-logo-horizontal-light.webp" alt="Rook System" width={139} height={47} className="h-10 w-auto dark:hidden" />
+            <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={144} height={47} className="h-10 w-auto hidden dark:block" />
           </Link>
           <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
             Inteligência Financeira para Food Service.

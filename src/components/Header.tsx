@@ -79,8 +79,11 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-[72px]">
         {/* Logo */}
         <Link href="/" className="flex items-center" aria-label="Rook System - Página inicial">
-          <Image src="/brand/rook-logo-horizontal-light.png" alt="Rook — Visão | Estratégia | Controle" width={118} height={40} className="h-10 w-auto dark:hidden" />
-          <Image src="/brand/rook-logo-horizontal.png" alt="Rook — Visão | Estratégia | Controle" width={122} height={40} className="h-10 w-auto hidden dark:block" />
+          {/* ROO-1124: .webp de 360px de largura no lugar do .png de 1961px. O
+              logo aparece com 40px de altura — o PNG original era 16× maior que
+              o necessário e pesava 37 KB; o WebP pesa 9,5 KB. */}
+          <Image src="/brand/rook-logo-horizontal-light.webp" alt="Rook — Visão | Estratégia | Controle" width={118} height={40} className="h-10 w-auto dark:hidden" />
+          <Image src="/brand/rook-logo-horizontal.webp" alt="Rook — Visão | Estratégia | Controle" width={122} height={40} className="h-10 w-auto hidden dark:block" />
         </Link>
 
         {/* Nav desktop */}
