@@ -1,5 +1,16 @@
+import { cache } from "react";
 import { localBlogPosts } from "@/content/blog-posts";
+import {
+  resolveBlogCollection,
+  resolveMissingSlugBehavior,
+  type BlogCollection,
+  type BlogFetchOutcome,
+  type BlogSourceStatus,
+  type MissingSlugBehavior,
+} from "@/lib/blog-source.mjs";
 import type { BlogDataSource, BlogFaq, BlogListOptions, BlogPost, BlogStatus } from "@/lib/blog-types";
+
+export type { BlogSourceStatus, MissingSlugBehavior } from "@/lib/blog-source.mjs";
 
 const DEFAULT_SITE_URL = "https://rooksystem.com.br";
 
@@ -81,8 +92,22 @@ function toBlogPost(row: SupabaseBlogRow): BlogPost {
   };
 }
 
-async function fetchSupabasePosts(): Promise<BlogPost[]> {
-  if (!shouldUseSupabase()) return [];
+type SupabaseFetchResult = {
+  outcome: BlogFetchOutcome;
+  posts: BlogPost[];
+  /** Motivo curto, publicável. O erro cru vai só para o log. */
+  reason: string | null;
+  /** Texto completo do erro, para o log do servidor. Nunca sai numa resposta. */
+  detail: string | null;
+};
+
+async function fetchSupabasePosts(): Promise<SupabaseFetchResult> {
+  // Sem URL ou chave não houve consulta nenhuma. Isso não é "a consulta veio
+  // vazia" nem "a consulta falhou" — é um terceiro caso, e confundi-lo com os
+  // outros é exatamente como a queda ficava invisível.
+  if (!shouldUseSupabase()) {
+    return { outcome: "unconfigured", posts: [], reason: "sem SUPABASE_URL/chave", detail: null };
+  }
 
   const endpoint = new URL(`${supabaseUrl!.replace(/\/$/, "")}/rest/v1/blog_posts`);
   endpoint.searchParams.set("select", "*");
@@ -99,35 +124,82 @@ async function fetchSupabasePosts(): Promise<BlogPost[]> {
     });
 
     if (!response.ok) {
-      console.warn("[blog] Supabase returned", response.status, response.statusText);
-      return [];
+      // Tabela inexistente (o caso de homologação hoje) chega aqui como 404
+      // com corpo PostgREST. O corpo entra só no log: pode nomear schema e
+      // relação, e a rota de diagnóstico é pública.
+      const body = await response.text().catch(() => "");
+      return {
+        outcome: "failed",
+        posts: [],
+        reason: `HTTP ${response.status}`,
+        detail: `${response.status} ${response.statusText} ${body}`.trim().slice(0, 500),
+      };
     }
 
     const rows = (await response.json()) as SupabaseBlogRow[];
-    return rows.map(toBlogPost);
+    return { outcome: "ok", posts: rows.map(toBlogPost), reason: null, detail: null };
   } catch (error) {
-    console.warn("[blog] Falling back to local posts:", error);
-    return [];
+    return {
+      outcome: "failed",
+      posts: [],
+      reason: "falha de rede",
+      detail: error instanceof Error ? error.message : "erro desconhecido",
+    };
   }
 }
 
-async function allPosts() {
-  const remotePosts = await fetchSupabasePosts();
-  const postsBySlug = new Map(localBlogPosts.map((post) => [post.slug, post]));
+/**
+ * Carrega os artigos E o diagnóstico da origem.
+ *
+ * `cache()` é por requisição: a página do blog chama a listagem e as
+ * categorias, e sem isto o log sairia duplicado para uma queda só.
+ */
+const loadBlog = cache(async (): Promise<BlogCollection> => {
+  const remote = await fetchSupabasePosts();
+  const collection = resolveBlogCollection({
+    outcome: remote.outcome,
+    remotePosts: remote.posts,
+    localPosts: localBlogPosts,
+    reason: remote.reason,
+  });
 
-  for (const post of remotePosts) {
-    postsBySlug.set(post.slug, post);
+  // Critério 1 do ROO-1116: a falha precisa deixar sinal. `console.error`
+  // (não `warn`) porque é isto que a coleta de log do runtime trata como
+  // incidente — o `console.warn` antigo se perdia no ruído.
+  if (collection.status.source === "fallback") {
+    console.error("[ROO-1116] Blog caiu para os posts locais", {
+      reason: remote.reason,
+      detail: remote.detail,
+      servedPostCount: collection.status.servedPostCount,
+    });
+  } else if (collection.status.source === "unconfigured") {
+    // Normal na máquina de quem desenvolve, erro de configuração em qualquer
+    // ambiente publicado. Por isso `warn`, e por isso `/api/blog/status`
+    // reporta o estado separado em vez de dizer só "degradado".
+    console.warn("[ROO-1116] Blog sem Supabase configurado; servindo só a semente local");
+  } else if (collection.status.source === "empty") {
+    // A consulta respondeu e disse que não há artigo publicado. Não é falha,
+    // mas em produção é anormal o bastante para merecer registro.
+    console.warn("[ROO-1116] Supabase respondeu sem nenhum artigo publicado");
   }
 
-  const posts = Array.from(postsBySlug.values());
+  return collection;
+});
 
-  return posts
-    .filter((post) => post.status === "published")
-    .sort((a, b) => {
-      const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
-      const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-      return dateB - dateA;
-    });
+async function allPosts() {
+  return (await loadBlog()).posts;
+}
+
+/**
+ * Critério 2 do ROO-1116: dá para responder "o blog está servindo dado fresco
+ * ou fallback?" sem abrir o código. Serve `/api/blog/status` e as telas.
+ */
+export async function getBlogSourceStatus(): Promise<BlogSourceStatus> {
+  return (await loadBlog()).status;
+}
+
+export async function getBlogCollection(): Promise<BlogCollection> {
+  return loadBlog();
 }
 
 export async function getPublishedPosts(options: BlogListOptions = {}) {
@@ -147,9 +219,25 @@ export async function getAllPublishedPosts() {
   return allPosts();
 }
 
-export async function getPostBySlug(slug: string) {
-  const posts = await allPosts();
-  return posts.find((post) => post.slug === slug) || null;
+/**
+ * Procura um artigo pelo slug e devolve, junto, o que fazer se ele não vier.
+ *
+ * Substituiu o antigo `getPostBySlug`, que devolvia só `BlogPost | null`. Com
+ * aquela assinatura era impossível para quem chamava distinguir "esse artigo
+ * não existe" de "não consegui perguntar" — e as duas viravam o mesmo 404.
+ * A regra em si mora em `resolveMissingSlugBehavior`, com a justificativa.
+ */
+export async function findPostBySlug(slug: string): Promise<{
+  post: BlogPost | null;
+  status: BlogSourceStatus;
+  missingBehavior: MissingSlugBehavior;
+}> {
+  const { posts, status } = await loadBlog();
+  return {
+    post: posts.find((post) => post.slug === slug) || null,
+    status,
+    missingBehavior: resolveMissingSlugBehavior(status),
+  };
 }
 
 export async function getRelatedPosts(post: BlogPost, limit = 3) {

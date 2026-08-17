@@ -6,9 +6,10 @@ import BlogCard from "@/components/blog/BlogCard";
 import DataSources from "@/components/blog/DataSources";
 import FaqSection from "@/components/blog/FaqSection";
 import MarkdownContent from "@/components/blog/MarkdownContent";
+import type { BlogPost } from "@/lib/blog-types";
 import {
+  findPostBySlug,
   getAllPublishedPosts,
-  getPostBySlug,
   getRelatedPosts,
   markdownToPlainText,
   postUrl,
@@ -29,8 +30,20 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug);
-  if (!post) return {};
+  const { post, missingBehavior } = await findPostBySlug(params.slug);
+  if (!post) {
+    // ROO-1116: com a origem caída servimos uma página que explica, em vez de
+    // 404. Ela não pode ser indexada no lugar do artigo real — daí o noindex.
+    // Quando a origem volta, a revalidação de 60s troca esta página pelo
+    // artigo (ou por um 404 legítimo) sem intervenção.
+    if (missingBehavior === "temporarily-unavailable") {
+      return {
+        title: "Artigo temporariamente indisponível | Blog Rook",
+        robots: { index: false, follow: false },
+      };
+    }
+    return {};
+  }
 
   const canonical = post.canonicalUrl || postUrl(post);
   const title = post.seoTitle || post.title;
@@ -60,7 +73,39 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   };
 }
 
-function jsonLd(post: Awaited<ReturnType<typeof getPostBySlug>>) {
+/**
+ * Página servida quando o slug não foi encontrado E a origem dos artigos está
+ * fora do ar. Não é um 404 disfarçado: ela não afirma que o artigo não existe,
+ * porque nesse estado nós não sabemos. Diz o que sabemos e oferece a saída.
+ */
+function ArtigoIndisponivel() {
+  return (
+    <article className="py-20">
+      <div className="max-w-3xl mx-auto px-6">
+        <Link href="/blog/" className="text-sm text-terracota hover:text-ocre">
+          ← Voltar ao blog
+        </Link>
+
+        <div className="card mt-8 p-8">
+          <p className="section-label mb-4">— Indisponível no momento</p>
+          <h1 className="text-3xl font-bold leading-tight text-cream mb-4">
+            Não conseguimos carregar este artigo agora.
+          </h1>
+          <p className="text-muted leading-relaxed mb-6">
+            A falha é nossa, não do endereço que você acessou. Tente de novo em alguns minutos —
+            se o artigo estiver publicado, ele volta sozinho. Enquanto isso, os outros artigos do
+            blog continuam disponíveis.
+          </p>
+          <Link href="/blog/" className="btn-ghost">
+            Ver todos os artigos
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function jsonLd(post: BlogPost | null) {
   if (!post) return [];
   const url = post.canonicalUrl || postUrl(post);
   const image = post.coverImageUrl?.startsWith("http") ? post.coverImageUrl : `${siteUrl}${post.coverImageUrl || "/og-image-default.png"}`;
@@ -128,8 +173,17 @@ function jsonLd(post: Awaited<ReturnType<typeof getPostBySlug>>) {
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const post = await getPostBySlug(params.slug);
-  if (!post) notFound();
+  const { post, missingBehavior } = await findPostBySlug(params.slug);
+
+  if (!post) {
+    // ROO-1116 — o slug não apareceu. O que isso significa depende de a
+    // consulta ter respondido ou não; a regra e a justificativa estão em
+    // `resolveMissingSlugBehavior` (src/lib/blog-source.mjs).
+    if (missingBehavior === "temporarily-unavailable") {
+      return <ArtigoIndisponivel />;
+    }
+    notFound();
+  }
 
   const relatedPosts = await getRelatedPosts(post);
   const jsonLdItems = jsonLd(post);
