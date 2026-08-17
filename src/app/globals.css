@@ -2,7 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+/*
+ * AQUI HAVIA UM @import DE GOOGLE FONTS. ELE NUNCA FUNCIONOU. (ROO-1124)
+ *
+ * A linha era:
+ *   @import url('https://fonts.googleapis.com/css2?family=Manrope:...');
+ *
+ * Escrita depois das diretivas `@tailwind`, que o Tailwind expande no lugar,
+ * ela terminava no CSS publicado no byte 27.445 de 32.436 — depois de milhares
+ * de regras. A especificação do CSS manda o navegador ignorar `@import` que não
+ * venha antes de qualquer regra, e é o que acontece.
+ *
+ * Verificado no Chrome contra www.rook.com.br em 17/08/2026: ZERO requisições a
+ * fonts.googleapis.com e fonts.gstatic.com, `document.fonts` vazio. O site
+ * inteiro sempre renderizou na fonte do sistema — Manrope e JetBrains Mono
+ * nunca chegaram a nenhum visitante. A linha só ocupava espaço no bundle.
+ *
+ * ⚠️ NÃO "conserte" movendo o @import para o topo do arquivo. Isso faria a
+ * fonte carregar, sim — e colocaria DOIS hosts de terceiro
+ * (fonts.googleapis.com e depois fonts.gstatic.com) no caminho crítico da
+ * primeira pintura no celular, em cadeia: HTML → CSS → CSS do Google → arquivo
+ * da fonte. É exatamente o problema que a ROO-1124 foi aberta para resolver.
+ *
+ * O caminho certo é `next/font/google`, que baixa a fonte no build e a serve do
+ * nosso próprio domínio, com preload e sem host novo. Isso MUDA a aparência do
+ * site inteiro (hoje ele é system-ui), então é decisão de produto/design, não
+ * de performance. Está registrado como recomendação em
+ * docs/performance-lp-roo1124.md. A guarda está em tests/performance-lp.test.mjs.
+ */
 
 /*
  * A paleta do redesenho v4 vale para o site inteiro.
@@ -26,7 +53,9 @@
     --color-text-muted: #5a6675;
     --color-border: rgba(16, 21, 28, 0.1);
     --color-cream: #10151c;
-    --color-section-label: rgba(16, 21, 28, 0.55);
+    /* 0.55 dava 4,00:1 sobre o fundo claro e 4,07:1 sobre o cartão — abaixo do
+       piso de 4,5:1 para texto de 11px. Em 0.62 mede 5,03:1 e 5,12:1. */
+    --color-section-label: rgba(16, 21, 28, 0.62);
     --color-header-bg: rgba(247, 248, 250, 0.92);
     --color-btn-ghost-border: rgba(16, 21, 28, 0.15);
     --color-btn-ghost-text: rgba(16, 21, 28, 0.75);
@@ -39,6 +68,27 @@
     --lp-muted: var(--color-text-muted);
     --lp-line: var(--color-border);
     --lp-accent: #2e7d32;
+
+    /*
+     * Duas faces do terracota, porque uma cor de marca não resolve os dois
+     * papéis de acessibilidade ao mesmo tempo.
+     *
+     * O terracota da marca (#e54c00) continua sendo a cor das manchetes: como
+     * texto grande o piso é 3:1 e ele mede 3,68:1 sobre o fundo claro. Passa.
+     *
+     * Onde ele NÃO passa é nos dois papéis abaixo, medidos com o site rodando:
+     *
+     *   branco sobre #e54c00 ............ 3,91:1  (piso 4,5 — botão primário)
+     *   #e54c00 como texto de 14px ...... 3,45:1  (piso 4,5 — sobre o elevado)
+     *
+     * `--color-cta` é o terracota escurecido o bastante para carregar texto
+     * branco (5,19:1). Vale nos dois temas: é fundo sólido, não depende da
+     * página. `--color-terracota-text` é o terracota legível como texto miúdo,
+     * e este precisa inverter por tema — escurecer no claro, clarear no
+     * escuro —, exatamente como `--lp-accent` já faz.
+     */
+    --color-cta: #c24100;
+    --color-terracota-text: #c24100;
   }
 
   .dark {
@@ -56,6 +106,11 @@
     --color-btn-ghost-hover-bg: rgba(255, 255, 255, 0.05);
 
     --lp-accent: #4caf50;
+
+    /* No escuro o terracota da marca mede 3,32:1 como texto sobre a superfície
+       elevada. Clareado, mede 5,32:1 na pior superfície do tema. O `--color-cta`
+       não muda: é fundo sólido com texto branco em cima. */
+    --color-terracota-text: #ff8345;
   }
 
   html { scroll-behavior: smooth; }
@@ -132,8 +187,14 @@
   }
 
   /* Buttons */
+  /*
+   * O fundo vem de `--color-cta`, não do terracota da marca: com #e54c00 o
+   * rótulo branco media 3,91:1 e reprovava o piso de 4,5:1 para texto de 15px.
+   * É o "Testar por 7 dias" do cabeçalho, presente em todas as páginas.
+   */
   .btn-primary {
-    @apply inline-flex items-center justify-center px-7 py-3.5 bg-terracota text-white font-semibold text-[15px] rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5;
+    @apply inline-flex items-center justify-center px-7 py-3.5 text-white font-semibold text-[15px] rounded-lg transition-all hover:brightness-110 hover:-translate-y-0.5;
+    background-color: var(--color-cta);
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center px-5 py-3 font-medium text-[15px] rounded-lg transition-all;

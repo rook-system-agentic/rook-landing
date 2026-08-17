@@ -128,7 +128,12 @@ test("página usa checkout direto em Knight/Rook e reserva o CRM para Chess", as
   ]);
 
   assert.match(source, /getLandingBillingCatalog/);
-  assert.match(source, /https:\/\/www\.rook\.com\.br\/planos\//);
+  // ROO-1125: a URL canônica de /planos deixou de ser string literal aqui e
+  // passou a sair de `siteUrl()`. A garantia não sumiu — ficou mais forte:
+  // `tests/canonical-origin.test.mjs` prova que a origem tem www e que NENHUMA
+  // página escreve origem própria, e não só esta.
+  assert.match(source, /canonical: siteUrl\("\/planos\/"\)/);
+  assert.match(source, /from "@\/lib\/site-origin"/);
   assert.match(experience, /href=\{buildDirectCheckoutHref\(selected\.productCode\)\}/);
   assert.match(experience, />\s*Testar por 7 dias\s*<\/a>/);
   assert.doesNotMatch(experience, /interest=\{selected\.productCode/);

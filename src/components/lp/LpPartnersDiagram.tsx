@@ -137,9 +137,15 @@ export default function LpPartnersDiagram({ className = "" }: { className?: stri
           strokeWidth="1.5"
           filter="url(#lp-sombra-nucleo)"
         />
+        {/*
+          ROO-1124: as duas artes são .webp de 192px. `<image>` dentro de SVG
+          baixa as DUAS sempre — o `display:none` do tema esconde uma, não
+          impede o download. Em PNG isso custava 58 KB por visita para desenhar
+          um ícone de ~33px na tela do celular; em WebP custa 6,7 KB.
+        */}
         <image
           className="lp-marca-clara"
-          href="/brand/rook-icon.png"
+          href="/brand/rook-icon.webp"
           x={NUCLEO_X - 29}
           y={EIXO_Y - 30}
           width="58"
@@ -147,7 +153,7 @@ export default function LpPartnersDiagram({ className = "" }: { className?: stri
         />
         <image
           className="lp-marca-escura"
-          href="/brand/rook-icon-branco.png"
+          href="/brand/rook-icon-branco.webp"
           x={NUCLEO_X - 29}
           y={EIXO_Y - 30}
           width="58"

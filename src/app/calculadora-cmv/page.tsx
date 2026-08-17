@@ -1,6 +1,7 @@
 import { CmvCalculator } from "@/components/CmvCalculator";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { siteUrl } from "@/lib/site-origin";
 
 export const metadata: Metadata = {
   title: "Calculadora de CMV Grátis para Restaurante | Rook System",
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
     "sistema de gestão para restaurante",
   ],
   alternates: {
-    canonical: "https://rook.com.br/calculadora-cmv/",
+    canonical: siteUrl("/calculadora-cmv/"),
   },
 };
 

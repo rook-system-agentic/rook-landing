@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Button, Heading, Hr, Section, Text } from "@react-email/components";
 import { EmailLayout, styles } from "./components/Layout";
+import { siteUrl } from "@/lib/site-origin";
 
 export type WelcomeEmailProps = {
   name?: string | null;
@@ -11,7 +12,7 @@ export type WelcomeEmailProps = {
 /** ROO-139 · Bloco 2 — e-mail de boas-vindas (disparado no signup). */
 export function WelcomeEmail({
   name,
-  ctaUrl = "https://rooksystem.com.br/blog",
+  ctaUrl = siteUrl("/blog/"),
   unsubscribeUrl,
 }: WelcomeEmailProps) {
   const firstName = name?.trim().split(/\s+/)[0];

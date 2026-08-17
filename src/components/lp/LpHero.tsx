@@ -44,7 +44,9 @@ export default function LpHero() {
             <p className="lp-body mb-5">
               <Rich paragraph={HERO_PARAGRAPH} />
             </p>
-            <p className="font-mono text-xs" style={{ color: "var(--lp-muted)", opacity: 0.7 }}>
+            {/* Sem `opacity`: a linha de fontes media 2,97:1 no claro e 3,85:1
+                no escuro com 0.7. O cinza cru mede 5,50:1 e 6,47:1. */}
+            <p className="font-mono text-xs" style={{ color: "var(--lp-muted)" }}>
               {HERO.sourcesLine}
             </p>
           </div>
@@ -77,7 +79,7 @@ export default function LpHero() {
                     </p>
                     <p
                       className="mt-0.5 font-mono text-[10px] uppercase tracking-wider"
-                      style={{ color: "var(--lp-muted)", opacity: 0.7 }}
+                      style={{ color: "var(--lp-muted)" }}
                     >
                       {s.source}
                     </p>

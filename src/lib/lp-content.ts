@@ -212,13 +212,21 @@ export interface Partner {
   h?: number;
 }
 
+/*
+ * ROO-1124: os logos de bitmap são .webp já reduzidos ao tamanho de tela (a
+ * placa exibe no máximo 116×36). Os .png originais continuam em
+ * `public/partners/` como fonte — se alguém precisar gerar outro tamanho,
+ * gera a partir deles, não do WebP. O `w`/`h` aqui é a dimensão real do
+ * arquivo servido, e é o que reserva o espaço antes da imagem chegar.
+ * Logo em SVG fica em SVG: escala sozinho e não tem o que reduzir.
+ */
 export const PARTNERS: readonly Partner[] = [
   { name: "Omie", categoria: "ERP", logo: "/partners/omie.png", w: 134, h: 46 },
   { name: "Conta Azul", categoria: "ERP", logo: "/partners/conta-azul.svg", w: 139, h: 18 },
   { name: "Saipos", categoria: "PDV", logo: "/partners/saipos.svg", w: 161, h: 51 },
-  { name: "iFood", categoria: "Delivery", logo: "/partners/ifood.png", w: 270, h: 270 },
-  { name: "Cardápio Web", categoria: "Delivery", logo: "/partners/cardapio-web.png", w: 810, h: 525 },
-  { name: "Stone", categoria: "Adquirente", logo: "/partners/stone.png", w: 152, h: 44 },
+  { name: "iFood", categoria: "Delivery", logo: "/partners/ifood.webp", w: 120, h: 120 },
+  { name: "Cardápio Web", categoria: "Delivery", logo: "/partners/cardapio-web.webp", w: 240, h: 156 },
+  { name: "Stone", categoria: "Adquirente", logo: "/partners/stone.webp", w: 152, h: 44 },
   // Sem arquivo: userede.com.br responde 302 e não entrega o SVG. Colocar em
   // public/partners/rede.svg e preencher `logo` faz o logo aparecer sozinho.
   { name: "Rede", categoria: "Adquirente", logo: null },

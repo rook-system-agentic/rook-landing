@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { track, TRACKING_EVENTS } from "@/lib/track";
 
 /* ─── Benchmark Data ─── */
 const segmentsData = [
@@ -151,6 +152,7 @@ export function DiagnosticoFlow() {
 
     setResult(resultData);
     setStep("result");
+    track(TRACKING_EVENTS.diagnostic, { ab_variant: abVariant });
     sendToSupabase(resultData, cmo);
   }
 
@@ -211,8 +213,8 @@ export function DiagnosticoFlow() {
       <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4" style={{ backgroundColor: "var(--color-header-bg)", backdropFilter: "blur(12px)" }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/">
-            <Image src="/brand/rook-logo-horizontal.png" alt="Rook System" width={98} height={32} className="hidden dark:block" />
-            <Image src="/brand/rook-logo-horizontal-light.png" alt="Rook System" width={94} height={32} className="dark:hidden" />
+            <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={98} height={32} className="hidden dark:block" />
+            <Image src="/brand/rook-logo-horizontal-light.webp" alt="Rook System" width={94} height={32} className="dark:hidden" />
           </Link>
           <span className="font-mono text-[10px] text-muted uppercase tracking-widest">Diagnóstico Gratuito</span>
         </div>

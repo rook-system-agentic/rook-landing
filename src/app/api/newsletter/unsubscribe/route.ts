@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isSupabaseAdminConfigured } from "@/lib/supabase-admin";
 import { unsubscribeLead } from "@/lib/newsletter";
+import { SITE_ORIGIN } from "@/lib/site-origin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,7 +32,7 @@ function page(title: string, message: string, status = 200) {
       <div class="logo">♜ Rook System</div>
       <h1>${title}</h1>
       <p>${message}</p>
-      <p><a href="https://rooksystem.com.br">Voltar ao site</a></p>
+      <p><a href="${SITE_ORIGIN}">Voltar ao site</a></p>
     </div>
   </body>
 </html>`;

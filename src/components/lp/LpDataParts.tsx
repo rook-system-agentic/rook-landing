@@ -121,7 +121,12 @@ export function CmvBar() {
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between">
-        <span className="font-mono text-lg font-semibold" style={{ color: TERRACOTA }}>
+        {/* `--color-terracota-text`, e não a constante TERRACOTA: este é o
+            único lugar do arquivo em que o terracota vira TEXTO. Com #e54c00 o
+            número media 3,68:1 no claro e 4,43:1 no escuro, abaixo do piso de
+            4,5:1 para 18px. As barras e o traço do gráfico seguem no terracota
+            da marca — são forma, não texto, e têm rótulo próprio no aria-label. */}
+        <span className="font-mono text-lg font-semibold" style={{ color: "var(--color-terracota-text)" }}>
           {num(real)}%
         </span>
         <span className="font-mono text-[11px]" style={{ color: "var(--lp-muted)" }}>

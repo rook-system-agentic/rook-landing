@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Button, Heading, Hr, Link, Section, Text } from "@react-email/components";
 import { EmailLayout, styles } from "./components/Layout";
+import { siteUrl } from "@/lib/site-origin";
 
 export type DigestItem = {
   title: string;
@@ -21,7 +22,7 @@ export function WeeklyDigestEmail({
   name,
   periodLabel,
   posts,
-  ctaUrl = "https://rooksystem.com.br/blog",
+  ctaUrl = siteUrl("/blog/"),
   unsubscribeUrl,
 }: WeeklyDigestEmailProps) {
   const firstName = name?.trim().split(/\s+/)[0];
