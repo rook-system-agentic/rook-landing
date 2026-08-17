@@ -13,7 +13,7 @@
     "test:billing": "node --test tests/billing-catalog.test.mjs",
     "test:blog": "node --test tests/blog-source.test.mjs",
     "test:commercial-leads": "node --test tests/commercial-leads.test.mjs",
-    "test:ci": "node --test tests/tracking-events.test.mjs"
+    "test:ci": "node scripts/run-ci-tests.mjs"
   },
   "dependencies": {
     "@react-email/components": "^1.0.12",
