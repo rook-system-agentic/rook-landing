@@ -1,12 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 
 interface RevealProps {
   children: ReactNode;
   /** Atraso da entrada, em ms. Use para escalonar irmãos. */
   delay?: number;
   className?: string;
+  /**
+   * Elemento a renderizar. `div` na maioria dos casos, `li` quando o Reveal é
+   * filho direto de `<ol>`/`<ul>`.
+   *
+   * Existe porque o wrapper não é neutro onde a lista é: um `<div>` entre o
+   * `<ol>` e o `<li>` quebra a lista para leitor de tela — os itens deixam de
+   * ser anunciados como "item 1 de 6" e o `<ol>` fica sem filhos válidos.
+   */
+  as?: "div" | "li";
 }
 
 /**
@@ -20,8 +29,8 @@ interface RevealProps {
  * Isso é deliberado: numa página de conversão, conteúdo que depende de um
  * gatilho para existir é conteúdo que às vezes não existe.
  */
-export default function Reveal({ children, delay = 0, className = "" }: RevealProps) {
-  const ref = useRef<HTMLDivElement>(null);
+export default function Reveal({ children, delay = 0, className = "", as: Tag = "div" }: RevealProps) {
+  const ref = useRef<HTMLElement>(null);
   const [seen, setSeen] = useState(false);
 
   useEffect(() => {
@@ -48,12 +57,12 @@ export default function Reveal({ children, delay = 0, className = "" }: RevealPr
   }, [seen]);
 
   return (
-    <div
-      ref={ref}
+    <Tag
+      ref={ref as RefObject<HTMLDivElement & HTMLLIElement>}
       className={`${seen ? "lp-in" : ""} ${className}`.trim()}
       style={seen && delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {children}
-    </div>
+    </Tag>
   );
 }
