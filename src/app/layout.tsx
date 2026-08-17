@@ -5,9 +5,10 @@ import Footer from "@/components/Footer";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import AppHandoffTracker from "@/components/AppHandoffTracker";
 import { Analytics } from "@vercel/analytics/react";
+import { siteUrl } from "@/lib/site-origin";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rook.com.br"),
+  metadataBase: new URL(siteUrl()),
   title: "Rook System — Inteligência Financeira e Gestão para Restaurantes",
   description:
     "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, ficha técnica automática, DRE em tempo real e análise preditiva de compras e vendas.",
@@ -24,12 +25,12 @@ export const metadata: Metadata = {
     "margem de lucro restaurante"
   ],
   alternates: {
-    canonical: "https://rook.com.br",
+    canonical: siteUrl(),
   },
   openGraph: {
     title: "Rook System — Inteligência Financeira e Gestão para Restaurantes",
     description: "Controle CMV, otimize compras e proteja a margem do seu restaurante com inteligência financeira.",
-    url: "https://rook.com.br",
+    url: siteUrl(),
     siteName: "Rook System",
     type: "website",
   },
@@ -41,7 +42,7 @@ const jsonLd = {
     {
       "@type": "SoftwareApplication",
       "name": "Rook System",
-      "url": "https://rook.com.br",
+      "url": siteUrl(),
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, iOS, Android",
       "offers": [
@@ -51,7 +52,7 @@ const jsonLd = {
           "price": "479.90",
           "priceCurrency": "BRL",
           "priceValidUntil": "2027-12-31",
-          "url": "https://rook.com.br/planos/",
+          "url": siteUrl("/planos/"),
           "description": "Plano para restaurantes com faturamento mensal de até R$ 250 mil. Acesso completo à plataforma. 7 dias de teste grátis."
         },
         {
@@ -60,7 +61,7 @@ const jsonLd = {
           "price": "779.90",
           "priceCurrency": "BRL",
           "priceValidUntil": "2027-12-31",
-          "url": "https://rook.com.br/planos/",
+          "url": siteUrl("/planos/"),
           "description": "Plano para restaurantes com faturamento mensal acima de R$ 250 mil. Acesso completo à plataforma. 7 dias de teste grátis."
         },
         {
@@ -69,7 +70,7 @@ const jsonLd = {
           "price": "279.90",
           "priceCurrency": "BRL",
           "priceValidUntil": "2027-12-31",
-          "url": "https://rook.com.br/planos/",
+          "url": siteUrl("/planos/"),
           "description": "Add-on organizacional para consolidação multiunidade (redes e franquias)."
         }
       ],
@@ -78,8 +79,8 @@ const jsonLd = {
     {
       "@type": "Organization",
       "name": "Rook System",
-      "url": "https://rook.com.br",
-      "logo": "https://rook.com.br/brand/rook-logo-horizontal-light.png"
+      "url": siteUrl(),
+      "logo": siteUrl("/brand/rook-logo-horizontal-light.png")
     },
     {
       "@type": "FAQPage",

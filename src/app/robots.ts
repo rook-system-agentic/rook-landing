@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/lib/site-origin";
 
 export default function robots(): MetadataRoute.Robots {
   // Homologação recusa todo robô. O cabeçalho X-Robots-Tag (next.config.mjs)
@@ -15,6 +16,6 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "PerplexityBot", allow: "/" },
       { userAgent: "Google-Extended", allow: "/" },
     ],
-    sitemap: "https://rook.com.br/sitemap.xml",
+    sitemap: siteUrl("/sitemap.xml"),
   };
 }

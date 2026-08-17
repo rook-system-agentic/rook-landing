@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DiagnosticoFlow } from "@/components/DiagnosticoFlow";
+import { siteUrl } from "@/lib/site-origin";
 
 export const metadata: Metadata = {
   title: "Diagnóstico Financeiro Gratuito para Restaurantes | Rook System",
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
     "quanto preciso faturar restaurante",
   ],
   alternates: {
-    canonical: "https://rook.com.br/diagnostico/",
+    canonical: siteUrl("/diagnostico/"),
   },
   openGraph: {
     title: "Diagnóstico Financeiro Gratuito | Rook System",

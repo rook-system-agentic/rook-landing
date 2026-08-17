@@ -3,6 +3,7 @@ import Link from "next/link";
 import NewsletterForm from "@/components/NewsletterForm";
 import BlogCard from "@/components/blog/BlogCard";
 import { getBlogCategories, getPublishedPosts } from "@/lib/blog";
+import { siteUrl } from "@/lib/site-origin";
 
 export const revalidate = 60;
 
@@ -11,9 +12,9 @@ export const metadata: Metadata = {
   description:
     "Artigos sobre CMV, DRE, compras, impostos e gestão financeira para restaurantes. Conteúdo editorial para transformar faturamento em lucro.",
   alternates: {
-    canonical: "https://rooksystem.com.br/blog/",
+    canonical: siteUrl("/blog/"),
     types: {
-      "application/rss+xml": "https://rooksystem.com.br/feed.xml",
+      "application/rss+xml": siteUrl("/feed.xml"),
     },
   },
 };
