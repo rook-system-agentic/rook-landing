@@ -11,6 +11,8 @@ import {
   Text,
 } from "@react-email/components";
 
+import { SITE_ORIGIN } from "@/lib/site-origin";
+
 /**
  * ROO-139 — paleta e shell compartilhados dos e-mails da newsletter.
  * Mantém a identidade de marca (marrom Rook + acento ocre) e um layout
@@ -174,8 +176,8 @@ export function EmailLayout({ preview, unsubscribeUrl, children }: EmailLayoutPr
                   Cancelar inscrição
                 </Link>{" "}
                 ·{" "}
-                <Link href="https://rooksystem.com.br" style={footerLink}>
-                  rooksystem.com.br
+                <Link href={SITE_ORIGIN} style={footerLink}>
+                  rook.com.br
                 </Link>
               </Text>
             ) : null}
