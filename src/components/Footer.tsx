@@ -2,6 +2,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { COMPANY_INFO } from "@/lib/company";
 
+/*
+ * Os três títulos de coluna são `<h2>`, não `<h4>`.
+ *
+ * O rodapé vive no layout, então ele fecha a hierarquia de TODA página. Como
+ * `<h4>`, ele criava um salto h2 → h4 em nove das dez rotas, e um salto
+ * h1 → h4 em /diagnostico, que não tem `<h2>` nenhum. Salto de nível é o que
+ * faz o leitor de tela anunciar uma subseção inexistente entre o conteúdo e o
+ * rodapé.
+ *
+ * O tamanho na tela não muda: as classes continuam as mesmas — quem define o
+ * corpo aqui é `text-sm`, não a tag.
+ */
 export default function Footer() {
   return (
     <footer className="border-t" style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-bg)" }}>
@@ -19,7 +31,7 @@ export default function Footer() {
 
         {/* Produto */}
         <div>
-          <h4 className="font-semibold text-cream text-sm mb-4">Produto</h4>
+          <h2 className="font-semibold text-cream text-sm mb-4">Produto</h2>
           <ul className="space-y-2.5 text-sm text-muted">
             <li><Link href="/funcionalidades/" className="hover:text-cream transition-colors">Funcionalidades</Link></li>
             <li><Link href="/calculadora-cmv/" className="hover:text-cream transition-colors">Calculadora CMV Grátis</Link></li>
@@ -31,7 +43,7 @@ export default function Footer() {
 
         {/* Empresa */}
         <div>
-          <h4 className="font-semibold text-cream text-sm mb-4">Empresa</h4>
+          <h2 className="font-semibold text-cream text-sm mb-4">Empresa</h2>
           <ul className="space-y-2.5 text-sm text-muted">
             <li><Link href="/sobre/" className="hover:text-cream transition-colors">Sobre o Rook</Link></li>
             <li><a href="https://app.rook.com.br/login" className="hover:text-cream transition-colors">Entrar</a></li>
@@ -41,7 +53,7 @@ export default function Footer() {
 
         {/* Legal */}
         <div>
-          <h4 className="font-semibold text-cream text-sm mb-4">Legal</h4>
+          <h2 className="font-semibold text-cream text-sm mb-4">Legal</h2>
           <ul className="space-y-2.5 text-sm text-muted">
             <li><Link href="/privacidade/" className="hover:text-cream transition-colors">Privacidade</Link></li>
             <li><Link href="/termos/" className="hover:text-cream transition-colors">Termos de Uso</Link></li>

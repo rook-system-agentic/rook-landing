@@ -62,9 +62,12 @@ export default function LpManifesto() {
                     <span aria-hidden="true" className="font-mono text-lg" style={{ color: "#e54c00" }}>
                       ≠
                     </span>
+                    {/* Fundo em `--color-cta`, não no terracota da marca: o
+                        rótulo branco de 14px media 3,91:1 sobre #e54c00 e passa
+                        a 5,19:1. Mesma correção do botão primário. */}
                     <span
                       className="flex-1 rounded-lg py-2 text-center text-sm font-semibold"
-                      style={{ backgroundColor: "#e54c00", color: "#ffffff" }}
+                      style={{ backgroundColor: "var(--color-cta)", color: "#ffffff" }}
                     >
                       {right}
                     </span>

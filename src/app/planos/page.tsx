@@ -10,6 +10,8 @@ import {
   getLandingBillingCatalog,
 } from "@/lib/billing-catalog-server";
 import { buildBillingCatalogViewModel } from "@/lib/public-billing-catalog.mjs";
+import { siteUrl } from "@/lib/site-origin";
+import { CONTACT_EMAIL } from "@/lib/lp-content";
 
 export const revalidate = BILLING_CATALOG_REVALIDATE_SECONDS;
 
@@ -17,12 +19,12 @@ export const metadata: Metadata = {
   title: "Planos Knight, Rook e Chess — Rook System",
   description:
     "Planos mensais do Rook System para restaurantes e grupos multiunidade, com 7 dias de utilização mediante cadastro do cartão.",
-  alternates: { canonical: "https://www.rook.com.br/planos/" },
+  alternates: { canonical: siteUrl("/planos/") },
   openGraph: {
     title: "Planos Knight, Rook e Chess — Rook System",
     description:
       "Acesso completo com enquadramento por faturamento e Chess para organizações multiunidade.",
-    url: "https://www.rook.com.br/planos/",
+    url: siteUrl("/planos/"),
     type: "website",
   },
 };
@@ -44,7 +46,7 @@ function CatalogUnavailable() {
           uma contratação.
         </p>
         <a
-          href="mailto:contato@rooksystem.com.br?subject=Cat%C3%A1logo%20de%20planos%20Rook"
+          href={`mailto:${CONTACT_EMAIL}?subject=Cat%C3%A1logo%20de%20planos%20Rook`}
           className="btn-ghost inline-flex"
         >
           Falar com a equipe comercial
@@ -77,7 +79,7 @@ export default async function PlanosPage() {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: "Planos mensais Rook System",
-    url: "https://www.rook.com.br/planos/",
+    url: siteUrl("/planos/"),
     itemListElement: catalogResult.catalog.offers.map((offer, index) => ({
       "@type": "ListItem",
       position: index + 1,
@@ -90,7 +92,7 @@ export default async function PlanosPage() {
           "@type": "Offer",
           priceCurrency: offer.currency,
           price: (offer.unitAmountCents / 100).toFixed(2),
-          url: "https://www.rook.com.br/planos/",
+          url: siteUrl("/planos/"),
         },
       },
     })),

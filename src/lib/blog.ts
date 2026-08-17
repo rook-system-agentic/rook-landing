@@ -12,9 +12,13 @@ import type { BlogDataSource, BlogFaq, BlogListOptions, BlogPost, BlogStatus } f
 
 export type { BlogSourceStatus, MissingSlugBehavior } from "@/lib/blog-source.mjs";
 
-const DEFAULT_SITE_URL = "https://rooksystem.com.br";
+// ROO-1125: a origem vinha daqui, com default no domínio ANTIGO
+// (`rooksystem.com.br`) — era a fonte das URLs de post no sitemap, e por isso
+// os 6 posts do blog apareciam no domínio errado. Agora deriva do módulo
+// canônico. Reexportado como `siteUrl` para não quebrar os consumidores.
+import { SITE_ORIGIN } from "@/lib/site-origin";
 
-export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, "");
+export const siteUrl = SITE_ORIGIN;
 
 type SupabaseBlogRow = {
   id: string;

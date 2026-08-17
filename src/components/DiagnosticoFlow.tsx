@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { track, TRACKING_EVENTS } from "@/lib/track";
 
 /* ─── Benchmark Data ─── */
 const segmentsData = [
@@ -151,6 +152,7 @@ export function DiagnosticoFlow() {
 
     setResult(resultData);
     setStep("result");
+    track(TRACKING_EVENTS.diagnostic, { ab_variant: abVariant });
     sendToSupabase(resultData, cmo);
   }
 
