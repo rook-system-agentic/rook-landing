@@ -213,10 +213,17 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
           {post.coverImageUrl && (
             <figure className="mt-10 overflow-hidden rounded-2xl border border-border bg-white/[0.03]">
+              {/* A capa é o maior elemento da primeira tela do artigo, então é
+                  ela que define o LCP. `fetchPriority="high"` tira a imagem da
+                  fila de prioridade baixa em que o navegador põe imagem por
+                  padrão. O espaço já é reservado pelo `aspect-[3/2]`, então
+                  isso não desloca nada (ROO-1124). */}
               <img
                 src={post.coverImageUrl}
                 alt={post.coverImageAlt || post.title}
                 className="aspect-[3/2] w-full object-cover"
+                fetchPriority="high"
+                decoding="async"
               />
             </figure>
           )}

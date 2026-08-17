@@ -2,7 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+/*
+ * AQUI HAVIA UM @import DE GOOGLE FONTS. ELE NUNCA FUNCIONOU. (ROO-1124)
+ *
+ * A linha era:
+ *   @import url('https://fonts.googleapis.com/css2?family=Manrope:...');
+ *
+ * Escrita depois das diretivas `@tailwind`, que o Tailwind expande no lugar,
+ * ela terminava no CSS publicado no byte 27.445 de 32.436 — depois de milhares
+ * de regras. A especificação do CSS manda o navegador ignorar `@import` que não
+ * venha antes de qualquer regra, e é o que acontece.
+ *
+ * Verificado no Chrome contra www.rook.com.br em 17/08/2026: ZERO requisições a
+ * fonts.googleapis.com e fonts.gstatic.com, `document.fonts` vazio. O site
+ * inteiro sempre renderizou na fonte do sistema — Manrope e JetBrains Mono
+ * nunca chegaram a nenhum visitante. A linha só ocupava espaço no bundle.
+ *
+ * ⚠️ NÃO "conserte" movendo o @import para o topo do arquivo. Isso faria a
+ * fonte carregar, sim — e colocaria DOIS hosts de terceiro
+ * (fonts.googleapis.com e depois fonts.gstatic.com) no caminho crítico da
+ * primeira pintura no celular, em cadeia: HTML → CSS → CSS do Google → arquivo
+ * da fonte. É exatamente o problema que a ROO-1124 foi aberta para resolver.
+ *
+ * O caminho certo é `next/font/google`, que baixa a fonte no build e a serve do
+ * nosso próprio domínio, com preload e sem host novo. Isso MUDA a aparência do
+ * site inteiro (hoje ele é system-ui), então é decisão de produto/design, não
+ * de performance. Está registrado como recomendação em
+ * docs/performance-lp-roo1124.md. A guarda está em tests/performance-lp.test.mjs.
+ */
 
 /*
  * A paleta do redesenho v4 vale para o site inteiro.
