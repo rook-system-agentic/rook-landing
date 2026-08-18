@@ -25,7 +25,7 @@ export default function Footer() {
             <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={144} height={47} className="h-10 w-auto hidden dark:block" />
           </Link>
           <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
-            Inteligência Financeira para Food Service.
+            Software de inteligência financeira para food service. Coleta, interpreta e aponta a próxima decisão do gestor — em reais.
           </p>
         </div>
 
@@ -33,21 +33,21 @@ export default function Footer() {
         <div>
           <h2 className="font-semibold text-cream text-sm mb-4">Produto</h2>
           <ul className="space-y-2.5 text-sm text-muted">
-            <li><Link href="/funcionalidades/" className="hover:text-cream transition-colors">Funcionalidades</Link></li>
-            <li><Link href="/calculadora-cmv/" className="hover:text-cream transition-colors">Calculadora CMV Grátis</Link></li>
-            <li><Link href="/diagnostico/" className="hover:text-cream transition-colors">Diagnóstico Financeiro</Link></li>
-            <li><Link href="/planos/" className="hover:text-cream transition-colors">Planos</Link></li>
-            <li><Link href="/blog/" className="hover:text-cream transition-colors">Blog</Link></li>
+            <li><Link href="/diagnostico/" className="hover:text-cream transition-colors">Diagnóstico</Link></li>
+            <li><Link href="/calculadora-cmv/" className="hover:text-cream transition-colors">Calculadora de CMV</Link></li>
+            <li><Link href="/planos/" className="hover:text-cream transition-colors">Planos e teste</Link></li>
+            <li><Link href="/sobre/" className="hover:text-cream transition-colors">Sobre o Rook</Link></li>
           </ul>
         </div>
 
-        {/* Empresa */}
+        {/* Conteúdo */}
         <div>
-          <h2 className="font-semibold text-cream text-sm mb-4">Empresa</h2>
+          <h2 className="font-semibold text-cream text-sm mb-4">Conteúdo</h2>
           <ul className="space-y-2.5 text-sm text-muted">
-            <li><Link href="/sobre/" className="hover:text-cream transition-colors">Sobre o Rook</Link></li>
-            <li><a href="https://app.rook.com.br/login" className="hover:text-cream transition-colors">Entrar</a></li>
-            <li><a href="mailto:contato@rook.com.br" className="hover:text-cream transition-colors">Contato</a></li>
+            <li><Link href="/restaurantes/" className="hover:text-cream transition-colors">Restaurantes</Link></li>
+            <li><Link href="/setores/" className="hover:text-cream transition-colors">Setores</Link></li>
+            <li><Link href="/blog/" className="hover:text-cream transition-colors">Blog</Link></li>
+            <li><a href="mailto:contato@rook.com.br" className="hover:text-cream transition-colors">contato@rook.com.br</a></li>
           </ul>
         </div>
 
