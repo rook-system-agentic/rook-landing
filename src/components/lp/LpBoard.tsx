@@ -108,48 +108,55 @@ export default function LpBoard() {
             {BOARD.headlinePlain}
             <span style={{ color: "#e54c00" }}>{BOARD.headlineEmphasis}</span>
           </h2>
-          <p className="lp-body mb-2">
-            <strong className="lp-strong">{BOARD.sub}</strong>
-          </p>
           <p className="lp-body">{BOARD.intro}</p>
         </div>
 
-        <div role="tablist" aria-label="Etapas do tabuleiro" className="mb-6 flex flex-wrap gap-2">
-          {BOARD_TABS.map((t) => (
-            <button
-              key={t.id}
-              role="tab"
-              id={`board-tab-${t.id}`}
-              aria-selected={active === t.id}
-              aria-controls={`board-panel-${t.id}`}
-              onClick={() => setActive(t.id)}
-              className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-              style={
-                active === t.id
-                  ? { backgroundColor: "var(--color-cta)", color: "#ffffff" }
-                  : { backgroundColor: "var(--lp-elevated)", color: "var(--lp-muted)" }
-              }
-            >
-              {t.tab}
-            </button>
-          ))}
-        </div>
-
-        {BOARD_TABS.map((t) => (
+        {/* Abas verticais no desktop, como no preview; no celular viram pills
+            que quebram linha. */}
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
           <div
-            key={t.id}
-            role="tabpanel"
-            id={`board-panel-${t.id}`}
-            aria-labelledby={`board-tab-${t.id}`}
-            hidden={active !== t.id}
-            className="lp-card p-6"
+            role="tablist"
+            aria-label="Etapas do tabuleiro"
+            className="flex flex-wrap gap-2 lg:col-span-3 lg:flex-col"
           >
-            <p className="mb-4 text-sm" style={{ color: "var(--lp-muted)" }}>
-              {t.sub}
-            </p>
-            <Panel id={t.id} />
+            {BOARD_TABS.map((t) => (
+              <button
+                key={t.id}
+                role="tab"
+                id={`board-tab-${t.id}`}
+                aria-selected={active === t.id}
+                aria-controls={`board-panel-${t.id}`}
+                onClick={() => setActive(t.id)}
+                className="rounded-lg px-4 py-2.5 text-left text-sm font-semibold transition-colors lg:w-full"
+                style={
+                  active === t.id
+                    ? { backgroundColor: "var(--color-cta)", color: "#ffffff" }
+                    : { backgroundColor: "var(--lp-elevated)", color: "var(--lp-muted)" }
+                }
+              >
+                {t.tab}
+              </button>
+            ))}
           </div>
-        ))}
+
+          <div className="lg:col-span-9">
+            {BOARD_TABS.map((t) => (
+              <div
+                key={t.id}
+                role="tabpanel"
+                id={`board-panel-${t.id}`}
+                aria-labelledby={`board-tab-${t.id}`}
+                hidden={active !== t.id}
+                className="lp-card h-full p-6"
+              >
+                <p className="mb-4 text-sm" style={{ color: "var(--lp-muted)" }}>
+                  {t.sub}
+                </p>
+                <Panel id={t.id} />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

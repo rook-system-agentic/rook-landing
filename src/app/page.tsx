@@ -1,5 +1,4 @@
 import LpHero from "@/components/lp/LpHero";
-import LpShowcase from "@/components/lp/LpShowcase";
 import LpMethod from "@/components/lp/LpMethod";
 import LpSources from "@/components/lp/LpSources";
 import LpManifesto from "@/components/lp/LpManifesto";
@@ -35,7 +34,6 @@ export default function HomePage() {
           invisível onde o navegador não tem timeline de scroll no CSS. */}
       <div className="lp-progress" aria-hidden="true" />
       <LpHero />
-      <LpShowcase />
       <LpMethod />
       <LpSources />
       <LpManifesto />

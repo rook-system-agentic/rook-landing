@@ -68,6 +68,9 @@
     --lp-muted: var(--color-text-muted);
     --lp-line: var(--color-border);
     --lp-accent: #2e7d32;
+    /* v5.1: faixa alternada entre seções da home — branca sobre o fundo
+       cinza-claro, como no preview aprovado. */
+    --lp-band: #ffffff;
 
     /*
      * Duas faces do terracota, porque uma cor de marca não resolve os dois
@@ -106,6 +109,7 @@
     --color-btn-ghost-hover-bg: rgba(255, 255, 255, 0.05);
 
     --lp-accent: #4caf50;
+    --lp-band: #18212c;
 
     /* No escuro o terracota da marca mede 3,32:1 como texto sobre a superfície
        elevada. Clareado, mede 5,32:1 na pior superfície do tema. O `--color-cta`
@@ -619,5 +623,39 @@
     .lp-diagram-core {
       animation: none;
     }
+  }
+}
+
+/*
+ * v5.1 — faixa alternada da home (preview do Gabriel). A classe existe para a
+ * seção declarar "sou faixa branca" sem carregar mais um style inline; o tom
+ * por tema vive no token --lp-band, junto dos outros.
+ */
+@layer components {
+  .lp-band {
+    background-color: var(--lp-band);
+  }
+}
+
+/*
+ * v5.1 — rodapé escuro nos dois temas, como no preview. As cores dos links
+ * vivem aqui (e não em utilitários no JSX) porque o hover não existe em style
+ * inline. #9fb0bf sobre #0c1117 mede ~7:1.
+ */
+@layer components {
+  .footer-dark {
+    background-color: #0c1117;
+    color: #9fb0bf;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .footer-dark h2 {
+    color: #eef3f8;
+  }
+  .footer-dark a {
+    color: #9fb0bf;
+    transition: color 0.15s ease;
+  }
+  .footer-dark a:hover {
+    color: #ffffff;
   }
 }

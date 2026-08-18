@@ -15,8 +15,10 @@ import { FAQ, FAQ_ITEMS, CONTACT_EMAIL } from "@/lib/lp-content";
 export default function LpFaq() {
   return (
     <section className="py-20 lg:py-28" style={{ borderTop: "1px solid var(--lp-line)" }}>
-      <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[1fr_2fr]">
-        <div>
+      {/* v5.1: título em cima e acordeão em largura inteira, como no preview —
+          o layout de duas colunas espremia as respostas. */}
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mb-10 max-w-3xl">
           <p className="lp-label mb-4">{FAQ.label}</p>
           <h2
             className="mb-4 font-display font-extrabold"
@@ -30,10 +32,16 @@ export default function LpFaq() {
             {FAQ.headlinePlain}
             <span style={{ color: "#e54c00" }}>{FAQ.headlineEmphasis}</span>
           </h2>
-          <p className="lp-body mb-6">{FAQ.intro}</p>
-          <a href={`mailto:${CONTACT_EMAIL}`} className="btn-ghost text-sm">
-            {FAQ.ctaLabel}
-          </a>
+          <p className="lp-body mb-6">
+            {FAQ.intro}{" "}
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="underline underline-offset-4"
+              style={{ color: "var(--lp-accent)" }}
+            >
+              {FAQ.ctaLabel}
+            </a>
+          </p>
         </div>
 
         <div className="space-y-3">
