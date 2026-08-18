@@ -1,16 +1,18 @@
 import { EXEMPLO_DRE } from "@/lib/lp-content";
 
 /**
- * As peças de interface que aparecem dentro dos módulos do hero.
+ * As peças de interface da home: a vitrine "Tabuleiro · Casa exemplo"
+ * (LpShowcase) e os painéis do tabuleiro em abas (LpBoard) montam seus cards
+ * com estes gráficos.
  *
  * São SVG e divs estáticos de propósito: nenhuma depende de JavaScript para
  * existir na tela, então a página serve renderizada e o buscador vê o mesmo
  * que o visitante.
  *
- * NÚMEROS: os quatro gráficos e o funil descrevem o MESMO restaurante no MESMO
- * período, e tudo é derivado de `EXEMPLO_DRE`. Nada aqui é digitado à mão — se
- * um percentual mudar lá, os valores em reais e o texto de apoio acompanham.
- * É o que impede a página de dizer duas coisas sobre o mesmo dinheiro.
+ * NÚMEROS: os gráficos descrevem o MESMO restaurante no MESMO período, e tudo
+ * é derivado de `EXEMPLO_DRE`. Nada aqui é digitado à mão — se um percentual
+ * mudar lá, os valores em reais e o texto de apoio acompanham. É o que impede
+ * a página de dizer duas coisas sobre o mesmo dinheiro.
  *
  * Validado por Daniel em 13/08/2026 como reconhecível para a operação. Ainda é
  * exemplo, não é cliente.
@@ -255,5 +257,3 @@ export function DreLines() {
     </div>
   );
 }
-
-export const MODULE_VISUALS = [Sparkline, CmvBar, ExpenseBars, DreLines];

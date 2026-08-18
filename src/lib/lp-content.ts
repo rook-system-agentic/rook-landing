@@ -1,13 +1,13 @@
 /**
  * Conteúdo da home.
  *
- * Existe como fonte única porque o redesenho v4 divide a página em seis
- * componentes: sem isto, o texto se espalharia por seis arquivos e a próxima
- * alteração de copy passaria a ser uma caça.
+ * Existe como fonte única porque o redesenho divide a página em componentes:
+ * sem isto, o texto se espalharia por muitos arquivos e a próxima alteração
+ * de copy passaria a ser uma caça.
  *
- * O texto é o mesmo da home anterior, palavra por palavra. A única alteração
- * autorizada foi o e-mail de contato, que estava como contato@rooksystem.com.br
- * (autorizado por Daniel em 13/08/2026).
+ * v5 (18/08/2026): copy e disposição alinhados ao preview aprovado com Daniel
+ * (plaza-flora-cinder-sky.grok.me). O texto do preview é a fonte de verdade;
+ * os números do restaurante-exemplo continuam derivando de EXEMPLO_DRE.
  */
 
 export const CONTACT_EMAIL = "contato@rook.com.br";
@@ -24,23 +24,97 @@ export type Paragraph = readonly Segment[];
 /* ─── Hero ─── */
 
 export const HERO = {
-  label: "— Sistema de Inteligência Financeira e Gestão para Restaurantes",
-  headlinePlain: "Faturar não é ",
-  headlineEmphasis: "lucrar.",
-  sourcesLine: "Setor: Abrasel, 2025 · Mortalidade: IBGE, empresas brasileiras, 2024",
+  headlinePlain: "Inteligência financeira para ",
+  headlineEmphasis: "food service",
+  sub: "Faturar não é lucrar.",
+  primaryLabel: "Ver o diagnóstico do meu restaurante",
+  primaryHref: "/diagnostico/",
+  secondaryLabel: "Testar 7 dias",
+  secondaryHref: "/planos/",
 } as const;
 
 export const HERO_PARAGRAPH: Paragraph = [
-  { text: "Num setor que movimenta " },
-  { text: "R$ 495 bilhões por ano", strong: true },
-  {
-    text: ", aproximadamente 60% dos bares e restaurantes não geram lucro. O que separa as empresas que sobrevivem das que lucram e prosperam é a gestão pelos números corretos. ",
-  },
-  {
-    text: "O Rook é a inteligência financeira que te apoia na coleta, análise e interpretação desses dados.",
-    strong: true,
-  },
+  { text: "Num setor de " },
+  { text: "R$ 495 bilhões", strong: true },
+  { text: ", 6 em cada 10 casas não lucram. O Rook lê a operação, interpreta as seis etapas e aponta, " },
+  { text: "em reais", strong: true },
+  { text: ", a próxima decisão." },
 ];
+
+/* ─── Tabuleiro · Casa exemplo (a vitrine sob o hero) ─── */
+
+export const SHOWCASE = {
+  label: "Tabuleiro · Casa exemplo",
+  live: "Ao vivo",
+  vendas: "Vendas",
+  cmv: "Compras · CMV",
+  resultado: "Resultado do mês",
+} as const;
+
+/* ─── O método ─── */
+
+export const METHOD = {
+  label: "— O método",
+  headlinePlain: "Coleta. Interpreta. ",
+  headlineEmphasis: "Decide.",
+  intro: "Autoridade de quem vive controladoria há duas décadas — agora na tela, todo dia.",
+  cards: [
+    {
+      step: "Coleta",
+      title: "Lê o que a casa já produz",
+      desc: "PDV, ERP, Open Finance, SEFAZ, eSocial e adquirentes entram no mesmo tabuleiro — sem recadastrar a operação.",
+    },
+    {
+      step: "Interpretação",
+      title: "Seis etapas, um diagnóstico",
+      desc: "Vendas, impostos, custos, despesas, dívidas e resultado. Em cada uma, o Rook mostra onde a margem escapa.",
+    },
+    {
+      step: "Decisão",
+      title: "Recomendação em reais",
+      desc: "Não é um painel para contemplar. É a próxima decisão do gestor, com impacto em R$ e acompanhamento no WhatsApp.",
+    },
+  ],
+} as const;
+
+/* ─── De onde vêm os números ─── */
+
+export const DATA_SOURCES = {
+  label: "— De onde vêm os números",
+  headlinePlain: "De onde vêm os ",
+  headlineEmphasis: "números.",
+  sub: "Não é só o sistema da casa. É tudo que a operação já emite.",
+  intro:
+    "Open Finance monta o fluxo de caixa pelo extrato. A SEFAZ entrega a nota. O eSocial, a folha. A adquirente, a taxa. O PDV continua no salão.",
+  tags: ["Open Finance", "SEFAZ", "eSocial", "Adquirentes", "PDV, ERP, delivery"],
+  statement: {
+    title: "Central de Dados · Extratos bancários",
+    doc: "Extrato Stone · 01/07 a 31/07/2026 · Casa exemplo",
+    summary: [
+      { label: "Saldo anterior", value: "R$ 41.560" },
+      { label: "Créditos", value: "R$ 198.640", meta: "338 txns" },
+      { label: "Débitos", value: "R$ 171.080", meta: "214 txns" },
+      { label: "Saldo atual", value: "R$ 69.120" },
+    ],
+    classifiedTitle: "Classificação automática",
+    classified: [
+      { label: "Receita de Vendas", txns: 34, value: "R$ 186.410" },
+      { label: "Folha de Pagamento", txns: 18, value: "R$ 82.560" },
+      { label: "Taxas de Cartão", txns: 12, value: "R$ 12.230" },
+      { label: "Utilidades", txns: 4, value: "R$ 4.180" },
+      { label: "Impostos", txns: 2, value: "R$ 37.152" },
+    ],
+    badge: "Classificação 78%",
+  },
+} as const;
+
+/* ─── O setor ─── */
+
+export const SECTOR = {
+  label: "— O setor",
+  headlinePlain: "O setor em que o Rook ",
+  headlineEmphasis: "opera.",
+} as const;
 
 export interface SectorStat {
   value: string;
@@ -50,86 +124,18 @@ export interface SectorStat {
 
 export const SECTOR_STATS: readonly SectorStat[] = [
   { value: "R$ 495 bi", label: "O tamanho do setor", source: "Abrasel, 2025" },
-  { value: "39%", label: "Controlam contas na planilha ou caderno", source: "Conta Simples + Visa, 2024" },
-  { value: "37%", label: "Com contas em atraso", source: "Abrasel, mai/2025" },
+  { value: "60%", label: "Dos bares e restaurantes não geram lucro", source: "Abrasel, 2025" },
+  { value: "39%", label: "Ainda controlam na planilha ou no caderno", source: "Conta Simples + Visa, 2024" },
   { value: "62,7%", label: "Das empresas fecham em 5 anos", source: "IBGE, 2024" },
 ];
 
-export interface ModuleBlock {
-  title: string;
-  bullets: readonly string[];
-}
-
-export const MODULES: readonly ModuleBlock[] = [
-  {
-    title: "Vendas e Tributos",
-    bullets: [
-      "Faturamento diário, semanal e mensal, com pacote completo de indicadores de performance",
-      "Projeções ajustadas para suporte ao planejamento operacional",
-      "Comunicação ativa via WhatsApp para acompanhamento diário, semanal e mensal",
-      "Análise mensal dos impostos apurados",
-    ],
-  },
-  {
-    title: "Compras (CMV)",
-    bullets: [
-      "Compras diárias, semanais e mensais com pacote completo de indicadores de performance e controle",
-      "CMV real vs. meta por período, com limite de compras",
-      "Monitoramento de preços dos insumos com alerta de inflação",
-    ],
-  },
-  {
-    title: "Despesas",
-    bullets: [
-      "Despesas com vendas — análise e comparação com benchmarking",
-      "Despesas com pessoal — monitoramento do Custo de Mão de Obra (CMO) com indicadores de produtividade",
-      "Despesas administrativas — clareza sobre ocupação, serviços, manutenções e gastos gerais",
-    ],
-  },
-  {
-    title: "Resultados",
-    bullets: [
-      "DRE gerencial, fluxo de caixa realizado e projeções de receita e compras",
-      "Score de saúde financeira e liquidez",
-      "Análise de endividamento",
-    ],
-  },
-];
-
-/* ─── Funil das seis etapas ─── */
-
 /**
- * As seis etapas pelas quais o dinheiro passa, encenadas como funil.
- *
- * Não acrescenta informação: encena o parágrafo do manifesto sobre a margem
- * escapando a cada etapa.
- *
- * Cada valor é o que SOBRA depois da etapa, e a série é a mesma DRE que o
- * módulo "Resultados" do hero mostra em números — ver EXEMPLO_DRE abaixo. As
- * duas peças ficam a poucos pixels uma da outra na página; se contarem
- * histórias diferentes sobre o mesmo dinheiro, um contador percebe em dez
- * segundos.
- *
- * "dívidas" e "resultado" fecham no mesmo 15% de propósito: depois de pagar as
- * dívidas, o que sobra É o resultado. A última barra tem tratamento visual
- * próprio para ler como destino, não como mais uma dedução.
- */
-export const FUNNEL_STAGES: readonly { stage: string; remaining: number }[] = [
-  { stage: "vendas", remaining: 100 },
-  { stage: "impostos", remaining: 91 },
-  { stage: "custos", remaining: 60 },
-  { stage: "despesas", remaining: 24 },
-  { stage: "dívidas", remaining: 15 },
-  { stage: "resultado", remaining: 15 },
-];
-
-/**
- * O restaurante-exemplo da home. Um só, um período só — todos os quatro
- * gráficos do hero e o funil saem daqui.
+ * O restaurante-exemplo da home. Um só, um período só — os gráficos da
+ * vitrine e os painéis do tabuleiro saem daqui.
  *
  * Validado por Daniel em 13/08/2026 como reconhecível para a operação. Ainda
  * é exemplo, não é cliente: se algum dia for ancorado em dado medido, trocar
- * aqui e conferir se o funil continua fechando.
+ * aqui e conferir se os painéis continuam fechando.
  */
 export const EXEMPLO_DRE = {
   receita: 412_800,
@@ -139,14 +145,14 @@ export const EXEMPLO_DRE = {
     { label: "Despesas", pct: 36.0 },
     { label: "Dívidas", pct: 9.0 },
   ],
-  /** 100 − 9 − 31 − 36 − 9. Confira contra a última etapa do funil. */
+  /** 100 − 9 − 31 − 36 − 9. */
   margemPct: 15.0,
 } as const;
 
 /* ─── Manifesto ─── */
 
 export const MANIFESTO = {
-  label: "— A pergunta de quase todo dono de restaurante",
+  label: "— A pergunta de quase todo dono",
   headlinePlain: "Você sabe quanto ",
   headlineEmphasis: "sobrou",
   headlineTail: " no final do mês?",
@@ -154,23 +160,13 @@ export const MANIFESTO = {
 
 export const MANIFESTO_PARAGRAPHS: readonly Paragraph[] = [
   [
-    { text: "Movimento no caixa é uma " },
+    { text: "Movimento no caixa é " },
     { text: "percepção", strong: true },
     { text: ". Lucro é " },
-    { text: "uma realidade", strong: true },
+    { text: "realidade", strong: true },
     {
-      text: ". Entre os dois, o dinheiro passa por seis etapas: vendas, impostos, custos, despesas, dívidas e resultado. Em cada uma, a margem pode estar escapando sem você ver.",
+      text: ". Entre os dois, o dinheiro passa por seis etapas. Em cada uma, a margem pode escapar sem você ver.",
     },
-  ],
-  [
-    {
-      text: "A maioria dos restaurantes joga sem enxergar o tabuleiro e sem uma estratégia clara para ganhar o jogo — planilhas superficiais, “feeling” do gerente, sem fundamento econômico, financeiro ou contábil.",
-    },
-  ],
-  [
-    { text: "O Rook organiza as " },
-    { text: "seis etapas na mesma tela", strong: true },
-    { text: ", trazendo visão, estratégia e controle." },
   ],
 ];
 
@@ -182,17 +178,118 @@ export interface Contrast {
 export const CONTRASTS: readonly Contrast[] = [
   {
     contrast: "Receita ≠ Lucro",
-    desc: "O que entra no caixa não é o que fica no bolso — entre os dois há 6 etapas. Crescer 30% em vendas e ainda assim perder dinheiro acontece todo mês em food service: sem visão por linha de DRE, ninguém sabe em qual etapa a margem se perdeu.",
+    desc: "Crescer 30% em vendas e ainda perder dinheiro acontece todo mês. Sem visão por linha de DRE, ninguém sabe em qual etapa a margem se perdeu.",
   },
   {
     contrast: "Movimento ≠ Margem",
-    desc: "Filas no salão, delivery cheio, ticket bom — e a margem real pode ser positiva ou negativa. Decidir pelo número certo, e não pela sensação de movimento, muda o resultado do mês inteiro.",
+    desc: "Fila no salão e delivery cheio não pagam aluguel. Decidir pelo número certo — e não pela sensação de movimento — muda o resultado do mês.",
   },
   {
     contrast: "Dívida ≠ Estratégia",
-    desc: "Financiamento pode ser alavanca ou armadilha. Sem saber o porquê do endividamento e sem ter a certeza de como pagá-lo, o resultado é a queima insustentável de caixa.",
+    desc: "Financiamento pode ser alavanca ou armadilha. Sem saber por que a parcela existe e como ela será paga, o caixa queima em silêncio.",
   },
 ];
+
+/* ─── O tabuleiro (seis etapas em abas) ─── */
+
+export const BOARD = {
+  label: "— O tabuleiro",
+  headlinePlain: "O ",
+  headlineEmphasis: "tabuleiro.",
+  sub: "A casa inteira, na mesma tela.",
+  intro:
+    "Vendas, CMV, imposto, folha, dívida e o que sobrou — o número que o gestor usa para decidir o mês.",
+} as const;
+
+export interface BoardTab {
+  id: "vendas" | "cmv" | "impostos" | "despesas" | "dividas" | "resultado";
+  tab: string;
+  sub: string;
+}
+
+export const BOARD_TABS: readonly BoardTab[] = [
+  { id: "vendas", tab: "Vendas", sub: "Turno, canal e o dia que paga o mês." },
+  { id: "cmv", tab: "Compras / CMV", sub: "O real contra a meta, com limite de compras." },
+  { id: "impostos", tab: "Impostos", sub: "O que foi apurado no período." },
+  { id: "despesas", tab: "Despesas", sub: "Vendas, pessoal e administrativas." },
+  { id: "dividas", tab: "Endividamento", sub: "Por que a parcela existe e como será paga." },
+  { id: "resultado", tab: "Resultado", sub: "O que sobrou depois das seis etapas." },
+];
+
+/** Aba Vendas: turnos de ontem somam os R$ 17,4 mil do último dia da série. */
+export const BOARD_VENDAS = {
+  turnosTitle: "Por turno · ontem",
+  turnos: [
+    { label: "Almoço", valor: "R$ 6.210" },
+    { label: "Jantar", valor: "R$ 8.940" },
+    { label: "Delivery", valor: "R$ 2.250" },
+  ],
+  melhorDia: { label: "Melhor dia", valor: "Sáb · R$ 18.800" },
+  piorDia: { label: "Pior dia", valor: "Seg · R$ 9.000" },
+} as const;
+
+/* ─── O briefing da casa ─── */
+
+export const BRIEFING = {
+  label: "— O briefing da casa",
+  headlinePlain: "O briefing da ",
+  headlineEmphasis: "casa.",
+  sub: "Todo dia às 7h, o resumo no WhatsApp.",
+  intro:
+    "Não é chat. É o informe da operação: faturamento, compras e budget restante. Segunda-feira chega o limite da semana. Dia 1, o fechamento. O Rook.AI — a inteligência que cruza esses dados e responde o gestor — fica dentro da plataforma.",
+  ctaLabel: "Quero o resumo no WhatsApp",
+  ctaHref: "/planos/",
+  note: "Opt-in no onboarding, direto no seu WhatsApp.",
+  messages: [
+    {
+      time: "hoje · 07:10",
+      lines: [
+        "Bom dia. Segue o resumo diário do restaurante Casa exemplo referente a 17/08/2026.",
+        "Faturamento ontem: R$ 17.400,00",
+        "Acumulado no mês: R$ 198.640,00",
+        "Compras ontem: R$ 5.380,00",
+        "Budget restante: R$ 22.140,00",
+        "Acesse o dashboard para mais detalhes.",
+      ],
+      button: "Abrir Dashboard",
+    },
+    {
+      time: "seg · 07:00",
+      lines: [
+        "Bom dia. Segue o limite de compras semanal do restaurante Casa exemplo para a semana 11/08 a 17/08.",
+        "Limite semanal: R$ 28.896,00",
+        "Já utilizado: R$ 19.420,00",
+        "Disponível: R$ 9.476,00",
+        "Acompanhe suas compras no app.",
+      ],
+      button: "Ver Compras",
+    },
+  ],
+} as const;
+
+/* ─── Inteligência viva (Rook.AI) ─── */
+
+export const INTELLIGENCE = {
+  label: "— Inteligência viva",
+  headlinePlain: "Inteligência ",
+  headlineEmphasis: "viva.",
+  context: "Casa exemplo · à la carte · Julho 2026",
+  qa: [
+    {
+      q: "Por que o CMV fechou 2 pontos acima da meta?",
+      a: "CMV do período: 31,0% contra meta de 29,0%. São R$ 8.256 a mais no mês. A proteína puxou: filé +8,4% em 30 dias, em três notas do mesmo fornecedor — acima do preço médio do segmento à la carte.",
+    },
+    {
+      q: "E o mercado?",
+      a: "No seu grupo de casas semelhantes, o CMV mediano está em 29,4%. Vocês estão 1,6 p.p. acima. Próxima decisão: renegociar o filé ou ajustar a ficha dos 4 pratos que mais vendem. Impacto estimado: R$ 4.100 / mês.",
+    },
+  ],
+  productSub: "O Rook.AI mora no produto.",
+  productParagraph:
+    "O Rook.AI é a inteligência do negócio. Interliga o que a casa já emite e responde o gestor no momento da pergunta — com o número, o contexto e o que fazer agora. Sem esperar o fechamento. Sem montar a planilha.",
+  ctaLabel: "Ver o diagnóstico da minha casa",
+  ctaHref: "/diagnostico/",
+} as const;
 
 /* ─── Parceiros e integrações ─── */
 
@@ -237,11 +334,11 @@ export const PARTNERS_SECTION = {
   headlinePlain: "Funciona com o que você ",
   headlineEmphasis: "já usa.",
   intro:
-    "O Rook não substitui seu PDV, seu ERP ou sua maquininha. Ele lê o que esses sistemas já produzem, cruza com os documentos fiscais e devolve o resultado traduzido.",
+    "O PDV, o ERP e o delivery da casa entram no mesmo tabuleiro. Se o seu ainda não está na lista, peça.",
   ctaLabel: "Não encontrou o seu sistema? Solicite a integração →",
 } as const;
 
-/* ─── Planos ─── */
+/* ─── Oferta ─── */
 
 export interface Plan {
   name: string;
@@ -253,11 +350,11 @@ export interface Plan {
 }
 
 export const PRICING = {
-  label: "— Planos e preços",
+  label: "— Oferta",
   headlinePlain: "Quanto custa o ",
   headlineEmphasis: "Rook?",
   intro:
-    "O enquadramento é por faturamento bruto mensal. Ambos os planos entregam acesso completo à plataforma. Teste grátis por 7 dias.",
+    "Mesmo acesso nos dois planos. A diferença é o faturamento do estabelecimento. 7 dias de teste.",
   ctaLabel: "Ver detalhes e contratar →",
   ctaHref: "/planos/",
 } as const;
@@ -267,16 +364,16 @@ export const PLANS: readonly Plan[] = [
     name: "Knight",
     price: "R$ 479,90",
     period: "/mês",
-    description: "Para estabelecimentos com faturamento mensal de até R$ 250 mil.",
-    note: "Acesso completo à plataforma",
+    description: "Até R$ 250 mil de faturamento mensal.",
+    note: "7 dias de teste",
     highlighted: false,
   },
   {
     name: "Rook",
     price: "R$ 779,90",
     period: "/mês",
-    description: "Para estabelecimentos com faturamento mensal acima de R$ 250 mil.",
-    note: "Acesso completo à plataforma",
+    description: "Acima de R$ 250 mil de faturamento mensal.",
+    note: "7 dias de teste",
     highlighted: true,
   },
 ];
@@ -284,7 +381,7 @@ export const PLANS: readonly Plan[] = [
 export const CHESS_ADDON = {
   label: "Chess · Add-on",
   description:
-    "Para redes e franquias: consolidação de grupo e visão multiunidade, somada ao plano escolhido acima.",
+    "Para redes: consolidação de grupo e visão multiunidade, somada ao plano escolhido. Cobrança por grupo.",
   price: "+ R$ 279,90",
   period: "/mês",
 } as const;
@@ -308,57 +405,41 @@ export const FAQ = {
 
 export const FAQ_ITEMS: readonly FaqItem[] = [
   {
-    q: "Quanto custa o Rook System?",
-    a: "O Rook tem dois planos base: Knight (R$ 479,90/mês) para restaurantes com faturamento de até R$ 250 mil/mês, e Rook (R$ 779,90/mês) para faturamento acima de R$ 250 mil/mês. Ambos oferecem acesso completo à plataforma. Para redes e franquias, há o add-on Chess (R$ 279,90/mês por grupo econômico). Todos incluem 7 dias de teste grátis.",
-  },
-  {
-    q: "Como funciona o Rook?",
-    a: "O Rook coleta, analisa e interpreta os dados financeiros e fiscais do seu restaurante, classificando cada linha com base em metodologia contábil e traduzindo tudo em um diagnóstico. Pelo fluxo de caixa ou pelo DRE, você recebe recomendações direcionadas à construção do seu lucro.",
-  },
-  {
-    q: "Funciona em qualquer cidade do Brasil?",
-    a: "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O cálculo tributário considera a UF do estabelecimento automaticamente — você só precisa ter o cadastro do CNPJ correto.",
-  },
-  {
-    q: "É seguro? Quem mais vê meus dados?",
-    a: "Os dados são criptografados em trânsito (TLS 1.3) e em repouso (AES-256). Cada empresa tem seu próprio ambiente isolado — ninguém vê seus números fora da sua equipe. O Rook está adequado à LGPD.",
-  },
-  {
-    q: "Preciso mudar de contador?",
-    a: "Não. O Rook é uma inteligência de performance para o dono — ele não substitui o contador.",
+    q: "O que o Rook faz, na prática?",
+    a: "Organiza as seis etapas entre o caixa e o bolso — vendas, impostos, custos, despesas, dívidas e resultado — e devolve um diagnóstico com recomendação em reais. É inteligência financeira para o gestor decidir, todo dia.",
   },
   {
     q: "Preciso trocar o sistema que já uso?",
-    a: "Não. O Rook não substitui seu PDV ou ERP — nossa metodologia lê seus dados e traduz seu resultado. Para aumentar ainda mais a nossa capacidade de análise, possuímos integração com os principais ERPs do mercado.",
+    a: "Não. O Rook lê os dados que a operação já produz e cruza com os documentos fiscais. Se o seu sistema ainda não está na lista de integrações, peça — a gente prioriza pelo volume de indicações.",
     cta: {
-      label: "Caso seu ERP ainda não tenha integração, solicite aqui.",
+      label: "Solicite a integração aqui.",
       href: `mailto:${CONTACT_EMAIL}?subject=Solicita%C3%A7%C3%A3o%20de%20integra%C3%A7%C3%A3o%20com%20ERP`,
     },
   },
   {
-    q: "Posso testar antes de pagar?",
-    a: "Sim. O período de teste dura 7 dias, é oferecido uma vez por Empresa/CNPJ e exige um cartão válido. Se você cancelar antes do término, a primeira cobrança não será realizada.",
+    q: "Quanto custa?",
+    a: "Knight R$ 479,90/mês até R$ 250 mil de faturamento. Rook R$ 779,90/mês acima disso. Mesmo acesso nos dois. Chess é add-on de redes, R$ 279,90/mês por grupo. 7 dias de teste, uma vez por CNPJ.",
   },
   {
-    q: "Como funciona o pagamento?",
-    a: "A oferta padrão tem cobrança mensal recorrente em reais. O plano Knight custa R$ 479,90/mês e o Rook custa R$ 779,90/mês. Ao final do período de teste de 7 dias, a mensalidade do plano contratado é cobrada no meio de pagamento cadastrado.",
+    q: "Funciona em qualquer cidade?",
+    a: "Sim. 26 estados + DF. O cálculo tributário considera a UF do estabelecimento pelo CNPJ.",
   },
   {
-    q: "Posso cancelar quando quiser?",
-    a: "Sim. O cancelamento pode ser solicitado pela plataforma ou pelo suporte, com antecedência mínima de 15 dias do fim do ciclo, e produz efeitos ao final do período pago.",
+    q: "Posso testar sem cartão?",
+    a: "O diagnóstico e a calculadora de CMV são gratuitos e sem cartão. O teste de 7 dias da plataforma pede cartão válido; se cancelar antes, a primeira cobrança não ocorre.",
   },
 ];
 
 /* ─── CTA final ─── */
 
 export const CTA = {
-  label: "— Pronto para ver os seus números?",
-  headlinePlain: "Teste por ",
-  headlineEmphasis: "7 dias.",
+  label: "— Comece pelo diagnóstico. Sem cartão.",
+  headlinePlain: "Pronto para ver os seus ",
+  headlineEmphasis: "números?",
   intro:
-    "Escolha o plano adequado ao faturamento do seu estabelecimento. Organizações multiunidade também podem contratar o módulo Chess.",
-  primaryLabel: "Ver planos e testar →",
-  primaryHref: "/planos/",
-  secondaryLabel: "Conhecer o produto",
-  secondaryHref: "/funcionalidades/",
+    "Em dois minutos você vê se o restaurante está no lucro ou no prejuízo — e quanto precisa faturar para virar o mês.",
+  primaryLabel: "Fazer meu diagnóstico",
+  primaryHref: "/diagnostico/",
+  secondaryLabel: "Sou restaurante à la carte",
+  secondaryHref: "/diagnostico/",
 } as const;
