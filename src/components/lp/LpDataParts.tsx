@@ -20,13 +20,16 @@ import { EXEMPLO_DRE } from "@/lib/lp-content";
 
 const TERRACOTA = "#e54c00";
 
-const pctDe = (label: string) =>
+/** União literal dos labels do DRE: renomear em lp-content.ts quebra no tsc, não em runtime. */
+type DreLabel = (typeof EXEMPLO_DRE.linhas)[number]["label"];
+
+export const pctDe = (label: DreLabel) =>
   EXEMPLO_DRE.linhas.find((l) => l.label === label)!.pct;
 
-const reais = (pct: number) =>
+export const reais = (pct: number) =>
   Math.round((EXEMPLO_DRE.receita * pct) / 100).toLocaleString("pt-BR");
 
-const num = (n: number, casas = 1) =>
+export const num = (n: number, casas = 1) =>
   n.toFixed(casas).replace(".", ",");
 
 /**

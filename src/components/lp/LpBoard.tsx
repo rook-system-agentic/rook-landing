@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { BOARD, BOARD_TABS, BOARD_VENDAS, EXEMPLO_DRE, type BoardTab } from "@/lib/lp-content";
-import { Sparkline, CmvBar, ExpenseBars, DreLines } from "./LpDataParts";
+import { BOARD, BOARD_TABS, BOARD_VENDAS, type BoardTab } from "@/lib/lp-content";
+import { Sparkline, CmvBar, ExpenseBars, DreLines, pctDe, reais, num } from "./LpDataParts";
 
 /**
  * O tabuleiro: as seis etapas em abas.
@@ -12,15 +12,8 @@ import { Sparkline, CmvBar, ExpenseBars, DreLines } from "./LpDataParts";
  * menu mobile do Header. O estado só decide o que fica visível.
  *
  * Impostos e Endividamento não têm gráfico próprio: derivam de EXEMPLO_DRE,
- * como todo número desta página.
+ * via os helpers compartilhados de LpDataParts.
  */
-
-const num = (n: number) => n.toFixed(1).replace(".", ",");
-
-const pctDe = (label: string) => EXEMPLO_DRE.linhas.find((l) => l.label === label)!.pct;
-
-const reais = (pct: number) =>
-  Math.round((EXEMPLO_DRE.receita * pct) / 100).toLocaleString("pt-BR");
 
 function BigStat({ pct }: { pct: number }) {
   return (
