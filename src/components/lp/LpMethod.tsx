@@ -4,7 +4,7 @@ import Reveal from "./LpReveal";
 /** O método: coleta, interpretação, decisão — três cards textuais. */
 export default function LpMethod() {
   return (
-    <section className="py-20 lg:py-28" style={{ borderTop: "1px solid var(--lp-line)" }}>
+    <section className="lp-band py-20 lg:py-28" style={{ borderTop: "1px solid var(--lp-line)" }}>
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-12 max-w-3xl">
           <p className="lp-label mb-4">{METHOD.label}</p>

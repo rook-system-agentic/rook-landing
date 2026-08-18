@@ -24,9 +24,9 @@ export type Paragraph = readonly Segment[];
 /* ─── Hero ─── */
 
 export const HERO = {
-  headlinePlain: "Inteligência financeira para ",
-  headlineEmphasis: "food service",
-  sub: "Faturar não é lucrar.",
+  label: "— Inteligência financeira para food service",
+  headlinePlain: "Faturar não é ",
+  headlineEmphasis: "lucrar.",
   primaryLabel: "Ver o diagnóstico do meu restaurante",
   primaryHref: "/diagnostico/",
   secondaryLabel: "Testar 7 dias",
@@ -81,9 +81,8 @@ export const METHOD = {
 
 export const DATA_SOURCES = {
   label: "— De onde vêm os números",
-  headlinePlain: "De onde vêm os ",
-  headlineEmphasis: "números.",
-  sub: "Não é só o sistema da casa. É tudo que a operação já emite.",
+  headlinePlain: "Não é só o sistema da casa. É ",
+  headlineEmphasis: "tudo que a operação já emite.",
   intro:
     "Open Finance monta o fluxo de caixa pelo extrato. A SEFAZ entrega a nota. O eSocial, a folha. A adquirente, a taxa. O PDV continua no salão.",
   tags: ["Open Finance", "SEFAZ", "eSocial", "Adquirentes", "PDV, ERP, delivery"],
@@ -111,9 +110,7 @@ export const DATA_SOURCES = {
 /* ─── O setor ─── */
 
 export const SECTOR = {
-  label: "— O setor",
-  headlinePlain: "O setor em que o Rook ",
-  headlineEmphasis: "opera.",
+  label: "— O setor em que o Rook opera",
 } as const;
 
 export interface SectorStat {
@@ -194,9 +191,8 @@ export const CONTRASTS: readonly Contrast[] = [
 
 export const BOARD = {
   label: "— O tabuleiro",
-  headlinePlain: "O ",
-  headlineEmphasis: "tabuleiro.",
-  sub: "A casa inteira, na mesma tela.",
+  headlinePlain: "A casa inteira, na ",
+  headlineEmphasis: "mesma tela.",
   intro:
     "Vendas, CMV, imposto, folha, dívida e o que sobrou — o número que o gestor usa para decidir o mês.",
 } as const;
@@ -232,9 +228,8 @@ export const BOARD_VENDAS = {
 
 export const BRIEFING = {
   label: "— O briefing da casa",
-  headlinePlain: "O briefing da ",
-  headlineEmphasis: "casa.",
-  sub: "Todo dia às 7h, o resumo no WhatsApp.",
+  headlinePlain: "Todo dia às 7h, o resumo no ",
+  headlineEmphasis: "WhatsApp.",
   intro:
     "Não é chat. É o informe da operação: faturamento, compras e budget restante. Segunda-feira chega o limite da semana. Dia 1, o fechamento. O Rook.AI — a inteligência que cruza esses dados e responde o gestor — fica dentro da plataforma.",
   ctaLabel: "Quero o resumo no WhatsApp",
@@ -271,8 +266,8 @@ export const BRIEFING = {
 
 export const INTELLIGENCE = {
   label: "— Inteligência viva",
-  headlinePlain: "Inteligência ",
-  headlineEmphasis: "viva.",
+  headlinePlain: "O Rook.AI mora no ",
+  headlineEmphasis: "produto.",
   context: "Casa exemplo · à la carte · Julho 2026",
   qa: [
     {
@@ -284,7 +279,6 @@ export const INTELLIGENCE = {
       a: "No seu grupo de casas semelhantes, o CMV mediano está em 29,4%. Vocês estão 1,6 p.p. acima. Próxima decisão: renegociar o filé ou ajustar a ficha dos 4 pratos que mais vendem. Impacto estimado: R$ 4.100 / mês.",
     },
   ],
-  productSub: "O Rook.AI mora no produto.",
   productParagraph:
     "O Rook.AI é a inteligência do negócio. Interliga o que a casa já emite e responde o gestor no momento da pergunta — com o número, o contexto e o que fazer agora. Sem esperar o fechamento. Sem montar a planilha.",
   ctaLabel: "Ver o diagnóstico da minha casa",
@@ -355,7 +349,8 @@ export const PRICING = {
   headlineEmphasis: "Rook?",
   intro:
     "Mesmo acesso nos dois planos. A diferença é o faturamento do estabelecimento. 7 dias de teste.",
-  ctaLabel: "Ver detalhes e contratar →",
+  cardCtaLabel: "Testar 7 dias",
+  ctaLabel: "Ver detalhes →",
   ctaHref: "/planos/",
 } as const;
 
@@ -433,9 +428,10 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
 /* ─── CTA final ─── */
 
 export const CTA = {
-  label: "— Comece pelo diagnóstico. Sem cartão.",
-  headlinePlain: "Pronto para ver os seus ",
-  headlineEmphasis: "números?",
+  label: "— Pronto para ver os seus números",
+  headlinePlain: "Comece pelo ",
+  headlineEmphasis: "diagnóstico.",
+  headlineTail: " Sem cartão.",
   intro:
     "Em dois minutos você vê se o restaurante está no lucro ou no prejuízo — e quanto precisa faturar para virar o mês.",
   primaryLabel: "Fazer meu diagnóstico",

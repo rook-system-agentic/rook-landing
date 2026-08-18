@@ -10,23 +10,10 @@ import LpCountUp from "./LpCountUp";
  */
 export default function LpSector() {
   return (
-    <section className="py-20 lg:py-28" style={{ borderTop: "1px solid var(--lp-line)" }}>
+    <section className="lp-band py-20 lg:py-28" style={{ borderTop: "1px solid var(--lp-line)" }}>
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-10">
-          <p className="lp-label mb-4">{SECTOR.label}</p>
-          <h2
-            className="font-display font-extrabold"
-            style={{
-              color: "var(--lp-ink)",
-              fontSize: "clamp(2rem, 4.2vw, 3.4rem)",
-              lineHeight: 1.05,
-              letterSpacing: "-0.03em",
-            }}
-          >
-            {SECTOR.headlinePlain}
-            <span style={{ color: "#e54c00" }}>{SECTOR.headlineEmphasis}</span>
-          </h2>
-        </div>
+        {/* Sem manchete, como no preview: o rótulo apresenta e os números falam. */}
+        <p className="lp-label mb-8">{SECTOR.label}</p>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SECTOR_STATS.map((s, i) => (

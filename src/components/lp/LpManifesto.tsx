@@ -12,7 +12,7 @@ import LpGapChart from "./LpGapChart";
  */
 export default function LpManifesto() {
   return (
-    <section className="py-20 lg:py-28" style={{ borderTop: "1px solid var(--lp-line)" }}>
+    <section className="lp-band py-20 lg:py-28" style={{ borderTop: "1px solid var(--lp-line)" }}>
       <div className="mx-auto max-w-7xl px-6">
         {/* Texto e gráfico lado a lado: a seção afirma que receita e lucro são
             coisas diferentes, e o gráfico mostra a distância entre as duas. */}
