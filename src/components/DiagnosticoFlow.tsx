@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { track, TRACKING_EVENTS } from "@/lib/track";
@@ -68,19 +68,16 @@ function formatCurrency(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function getAbVariant(): "A" | "B" {
-  if (typeof window === "undefined") return "A";
-  const stored = localStorage.getItem("rook-diag-ab");
-  if (stored === "A" || stored === "B") return stored;
-  const variant = Math.random() < 0.5 ? "A" : "B";
-  localStorage.setItem("rook-diag-ab", variant);
-  return variant;
-}
-
 /* ─── Main Component ─── */
+
+/*
+ * O fluxo é a antiga variante B do teste A/B, fixada por decisão do brief de
+ * conversão (docs/brief-gabriel-conversao-20260818.md, §6): números da casa
+ * primeiro, gate de contato antes do resultado. O `ab_variant: "B"` continua
+ * indo no rastreamento para a série do GA4 não quebrar.
+ */
 export function DiagnosticoFlow() {
   const [step, setStep] = useState<"hero" | "gate" | "diagnostic" | "result">("hero");
-  const [abVariant, setAbVariant] = useState<"A" | "B">("A");
   const [gateData, setGateData] = useState<GateData>({
     restaurantName: "", responsibleName: "", email: "", phone: "", segment: "a_la_carte", city: "", state: "",
   });
@@ -89,45 +86,23 @@ export function DiagnosticoFlow() {
     monthlyRevenue: 0, salesExpenses: 0, generalExpenses: 0, partnerWithdrawal: 0, cmvPercent: 35,
   });
   const [result, setResult] = useState<ResultData | null>(null);
-  const [gateCompleted, setGateCompleted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    setAbVariant(getAbVariant());
-  }, []);
 
   const segment = segmentsData.find(s => s.slug === gateData.segment) || segmentsData[0];
 
   /* ─── Navigation Logic ─── */
   function handleHeroCta() {
-    // Variant A: gate first, then diagnostic
-    // Variant B: diagnostic first, gate before result
-    if (abVariant === "A") {
-      setStep("gate");
-    } else {
-      setStep("diagnostic");
-    }
+    setStep("diagnostic");
   }
 
   function handleGateSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setGateCompleted(true);
-    if (abVariant === "A") {
-      setStep("diagnostic");
-    } else {
-      // Variant B: gate was shown before result
-      calculateAndShow();
-    }
+    calculateAndShow();
   }
 
   function handleDiagnosticSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (abVariant === "A") {
-      calculateAndShow();
-    } else {
-      // Variant B: show gate before result
-      setStep("gate");
-    }
+    setStep("gate");
   }
 
   function calculateAndShow() {
@@ -152,7 +127,7 @@ export function DiagnosticoFlow() {
 
     setResult(resultData);
     setStep("result");
-    track(TRACKING_EVENTS.diagnostic, { ab_variant: abVariant });
+    track(TRACKING_EVENTS.diagnostic, { ab_variant: "B" });
     sendToSupabase(resultData, cmo);
   }
 
@@ -182,7 +157,7 @@ export function DiagnosticoFlow() {
         breakeven_point: resultData.breakevenPoint,
         revenue_gap: resultData.revenueGap,
         source: "lp_diagnostico",
-        ab_variant: abVariant,
+        ab_variant: "B",
         status: "apresentado",
       };
 
@@ -223,7 +198,7 @@ export function DiagnosticoFlow() {
       <main className="flex-1 pt-20">
         {step === "hero" && <HeroSection onStart={handleHeroCta} />}
         {step === "gate" && (
-          <GateSection data={gateData} onChange={setGateData} onSubmit={handleGateSubmit} variant={abVariant} />
+          <GateSection data={gateData} onChange={setGateData} onSubmit={handleGateSubmit} />
         )}
         {step === "diagnostic" && (
           <DiagnosticSection
@@ -231,7 +206,6 @@ export function DiagnosticoFlow() {
             onChange={setDiagData}
             segment={segment}
             onSubmit={handleDiagnosticSubmit}
-            variant={abVariant}
           />
         )}
         {step === "result" && result && (
@@ -252,10 +226,23 @@ function HeroSection({ onStart }: { onStart: () => void }) {
           Seu restaurante está no <em>lucro</em> ou no <em>prejuízo</em>?
         </h1>
         <p className="text-body text-lg text-muted max-w-xl mx-auto mb-8">
-          Descubra em 2 minutos quanto você precisa faturar para cobrir todos os custos e começar a lucrar de verdade. Sem planilhas, sem achismo.
+          Em dois minutos o Rook calcula o ponto de equilíbrio da casa: quanto você precisa faturar para cobrir custos e começar a lucrar de verdade. Sem planilha. Sem cartão.
         </p>
+        <ul className="grid gap-3 sm:grid-cols-3 max-w-xl mx-auto mb-10 text-left">
+          {[
+            { n: "01", t: "Números da casa", d: "Faturamento, CMV, folha, despesas." },
+            { n: "02", t: "Seus dados", d: "Nome e contato para liberar o resultado." },
+            { n: "03", t: "Ponto de equilíbrio", d: "Gap em reais e CMV versus o segmento." },
+          ].map((s) => (
+            <li key={s.n} className="card p-4">
+              <p className="font-mono text-xs" style={{ color: "var(--color-terracota-text)" }}>{s.n}</p>
+              <p className="mt-1 text-sm font-bold">{s.t}</p>
+              <p className="mt-1 text-xs text-muted">{s.d}</p>
+            </li>
+          ))}
+        </ul>
         <button onClick={onStart} className="btn-primary text-lg px-8 py-4">
-          Fazer meu diagnóstico gratuito
+          Começar pelos números da casa
         </button>
         <p className="text-xs text-muted mt-4">100% gratuito. Resultado imediato. Sem cartão de crédito.</p>
       </div>
@@ -265,12 +252,11 @@ function HeroSection({ onStart }: { onStart: () => void }) {
 
 /* ─── Gate Section ─── */
 function GateSection({
-  data, onChange, onSubmit, variant,
+  data, onChange, onSubmit,
 }: {
   data: GateData;
   onChange: (d: GateData) => void;
   onSubmit: (e: React.FormEvent) => void;
-  variant: "A" | "B";
 }) {
   const update = (field: keyof GateData, value: string) => onChange({ ...data, [field]: value });
 
@@ -278,14 +264,10 @@ function GateSection({
     <section className="section-spacing flex items-center justify-center min-h-[80vh]">
       <div className="max-w-lg mx-auto px-6 w-full">
         <div className="card p-8 sm:p-10">
-          <p className="section-label mb-3">— {variant === "A" ? "Passo 1 de 2" : "Último passo"}</p>
-          <h2 className="heading-section text-2xl sm:text-3xl mb-2">
-            {variant === "A" ? "Vamos começar" : "Quase lá!"}
-          </h2>
+          <p className="section-label mb-3">— Último passo</p>
+          <h2 className="heading-section text-2xl sm:text-3xl mb-2">Quase lá!</h2>
           <p className="text-muted text-sm mb-6">
-            {variant === "A"
-              ? "Preencha seus dados para personalizar o diagnóstico."
-              : "Preencha seus dados para ver o resultado completo do diagnóstico."}
+            Preencha seus dados para ver o resultado completo do diagnóstico.
           </p>
           <form onSubmit={onSubmit} className="space-y-4">
             <InputField label="Nome do restaurante" value={data.restaurantName} onChange={v => update("restaurantName", v)} required placeholder="Ex: Restaurante Sabor & Arte" />
@@ -310,7 +292,7 @@ function GateSection({
               <InputField label="Estado" value={data.state} onChange={v => update("state", v)} placeholder="DF" />
             </div>
             <button type="submit" className="btn-primary w-full mt-4 py-3">
-              {variant === "A" ? "Continuar para o diagnóstico" : "Ver meu resultado"}
+              Ver meu resultado
             </button>
           </form>
         </div>
@@ -321,13 +303,12 @@ function GateSection({
 
 /* ─── Diagnostic Section ─── */
 function DiagnosticSection({
-  data, onChange, segment, onSubmit, variant,
+  data, onChange, segment, onSubmit,
 }: {
   data: DiagnosticData;
   onChange: (d: DiagnosticData) => void;
   segment: typeof segmentsData[0];
   onSubmit: (e: React.FormEvent) => void;
-  variant: "A" | "B";
 }) {
   const update = <K extends keyof DiagnosticData>(field: K, value: DiagnosticData[K]) =>
     onChange({ ...data, [field]: value });
@@ -344,7 +325,7 @@ function DiagnosticSection({
     <section className="section-spacing flex items-center justify-center min-h-[80vh]">
       <div className="max-w-lg mx-auto px-6 w-full">
         <div className="card p-8 sm:p-10">
-          <p className="section-label mb-3">— {variant === "A" ? "Passo 2 de 2" : "Passo 1 de 2"}</p>
+          <p className="section-label mb-3">— Passo 1 de 2</p>
           <h2 className="heading-section text-2xl sm:text-3xl mb-2">Dados financeiros</h2>
           <p className="text-muted text-sm mb-6">
             Preencha com os dados aproximados do seu restaurante. Quanto mais preciso, melhor o diagnóstico.
@@ -422,7 +403,7 @@ function DiagnosticSection({
             </div>
 
             <button type="submit" className="btn-primary w-full mt-4 py-3">
-              {variant === "A" ? "Calcular meu Ponto de Equilíbrio" : "Continuar"}
+              Continuar
             </button>
           </form>
         </div>
