@@ -319,6 +319,46 @@ export const BOARD_VENDAS = {
   piorDia: { label: "Pior dia", valor: "Seg · R$ 9.000" },
 } as const;
 
+/**
+ * Aba Compras/CMV: inflação de insumo e limite semanal (brief §5.4).
+ *
+ * O limite semanal deriva do CMV do DRE em LpBoard — 31% da receita,
+ * proporcional a 7 dos 31 dias do mês = R$ 28.896. Usado + disponível fecham
+ * nesse total, e o disponível bate com o informe semanal do WhatsApp
+ * (BRIEFING.messages).
+ */
+export const BOARD_CMV = {
+  insumosTitle: "Inflação de insumo · 30 dias",
+  insumos: [
+    { label: "Filé mignon", delta: "+8,4%", note: "3 notas · mesmo fornecedor" },
+    { label: "Azeite extra", delta: "+12,1%", note: "Acima do segmento" },
+    { label: "Cerveja long neck", delta: "+1,2%", note: "Dentro da faixa" },
+  ],
+  limiteTitle: "Limite semanal de compras",
+  limiteUsado: "R$ 19.420 usados",
+  limiteDisponivel: "R$ 9.476 disponíveis",
+} as const;
+
+/** Aba Impostos: a alíquota é o percentual do DRE; o resto é contexto. */
+export const BOARD_IMPOSTOS = {
+  bigLabel: "Alíquota efetiva no período",
+  note: "A alíquota sai do CNPJ e da UF do estabelecimento. Sem planilha paralela — o impacto aparece em reais na DRE.",
+} as const;
+
+/**
+ * Aba Endividamento. O caixa do período é o saldo atual do extrato
+ * (DATA_SOURCES.statement) e a cobertura é caixa ÷ parcelas
+ * (69.120 ÷ 37.152 ≈ 1,9×) — o mesmo restaurante, o mesmo período.
+ */
+export const BOARD_DIVIDAS = {
+  bigLabel: "Parcelas do mês",
+  rows: [
+    { label: "4 contratos ativos", value: "capital de giro + equipamentos" },
+    { label: "Caixa do período", value: "R$ 69.120" },
+    { label: "Cobertura das parcelas", value: "1,9×" },
+  ],
+} as const;
+
 /* ─── O briefing da casa ─── */
 
 export const BRIEFING = {
