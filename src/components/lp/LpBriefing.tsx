@@ -54,6 +54,17 @@ export default function LpBriefing() {
             className="space-y-3 rounded-2xl p-4 sm:p-5"
             style={{ backgroundColor: PANEL.bg, border: `1px solid ${PANEL.line}` }}
           >
+            <div
+              className="flex items-baseline justify-between gap-4 pb-3"
+              style={{ borderBottom: `1px solid ${PANEL.line}` }}
+            >
+              <p className="text-sm font-bold" style={{ color: PANEL.ink }}>
+                {BRIEFING.contactName}
+              </p>
+              <p className="font-mono text-xs" style={{ color: PANEL.muted }}>
+                {BRIEFING.contactNumber}
+              </p>
+            </div>
             {BRIEFING.messages.map((m) => (
               <article key={m.time} className="rounded-xl p-4" style={{ backgroundColor: PANEL.inset }}>
                 <div className="mb-3 flex items-baseline justify-between gap-4">

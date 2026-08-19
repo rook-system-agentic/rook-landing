@@ -370,6 +370,9 @@ export const BRIEFING = {
   ctaLabel: "Quero o resumo no WhatsApp",
   ctaHref: "/planos/",
   note: "Opt-in no onboarding, direto no seu WhatsApp.",
+  /** O número real do canal (Twilio), como no preview aprovado — brief §5.5. */
+  contactName: "Rook",
+  contactNumber: "+55 61 3686-6728",
   messages: [
     {
       time: "hoje · 07:10",
