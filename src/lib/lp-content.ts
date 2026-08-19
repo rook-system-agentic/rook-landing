@@ -85,7 +85,6 @@ export const DATA_SOURCES = {
   headlineEmphasis: "tudo que a operação já emite.",
   intro:
     "Open Finance monta o fluxo de caixa pelo extrato. A SEFAZ entrega a nota. O eSocial, a folha. A adquirente, a taxa. O PDV continua no salão.",
-  tags: ["Open Finance", "SEFAZ", "eSocial", "Adquirentes", "PDV, ERP, delivery"],
   statement: {
     title: "Central de Dados · Extratos bancários",
     doc: "Extrato Stone · 01/07 a 31/07/2026 · Casa exemplo",
@@ -105,6 +104,102 @@ export const DATA_SOURCES = {
     ],
     badge: "Classificação 78%",
   },
+} as const;
+
+/*
+ * A captura viva (brief do Gabriel, §5.2 — docs/brief-gabriel-conversao-20260818.md):
+ * cada fonte abre um mock da Central de Dados, não um card genérico. Os números
+ * fecham entre si e com EXEMPLO_DRE: a folha de R$ 82.560 é 20% da receita; os
+ * créditos de R$ 198.640 do extrato são o bruto das adquirentes, e o líquido de
+ * R$ 186.410 é a "Receita de Vendas" classificada no extrato.
+ */
+
+export interface SourceTab {
+  id: "openfinance" | "sefaz" | "esocial" | "adquirentes" | "pdv";
+  tab: string;
+}
+
+export const SOURCE_TABS: readonly SourceTab[] = [
+  { id: "openfinance", tab: "Open Finance" },
+  { id: "sefaz", tab: "SEFAZ" },
+  { id: "esocial", tab: "eSocial" },
+  { id: "adquirentes", tab: "Adquirentes" },
+  { id: "pdv", tab: "PDV, ERP, delivery" },
+];
+
+export const SEFAZ_MOCK = {
+  title: "Central de Dados · SEFAZ",
+  doc: "NF-e de compra · 11/08/2026 · Casa exemplo",
+  aceite: {
+    warning: "Aguardando seu aceite — o XML expira na SEFAZ em 174 dias.",
+    action: "Confirmar operação",
+  },
+  partes: [
+    { label: "Emitente", value: "Distribuidora Serra Ltda" },
+    { label: "Destinatário", value: "Casa exemplo" },
+  ],
+  tributos: [
+    { label: "Produtos", value: "R$ 3.314" },
+    { label: "ICMS", value: "R$ 593" },
+    { label: "PIS", value: "R$ 27" },
+    { label: "COFINS", value: "R$ 126" },
+  ],
+  categoriasTitle: "Resumo por categoria — na extração",
+  categorias: [
+    { label: "Laticínios", pct: 68, value: "R$ 2.256", itens: "5 itens" },
+    { label: "Mercearia", pct: 25, value: "R$ 830", itens: "9 itens" },
+    { label: "Proteínas", pct: 4, value: "R$ 134", itens: "2 itens" },
+    { label: "Limpeza", pct: 3, value: "R$ 55", itens: "1 item" },
+  ],
+  itens: [
+    { label: "ÓLEO DE SOJA 900ML", categoria: "Mercearia", value: "R$ 47,86" },
+    { label: "AÇÚCAR CRISTAL 5KG", categoria: "Mercearia", value: "R$ 31,52" },
+    { label: "LEITE CONDENSADO", categoria: "Laticínios", value: "R$ 704,94" },
+  ],
+} as const;
+
+export const ESOCIAL_MOCK = {
+  title: "Central de Dados · eSocial",
+  doc: "Eventos do eSocial · sem recadastrar colaborador",
+  badge: "Folha lida na origem",
+  summary: [
+    { label: "Vínculos", value: "18" },
+    { label: "Folha do mês", value: "R$ 82.560" },
+    { label: "CMO sobre a receita", value: "20,0%" },
+  ],
+  setores: [
+    { label: "Cozinha · 8 vínculos", value: "R$ 38.400" },
+    { label: "Salão · 7 vínculos", value: "R$ 29.680" },
+    { label: "Administrativo · 3 vínculos", value: "R$ 14.480" },
+  ],
+} as const;
+
+export const ADQUIRENTES_MOCK = {
+  title: "Central de Dados · Faturas de cartão",
+  doc: "Stone + Rede · liquidação do período",
+  badge: "Conciliado",
+  summary: [
+    { label: "Venda bruta", value: "R$ 198.640" },
+    { label: "Taxas", value: "R$ 12.230", tone: "out" },
+    { label: "Caiu na conta", value: "R$ 186.410", tone: "in" },
+  ],
+  adquirentes: [
+    { label: "Stone · 62% do volume", value: "taxa 3,19%" },
+    { label: "Rede · 38% do volume", value: "taxa 2,89%" },
+  ],
+} as const;
+
+export const PDV_MOCK = {
+  title: "Infraestrutura de dados · Central de Dados",
+  doc: "O PDV, o ERP e o delivery entram aqui — e cruzam com nota, banco e maquininha.",
+  badge: "Julho 2026",
+  tiles: [
+    { value: "47", label: "Notas de compra" },
+    { value: "312", label: "Notas de venda" },
+    { value: "3", label: "Extratos bancários" },
+    { value: "2", label: "Faturas de cartão" },
+  ],
+  note: "Conferência cruzada: PDV × NFC-e × adquirente × extrato.",
 } as const;
 
 /* ─── O setor ─── */
