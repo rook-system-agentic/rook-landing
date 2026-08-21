@@ -7,3 +7,9 @@ out/
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+
+# Worktrees isoladas criadas por agentes de IA para trabalho paralelo.
+# Cada uma é um checkout completo do repo (centenas de MB) — nunca versionar.
+# O resto de .claude/ (settings, hooks, agents) é versionado de propósito:
+# é o que faz as worktrees herdarem os guards.
+.claude/worktrees/
