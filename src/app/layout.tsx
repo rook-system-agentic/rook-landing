@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import AppHandoffTracker from "@/components/AppHandoffTracker";
+import CookieConsent from "@/components/CookieConsent";
 import { Analytics } from "@vercel/analytics/react";
 import { siteUrl } from "@/lib/site-origin";
 import { FAQ_ITEMS } from "@/lib/lp-content";
@@ -129,6 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppHandoffTracker />
         <Header />
         <main className="pt-[72px]">{children}</main>
+        <CookieConsent />
         <Footer />
         <Analytics />
       </body>
