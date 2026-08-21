@@ -25,9 +25,23 @@ export const metadata: Metadata = {
     "controle de custos",
     "margem de lucro restaurante"
   ],
-  alternates: {
-    canonical: siteUrl(),
-  },
+  /*
+   * AQUI NÃO ENTRA `alternates.canonical`. (ROO-1125, 21/08/2026)
+   *
+   * Havia `canonical: siteUrl()` neste lugar, e o efeito era o oposto do
+   * pretendido: metadata de layout é HERDADA por toda página que não declara a
+   * sua. Então `/termos/`, `/privacidade/` e `/sobre/` diziam ao Google que a
+   * URL oficial delas era a HOME — e o Google fez o que foi mandado, tirando as
+   * três do índice. É o mesmo defeito de canonical que a ROO-1125 abriu para
+   * consertar, só que vindo de dentro em vez de vir do www.
+   *
+   * A canonical da home agora mora em `src/app/page.tsx`, junto da home. Sem
+   * valor global, página que esquecer a sua fica SEM canonical — e sem canonical
+   * o Google auto-referencia a própria URL, que é o certo. Errar por omissão
+   * custa nada; errar apontando para outra página custa a indexação.
+   *
+   * A trava está em `tests/canonical-origin.test.mjs`.
+   */
   openGraph: {
     title: "Rook System — Inteligência financeira para food service",
     description: "Faturar não é lucrar. O Rook lê a operação, interpreta as seis etapas e aponta, em reais, a próxima decisão.",

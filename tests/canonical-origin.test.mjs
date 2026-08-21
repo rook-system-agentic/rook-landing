@@ -98,3 +98,69 @@ test("o sitemap não concatena caminho sobre a raiz (barra dupla)", async () => 
     "Concatenar sobre siteUrl() gera '//', que é outra URL para o Google.",
   );
 });
+
+/*
+ * TODA ROTA DECLARA A PRÓPRIA CANONICAL — E O LAYOUT RAIZ NÃO DECLARA NENHUMA.
+ *
+ * Medido em produção em 21/08/2026: `/termos/`, `/privacidade/` e `/sobre/`
+ * serviam `<link rel="canonical" href="https://www.rook.com.br/">` — a HOME.
+ * Nenhuma das três tinha canonical própria, e o `alternates.canonical` do
+ * `app/layout.tsx` é HERDADO por quem não declara a sua. As três diziam ao
+ * Google "a URL oficial desta página é a home", e o Google obedeceu: fora do
+ * índice.
+ *
+ * É o mesmo defeito da ROO-1125 (canonical apontando para URL que não é a da
+ * página), com origem interna em vez de vir do www. E o defeito não era das
+ * três páginas: era do valor global no layout, que transforma esquecimento em
+ * canonical errada. A próxima rota criada herdaria igual.
+ *
+ * Por isso a trava tem duas metades, e as duas importam:
+ *  - o layout raiz NÃO pode declarar canonical (senão a armadilha volta);
+ *  - toda page.tsx precisa de canonical própria ou de um layout irmão que a
+ *    declare (senão a página fica sem canonical — tolerável, mas não é o que
+ *    se quer para uma rota indexável).
+ */
+test("nenhuma rota herda a canonical da home", async () => {
+  const appDir = path.join(RAIZ, "app");
+
+  const layoutRaiz = await readFile(path.join(appDir, "layout.tsx"), "utf8");
+  const semComentarios = layoutRaiz
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/^\s*\/\/.*$/gm, "");
+  assert.doesNotMatch(
+    semComentarios,
+    /alternates/,
+    "app/layout.tsx voltou a declarar `alternates`. Metadata de layout é herdada: " +
+      "toda página sem canonical própria passaria a apontar para a home e sairia do índice. " +
+      "A canonical da home mora em app/page.tsx.",
+  );
+
+  async function paginas(dir, acc = []) {
+    for (const entrada of await readdir(dir, { withFileTypes: true })) {
+      const completo = path.join(dir, entrada.name);
+      if (entrada.isDirectory()) await paginas(completo, acc);
+      else if (entrada.name === "page.tsx") acc.push(completo);
+    }
+    return acc;
+  }
+
+  const semCanonical = [];
+  for (const pagina of await paginas(appDir)) {
+    const conteudo = await readFile(pagina, "utf8");
+    if (/alternates/.test(conteudo)) continue;
+    // Um layout irmão pode declarar a canonical no lugar da página.
+    const irmao = path.join(path.dirname(pagina), "layout.tsx");
+    const temLayout = await readFile(irmao, "utf8").then(
+      (c) => /alternates/.test(c),
+      () => false,
+    );
+    if (!temLayout) semCanonical.push(path.relative(RAIZ, pagina));
+  }
+
+  assert.deepEqual(
+    semCanonical,
+    [],
+    "Rota sem canonical própria nem em layout irmão. Adicione " +
+      '`alternates: { canonical: siteUrl("/rota/") }` ao metadata da página.',
+  );
+});
