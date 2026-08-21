@@ -4,10 +4,14 @@
 leva condição de hostname. Tag sem condição dispara também no app, que já envia
 `page_view` manualmente — o app passaria a contar cada tela duas vezes.
 
-**Estado: publicado na versão 4 do contêiner, em 21/08/2026.** As tabelas
+**Estado: publicado na versão 6 do contêiner, em 21/08/2026.** As tabelas
 abaixo descrevem o que está no ar, verificado lendo o
-`gtm.js?id=GTM-M8ZJ3WTV` servido. Duas tags previstas ainda faltam, ver
-"Pendências".
+`gtm.js?id=GTM-M8ZJ3WTV` servido, não a tela do GTM. Uma tag prevista ainda
+falta, ver "Faltando no contêiner".
+
+Histórico das versões: a 4 levou as tags e os eventos; a 5 pôs a checagem de
+`ad_storage` nas quatro tags da Meta; a 6 acrescentou o gatilho do aceite na
+mesma página.
 
 ## Variáveis
 
@@ -27,7 +31,7 @@ abaixo descrevem o que está no ar, verificado lendo o
 | `LP - diagnóstico concluído` | Evento personalizado | Nome `diagnostic_complete` **e** `Page Hostname` igual a `www.rook.com.br` |
 | `LP - newsletter` | Evento personalizado | Nome `newsletter_signup` **e** `Page Hostname` igual a `www.rook.com.br` |
 | `LP - saída para o app` | Evento personalizado | Nome `app_handoff` **e** `Page Hostname` igual a `www.rook.com.br` |
-| `LP - consentimento de anúncios concedido` | Evento personalizado | Nome `consent_ads_granted` **e** `Page Hostname` igual a `www.rook.com.br` |
+| `LP - consentimento de anuncios concedido` | Evento personalizado | Nome `consent_ads_granted` **e** `Page Hostname` igual a `www.rook.com.br` |
 
 ⚠️ O último gatilho existe por um defeito medido em produção, não por completude. Ver "O aceite na mesma página" abaixo. O nome do evento tem de ser exatamente `consent_ads_granted` — é o que `CookieConsent.tsx` empurra.
 
@@ -42,23 +46,24 @@ abaixo descrevem o que está no ar, verificado lendo o
 
 | Nome | Tipo | ID | Gatilho | Observação |
 | :-- | :-- | :-- | :-- | :-- |
-| `GA4 - configuração LP` | Google Tag | `G-M93QYWQ84F` | `LP - todas as páginas` | ⚠️ **Não é uma tag nova: é a Google Tag que já existia no contêiner.** Ela disparava em *Inicialização*, sem condição de hostname. Ganhou o parâmetro de configuração `page_type` = `{{dlv - page_type}}` e passou a usar `LP - todas as páginas`. Criar uma segunda Google Tag com o mesmo `G-M93QYWQ84F` daria **dois `page_view` na LP** — duas chamadas de `config` para o mesmo ID de medição. O app não perde nada com a restrição de hostname: ele carrega o próprio `gtag/js?id=G-M93QYWQ84F` no código, com `send_page_view: false`, e manda o `page_view` à mão. A restrição na verdade **encerrou uma contagem em dobro que já existia no app**. Sobre `page_type`: o `Header` navega com `next/link` (troca de rota sem recarregar o documento), o gatilho de visualização de página dispara uma vez por carregamento, e o script que empurra `page_type` não reexecuta na troca de rota. Hoje isso separa no relatório pela **página de entrada da sessão**, não página a página. |
+| `GA4 - Rook System` | Google Tag | `G-M93QYWQ84F` | `LP - todas as páginas` | ⚠️ **Não é uma tag nova: é a Google Tag que já existia no contêiner.** Ela disparava em *Inicialização*, sem condição de hostname. Ganhou o parâmetro de configuração `page_type` = `{{dlv - page_type}}` e passou a usar `LP - todas as páginas`. Criar uma segunda Google Tag com o mesmo `G-M93QYWQ84F` daria **dois `page_view` na LP** — duas chamadas de `config` para o mesmo ID de medição. O app não perde nada com a restrição de hostname: ele carrega o próprio `gtag/js?id=G-M93QYWQ84F` no código, com `send_page_view: false`, e manda o `page_view` à mão. A restrição na verdade **encerrou uma contagem em dobro que já existia no app**. Sobre `page_type`: o `Header` navega com `next/link` (troca de rota sem recarregar o documento), o gatilho de visualização de página dispara uma vez por carregamento, e o script que empurra `page_type` não reexecuta na troca de rota. Hoje isso separa no relatório pela **página de entrada da sessão**, não página a página. |
 | `GA4 - generate_lead` | Evento GA4 | `G-M93QYWQ84F` | `LP - lead comercial` | ID de medição declarado direto na tag. Parâmetro `plano` = `{{dlv - plano}}` |
 | `GA4 - diagnostic_complete` | Evento GA4 | `G-M93QYWQ84F` | `LP - diagnóstico concluído` | Parâmetro `ab_variant` = `{{dlv - ab_variant}}` |
 | `GA4 - newsletter_signup` | Evento GA4 | `G-M93QYWQ84F` | `LP - newsletter` | Sem parâmetro. |
 | `GA4 - app_handoff` | Evento GA4 | `G-M93QYWQ84F` | `LP - saída para o app` | Parâmetro `destino` = `{{dlv - destino}}` |
-| `Meta - PageView` | HTML personalizado | `1088278284898303` | `LP - todas as páginas` **+** `LP - consentimento de anúncios concedido` | Código base do pixel: `fbq('init')` + `fbq('track','PageView')`. Os **dois** gatilhos são necessários — ver "O aceite na mesma página" |
+| `Meta - PageView` | HTML personalizado | `1088278284898303` | `LP - todas as páginas` **+** `LP - consentimento de anuncios concedido` | Código base do pixel: `fbq('init')` + `fbq('track','PageView')`. Os **dois** gatilhos são necessários — ver "O aceite na mesma página" |
 | `Meta - Lead` | HTML personalizado | `1088278284898303` | `LP - lead comercial` | `fbq('track','Lead')` |
 | `Meta - CompleteRegistration` | HTML personalizado | `1088278284898303` | `LP - diagnóstico concluído` | `fbq('track','CompleteRegistration')` — **não** usar `Lead`, para não misturar intenção comercial com uso de ferramenta |
 | `Meta - Subscribe` | HTML personalizado | `1088278284898303` | `LP - newsletter` | `fbq('track','Subscribe')` |
 | `Google Ads - remarketing` | Google Tag | `AW-7866728846` | `LP - todas as páginas` | Repõe o que o código fazia antes com `gtag('config','AW-…')` em toda página. Sem ela, o público de remarketing para de ser alimentado. |
 | `Google Ads - vinculador de conversões` | Vinculador de conversões | — | `LP - todas as páginas` | Preserva o `gclid` do clique. Sem ela a conversão não é atribuída à campanha. |
 
-## Faltando no contêiner (verificado na versão 4)
+## Faltando no contêiner (verificado na versão 6)
 
 | O que | Efeito de estar faltando |
 | :-- | :-- |
 | `Clarity` · HTML personalizado · projeto `x4y25y8xz4` · `LP - todas as páginas` | A LP está **sem gravação de sessão desde 17/08/2026**: o script saiu do código no PR #86 e nunca entrou no contêiner. O projeto `x4y25y8xz4` é o da LP; o app usa outro (`x4ynw4yaek`), não confunda. |
+| Nome da tag `A4 - app_handoff` | Erro de digitação: falta o `G`. Só cosmético, mas confunde quem procura a tag do GA4 na lista. |
 | Conversão de lead no Google Ads | O `AW-7866728846` está no ar como Google Tag (remarketing), mas **nenhuma conversão é registrada**. Duas saídas: criar a tag "Conversão do Google Ads" no gatilho `LP - lead comercial` (o rótulo vem de *Objetivos → Conversões* na conta do Ads), **ou** importar o evento-chave `generate_lead` do GA4 como conversão no Ads. A segunda não cria tag nenhuma e é suficiente para a campanha otimizar. |
 
 ## Depois de publicar — três passos no GA4, não um
@@ -95,7 +100,7 @@ não existe, e número que não existe ninguém vê.
 
 ## Consentimento por tag: a Meta exige configuração manual
 
-As tags `GA4 - configuração LP`, `GA4 - generate_lead`,
+As tags `GA4 - Rook System`, `GA4 - generate_lead`,
 `GA4 - diagnostic_complete`, `GA4 - newsletter_signup` e `GA4 - app_handoff`
 são nativas do Google e respeitam o sinal do Consent Mode sozinhas —
 nenhuma configuração adicional é necessária nelas.
@@ -172,7 +177,7 @@ consentimento internamente e reagem ao `consent update` na hora. Medido —
 **A correção tem duas metades.** No código, `CookieConsent.tsx` empurra
 `dataLayer.push({event:'consent_ads_granted'})` quando — e só quando — a
 publicidade é concedida. No contêiner, o gatilho
-`LP - consentimento de anúncios concedido` escuta esse evento e é adicionado
+`LP - consentimento de anuncios concedido` escuta esse evento e é adicionado
 como **segundo** gatilho de `Meta - PageView`.
 
 Não há disparo em dobro: quem recusa não emite o evento, e quem volta não vê
@@ -181,7 +186,7 @@ o banner, então nunca passa por esse caminho.
 ## Pendências
 
 - **Separação por página real, não só por página de entrada.** Hoje
-  `GA4 - configuração LP` produz um `page_view` por sessão, com `page_type`
+  `GA4 - Rook System` produz um `page_view` por sessão, com `page_type`
   da página em que o visitante chegou, congelado pelo resto da visita — a
   navegação entre `/`, `/planos`, `/blog`, `/diagnostico` e
   `/calculadora-cmv` troca de rota via `next/link`, sem recarregar o
