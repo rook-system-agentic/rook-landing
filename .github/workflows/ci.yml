@@ -8,6 +8,10 @@ name: CI
 #
 # A regra que mais depende disso é a allowlist de src/lib/tracking-events.mjs,
 # que impede dado pessoal de chegar ao GA4 e à Meta.
+#
+# tests/billing-catalog.test.mjs fica fora do test:ci: o snapshot que ele
+# compara está expirado, de forma anterior e independente deste trabalho —
+# não é uma exclusão por não rodar ou não passar, é dívida já existente.
 
 on:
   pull_request:
@@ -38,6 +42,9 @@ jobs:
 
       - name: Instalar dependências
         run: pnpm install --frozen-lockfile
+
+      - name: Checar tipos
+        run: pnpm exec tsc --noEmit
 
       - name: Rodar testes
         run: pnpm test:ci
