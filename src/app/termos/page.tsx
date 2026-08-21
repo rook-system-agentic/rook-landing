@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { siteUrl } from "@/lib/site-origin";
 import { COMPANY_INFO } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Termos de Uso do Site — Rook System",
   description: "Condições gerais de acesso ao site público do Rook System.",
+  alternates: { canonical: siteUrl("/termos/") },
 };
 
 const sections = [

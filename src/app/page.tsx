@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { siteUrl } from "@/lib/site-origin";
 import LpHero from "@/components/lp/LpHero";
 import LpMethod from "@/components/lp/LpMethod";
 import LpSources from "@/components/lp/LpSources";
@@ -27,6 +29,16 @@ import LpCta from "@/components/lp/LpCta";
  *
  * Todo o texto vem de `@/lib/lp-content`.
  */
+/*
+ * A canonical da home mora aqui, e não no layout: no layout ela era herdada
+ * por toda página sem canonical própria. Ver o comentário em `layout.tsx`.
+ * O resto do metadata (título, descrição, openGraph) continua no layout, que é
+ * onde faz sentido — a home É o padrão do site.
+ */
+export const metadata: Metadata = {
+  alternates: { canonical: siteUrl() },
+};
+
 export default function HomePage() {
   return (
     <div data-lp-home>
