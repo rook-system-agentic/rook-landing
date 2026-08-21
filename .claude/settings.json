@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-secrets.sh",
+            "shell": "bash",
+            "timeout": 15,
+            "statusMessage": "Verificando se o arquivo é env com valor real..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/test-changed.sh",
+            "shell": "bash",
+            "async": true,
+            "asyncRewake": true,
+            "timeout": 120,
+            "statusMessage": "Rodando a suíte node:test do módulo tocado..."
+          }
+        ]
+      }
+    ]
+  }
+}
