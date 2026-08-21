@@ -86,6 +86,35 @@ test("next.config declara cache para os arquivos estáticos de public/", async (
 });
 
 /*
+ * ACOPLAMENTO INVISÍVEL COM O CLOUDFLARE (ROO-1124, 21/08/2026).
+ *
+ * O HTML das páginas passou a ser cacheado na borda do Cloudflare por uma Cache
+ * Rule cuja expressão é:
+ *
+ *   ends_with(http.request.uri.path, "/") and not starts_with(..., "/api/")
+ *
+ * Ela distingue "página" de "arquivo" pela BARRA FINAL, e a barra final só
+ * existe porque `trailingSlash: true` está aqui. Tirar essa linha faz as URLs
+ * de página deixarem de terminar em `/`, a regra deixa de casar, e o HTML volta
+ * a fazer round trip até `iad1` a cada visita — sem erro, sem teste vermelho e
+ * sem nada na tela. Só o TTFB triplica.
+ *
+ * Este teste é o único lugar do repositório onde essa regra existe escrita, já
+ * que ela mora no painel do Cloudflare e não no código. Se `trailingSlash` tiver
+ * que sair, a Cache Rule tem que ser reescrita ANTES.
+ */
+test("trailingSlash continua ligado — a Cache Rule do Cloudflare depende dele", async () => {
+  const conteudo = semComentarios(
+    await readFile(path.join(RAIZ, "next.config.mjs"), "utf8"),
+  );
+  assert.match(
+    conteudo,
+    /trailingSlash:\s*true/,
+    "trailingSlash: true foi removido — a Cache Rule do Cloudflare casa páginas pela barra final e vai parar de cachear o HTML. Ver docs/performance-lp-roo1124.md §8.",
+  );
+});
+
+/*
  * `images: { unoptimized: true }` está ligado (a imagem de homologação em k3s
  * não roda o otimizador do Next). Com ele, `next/image` é um <img> simples: o
  * arquivo vai para o celular do jeito que está em `public/`. Então o tamanho do

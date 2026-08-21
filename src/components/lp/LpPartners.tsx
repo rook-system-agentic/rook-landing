@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { PARTNERS, PARTNERS_SECTION, CONTACT_EMAIL, type Partner } from "@/lib/lp-content";
-import LpPartnersDiagram from "./LpPartnersDiagram";
 
 /**
  * Um parceiro na faixa.
@@ -54,46 +53,30 @@ export default function LpPartners() {
       aria-labelledby="partners-title"
     >
       <div className="mx-auto max-w-7xl px-6">
-        {/*
-          O diagrama leva a coluna maior: são sete origens mais o núcleo e o
-          gestor, e em meia coluna os rótulos ficam ilegíveis.
-
-          Grade de 12 com `col-span`, que é o idioma comum do Tailwind e
-          dispensa valor arbitrário.
-
-          Nota para quem for depurar layout aqui: se uma classe nova parecer
-          "não existir", desconfie do servidor de desenvolvimento antes do
-          código. O observador do Tailwind trava depois de muitas edições
-          seguidas e para de emitir classes novas, enquanto as que já existiam
-          continuam funcionando — o sintoma é um grid que cai para uma coluna
-          sem erro nenhum. `rm -rf .next` e reiniciar resolve.
-        */}
-        <div className="grid items-center gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-5">
-            <p className="lp-label mb-4">{PARTNERS_SECTION.label}</p>
-            <h2
-              id="partners-title"
-              className="mb-5 font-display font-extrabold"
-              style={{
-                color: "var(--lp-ink)",
-                fontSize: "clamp(2rem, 4.2vw, 3.4rem)",
-                lineHeight: 1.05,
-                letterSpacing: "-0.03em",
-              }}
-            >
-              {PARTNERS_SECTION.headlinePlain}
-              <span style={{ color: "#e54c00" }}>{PARTNERS_SECTION.headlineEmphasis}</span>
-            </h2>
-            <p className="lp-body mb-6">{PARTNERS_SECTION.intro}</p>
-            <a
-              href={`mailto:${CONTACT_EMAIL}?subject=Solicita%C3%A7%C3%A3o%20de%20integra%C3%A7%C3%A3o`}
-              className="btn-ghost text-sm"
-            >
-              {PARTNERS_SECTION.ctaLabel}
-            </a>
-          </div>
-
-          <LpPartnersDiagram className="lg:col-span-7" />
+        {/* v5.1: sem o diagrama de rede — no preview aprovado a seção é o
+            argumento em texto e a faixa de logos, nada mais. */}
+        <div className="max-w-3xl">
+          <p className="lp-label mb-4">{PARTNERS_SECTION.label}</p>
+          <h2
+            id="partners-title"
+            className="mb-5 font-display font-extrabold"
+            style={{
+              color: "var(--lp-ink)",
+              fontSize: "clamp(2rem, 4.2vw, 3.4rem)",
+              lineHeight: 1.05,
+              letterSpacing: "-0.03em",
+            }}
+          >
+            {PARTNERS_SECTION.headlinePlain}
+            <span style={{ color: "#e54c00" }}>{PARTNERS_SECTION.headlineEmphasis}</span>
+          </h2>
+          <p className="lp-body mb-6">{PARTNERS_SECTION.intro}</p>
+          <a
+            href={`mailto:${CONTACT_EMAIL}?subject=Solicita%C3%A7%C3%A3o%20de%20integra%C3%A7%C3%A3o`}
+            className="btn-ghost text-sm"
+          >
+            {PARTNERS_SECTION.ctaLabel}
+          </a>
         </div>
       </div>
 

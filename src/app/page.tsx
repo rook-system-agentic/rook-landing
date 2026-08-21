@@ -1,18 +1,25 @@
+import type { Metadata } from "next";
+import { siteUrl } from "@/lib/site-origin";
 import LpHero from "@/components/lp/LpHero";
-import LpFunnel from "@/components/lp/LpFunnel";
+import LpMethod from "@/components/lp/LpMethod";
+import LpSources from "@/components/lp/LpSources";
 import LpManifesto from "@/components/lp/LpManifesto";
+import LpBoard from "@/components/lp/LpBoard";
+import LpBriefing from "@/components/lp/LpBriefing";
+import LpIntelligence from "@/components/lp/LpIntelligence";
+import LpSector from "@/components/lp/LpSector";
 import LpPartners from "@/components/lp/LpPartners";
 import LpPricing from "@/components/lp/LpPricing";
 import LpFaq from "@/components/lp/LpFaq";
 import LpCta from "@/components/lp/LpCta";
 
 /**
- * Home — redesenho v4.
+ * Home — redesenho v5, alinhado ao preview aprovado com Daniel em 18/08/2026.
  *
- * A composição foi decidida no Claude Design a partir de três variações
- * concorrentes: a base é a "Produto vivo" (interface real dentro dos módulos)
- * com o funil das seis etapas, da variação cinematográfica, encaixado logo
- * depois do hero.
+ * A ordem conta uma história: promessa (hero), prova (vitrine), método,
+ * fontes de dados, a pergunta do dono (manifesto), o produto por dentro
+ * (tabuleiro, briefing, inteligência), contexto de mercado (setor),
+ * integrações, oferta, dúvidas e a chamada final.
  *
  * O atributo `data-lp-home` é o que aplica a paleta desta página. Ele é lido
  * por `body:has([data-lp-home])` no `globals.css`, e é assim que o Header e o
@@ -22,6 +29,16 @@ import LpCta from "@/components/lp/LpCta";
  *
  * Todo o texto vem de `@/lib/lp-content`.
  */
+/*
+ * A canonical da home mora aqui, e não no layout: no layout ela era herdada
+ * por toda página sem canonical própria. Ver o comentário em `layout.tsx`.
+ * O resto do metadata (título, descrição, openGraph) continua no layout, que é
+ * onde faz sentido — a home É o padrão do site.
+ */
+export const metadata: Metadata = {
+  alternates: { canonical: siteUrl() },
+};
+
 export default function HomePage() {
   return (
     <div data-lp-home>
@@ -29,8 +46,13 @@ export default function HomePage() {
           invisível onde o navegador não tem timeline de scroll no CSS. */}
       <div className="lp-progress" aria-hidden="true" />
       <LpHero />
-      <LpFunnel />
+      <LpMethod />
+      <LpSources />
       <LpManifesto />
+      <LpBoard />
+      <LpBriefing />
+      <LpIntelligence />
+      <LpSector />
       <LpPartners />
       <LpPricing />
       <LpFaq />

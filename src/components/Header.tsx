@@ -4,11 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 
 const navLinks = [
-  { href: "/", label: "Início" },
-  { href: "/funcionalidades/", label: "Funcionalidades" },
-  { href: "/calculadora-cmv/", label: "Calculadora CMV" },
-  { href: "/planos/", label: "Planos" },
-  { href: "/sobre/", label: "Sobre o Rook" },
+  { href: "/sobre/", label: "Sobre" },
+  { href: "/restaurantes/", label: "Restaurantes" },
+  { href: "/diagnostico/", label: "Diagnóstico" },
+  { href: "/calculadora-cmv/", label: "CMV" },
   { href: "/blog/", label: "Blog" },
 ];
 
@@ -99,7 +98,7 @@ export default function Header() {
         <div className="hidden lg:flex items-center gap-3">
           <ThemeToggle />
           <a href="https://app.rook.com.br/login" className="btn-ghost text-sm">Entrar</a>
-          <Link href="/planos/" className="btn-primary text-sm">Testar por 7 dias</Link>
+          <Link href="/planos/" className="btn-primary text-sm">Testar 7 dias</Link>
         </div>
 
         {/* Mobile toggle */}
@@ -126,7 +125,7 @@ export default function Header() {
         ))}
         <div className="flex flex-col gap-2 pt-3" style={{ borderTop: "1px solid var(--color-border)" }}>
           <a href="https://app.rook.com.br/login" className="btn-ghost text-sm text-center">Entrar</a>
-          <Link href="/planos/" className="btn-primary text-sm text-center">Testar por 7 dias</Link>
+          <Link href="/planos/" className="btn-primary text-sm text-center">Testar 7 dias</Link>
         </div>
       </nav>
     </header>

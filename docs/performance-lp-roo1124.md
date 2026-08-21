@@ -370,3 +370,318 @@ ela precisa quebrar no momento em que é desfeita, não no deploy.
 Cinco das seis foram conferidas reprovando contra o código anterior a esta
 entrega. A do `beforeInteractive` já passava — existe para o futuro, não para o
 passado.
+
+---
+
+## 8. Segunda rodada — 21/08/2026: o LCP explicado e atacado
+
+A seção 5 fechou com "o LCP de 7,6 s continua sem explicação completa". Esta
+rodada explicou. Medições com Lighthouse 12 mobile (`--throttling-method=simulate`,
+Chrome headless local) contra **produção**, nos dois hosts, antes e depois:
+
+| Entrada | Score | FCP | LCP |
+|---|---:|---:|---:|
+| `rook.com.br` — antes | 90 | 2,8 s | 3,0 s |
+| `rook.com.br` — depois | **93** | 2,6 s | **2,6 s** |
+| `www.rook.com.br` — antes | 93 | 2,0 s | 2,1 s |
+| `www.rook.com.br` — depois | **98** | 1,8 s | **2,0 s** |
+
+O elemento do LCP continua sendo **texto** (o parágrafo do hero), com
+`Load Delay` e `Load Time` em **zero**. Vale repetir porque é contraintuitivo e
+custa tempo de quem chega nesta issue depois: **nenhum trabalho de imagem move
+este LCP.** Ele é feito só de TTFB + render delay.
+
+E o render delay, decomposto, não era CSS nem JavaScript nosso. Eram três coisas
+que não estão em lugar nenhum deste repositório.
+
+### 8.1 — O 308 do apex era respondido pela Vercel, na Virgínia
+
+`https://rook.com.br/` respondia 308 com `x-vercel-id: iad1::…`. Ou seja: o
+visitante em São Paulo abria conexão, atravessava até a Virgínia e voltava —
+**só para ser informado de que o endereço certo tem `www`**. Conferido: o
+ruleset `http_request_dynamic_redirect` da zona estava vazio, e os dois
+registros (`rook.com.br` A proxiado, `www` CNAME proxiado) apontam para a Vercel.
+
+Feito: uma **Redirect Rule do Cloudflare** passou a responder o 308 — agora 301
+— na borda, sem tocar a origem.
+
+```
+expressão: http.host eq "rook.com.br"
+           and not starts_with(http.request.uri.path, "/.well-known/")
+ação:      redirect 301 → concat("https://www.rook.com.br", http.request.uri)
+```
+
+`http.request.uri` já carrega caminho **e** query string, então não há
+`preserve_query_string` nem ramificação. Conferido: `rook.com.br/planos/?utm=x`
+→ `301` para `https://www.rook.com.br/planos/?utm=x`, resposta **sem**
+`x-vercel-id`.
+
+**A exclusão de `/.well-known/` não é zelo decorativo.** A Vercel emite
+certificado do apex por desafio HTTP em `/.well-known/acme-challenge/`. Sem essa
+cláusula, o redirect engoliria o desafio e a renovação do certificado falharia —
+em algum dia daqui a três meses, sem relação aparente com performance.
+
+O redirecionamento da Vercel continua configurado e nunca mais é atingido. É
+fallback, não redundância a limpar.
+
+**O que isso NÃO resolve, e é importante:** o Lighthouse ainda cobra **760 ms**
+de `redirects` (era 890 ms). O ganho foi só de 130 ms porque o modelo de rede
+simulada cobra sobretudo a **abertura da segunda conexão** — DNS, TCP e TLS para
+um host diferente — e não a ida à origem. No mundo real o ganho é maior do que o
+modelo mostra, porque o RTT até `iad1` é real e o do simulador é fixo. Mas o
+score do PageSpeed é o modelo. **Zerar esses 760 ms exige não redirecionar**, ou
+seja escolher UM host oficial e servir direto nele — a decisão que a seção 4.3
+registrou e que continua aberta. Ela é de produto e de SEO (a canonical é `www`
+desde a ROO-1125, que consertou 13 páginas não indexadas), não de engenharia.
+
+### 8.2 — O Cloudflare injetava um script síncrono para esconder o e-mail
+
+O maior item isolado do render delay, e o mais invisível: **479 ms de
+render-blocking** vindos de
+
+```
+https://www.rook.com.br/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js
+```
+
+Prioridade `High`, síncrono, **na frente da primeira pintura** — mais caro que a
+folha de estilo inteira do site (170 ms). Ninguém escreveu essa tag: é o
+**Email Address Obfuscation** do Cloudflare (`email_obfuscation: on` na zona).
+Ele varre o HTML, acha `contato@rook.com.br` — que aparece no Footer, no LpFaq e
+no LpPartners — troca por `<span data-cfemail>` e injeta o decodificador para
+desfazer isso no navegador de quem visita.
+
+Feito: `email_obfuscation` → **`off`**.
+
+O que se perde: proteção contra scraper de e-mail. Que era simbólica — o mesmo
+endereço está em `mailto:` em seis lugares do site, e `mailto:` o Cloudflare não
+obfusca. Trocávamos meio segundo de LCP de todo visitante por um obstáculo que
+qualquer scraper com uma regex vence.
+
+Conferido depois: zero ocorrências de `email-decode` e de `__cf_email__` no HTML
+servido, e os seis `mailto:contato@rook.com.br` intactos. O Lighthouse passou a
+reportar **nenhum** recurso render-blocking nos dois hosts — sem o script, o CSS
+de 8,2 KB sozinho fica abaixo do limiar.
+
+### 8.3 — O HTML nunca era cacheado na borda
+
+Toda resposta de página vinha com:
+
+```
+cache-control: public, max-age=0, must-revalidate
+cf-cache-status: DYNAMIC
+x-vercel-cache: HIT          ← já era prerender estático
+age: 320885                  ← parado há 3,7 dias sem mudar
+x-vercel-id: iad1::…
+```
+
+Um prerender estático, imutável entre deploys, fazendo round trip até a Virgínia
+**a cada visita**. `cache_level` da zona está em `aggressive`, mas isso não
+cacheia HTML: o Cloudflare ignora documento HTML no cache padrão
+independentemente de cabeçalho.
+
+Feito: uma **Cache Rule**.
+
+```
+expressão: ends_with(http.request.uri.path, "/")
+           and not starts_with(http.request.uri.path, "/api/")
+ação:      cache: true
+           edge_ttl:    override_origin, 300 s
+           browser_ttl: respect_origin
+```
+
+**Por que a barra final e não uma lista de rotas:** `trailingSlash: true` está no
+`next.config.mjs`, então toda URL de *página* termina em `/` e nenhum *arquivo*
+termina em `/`. Uma expressão distingue os dois sem enumerar rota nenhuma, e
+rota nova entra sozinha. O preço é um acoplamento com o `next.config.mjs` que
+mora no painel do Cloudflare e não no código — está travado por
+`tests/performance-lp.test.mjs`, que é o único lugar do repositório onde essa
+dependência existe escrita.
+
+**`override_origin` é o ponto do exercício:** ele ignora o
+`max-age=0, must-revalidate` que a Vercel emite. Sem isso a regra não faria nada.
+`browser_ttl: respect_origin` mantém o navegador revalidando a cada navegação —
+mas essa revalidação agora morre na borda de São Paulo, não em `iad1`.
+
+**⚠️ CONSEQUÊNCIA OPERACIONAL: um deploy leva até 5 minutos para aparecer.** É o
+preço dos 300 s de `edge_ttl`, e foi escolhido em vez de purge no deploy porque
+5 minutos captura praticamente todo o ganho de cache (a home recebe visita
+contínua) sem acoplar o pipeline de deploy a um token do Cloudflare. Se um dia
+precisar aparecer na hora: purgue a URL no painel, ou baixe o TTL.
+
+Conferido: `cf-cache-status` foi de `MISS`, `MISS` para `HIT` na terceira
+requisição, e depois `HIT` em 10 de 10. TTFB real medido em 10 amostras caiu
+para **76–84 ms** nos acertos de borda com conexão quente, contra 350–520 ms
+antes — faixa que simplesmente não existia.
+
+**O Lighthouse quase não credita isso**, e é bom saber antes de comparar scores:
+o `timeToFirstByte` do modo `simulate` usa um RTT simulado fixo, então continua
+marcando ~600 ms. O que melhorou de verdade aparece no observado — FCP
+observado 384 ms → **270 ms**. Quem ganha é o visitante brasileiro, não a
+planilha.
+
+### 8.4 — O que foi medido e deliberadamente NÃO feito
+
+**Reduzir o HTML da home.** Medido: 148.064 B crus, 19.036 B em brotli na rede.
+**90.943 B — 61% do arquivo — são `<script>` inline**: o payload de flight do
+RSC, a árvore React serializada que o App Router manda junto com o HTML para
+hidratar. Encolher isso significa mexer nas fronteiras cliente/servidor de todos
+os componentes da LP. Contra 19 KB comprimidos no fio, o ganho simulado é da
+ordem de 50 ms. **Não vale o risco de reestruturar a página aprovada por 50 ms.**
+Fica medido aqui para ninguém precisar medir de novo antes de recusar.
+
+**Inline do CSS crítico.** Depois de 8.2 o Lighthouse não reporta mais recurso
+render-blocking nenhum. Não há o que consertar.
+
+**`content-visibility: auto` nas seções abaixo da dobra.** A página tem 10.017 px
+de altura e 604 elementos, e `Style & Layout` + `Rendering` somam ~900 ms de
+linha principal. Tentador — e desnecessário: o TBT está em **30 ms** e o CLS em
+**0**. Não se otimiza o que já pontua 1.
+
+### 8.5 — Onde isto mora agora
+
+Três das quatro mudanças desta rodada **não estão neste repositório**. Ficam
+registradas aqui porque é o único lugar onde alguém as vai procurar:
+
+| Mudança | Onde | Objeto |
+|---|---|---|
+| `email_obfuscation: off` | zona `rook.com.br` (`fbe6a7d3736d749d6783dbbe15643f01`) | setting |
+| Redirect do apex na borda | mesma zona | ruleset `http_request_dynamic_redirect` |
+| Cache do HTML na borda | mesma zona | ruleset `http_request_cache_settings` |
+| Guarda do `trailingSlash` | este repositório | `tests/performance-lp.test.mjs` |
+
+Nenhum teste de código consegue ver as três primeiras. Se um dia o LCP piorar de
+novo sem que ninguém tenha mexido no código, **é aqui que se olha primeiro** —
+essas três configurações são as candidatas, nesta ordem.
+
+---
+
+## 9. A decisão do host oficial — `www.rook.com.br` (21/08/2026)
+
+Decidido com o Daniel: **`www.rook.com.br` é o host oficial**, e o objetivo é que
+ninguém passe pelo apex. Esta seção fecha o item que a 4.3 e a 8.1 deixaram
+aberto.
+
+### 9.1 — Quanto o apex custa, medido de verdade
+
+O Lighthouse cobra 760 ms de `redirects`, mas é modelo. O número real, medido com
+Navigation Timing em contexto novo do Chrome, mediana de 6 amostras cada:
+
+| Entrada | TTFB | responseEnd |
+|---|---:|---:|
+| `https://rook.com.br/` | 364 ms | 393 ms |
+| `https://www.rook.com.br/` | **84 ms** | **132 ms** |
+
+**~280 ms de TTFB real**, por visita que entra pelo apex. (O `redirectEnd -
+redirectStart` do Navigation Timing dá 0 porque o salto é entre origens
+diferentes e a API o esconde; o custo aparece dentro do TTFB.)
+
+O detalhe de conexão, capturado pelo CDP, mostra por que é tão caro:
+
+```
+301 https://rook.com.br/      → ip=172.66.171.27  h2  reused=false
+200 https://www.rook.com.br/  → ip=104.20.29.107  h3  reused=false
+```
+
+**IP diferente e protocolo diferente.** O Cloudflare publica dois endereços
+anycast; o Chrome resolve o segundo hostname por conta própria, cai no outro
+endereço e negocia QUIC do zero. Não é um salto de HTTP — são duas conexões TLS
+completas.
+
+### 9.2 — A hipótese do certificado, e por que foi descartada
+
+Vale registrar porque é convincente e está errada.
+
+O apex serve um certificado que **não cobre** `www.rook.com.br`:
+
+| Pacote | Tipo | Hosts |
+|---|---|---|
+| `b0fcbf2c…` | advanced | `rook.com.br`, `timebox.rook.com.br`, `*.timebox.rook.com.br` |
+| `dc74ffcf…` | universal | `rook.com.br`, `*.rook.com.br` |
+
+O pacote *advanced* — criado em 20/08/2026 para o `timebox`, incluindo o apex na
+lista — ganha para o SNI do apex. Então quem entra pelo apex recebe um
+certificado sem `www` nas SANs, o que **impede** o *connection coalescing* do
+Chrome (reaproveitar a conexão aberta para o segundo hostname). A correção
+parecia óbvia: tirar `rook.com.br` do pacote advanced, o apex volta ao universal,
+que cobre os dois, e o salto deixa de custar handshake.
+
+**Testado antes de mexer.** Controle: a partir do `www` (cujo certificado cobre
+`*.rook.com.br`, portanto cobre `timebox.rook.com.br`), buscar
+`timebox.rook.com.br` — mesmo certificado, mesmo pool de IP. Resultado:
+
+```
+200 https://www.rook.com.br/       → ip=104.20.29.107  reused=true
+200 https://timebox.rook.com.br/   → ip=172.66.171.27  reused=false
+```
+
+**Não reusou.** O coalescing exige que o IP resolvido seja o mesmo da conexão
+aberta, e com dois registros A o Chrome cai no outro. Corrigir o certificado
+tornaria o coalescing *possível*, não confiável — e não se mexe em TLS de
+produção por um ganho que a medição não confirma. **Não foi feito, de propósito.**
+
+(O pacote advanced incluir o apex ainda é desalinhado com a intenção de quem o
+criou para o `timebox`. É arrumação de configuração, não de performance.)
+
+### 9.3 — "Acabar com o redirect" é acabar com o TRÁFEGO nele
+
+A regra do apex **não pode ser removida**: gente digita `rook.com.br`, existe
+backlink e material impresso apontando para lá, e sem a regra isso viraria erro.
+O que se elimina é o tráfego que passa por ela. Estado de cada frente:
+
+| Frente | Estado |
+|---|---|
+| Vercel: `www` primário, apex redireciona | ✅ já era |
+| Cloudflare: 301 do apex respondido na borda | ✅ feito em 8.1 |
+| `canonical` de toda rota | ✅ ver 9.4 |
+| `robots.txt` → `Sitemap:` com www | ✅ conferido em produção |
+| `sitemap.xml`: 15 URLs, 1 host só | ✅ conferido |
+| Código: nenhuma origem escrita fora de `site-origin.ts` | ✅ travado por `tests/canonical-origin.test.mjs` |
+| **Destino dos anúncios (Google Ads, Meta)** | ⚠️ **fora deste repositório — pendente** |
+| **Contêiner GTM** | ⚠️ **fora deste repositório — pendente** |
+| **Propriedade primária no Search Console** | ⚠️ **fora deste repositório — pendente** |
+
+As três pendências são a parte que ainda vale 280 ms por clique, e nenhuma delas
+se resolve com deploy. **Se um anúncio pago aponta para `rook.com.br`, cada
+clique comprado paga o salto** — é o item de maior valor que sobrou, e depende de
+quem administra as plataformas de mídia (ver ROO-1117, que já trata do GTM).
+
+**E a partir de agora o PageSpeed se mede em `https://www.rook.com.br/`.** O
+número do apex é estruturalmente pior e sempre vai ser: ele inclui um salto que
+o host oficial não tem. Medir o apex e tratar como nota do site é medir a coisa
+errada — foi o que fez o relatório de abertura desta rodada marcar 80.
+
+### 9.4 — Três páginas mandavam o Google desindexá-las
+
+Achado enquanto se auditava "tudo que aponta para o apex" — e o problema não era
+o apex, era interno. Medido em produção:
+
+| Rota | `<link rel="canonical">` servido |
+|---|---|
+| `/termos/` | `https://www.rook.com.br/` ← a **home** |
+| `/privacidade/` | `https://www.rook.com.br/` ← a **home** |
+| `/sobre/` | `https://www.rook.com.br/` ← a **home** |
+
+As três diziam ao Google que a URL oficial delas era a home. O Google obedece: a
+página sai do índice. É o mesmo mecanismo da ROO-1125 (canonical apontando para
+URL que não é a da página), com origem interna em vez de vir do www.
+
+**A causa não era das três páginas.** `app/layout.tsx` declarava
+`alternates: { canonical: siteUrl() }`, e metadata de layout é **herdada** por
+toda página que não declara a sua. O valor global transformava esquecimento em
+canonical errada, e a próxima rota criada herdaria igual.
+
+Corrigido pela causa: o `alternates` saiu do layout raiz e foi para
+`app/page.tsx`, junto da home. Sem valor global, página que esquecer a sua fica
+**sem** canonical — e sem canonical o Google auto-referencia a própria URL, que é
+o certo. Errar por omissão custa nada; errar apontando para outra página custa a
+indexação. As três páginas ganharam a canonical própria.
+
+Conferido no HTML do `next build`: as sete rotas verificadas saem
+auto-referentes. A trava tem duas metades — o layout raiz não pode declarar
+`alternates`, e toda `page.tsx` precisa de canonical própria ou de um `layout.tsx`
+irmão que a declare — e **as duas foram conferidas reprovando** contra o estado
+anterior.
+
+Fora do escopo, para quem estiver na ROO-1125: `/restaurantes/` e `/setores/`
+tinham o mesmo defeito, já corrigido em `homolog` e ainda não promovido a `main`.
+Em produção, hoje, as duas continuam apontando para a home.

@@ -24,7 +24,7 @@ export default function LpPricing() {
 
   return (
     <section
-      className="py-20 lg:py-28"
+      className="lp-band py-20 lg:py-28"
       style={{ borderTop: "1px solid var(--lp-line)" }}
       aria-labelledby="pricing-title"
     >
@@ -79,6 +79,14 @@ export default function LpPricing() {
                 <p className="mt-2 text-xs" style={{ color: "var(--lp-muted)" }}>
                   {plan.note}
                 </p>
+                {/* v5.1: botão por card, como no preview — o destacado leva o
+                    primário, o outro o fantasma. */}
+                <Link
+                  href={PRICING.ctaHref}
+                  className={`${plan.highlighted ? "btn-primary" : "btn-ghost"} mt-5 w-full`}
+                >
+                  {PRICING.cardCtaLabel}
+                </Link>
               </div>
             </Reveal>
           ))}
@@ -89,7 +97,14 @@ export default function LpPricing() {
             <div className="flex-1 text-center sm:text-left">
               <p className="lp-label mb-2">{CHESS_ADDON.label}</p>
               <p className="text-sm leading-relaxed" style={{ color: "var(--lp-muted)" }}>
-                {CHESS_ADDON.description}
+                {CHESS_ADDON.description}{" "}
+                <Link
+                  href={PRICING.ctaHref}
+                  className="whitespace-nowrap underline underline-offset-4"
+                  style={{ color: "var(--lp-accent)" }}
+                >
+                  {PRICING.ctaLabel}
+                </Link>
               </p>
             </div>
             <p
@@ -104,11 +119,6 @@ export default function LpPricing() {
           </div>
         </div>
 
-        <div className="mt-8 text-center">
-          <Link href={PRICING.ctaHref} className="btn-primary">
-            {PRICING.ctaLabel}
-          </Link>
-        </div>
       </div>
     </section>
   );

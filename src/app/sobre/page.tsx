@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { siteUrl } from "@/lib/site-origin";
 
 export const metadata: Metadata = {
   title: "Sobre o Rook | Rook System",
   description: "O Rook é um sistema de gestão para donos de food service que querem parar de operar no escuro. Conheça nossa história.",
+  alternates: { canonical: siteUrl("/sobre/") },
 };
 
 export default function SobrePage() {

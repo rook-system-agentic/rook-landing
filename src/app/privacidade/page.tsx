@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { siteUrl } from "@/lib/site-origin";
 import { COMPANY_INFO } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade — Rook System",
   description: "Informações gerais sobre o tratamento de dados pessoais pelo Rook System.",
+  alternates: { canonical: siteUrl("/privacidade/") },
 };
 
 const sections = [

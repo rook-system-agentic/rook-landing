@@ -6,12 +6,13 @@ import GoogleTagManager from "@/components/GoogleTagManager";
 import AppHandoffTracker from "@/components/AppHandoffTracker";
 import { Analytics } from "@vercel/analytics/react";
 import { siteUrl } from "@/lib/site-origin";
+import { FAQ_ITEMS } from "@/lib/lp-content";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
-  title: "Rook System — Inteligência Financeira e Gestão para Restaurantes",
+  title: "Rook System — Inteligência financeira para food service",
   description:
-    "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, ficha técnica automática, DRE em tempo real e análise preditiva de compras e vendas.",
+    "Inteligência financeira para food service. O Rook lê a operação, interpreta as seis etapas — vendas, impostos, custos, despesas, dívidas e resultado — e aponta a próxima decisão em reais.",
   keywords: [
     "sistema de inteligência financeira para restaurantes",
     "sistema de gestão para restaurante",
@@ -24,12 +25,26 @@ export const metadata: Metadata = {
     "controle de custos",
     "margem de lucro restaurante"
   ],
-  alternates: {
-    canonical: siteUrl(),
-  },
+  /*
+   * AQUI NÃO ENTRA `alternates.canonical`. (ROO-1125, 21/08/2026)
+   *
+   * Havia `canonical: siteUrl()` neste lugar, e o efeito era o oposto do
+   * pretendido: metadata de layout é HERDADA por toda página que não declara a
+   * sua. Então `/termos/`, `/privacidade/` e `/sobre/` diziam ao Google que a
+   * URL oficial delas era a HOME — e o Google fez o que foi mandado, tirando as
+   * três do índice. É o mesmo defeito de canonical que a ROO-1125 abriu para
+   * consertar, só que vindo de dentro em vez de vir do www.
+   *
+   * A canonical da home agora mora em `src/app/page.tsx`, junto da home. Sem
+   * valor global, página que esquecer a sua fica SEM canonical — e sem canonical
+   * o Google auto-referencia a própria URL, que é o certo. Errar por omissão
+   * custa nada; errar apontando para outra página custa a indexação.
+   *
+   * A trava está em `tests/canonical-origin.test.mjs`.
+   */
   openGraph: {
-    title: "Rook System — Inteligência Financeira e Gestão para Restaurantes",
-    description: "Controle CMV, otimize compras e proteja a margem do seu restaurante com inteligência financeira.",
+    title: "Rook System — Inteligência financeira para food service",
+    description: "Faturar não é lucrar. O Rook lê a operação, interpreta as seis etapas e aponta, em reais, a próxima decisão.",
     url: siteUrl(),
     siteName: "Rook System",
     type: "website",
@@ -84,48 +99,13 @@ const jsonLd = {
     },
     {
       "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Quanto custa o Rook System?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "O Rook tem dois planos base: Knight (R$ 479,90/mês) para restaurantes com faturamento de até R$ 250 mil/mês, e Rook (R$ 779,90/mês) para faturamento acima de R$ 250 mil/mês. Ambos oferecem acesso completo à plataforma. Para redes e franquias, há o add-on Chess (R$ 279,90/mês por grupo econômico). Todos incluem 7 dias de teste grátis."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Como funciona o Rook System?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "O Rook coleta, analisa e interpreta os dados financeiros e fiscais do seu restaurante, classificando cada linha com base em metodologia contábil e traduzindo tudo em um diagnóstico. Pelo fluxo de caixa ou pelo DRE, você recebe recomendações direcionadas à construção do seu lucro."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Posso testar o Rook antes de pagar?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Sim. O período de teste dura 7 dias, é oferecido uma vez por Empresa/CNPJ e exige um cartão válido. Se você cancelar antes do término, a primeira cobrança não será realizada."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Preciso trocar o sistema que já uso?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Não. O Rook não substitui seu PDV ou ERP. Nossa metodologia lê seus dados e traduz seu resultado. Possuímos integração com os principais ERPs do mercado."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "O Rook funciona em qualquer cidade do Brasil?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Sim. O Rook opera em todos os 26 estados + Distrito Federal. O cálculo tributário considera a UF do estabelecimento automaticamente."
-          }
-        }
-      ]
+      // Derivado do FAQ visível da home: uma fonte só, sem cópia para
+      // dessincronizar. O texto do buscador é o texto que o visitante lê.
+      "mainEntity": FAQ_ITEMS.map((f) => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a }
+      }))
     }
   ]
 };

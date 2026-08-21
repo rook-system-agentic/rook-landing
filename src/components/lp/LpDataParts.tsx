@@ -1,16 +1,18 @@
 import { EXEMPLO_DRE } from "@/lib/lp-content";
 
 /**
- * As peças de interface que aparecem dentro dos módulos do hero.
+ * As peças de interface da home: a vitrine "Tabuleiro · Casa exemplo"
+ * (LpShowcase) e os painéis do tabuleiro em abas (LpBoard) montam seus cards
+ * com estes gráficos.
  *
  * São SVG e divs estáticos de propósito: nenhuma depende de JavaScript para
  * existir na tela, então a página serve renderizada e o buscador vê o mesmo
  * que o visitante.
  *
- * NÚMEROS: os quatro gráficos e o funil descrevem o MESMO restaurante no MESMO
- * período, e tudo é derivado de `EXEMPLO_DRE`. Nada aqui é digitado à mão — se
- * um percentual mudar lá, os valores em reais e o texto de apoio acompanham.
- * É o que impede a página de dizer duas coisas sobre o mesmo dinheiro.
+ * NÚMEROS: os gráficos descrevem o MESMO restaurante no MESMO período, e tudo
+ * é derivado de `EXEMPLO_DRE`. Nada aqui é digitado à mão — se um percentual
+ * mudar lá, os valores em reais e o texto de apoio acompanham. É o que impede
+ * a página de dizer duas coisas sobre o mesmo dinheiro.
  *
  * Validado por Daniel em 13/08/2026 como reconhecível para a operação. Ainda é
  * exemplo, não é cliente.
@@ -18,13 +20,16 @@ import { EXEMPLO_DRE } from "@/lib/lp-content";
 
 const TERRACOTA = "#e54c00";
 
-const pctDe = (label: string) =>
+/** União literal dos labels do DRE: renomear em lp-content.ts quebra no tsc, não em runtime. */
+type DreLabel = (typeof EXEMPLO_DRE.linhas)[number]["label"];
+
+export const pctDe = (label: DreLabel) =>
   EXEMPLO_DRE.linhas.find((l) => l.label === label)!.pct;
 
-const reais = (pct: number) =>
+export const reais = (pct: number) =>
   Math.round((EXEMPLO_DRE.receita * pct) / 100).toLocaleString("pt-BR");
 
-const num = (n: number, casas = 1) =>
+export const num = (n: number, casas = 1) =>
   n.toFixed(casas).replace(".", ",");
 
 /**
@@ -255,5 +260,3 @@ export function DreLines() {
     </div>
   );
 }
-
-export const MODULE_VISUALS = [Sparkline, CmvBar, ExpenseBars, DreLines];
