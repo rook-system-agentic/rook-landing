@@ -685,3 +685,41 @@ anterior.
 Fora do escopo, para quem estiver na ROO-1125: `/restaurantes/` e `/setores/`
 tinham o mesmo defeito, já corrigido em `homolog` e ainda não promovido a `main`.
 Em produção, hoje, as duas continuam apontando para a home.
+
+---
+
+## 10. Remedição depois do redesenho v5 ir a produção (21/08/2026)
+
+**Os números das seções 8 e 9 foram medidos contra a home ANTERIOR ao redesenho
+v5.** O v5 subiu a produção no PR #97, no mesmo dia, e ele troca o elemento do
+LCP: o hero passou a ser de duas colunas e o parágrafo maior da primeira tela é
+outro. Medir de novo não era formalidade.
+
+Lighthouse 12 mobile, `https://www.rook.com.br/`, cache de borda quente, dois
+runs:
+
+| | run 1 | run 2 |
+|---|---:|---:|
+| Score | **98** | **98** |
+| FCP | 1,9 s | 1,9 s |
+| LCP | **1,9 s** | **1,9 s** |
+| TBT | 70 ms | 50 ms |
+| CLS | 0 | 0 |
+| Recursos render-blocking | nenhum | nenhum |
+
+Melhor que a home anterior (98 / LCP 2,0 s), com o v5 sendo uma página mais
+densa: o DOM foi de 604 para 823 elementos e o TBT de 30 ms para ~60 ms. As três
+correções da seção 8 seguram o ganho.
+
+O elemento do LCP continua sendo **texto** — agora o parágrafo "Num setor de
+R$ 495 bilhões, 6 em cada 10 casas não lucram…" do hero de duas colunas. A
+conclusão da seção 8 não mudou de dono: `Load Delay` e `Load Time` continuam em
+zero, e imagem nenhuma move este LCP.
+
+**Um aviso sobre medir logo depois de um deploy.** O primeiro run feito
+imediatamente após o merge deu score 96 com TTFB de 943 ms — e era artefato: o
+deploy invalida a entrada de borda, e aquele run pegou o `MISS` que atravessa
+até `iad1`. Com a borda quente, TTFB caiu para ~750 ms no modelo do Lighthouse
+(que usa RTT simulado fixo e por isso quase não credita o cache — ver 8.3) e o
+FCP observado ficou em 285–323 ms. **Aqueça a borda antes de medir**, ou a
+primeira medição pós-deploy vai parecer uma regressão que não existe.
