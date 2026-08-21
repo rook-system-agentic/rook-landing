@@ -27,6 +27,9 @@ abaixo descrevem o que está no ar, verificado lendo o
 | `LP - diagnóstico concluído` | Evento personalizado | Nome `diagnostic_complete` **e** `Page Hostname` igual a `www.rook.com.br` |
 | `LP - newsletter` | Evento personalizado | Nome `newsletter_signup` **e** `Page Hostname` igual a `www.rook.com.br` |
 | `LP - saída para o app` | Evento personalizado | Nome `app_handoff` **e** `Page Hostname` igual a `www.rook.com.br` |
+| `LP - consentimento de anúncios concedido` | Evento personalizado | Nome `consent_ads_granted` **e** `Page Hostname` igual a `www.rook.com.br` |
+
+⚠️ O último gatilho existe por um defeito medido em produção, não por completude. Ver "O aceite na mesma página" abaixo. O nome do evento tem de ser exatamente `consent_ads_granted` — é o que `CookieConsent.tsx` empurra.
 
 ## Tags
 
@@ -44,7 +47,7 @@ abaixo descrevem o que está no ar, verificado lendo o
 | `GA4 - diagnostic_complete` | Evento GA4 | `G-M93QYWQ84F` | `LP - diagnóstico concluído` | Parâmetro `ab_variant` = `{{dlv - ab_variant}}` |
 | `GA4 - newsletter_signup` | Evento GA4 | `G-M93QYWQ84F` | `LP - newsletter` | Sem parâmetro. |
 | `GA4 - app_handoff` | Evento GA4 | `G-M93QYWQ84F` | `LP - saída para o app` | Parâmetro `destino` = `{{dlv - destino}}` |
-| `Meta - PageView` | HTML personalizado | `1088278284898303` | `LP - todas as páginas` | Código base do pixel: `fbq('init')` + `fbq('track','PageView')` |
+| `Meta - PageView` | HTML personalizado | `1088278284898303` | `LP - todas as páginas` **+** `LP - consentimento de anúncios concedido` | Código base do pixel: `fbq('init')` + `fbq('track','PageView')`. Os **dois** gatilhos são necessários — ver "O aceite na mesma página" |
 | `Meta - Lead` | HTML personalizado | `1088278284898303` | `LP - lead comercial` | `fbq('track','Lead')` |
 | `Meta - CompleteRegistration` | HTML personalizado | `1088278284898303` | `LP - diagnóstico concluído` | `fbq('track','CompleteRegistration')` — **não** usar `Lead`, para não misturar intenção comercial com uso de ferramenta |
 | `Meta - Subscribe` | HTML personalizado | `1088278284898303` | `LP - newsletter` | `fbq('track','Subscribe')` |
@@ -144,6 +147,36 @@ pixel da Meta. Para o Google Ads, mesmo com o passo 3 feito, o ping sem
 cookie da modelagem de conversão continua: a página não promete o contrário,
 porque fala em não gravar cookie e não usar dado para publicidade, não em não
 emitir nenhum sinal.
+
+## O aceite na mesma página: o GTM não re-dispara HTML personalizado
+
+Medido em produção em 21/08/2026, com a versão 5 do contêiner no ar:
+
+| Situação | O pixel da Meta carrega? |
+| :-- | :-- |
+| Visitante novo, publicidade negada por padrão | Não — **correto**, é o efeito pretendido da checagem de `ad_storage` |
+| Clicou "Aceitar tudo", **na mesma página** | **Não** — o gatilho de visualização de página já passou, e o GTM não re-dispara tag de HTML personalizado quando o consentimento é concedido depois |
+| Página seguinte, ou recarregamento | Sim |
+
+O prejuízo não é o `page_view` daquela primeira página. É que `Meta - Lead`
+dispara em `generate_lead` já com o consentimento concedido, e chama
+`fbq('track','Lead')` — mas `fbq` não existe, porque o pixel base nunca rodou
+naquela página. Quem cai em `/planos`, aceita o banner e envia o formulário
+sem navegar tem a conversão perdida, em silêncio e sem erro visível em
+lugar nenhum.
+
+As tags nativas do Google não têm esse problema: elas são conscientes de
+consentimento internamente e reagem ao `consent update` na hora. Medido —
+`googleads.g.doubleclick.net` carrega no instante do aceite.
+
+**A correção tem duas metades.** No código, `CookieConsent.tsx` empurra
+`dataLayer.push({event:'consent_ads_granted'})` quando — e só quando — a
+publicidade é concedida. No contêiner, o gatilho
+`LP - consentimento de anúncios concedido` escuta esse evento e é adicionado
+como **segundo** gatilho de `Meta - PageView`.
+
+Não há disparo em dobro: quem recusa não emite o evento, e quem volta não vê
+o banner, então nunca passa por esse caminho.
 
 ## Pendências
 

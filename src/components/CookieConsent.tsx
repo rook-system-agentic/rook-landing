@@ -35,6 +35,28 @@ declare global {
  */
 function atualizarConsentimento(estado: Record<string, string>) {
   window.gtag?.("consent", "update", estado);
+
+  // POR QUE ESTE EVENTO EXISTE, ALÉM DO gtag('consent','update')
+  //
+  // As tags Meta no contêiner são HTML personalizado com checagem de
+  // `ad_storage`. Quando o visitante chega, o gatilho de visualização de
+  // página dispara com a publicidade negada e o GTM bloqueia o pixel — certo.
+  // Mas o GTM NÃO re-dispara tag de HTML personalizado quando o consentimento
+  // é concedido depois: o gatilho já passou. Medido em produção em 21/08/2026.
+  //
+  // O efeito não é só perder o PageView daquela página. `Meta - Lead` dispara
+  // em `generate_lead`, já com consentimento, e chama `fbq(...)` — que não
+  // existe, porque o pixel base nunca rodou ali. Quem cai em /planos, aceita
+  // o banner e envia o formulário sem navegar perde a conversão, em silêncio.
+  //
+  // Este evento dá ao contêiner um gatilho para subir o pixel base no momento
+  // do aceite. Só é emitido quando a publicidade é concedida: para quem
+  // recusa, nada deve subir. Visitante que volta não passa por aqui (o banner
+  // não aparece), então não há disparo em dobro.
+  if (estado.ad_storage === "granted") {
+    window.dataLayer?.push({ event: "consent_ads_granted" });
+  }
+
   try {
     localStorage.setItem(CONSENT_STORAGE_KEY, serializeConsentState(estado));
   } catch {
