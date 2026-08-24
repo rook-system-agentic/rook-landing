@@ -216,19 +216,41 @@ export function DiagnosticoFlow() {
     }
   }
 
+  /*
+   * O CABEÇALHO DESTA PÁGINA (24/08/2026)
+   *
+   * Havia DOIS headers empilhados aqui, e ninguém tinha reparado: o do site,
+   * vindo do layout, e este — os dois `fixed`, os dois em `z-50`, os dois no
+   * topo, os dois com fundo 92% opaco. O de baixo aparecia fantasma através do
+   * de cima, e a página ficava visivelmente diferente das outras sem que a
+   * causa fosse óbvia.
+   *
+   * A intenção original era legítima: página de funil não exibe menu, porque
+   * cada link é uma porta de saída no meio de um formulário de vários passos.
+   * O que faltou foi suprimir o header do site — o `data-diagnostico-etapa`
+   * abaixo é lido por `body:has(...)` no globals.css e faz isso.
+   *
+   * E a supressão vale só ATÉ o resultado. Depois que o visitante converteu, o
+   * menu deixa de ser fuga e vira caminho: é dali que ele vai para a
+   * calculadora, para os planos, para o resto do site. Na etapa `result` este
+   * cabeçalho enxuto sai de cena e o header completo assume.
+   */
+  const etapaFinal = step === "result";
+
   /* ─── Render ─── */
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Minimal Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4" style={{ backgroundColor: "var(--color-header-bg)", backdropFilter: "blur(12px)" }}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/">
-            <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={98} height={32} className="hidden dark:block" />
-            <Image src="/brand/rook-logo-horizontal-light.webp" alt="Rook System" width={94} height={32} className="dark:hidden" />
-          </Link>
-          <span className="font-mono text-[10px] text-muted uppercase tracking-widest">Diagnóstico Gratuito</span>
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col" data-diagnostico-etapa={etapaFinal ? "resultado" : "formulario"}>
+      {!etapaFinal && (
+        <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4" style={{ backgroundColor: "var(--color-header-bg)", backdropFilter: "blur(12px)" }}>
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <Link href="/">
+              <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={98} height={32} className="hidden dark:block" />
+              <Image src="/brand/rook-logo-horizontal-light.webp" alt="Rook System" width={94} height={32} className="dark:hidden" />
+            </Link>
+            <span className="font-mono text-[10px] text-muted uppercase tracking-widest">Diagnóstico Gratuito</span>
+          </div>
+        </header>
+      )}
 
       <main className="flex-1 pt-20">
         {step === "hero" && <HeroSection onStart={handleHeroCta} />}
