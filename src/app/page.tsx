@@ -22,16 +22,22 @@ import LpCta from "@/components/lp/LpCta";
  *
  *   promessa (hero) → integrações, que respondem "vai funcionar com o que eu já
  *   uso?" e emprestam a credibilidade dos parceiros → a dor dele (manifesto) →
- *   como funciona (método) → o produto por dentro (fontes, tabuleiro) → a prova
- *   que vale dinheiro (Rook.AI) → o hábito (briefing) → quem está por trás
+ *   como funciona (método) → o consultor digital em ação (Rook.AI) → o produto
+ *   por dentro (fontes, tabuleiro) → o hábito (briefing) → quem está por trás
  *   (autoridade) → você não está sozinho (setor) → oferta → dúvidas → fecho.
  *
  * O que saiu de lugar e por quê:
  *   - O MÉTODO era a segunda seção, antes de a página ter nomeado a dor.
  *     Explicar como funciona a quem ainda não se reconheceu no problema é
  *     responder pergunta que ninguém fez; agora vem depois do manifesto.
- *   - O ROOK.AI era a sétima seção. É a melhor prova do produto — um vazamento
- *     achado, quantificado e resolvido — e subiu para logo depois do tabuleiro.
+ *   - O ROOK.AI sobe de novo (24/08/2026), agora para logo depois do método.
+ *     Na v6 ele já tinha subido para depois do tabuleiro, e não bastou: com
+ *     três seções de produto na frente (método, fontes, tabuleiro), o Gabriel
+ *     percorreu a home e não chegou nele — disse ter sentido falta de uma
+ *     seção que estava lá. Se quem conhece o produto não alcança, o dono
+ *     também não. É a melhor prova que a página tem (um vazamento achado,
+ *     quantificado e resolvido em reais) e agora vem ANTES do detalhamento:
+ *     primeiro o que o Rook faz por você, depois como ele faz.
  *   - O SETOR desceu para perto da oferta: a estatística agora conforta quem já
  *     entendeu a proposta, em vez de abrir a página com dado de mercado.
  *   - AS INTEGRAÇÕES subiram para logo abaixo do hero (24/08/2026). A v6 tinha
@@ -91,9 +97,9 @@ export default function HomePage() {
       <LpPartners />
       <LpManifesto />
       <LpMethod />
+      <LpIntelligence />
       <LpSources />
       <LpBoard />
-      <LpIntelligence />
       <LpBriefing />
       <LpAuthority />
       <LpSector />

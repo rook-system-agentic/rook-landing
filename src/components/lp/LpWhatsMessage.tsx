@@ -24,12 +24,22 @@ export const PANEL = {
  * Mock estático: o "botão" da mensagem é texto estilizado de propósito. Um
  * <button> de verdade num mock seria um elemento focável que não faz nada.
  */
-export function WhatsMessage({ message }: { message: BriefingMessage }) {
+export function WhatsMessage({
+  message,
+  remetente,
+}: {
+  message: BriefingMessage;
+  /* O nome do perfil comercial. Vem de `BRIEFING.contactName` em vez de ficar
+     escrito aqui: o cabeçalho do painel e a bolha precisam dizer a mesma coisa,
+     e em 24/08/2026 os dois diziam só "Rook" enquanto o perfil real é
+     "Rook Insights". Um lugar só evita a divergência voltar. */
+  remetente: string;
+}) {
   return (
     <article className="rounded-xl p-4" style={{ backgroundColor: PANEL.inset }}>
       <div className="mb-3 flex items-baseline justify-between gap-4">
         <p className="font-mono text-[11px] uppercase tracking-[0.2em]" style={{ color: PANEL.accent }}>
-          Rook
+          {remetente}
         </p>
         <p className="font-mono text-[10px] uppercase tracking-wider" style={{ color: PANEL.muted }}>
           {message.time}
