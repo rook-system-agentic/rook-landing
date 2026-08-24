@@ -72,8 +72,19 @@ export function Sparkline() {
    * direita, independente de escala.
    */
 
+  /*
+   * O contêiner cresce (`h-full` + coluna flex) e o SVG ocupa a sobra
+   * (`flex-1`). Antes o gráfico tinha altura fixa de 64px dentro de um card que
+   * a grade estica até a altura da coluna vizinha — sobravam dois terços de
+   * espaço vazio embaixo da linha.
+   *
+   * Esticar não custa qualidade: é vetor, e `vectorEffect="non-scaling-stroke"`
+   * mantém a espessura do traço em pixels de tela, independente da escala do
+   * viewBox. O `min-h-16` preserva o tamanho antigo como piso, para o gráfico
+   * não achatar onde o card é baixo (a aba Vendas do tabuleiro).
+   */
   return (
-    <div>
+    <div className="flex h-full flex-col">
       <div className="mb-1 flex items-baseline justify-between">
         <span className="font-mono text-lg font-semibold" style={{ color: "var(--lp-ink)" }}>
           R$ {num(DAILY_REVENUE[DAILY_REVENUE.length - 1])} mil
@@ -84,20 +95,18 @@ export function Sparkline() {
       </div>
       <svg
         viewBox={`0 0 ${w} ${h}`}
-        className="lp-spark h-16 w-full"
+        className="lp-spark min-h-16 w-full flex-1"
         preserveAspectRatio="none"
         role="img"
         aria-label="Faturamento diário das últimas duas semanas, em tendência de alta"
       >
         <polyline
-          className="lp-spark-area"
           points={`0,${h} ${pts.join(" ")} ${w},${h}`}
           fill={TERRACOTA}
           opacity="0.08"
           stroke="none"
         />
         <polyline
-          className="lp-spark-line"
           points={pts.join(" ")}
           fill="none"
           stroke={TERRACOTA}
