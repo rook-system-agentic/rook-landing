@@ -12,12 +12,18 @@ import {
 import { solveCommercialLeadChallenge } from "@/lib/commercial-lead-challenge-client.mjs";
 import type { CommercialInterest } from "@/lib/commercial-lead-validation.mjs";
 import { buildDirectCheckoutHref } from "@/lib/direct-checkout-link.mjs";
-import type { BillingCatalogViewModel } from "@/lib/public-billing-catalog.mjs";
+import type { PlanoExibido } from "@/lib/planos-copy.mjs";
 import { track, TRACKING_EVENTS } from "@/lib/track";
 import { INPUT_CLASSNAME } from "@/lib/form-styles";
 
-type BasePlan = BillingCatalogViewModel["basePlans"][number];
-type ChessPlan = BillingCatalogViewModel["chess"];
+/*
+ * Os cartões recebem o plano JÁ RESOLVIDO pela página (server component):
+ * copy do site no lugar da do catálogo, e sem os campos de texto crus.
+ * Ver `@/lib/planos-copy.mjs` — este componente é cliente, então tudo que
+ * entra aqui é serializado dentro do HTML publicado.
+ */
+type BasePlan = PlanoExibido;
+type ChessPlan = PlanoExibido;
 type FieldErrors = Partial<Record<"name" | "company" | "email" | "phone" | "cnpj", string>>;
 
 /* Um estilo só para os campos do site — ver `@/lib/form-styles`. */
@@ -379,7 +385,7 @@ export function PlansCommercialExperience({
           </p>
           <h2 className="mt-3 text-3xl font-bold text-cream">{selected.displayName}</h2>
           <p className="mt-3 text-sm leading-relaxed text-muted">
-            {selected.description}
+            {selected.descricao}
           </p>
           <p className="mt-7 text-3xl font-bold text-cream">
             {selected.formattedPrice}
@@ -389,7 +395,7 @@ export function PlansCommercialExperience({
           </p>
           <p className="mt-2 text-xs text-muted">Cobrança mensal recorrente em reais.</p>
           <ul className="mt-7 space-y-3">
-            {selected.publicFeatures.map((feature) => (
+            {selected.features.map((feature) => (
               <li key={feature} className="flex items-start gap-2 text-sm text-muted">
                 <span className="mt-0.5 text-floresta" aria-hidden="true">✓</span>
                 <span>{feature}</span>
