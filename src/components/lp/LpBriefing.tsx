@@ -44,7 +44,7 @@ export default function LpBriefing() {
         <Reveal className="lg:col-span-6">
           <WhatsPanel contactName={BRIEFING.contactName} contactTag={BRIEFING.contactTag}>
             {BRIEFING.messages.map((m) => (
-              <WhatsMessage key={m.time} message={m} />
+              <WhatsMessage key={m.time} message={m} remetente={BRIEFING.contactName} />
             ))}
           </WhatsPanel>
         </Reveal>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
-import { segmentoPorSlug, pctBr, BENCHMARK_FONTE } from "@/lib/cmv-benchmarks.mjs";
+import { BENCHMARK_FONTE } from "@/lib/cmv-benchmarks.mjs";
 
 export const metadata: Metadata = {
   title: "O Rook para o seu tipo de casa | Rook System",
@@ -22,11 +22,15 @@ export const metadata: Metadata = {
  * a vive, e o CMV de referência do segmento ao lado. Sem isso o texto viraria
  * "o Rook também atende pizzaria" — que não diz nada a um dono de pizzaria.
  *
- * OS NÚMEROS vêm de `@/lib/cmv-benchmarks`, a mesma tabela que a calculadora
- * usa. Nenhum percentual é digitado aqui: se o benchmark mudar, muda em um
- * lugar só e as duas páginas acompanham. `segmentoPorSlug` devolve `undefined`
- * para slug desconhecido, e o `!` abaixo é deliberado — se alguém renomear um
- * slug na tabela, isto quebra no build, que é onde deve quebrar.
+ * O CMV DE REFERÊNCIA NÃO APARECE AQUI, e isso é decisão de conversão
+ * (Gabriel, 24/08/2026). A primeira versão estampava o percentual de cada
+ * segmento no card — e entregar o número de graça encerra o assunto: quem já
+ * leu "32,0%" não tem motivo nenhum para abrir a calculadora. A página passa a
+ * fazer a pergunta e mandar para a ferramenta que responde, que é onde o
+ * visitante vira lead.
+ *
+ * O `slug` continua aqui porque é a chave que leva cada card ao segmento certo
+ * dentro da calculadora — não é enfeite.
  */
 const BLOCOS = [
   {
@@ -90,45 +94,42 @@ export default function RestaurantesPage() {
           <p className="section-label mb-6">— Onde a margem escapa em cada casa</p>
           <h2 className="heading-section mb-4">Ache a sua casa aqui.</h2>
           <p className="text-body max-w-2xl mb-10">
-            O CMV de referência de cada segmento sai do {BENCHMARK_FONTE} — o mesmo que a
-            calculadora usa. É a régua contra a qual o Rook compara a sua casa, todo mês.
+            Cada segmento tem um CMV saudável diferente — o que é ótimo numa pizzaria é sinal de
+            alerta num bar. A calculadora mostra a faixa da sua casa pelo {BENCHMARK_FONTE} e,
+            com o seu faturamento, quanto dinheiro está em jogo por mês.
           </p>
 
           <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {BLOCOS.map((b) => {
-              const seg = segmentoPorSlug(b.slug)!;
               return (
-                <li key={b.slug} className="card h-full p-6">
+                <li key={b.slug} className="card h-full p-6 flex flex-col">
                   <h3 className="heading-section text-xl mb-3">{b.titulo}</h3>
-                  <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--color-muted)" }}>
+                  <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: "var(--color-muted)" }}>
                     {b.dor}
                   </p>
-                  <p
-                    className="font-mono text-xs uppercase tracking-wider pt-4"
-                    style={{ borderTop: "1px solid var(--color-border)", color: "var(--color-muted)" }}
+                  <Link
+                    href="/calculadora-cmv/"
+                    className="font-mono text-xs uppercase tracking-wider pt-4 underline underline-offset-4"
+                    style={{ borderTop: "1px solid var(--color-border)", color: "var(--color-terracota-text)" }}
                   >
-                    CMV de referência{" "}
-                    <span style={{ color: "var(--color-terracota-text)" }}>
-                      {pctBr(seg.defaultCmvTarget)}
-                    </span>{" "}
-                    · faixa saudável {pctBr(seg.cmvMin)}–{pctBr(seg.cmvMax)}
-                  </p>
+                    Ver o CMV ideal de {b.titulo.toLowerCase()} →
+                  </Link>
                 </li>
               );
             })}
           </ul>
 
-          <p className="text-body mt-8">
-            Self-service, japonesa, italiana, fine dining, fast food — a calculadora traz os onze
-            segmentos com a faixa de cada um.{" "}
-            <Link
-              href="/calculadora-cmv/"
-              className="underline underline-offset-4"
-              style={{ color: "var(--color-terracota-text)" }}
-            >
-              Ver a calculadora de CMV →
+          <div className="card mt-10 p-8 text-center">
+            <h3 className="heading-section text-2xl mb-3">Quanto o CMV está comendo do seu lucro?</h3>
+            <p className="text-body mx-auto mb-6 max-w-2xl">
+              São onze segmentos, do fine dining ao self-service. Escolha o seu, informe o
+              faturamento e o CMV de hoje: em segundos você vê a faixa saudável da sua casa e
+              quanto sobra por mês ao chegar nela. Gratuito e sem cadastro.
+            </p>
+            <Link href="/calculadora-cmv/" className="btn-primary">
+              Calcular o CMV da minha casa →
             </Link>
-          </p>
+          </div>
         </div>
       </section>
 

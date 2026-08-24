@@ -99,7 +99,7 @@ export const METHOD = {
     {
       step: "3 · Decide",
       title: "O que fazer, em reais",
-      desc: "O Rook aponta onde a margem está escapando e o que fazer agora — renegociar, ajustar a ficha, segurar a compra — com o impacto em R$ de cada decisão.",
+      desc: "O Rook.AI — o consultor digital da casa — aponta onde a margem está escapando e o que fazer agora: renegociar, ajustar a ficha, segurar a compra. Sempre com o impacto em R$ de cada decisão.",
     },
   ],
   /**
@@ -471,7 +471,7 @@ export const BRIEFING = {
    * `contactTag` é rótulo, não identificador: nada aqui deve voltar a ser algo
    * que o visitante consiga discar.
    */
-  contactName: "Rook",
+  contactName: "Rook Insights",
   contactTag: "Conta comercial",
   /*
    * Só o informe semanal. O diário subiu para o hero na v6 (HERO_MESSAGE) e
@@ -502,7 +502,7 @@ export const BRIEFING = {
  * por uma frase sobre arquitetura de software.
  */
 export const INTELLIGENCE = {
-  label: "— O Rook.AI em ação",
+  label: "— O consultor digital da casa",
   headlinePlain: "O filé subiu 8% e ninguém te avisou. ",
   headlineEmphasis: "O Rook avisa",
   headlineTail: " — e diz o que fazer.",
@@ -518,7 +518,7 @@ export const INTELLIGENCE = {
     },
   ],
   productParagraph:
-    "O Rook.AI mora dentro da plataforma. Você pergunta em português, ele responde com o número, o contexto e a próxima decisão — sem esperar o fechamento, sem montar planilha.",
+    "O Rook.AI é o consultor que mora dentro da plataforma. Você pergunta em português, como perguntaria ao seu contador — e ele responde com o número, o contexto do seu segmento e a próxima decisão. Sem esperar o fechamento, sem montar planilha, a qualquer hora.",
   /** Fecha o argumento em dinheiro: a economia contra a mensalidade. */
   payoff: [
     { text: "Uma decisão dessas devolve " },
