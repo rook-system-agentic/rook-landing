@@ -11,6 +11,7 @@ import {
 } from "@/lib/billing-catalog-server";
 import { buildBillingCatalogViewModel } from "@/lib/public-billing-catalog.mjs";
 import { siteUrl } from "@/lib/site-origin";
+import { copyDoPlano, planoParaExibicao } from "@/lib/planos-copy.mjs";
 import { CONTACT_EMAIL } from "@/lib/lp-content";
 import { OG_IMAGE } from "@/lib/og-image";
 
@@ -78,6 +79,13 @@ export default async function PlanosPage() {
   }
 
   const view = buildBillingCatalogViewModel(catalogResult.catalog);
+  /*
+   * A copy do site entra aqui, no servidor, e o texto cru do catálogo para
+   * aqui: `PlansCommercialExperience` é componente de cliente, e o que for
+   * passado a ele vai serializado dentro do HTML. Ver `@/lib/planos-copy.mjs`.
+   */
+  const planosExibidos = view.basePlans.map(planoParaExibicao);
+  const chessExibido = planoParaExibicao(view.chess);
   const schema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -89,7 +97,8 @@ export default async function PlanosPage() {
       item: {
         "@type": "Product",
         name: offer.displayName,
-        description: offer.description,
+        description:
+          copyDoPlano(offer.productCode)?.descricao ?? offer.description,
         brand: { "@type": "Brand", name: "Rook System" },
         offers: {
           "@type": "Offer",
@@ -134,8 +143,8 @@ export default async function PlanosPage() {
 
           <PlansCommercialExperience
             threshold={view.threshold}
-            basePlans={view.basePlans}
-            chess={view.chess}
+            basePlans={planosExibidos}
+            chess={chessExibido}
           />
         </div>
       </section>
@@ -198,11 +207,12 @@ export default async function PlanosPage() {
                 Chess organiza o grupo. <em>Unidade por unidade.</em>
               </h2>
               <p className="text-body mb-6">
-                {view.chess.description} Cada estabelecimento mantém Knight ou
-                Rook, e a organização adiciona uma mensalidade Chess.
+                {chessExibido.descricao}{" "}
+                Cada estabelecimento mantém Knight ou Rook, e a organização
+                adiciona uma mensalidade Chess.
               </p>
               <p className="text-3xl font-bold text-cream">
-                {view.chess.formattedPrice}
+                {chessExibido.formattedPrice}
                 <span className="ml-2 text-sm font-normal text-muted">
                   /organização/mês
                 </span>
