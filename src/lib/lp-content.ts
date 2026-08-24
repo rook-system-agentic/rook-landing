@@ -77,20 +77,6 @@ export const SHOWCASE = {
   resultado: "Resultado do mês",
 } as const;
 
-/* ─── Parceiros logo abaixo do hero ─── */
-
-/*
- * A barra de credibilidade da v6. Não há cliente referenciável para citar
- * ainda (confirmado com o Gabriel em 24/08/2026), então a prova desta faixa é
- * por associação: os sistemas que o setor já usa conversam com o Rook. Os
- * logos são os mesmos de PARTNERS — um arquivo só, sem segunda lista para
- * manter em dia. Quando houver casas referenciáveis, esta faixa é o lugar
- * delas, e os parceiros continuam na seção de integrações mais abaixo.
- */
-export const PARTNERS_STRIP = {
-  label: "— Conecta com os sistemas que você já usa",
-} as const;
-
 /* ─── Como funciona (era "O método") ─── */
 
 export const METHOD = {
