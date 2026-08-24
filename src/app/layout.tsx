@@ -7,6 +7,7 @@ import AppHandoffTracker from "@/components/AppHandoffTracker";
 import CookieConsent from "@/components/CookieConsent";
 import { Analytics } from "@vercel/analytics/react";
 import { siteUrl } from "@/lib/site-origin";
+import { OG_IMAGE, OG_IMAGE_PATH, TWITTER_CARD } from "@/lib/og-image";
 import { FAQ_ITEMS } from "@/lib/lp-content";
 
 export const metadata: Metadata = {
@@ -43,12 +44,38 @@ export const metadata: Metadata = {
    *
    * A trava está em `tests/canonical-origin.test.mjs`.
    */
+  /*
+   * A IMAGEM DE COMPARTILHAMENTO. (24/08/2026)
+   *
+   * O site não declarava `og:image`. Quando o link era colado no LinkedIn, o
+   * scraper varria a página e escolhia sozinho — e escolheu o LOGO DA OMIE.
+   *
+   * O motivo é específico e vale registrar, porque a armadilha volta: as duas
+   * primeiras imagens da página são os logos do Rook em `.webp`, formato que o
+   * scraper do LinkedIn não consome. A terceira é `/partners/omie.png` — o
+   * primeiro PNG do documento. Sem `og:image`, o compartilhamento do Rook
+   * anunciava um parceiro.
+   *
+   * A arte fica em `public/og/`, e não em `public/brand/`, de propósito: o teste
+   * de performance limita arte de marca a 20 KB porque ela é baixada por todo
+   * visitante. Esta aqui NUNCA é carregada pela página — só por scraper de
+   * rede social —, e 20 KB inviabilizariam 1200×630 legível. PNG e não WebP,
+   * pelo mesmo motivo que causou o problema.
+   */
   openGraph: {
     title: "Rook System — Inteligência financeira para food service",
     description: "Faturar não é lucrar. O Rook lê a operação, interpreta as seis etapas e aponta, em reais, a próxima decisão.",
     url: siteUrl(),
     siteName: "Rook System",
     type: "website",
+    locale: "pt_BR",
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: TWITTER_CARD,
+    title: "Rook System — Inteligência financeira para food service",
+    description: "Faturar não é lucrar. O Rook lê a operação, interpreta as seis etapas e aponta, em reais, a próxima decisão.",
+    images: [OG_IMAGE_PATH],
   },
 };
 

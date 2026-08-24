@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
+import { OG_IMAGE } from "@/lib/og-image";
 
 export const metadata: Metadata = {
   title: "Funcionalidades do Rook System — 6 Módulos de Inteligência Financeira",
@@ -17,6 +18,8 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: siteUrl("/funcionalidades/") },
   openGraph: {
+    /* Ver `@/lib/og-image`: sem isto, esta rota compartilha sem imagem. */
+    images: [OG_IMAGE],
     title: "Funcionalidades do Rook System — 6 Módulos de Inteligência Financeira",
     description:
       "Vendas, Compras/CMV, Impostos, Despesas, Dívidas e Resultado. Tudo na mesma tela para o dono de restaurante.",

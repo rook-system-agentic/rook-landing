@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
+import { OG_IMAGE, OG_IMAGE_PATH, TWITTER_CARD } from "@/lib/og-image";
 import LpHero from "@/components/lp/LpHero";
 import LpManifesto from "@/components/lp/LpManifesto";
 import LpMethod from "@/components/lp/LpMethod";
@@ -78,12 +79,26 @@ export const metadata: Metadata = {
   title: TITULO,
   description: DESCRICAO,
   alternates: { canonical: siteUrl() },
+  /*
+   * `images` PRECISA ser repetido aqui. O Next substitui o objeto `openGraph`
+   * inteiro quando a página declara o seu — não faz merge campo a campo. Sem
+   * esta linha, a home (a página mais compartilhada do site) ficaria justamente
+   * sem imagem, que é o defeito que a do layout existe para consertar.
+   */
   openGraph: {
     title: TITULO,
     description: DESCRICAO,
     url: siteUrl(),
     siteName: "Rook System",
     type: "website",
+    locale: "pt_BR",
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: TWITTER_CARD,
+    title: TITULO,
+    description: DESCRICAO,
+    images: [OG_IMAGE_PATH],
   },
 };
 

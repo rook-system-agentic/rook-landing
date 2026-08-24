@@ -12,6 +12,7 @@ import {
 import { buildBillingCatalogViewModel } from "@/lib/public-billing-catalog.mjs";
 import { siteUrl } from "@/lib/site-origin";
 import { CONTACT_EMAIL } from "@/lib/lp-content";
+import { OG_IMAGE } from "@/lib/og-image";
 
 export const revalidate = BILLING_CATALOG_REVALIDATE_SECONDS;
 
@@ -21,6 +22,8 @@ export const metadata: Metadata = {
     "Planos mensais do Rook System para restaurantes e grupos multiunidade, com 7 dias de utilização mediante cadastro do cartão.",
   alternates: { canonical: siteUrl("/planos/") },
   openGraph: {
+    /* Ver `@/lib/og-image`: sem isto, esta rota compartilha sem imagem. */
+    images: [OG_IMAGE],
     title: "Planos e teste | Rook System",
     description:
       "Acesso completo com enquadramento por faturamento e Chess para organizações multiunidade.",
