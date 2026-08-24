@@ -468,9 +468,25 @@ export const BRIEFING = {
   ctaLabel: "Quero o resumo no WhatsApp",
   ctaHref: "/planos/",
   note: "Você ativa no cadastro, no seu número. Sem spam — só o informe da sua casa.",
-  /** O número real do canal (Twilio), como no preview aprovado — brief §5.5. */
+  /*
+   * O CABEÇALHO DO MOCK NÃO CARREGA NÚMERO DE TELEFONE. (24/08/2026)
+   *
+   * Até aqui o mock exibia o número real do canal Twilio, como no preview
+   * aprovado (brief §5.5). Enquanto vivia no meio da página passava batido; com
+   * o informe subindo para o hero na v6, o número virou a segunda coisa mais
+   * visível do site — e um número de canal automatizado exposto assim recebe o
+   * que não deveria: resposta de quem acha que fala com atendimento, contato de
+   * quem não é cliente, e o que mais vier de um número público na home.
+   *
+   * O canal é de saída, com opt-in no onboarding. Quem precisa falar com o Rook
+   * tem o e-mail no rodapé e o formulário; o mock só precisa parecer o que é —
+   * uma conversa de WhatsApp — e para isso o nome do remetente basta.
+   *
+   * `contactTag` é rótulo, não identificador: nada aqui deve voltar a ser algo
+   * que o visitante consiga discar.
+   */
   contactName: "Rook",
-  contactNumber: "+55 61 3686-6728",
+  contactTag: "Conta comercial",
   /*
    * Só o informe semanal. O diário subiu para o hero na v6 (HERO_MESSAGE) e
    * repeti-lo aqui seria mostrar o mesmo bloco de texto duas vezes na mesma

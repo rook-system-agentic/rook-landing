@@ -59,7 +59,7 @@ export default function LpHero() {
         </div>
 
         <Reveal className="lg:col-span-6">
-          <WhatsPanel contactName={BRIEFING.contactName} contactNumber={BRIEFING.contactNumber}>
+          <WhatsPanel contactName={BRIEFING.contactName} contactTag={BRIEFING.contactTag}>
             <WhatsMessage message={HERO_MESSAGE} />
           </WhatsPanel>
         </Reveal>
