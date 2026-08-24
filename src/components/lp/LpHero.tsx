@@ -1,55 +1,28 @@
 import Link from "next/link";
-import { HERO, HERO_PARAGRAPH, SHOWCASE } from "@/lib/lp-content";
+import { HERO, HERO_PARAGRAPH, HERO_MESSAGE, BRIEFING } from "@/lib/lp-content";
 import Rich from "./LpRich";
 import Reveal from "./LpReveal";
-import { Sparkline, CmvBar, DreLines } from "./LpDataParts";
+import { WhatsMessage, WhatsPanel } from "./LpWhatsMessage";
 
 /**
- * Hero da home (v5.1): duas colunas, como no preview aprovado — a tese à
- * esquerda, o "Tabuleiro · Casa exemplo" à direita como primeira prova.
+ * Hero da home (v6): a pergunta que o dono se faz à esquerda, o informe das 7h
+ * no WhatsApp à direita.
  *
- * A manchete é "Faturar não é lucrar."; "inteligência financeira para food
- * service" é o rótulo. Os três gráficos do painel derivam de EXEMPLO_DRE
- * (ver LpDataParts), os mesmos números do tabuleiro em abas mais abaixo.
+ * Duas trocas em relação à v5, ambas explicadas no cabeçalho de `lp-content`:
+ *
+ *   A MANCHETE deixou de ser "Faturar não é lucrar." — que continua na página,
+ *   como assinatura acima do título — e passou a ser a pergunta do visitante.
+ *   A frase de marca é excelente e não pedia nada; a pergunta pede.
+ *
+ *   O ARTEFATO deixou de ser o "Tabuleiro · Casa exemplo". Aquele card é uma
+ *   DRE, e a DRE é justamente a planilha de que este público foge — ele desceu
+ *   para o método (LpMethod), onde o passo "Enxerga" dá contexto para lê-la.
+ *   No lugar entrou a mensagem de WhatsApp: o mesmo produto, no artefato que o
+ *   dono já sabe ler.
+ *
+ * A microcopy sob os botões (2 minutos · sem cartão · na hora) fica na mesma
+ * linha de visão do clique: é ali que o risco é avaliado, não no rodapé.
  */
-function ShowcasePanel() {
-  return (
-    <article className="lp-card p-5">
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <p className="lp-label">{SHOWCASE.label}</p>
-        <p
-          className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider"
-          style={{ color: "var(--lp-muted)" }}
-        >
-          <span
-            aria-hidden="true"
-            className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: "var(--lp-accent)" }}
-          />
-          {SHOWCASE.live}
-        </p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg p-4" style={{ backgroundColor: "var(--lp-bg)" }}>
-          <p className="lp-label mb-2">{SHOWCASE.vendas}</p>
-          <Sparkline />
-        </div>
-        <div className="flex flex-col gap-4">
-          <div className="rounded-lg p-4" style={{ backgroundColor: "var(--lp-bg)" }}>
-            <p className="lp-label mb-2">{SHOWCASE.cmv}</p>
-            <CmvBar />
-          </div>
-          <div className="flex-1 rounded-lg p-4" style={{ backgroundColor: "var(--lp-bg)" }}>
-            <p className="lp-label mb-2">{SHOWCASE.resultado}</p>
-            <DreLines />
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 export default function LpHero() {
   return (
     <section className="lp-band pt-14 pb-16 lg:pt-20 lg:pb-20">
@@ -67,6 +40,7 @@ export default function LpHero() {
           >
             {HERO.headlinePlain}
             <span style={{ color: "#e54c00" }}>{HERO.headlineEmphasis}</span>
+            {HERO.headlineTail}
           </h1>
           <p className="lp-body mb-8">
             <Rich paragraph={HERO_PARAGRAPH} />
@@ -79,10 +53,15 @@ export default function LpHero() {
               {HERO.secondaryLabel}
             </Link>
           </div>
+          <p className="mt-4 font-mono text-xs uppercase tracking-wider" style={{ color: "var(--lp-muted)" }}>
+            {HERO.micro}
+          </p>
         </div>
 
         <Reveal className="lg:col-span-6">
-          <ShowcasePanel />
+          <WhatsPanel contactName={BRIEFING.contactName} contactNumber={BRIEFING.contactNumber}>
+            <WhatsMessage message={HERO_MESSAGE} />
+          </WhatsPanel>
         </Reveal>
       </div>
     </section>

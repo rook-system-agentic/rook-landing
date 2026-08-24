@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
 import LpHero from "@/components/lp/LpHero";
+import LpPartnersStrip from "@/components/lp/LpPartnersStrip";
+import LpManifesto from "@/components/lp/LpManifesto";
 import LpMethod from "@/components/lp/LpMethod";
 import LpSources from "@/components/lp/LpSources";
-import LpManifesto from "@/components/lp/LpManifesto";
 import LpBoard from "@/components/lp/LpBoard";
-import LpBriefing from "@/components/lp/LpBriefing";
 import LpIntelligence from "@/components/lp/LpIntelligence";
+import LpBriefing from "@/components/lp/LpBriefing";
+import LpAuthority from "@/components/lp/LpAuthority";
 import LpSector from "@/components/lp/LpSector";
 import LpPartners from "@/components/lp/LpPartners";
 import LpPricing from "@/components/lp/LpPricing";
@@ -14,12 +16,25 @@ import LpFaq from "@/components/lp/LpFaq";
 import LpCta from "@/components/lp/LpCta";
 
 /**
- * Home — redesenho v5, alinhado ao preview aprovado com Daniel em 18/08/2026.
+ * Home — v6 (24/08/2026), "o Rook na língua do dono".
  *
- * A ordem conta uma história: promessa (hero), prova (vitrine), método,
- * fontes de dados, a pergunta do dono (manifesto), o produto por dentro
- * (tabuleiro, briefing, inteligência), contexto de mercado (setor),
- * integrações, oferta, dúvidas e a chamada final.
+ * A ordem é a conversa que o dono precisa ter, e mudou na v6 porque a anterior
+ * pedia paciência antes de dar motivo para tê-la:
+ *
+ *   promessa (hero) → credibilidade emprestada (parceiros) → a dor dele
+ *   (manifesto) → como funciona (método) → o produto por dentro (fontes,
+ *   tabuleiro) → a prova que vale dinheiro (Rook.AI) → o hábito (briefing) →
+ *   quem está por trás (autoridade) → você não está sozinho (setor) →
+ *   integrações → oferta → dúvidas → chamada final.
+ *
+ * O que saiu de lugar e por quê:
+ *   - O MÉTODO era a segunda seção, antes de a página ter nomeado a dor.
+ *     Explicar como funciona a quem ainda não se reconheceu no problema é
+ *     responder pergunta que ninguém fez; agora vem depois do manifesto.
+ *   - O ROOK.AI era a sétima seção. É a melhor prova do produto — um vazamento
+ *     achado, quantificado e resolvido — e subiu para logo depois do tabuleiro.
+ *   - O SETOR desceu para perto da oferta: a estatística agora conforta quem já
+ *     entendeu a proposta, em vez de abrir a página com dado de mercado.
  *
  * O atributo `data-lp-home` é o que aplica a paleta desta página. Ele é lido
  * por `body:has([data-lp-home])` no `globals.css`, e é assim que o Header e o
@@ -35,8 +50,30 @@ import LpCta from "@/components/lp/LpCta";
  * O resto do metadata (título, descrição, openGraph) continua no layout, que é
  * onde faz sentido — a home É o padrão do site.
  */
+/*
+ * Título e descrição PRÓPRIOS da home, e não no layout (v6).
+ *
+ * O layout continua com o texto institucional porque ele é o padrão herdado
+ * por toda rota que não declara o seu — inclusive /termos/ e /privacidade/,
+ * onde "saiba todo dia se o seu restaurante deu lucro" seria mentira de
+ * catálogo. Aqui a promessa é a mesma da manchete, que é o que o dono digita
+ * no Google e o que ele vê quando alguém manda o link no WhatsApp.
+ */
+const TITULO = "Rook — Saiba todo dia se o seu restaurante deu lucro";
+const DESCRICAO =
+  "O Rook conecta vendas, notas e banco do seu restaurante e mostra, em reais, quanto sobrou — com resumo diário no WhatsApp e diagnóstico gratuito em 2 minutos.";
+
 export const metadata: Metadata = {
+  title: TITULO,
+  description: DESCRICAO,
   alternates: { canonical: siteUrl() },
+  openGraph: {
+    title: TITULO,
+    description: DESCRICAO,
+    url: siteUrl(),
+    siteName: "Rook System",
+    type: "website",
+  },
 };
 
 export default function HomePage() {
@@ -46,12 +83,14 @@ export default function HomePage() {
           invisível onde o navegador não tem timeline de scroll no CSS. */}
       <div className="lp-progress" aria-hidden="true" />
       <LpHero />
+      <LpPartnersStrip />
+      <LpManifesto />
       <LpMethod />
       <LpSources />
-      <LpManifesto />
       <LpBoard />
-      <LpBriefing />
       <LpIntelligence />
+      <LpBriefing />
+      <LpAuthority />
       <LpSector />
       <LpPartners />
       <LpPricing />

@@ -1,26 +1,18 @@
 import Link from "next/link";
 import { BRIEFING } from "@/lib/lp-content";
 import Reveal from "./LpReveal";
-
-/*
- * Paleta fixa do painel escuro (mesma do extrato em LpSources): o mock do
- * WhatsApp é escuro nos dois temas, como no preview aprovado.
- */
-const PANEL = {
-  bg: "#10151c",
-  line: "rgba(255, 255, 255, 0.1)",
-  inset: "rgba(255, 255, 255, 0.06)",
-  ink: "#eef3f8",
-  muted: "#9fb0bf",
-  accent: "#ff8345",
-  action: "#6fcf97",
-};
+import { WhatsMessage, WhatsPanel } from "./LpWhatsMessage";
 
 /**
- * O briefing da casa: o informe diário no WhatsApp, encenado como duas
- * mensagens num painel escuro de celular. Mock estático — os "botões" das
- * mensagens são texto estilizado de propósito: um <button> de verdade num
- * mock seria um elemento focável que não faz nada.
+ * O briefing da casa: o informe da operação chegando no WhatsApp.
+ *
+ * v6: o painel mostra só o informe SEMANAL. O diário subiu para o hero e
+ * repeti-lo aqui seria imprimir o mesmo bloco de texto duas vezes na mesma
+ * página — a seção rende mais ilustrando a mensagem que o hero não mostrou.
+ * O texto ao lado é que cobre os três ritmos: diário, semanal e o fechamento
+ * do dia 1.
+ *
+ * O desenho das bolhas mora em LpWhatsMessage, compartilhado com o hero.
  */
 export default function LpBriefing() {
   return (
@@ -50,57 +42,11 @@ export default function LpBriefing() {
         </div>
 
         <Reveal className="lg:col-span-6">
-          <div
-            className="space-y-3 rounded-2xl p-4 sm:p-5"
-            style={{ backgroundColor: PANEL.bg, border: `1px solid ${PANEL.line}` }}
-          >
-            <div
-              className="flex items-baseline justify-between gap-4 pb-3"
-              style={{ borderBottom: `1px solid ${PANEL.line}` }}
-            >
-              <p className="text-sm font-bold" style={{ color: PANEL.ink }}>
-                {BRIEFING.contactName}
-              </p>
-              <p className="font-mono text-xs" style={{ color: PANEL.muted }}>
-                {BRIEFING.contactNumber}
-              </p>
-            </div>
+          <WhatsPanel contactName={BRIEFING.contactName} contactNumber={BRIEFING.contactNumber}>
             {BRIEFING.messages.map((m) => (
-              <article key={m.time} className="rounded-xl p-4" style={{ backgroundColor: PANEL.inset }}>
-                <div className="mb-3 flex items-baseline justify-between gap-4">
-                  <p
-                    className="font-mono text-[11px] uppercase tracking-[0.2em]"
-                    style={{ color: PANEL.accent }}
-                  >
-                    Rook
-                  </p>
-                  <p
-                    className="font-mono text-[10px] uppercase tracking-wider"
-                    style={{ color: PANEL.muted }}
-                  >
-                    {m.time}
-                  </p>
-                </div>
-                <div className="space-y-1.5">
-                  {m.lines.map((l) => (
-                    <p
-                      key={l}
-                      className={`text-sm leading-relaxed ${l.includes("R$") ? "font-mono" : ""}`}
-                      style={{ color: l.includes("R$") ? PANEL.ink : PANEL.muted }}
-                    >
-                      {l}
-                    </p>
-                  ))}
-                </div>
-                <p
-                  className="mt-3 rounded-lg py-2 text-center text-sm font-semibold"
-                  style={{ backgroundColor: "rgba(255, 255, 255, 0.08)", color: PANEL.action }}
-                >
-                  {m.button}
-                </p>
-              </article>
+              <WhatsMessage key={m.time} message={m} />
             ))}
-          </div>
+          </WhatsPanel>
         </Reveal>
       </div>
     </section>
