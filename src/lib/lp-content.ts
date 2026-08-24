@@ -501,22 +501,61 @@ export const BRIEFING = {
  * página — um vazamento achado, quantificado e resolvido — e estava anunciada
  * por uma frase sobre arquitetura de software.
  */
+/*
+ * O MOCKUP É UM CHAT, PORQUE O PRODUTO É UM CHAT. (24/08/2026)
+ *
+ * A versão anterior empilhava dois blocos rotulados "ROOK.AI", cada um com uma
+ * pergunta em negrito e a resposta embaixo. Dois problemas:
+ *
+ *   1. Estava ERRADO. A pergunta é do dono, não do Rook.AI — e os dois lados
+ *      levavam a mesma etiqueta. Quem lesse com atenção via a IA perguntando a
+ *      si mesma.
+ *   2. Não parecia o produto. O Rook.AI real é uma conversa: pergunta do
+ *      usuário à direita, resposta do agente à esquerda, campo de digitação
+ *      embaixo e o aviso de que a IA pode errar. Prometer na LP algo com outra
+ *      cara é preparar frustração no primeiro login.
+ *
+ * Agora os turnos têm autor (`de: "dono" | "rook"`), e o componente desenha
+ * cada um do seu lado. Os números continuam derivando de EXEMPLO_DRE e a
+ * conversa é da Casa exemplo — nada aqui é dado de cliente real.
+ */
+
+export interface ChatTurn {
+  de: "dono" | "rook";
+  texto: string;
+}
+
 export const INTELLIGENCE = {
   label: "— O consultor digital da casa",
   headlinePlain: "O filé subiu 8% e ninguém te avisou. ",
   headlineEmphasis: "O Rook avisa",
   headlineTail: " — e diz o que fazer.",
+  /** Cabeçalho do painel, como no produto. */
+  appName: "Rook.AI",
+  appTagline: "Inteligência financeira conversacional",
   context: "Casa exemplo · à la carte · Julho 2026",
-  qa: [
+  turnos: [
     {
-      q: "Por que o CMV fechou 2 pontos acima da meta?",
-      a: "CMV do período: 31,0% contra meta de 29,0%. São R$ 8.256 a mais no mês. A proteína puxou: filé +8,4% em 30 dias, em três notas do mesmo fornecedor — acima do preço médio do segmento à la carte.",
+      de: "dono",
+      texto: "Por que o CMV fechou 2 pontos acima da meta?",
     },
     {
-      q: "E o mercado?",
-      a: "No seu grupo de casas semelhantes, o CMV mediano está em 29,4%. Vocês estão 1,6 ponto acima. Próxima decisão: renegociar o filé ou ajustar a ficha dos 4 pratos que mais vendem. Impacto estimado: R$ 4.100 / mês.",
+      de: "rook",
+      texto: "CMV do período: 31,0% contra meta de 29,0% — São R$ 8.256 a mais no mês. A proteína puxou: filé +8,4% em 30 dias, em três notas do mesmo fornecedor, acima do preço médio do segmento à la carte.",
     },
-  ],
+    {
+      de: "dono",
+      texto: "E o mercado?",
+    },
+    {
+      de: "rook",
+      texto: "No seu grupo de casas semelhantes o CMV mediano está em 29,4% — vocês estão 1,6 ponto acima. Próxima decisão: renegociar o filé ou ajustar a ficha dos 4 pratos que mais vendem. Impacto estimado: R$ 4.100 / mês. Quer que eu simule as duas opções?",
+    },
+  ] as readonly ChatTurn[],
+  /** Placeholder do campo de digitação — o mesmo do produto. */
+  inputPlaceholder: "Pergunte ao Rook.AI...",
+  /** O produto exibe este aviso sob o campo; a LP não pode prometer menos. */
+  disclaimer: "Rook.AI pode cometer erros. Valide dados importantes.",
   productParagraph:
     "O Rook.AI é o consultor que mora dentro da plataforma. Você pergunta em português, como perguntaria ao seu contador — e ele responde com o número, o contexto do seu segmento e a próxima decisão. Sem esperar o fechamento, sem montar planilha, a qualquer hora.",
   /** Fecha o argumento em dinheiro: a economia contra a mensalidade. */
