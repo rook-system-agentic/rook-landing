@@ -14,13 +14,14 @@ import type { CommercialInterest } from "@/lib/commercial-lead-validation.mjs";
 import { buildDirectCheckoutHref } from "@/lib/direct-checkout-link.mjs";
 import type { BillingCatalogViewModel } from "@/lib/public-billing-catalog.mjs";
 import { track, TRACKING_EVENTS } from "@/lib/track";
+import { INPUT_CLASSNAME } from "@/lib/form-styles";
 
 type BasePlan = BillingCatalogViewModel["basePlans"][number];
 type ChessPlan = BillingCatalogViewModel["chess"];
 type FieldErrors = Partial<Record<"name" | "company" | "email" | "phone" | "cnpj", string>>;
 
-const inputClassName =
-  "w-full rounded-lg border border-border bg-bg px-4 py-3 text-sm text-cream outline-none transition-colors placeholder:text-muted/70 focus:border-terracota focus:ring-2 focus:ring-terracota/20";
+/* Um estilo só para os campos do site — ver `@/lib/form-styles`. */
+const inputClassName = INPUT_CLASSNAME;
 
 function CommercialLeadDialog({
   dialogRef,
