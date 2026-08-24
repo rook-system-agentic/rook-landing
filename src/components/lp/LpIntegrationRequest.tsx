@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState } from "react";
 import { SISTEMAS } from "@/lib/integration-request-validation.mjs";
+import { INPUT_CLASSNAME } from "@/lib/form-styles";
 
 /**
  * "Não encontrou o seu sistema? Solicite a integração."
@@ -159,7 +160,7 @@ export default function LpIntegrationRequest({ label }: { label: string }) {
               <label htmlFor={`${idBase}-nome`} className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted">
                 Seu nome
               </label>
-              <input id={`${idBase}-nome`} name="nome" required maxLength={120} className="input-base w-full" placeholder="Nome do responsável" />
+              <input id={`${idBase}-nome`} name="nome" required maxLength={120} className={INPUT_CLASSNAME} placeholder="Nome do responsável" />
               {erroDe("nome")}
             </div>
 
@@ -168,7 +169,7 @@ export default function LpIntegrationRequest({ label }: { label: string }) {
                 <label htmlFor={`${idBase}-email`} className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted">
                   E-mail
                 </label>
-                <input id={`${idBase}-email`} name="email" type="email" required maxLength={254} className="input-base w-full" placeholder="voce@restaurante.com.br" />
+                <input id={`${idBase}-email`} name="email" type="email" required maxLength={254} className={INPUT_CLASSNAME} placeholder="voce@restaurante.com.br" />
                 {erroDe("email")}
               </div>
               <div>
@@ -180,7 +181,7 @@ export default function LpIntegrationRequest({ label }: { label: string }) {
                     telefone em formato brasileiro no conteúdo da LP — inclusive
                     "(00) 00000-0000" — e ela está certa: placeholder é texto que
                     o visitante lê na tela igual a qualquer outro. */}
-                <input id={`${idBase}-telefone`} name="telefone" type="tel" required maxLength={32} className="input-base w-full" placeholder="DDD + número" />
+                <input id={`${idBase}-telefone`} name="telefone" type="tel" required maxLength={32} className={INPUT_CLASSNAME} placeholder="DDD + número" />
                 {erroDe("telefone")}
               </div>
             </div>
@@ -195,7 +196,7 @@ export default function LpIntegrationRequest({ label }: { label: string }) {
                 required
                 value={sistema}
                 onChange={(e) => setSistema(e.target.value)}
-                className="input-base w-full cursor-pointer"
+                className={`${INPUT_CLASSNAME} cursor-pointer`}
               >
                 <option value="" disabled>
                   Selecione…
@@ -215,7 +216,7 @@ export default function LpIntegrationRequest({ label }: { label: string }) {
                 <label htmlFor={`${idBase}-outro`} className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-muted">
                   Qual sistema?
                 </label>
-                <input id={`${idBase}-outro`} name="sistemaOutro" maxLength={120} className="input-base w-full" placeholder="Escreva o nome do sistema" autoFocus />
+                <input id={`${idBase}-outro`} name="sistemaOutro" maxLength={120} className={INPUT_CLASSNAME} placeholder="Escreva o nome do sistema" autoFocus />
                 {erroDe("sistemaOutro")}
               </div>
             )}

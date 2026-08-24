@@ -39,7 +39,9 @@ function ShowcasePanel() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg p-4" style={{ backgroundColor: "var(--lp-bg)" }}>
+        {/* Coluna flex: é o que deixa o gráfico ocupar a altura toda do card,
+            que a grade estica até a altura da coluna ao lado. */}
+        <div className="flex flex-col rounded-lg p-4" style={{ backgroundColor: "var(--lp-bg)" }}>
           <p className="lp-label mb-2">{SHOWCASE.vendas}</p>
           <Sparkline />
         </div>
