@@ -87,6 +87,9 @@ export function DiagnosticoFlow() {
   });
   const [result, setResult] = useState<ResultData | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  /* Gravação falhou: o resultado aparece igual, mas o visitante precisa saber
+     que o contato dele não chegou — ver `enviarLead`. */
+  const [falhaAoGravar, setFalhaAoGravar] = useState(false);
 
   const segment = segmentsData.find(s => s.slug === gateData.segment) || segmentsData[0];
 
@@ -127,16 +130,36 @@ export function DiagnosticoFlow() {
 
     setResult(resultData);
     setStep("result");
-    // sendToSupabase primeiro: a gravação do lead não pode depender do
-    // rastreamento. sendToSupabase é async e não é aguardado aqui, mas o
+    // enviarLead primeiro: a gravação do lead não pode depender do
+    // rastreamento. enviarLead é async e não é aguardado aqui, mas o
     // fetch() já é disparado de forma síncrona antes do primeiro `await`
     // dentro dela — o pedido de rede começa antes de track() rodar.
-    sendToSupabase(resultData, cmo);
+    enviarLead(resultData, cmo);
     track(TRACKING_EVENTS.diagnostic, { ab_variant: "B" });
   }
 
-  async function sendToSupabase(resultData: ResultData, cmo: number) {
+  /**
+   * Grava o lead pela rota de servidor.
+   *
+   * ANTES (e por que mudou — incidente de 24/08/2026): esta função montava o
+   * registro e o enviava DIRETO à REST do Supabase, com URL e chave anônima
+   * embutidas logo abaixo. A chave embutida era de outro projeto — a URL
+   * apontava para `...knuspwchwflqq` e o JWT fora emitido para
+   * `...knespwchwflqq` — e o Supabase respondia 401 Invalid API key.
+   *
+   * O 401 passava batido porque `fetch()` NÃO rejeita em resposta de erro: só
+   * rejeita se a requisição nem sair. O `catch` nunca era acionado, o visitante
+   * via o resultado normalmente e o lead sumia. Foram 17 dias assim, com zero
+   * linhas gravadas — descoberto só quando alguém foi olhar a tabela.
+   *
+   * Agora: POST em `/api/diagnostics`, que grava com service role no servidor
+   * (chave nenhuma chega ao navegador), e AQUI se confere `response.ok`. Falha
+   * de gravação vira estado visível para o visitante, com o contato do suporte
+   * — melhor pedir o reenvio do que perder o lead em silêncio de novo.
+   */
+  async function enviarLead(resultData: ResultData, cmo: number) {
     setSubmitting(true);
+    setFalhaAoGravar(false);
     try {
       const payload = {
         restaurant_name: gateData.restaurantName,
@@ -160,26 +183,29 @@ export function DiagnosticoFlow() {
         contribution_margin: resultData.contributionMargin,
         breakeven_point: resultData.breakevenPoint,
         revenue_gap: resultData.revenueGap,
-        source: "lp_diagnostico",
         ab_variant: "B",
-        status: "apresentado",
       };
 
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://ezisuahknuspwchwflqq.supabase.co";
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6aXN1YWhrbmVzcHdjaHdmbHFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzMjI2NzIsImV4cCI6MjA0ODg5ODY3Mn0.GG7iFBuMPOxGPMq3GhJvnKOFBylSFbVfBHNLHTnMBVk";
-
-      await fetch(`${supabaseUrl}/rest/v1/onboarding_diagnostics`, {
+      /*
+       * Com barra final: `trailingSlash: true` no next.config faz
+       * `/api/diagnostics` responder 308 para `/api/diagnostics/`. O navegador
+       * segue e preserva o método, mas é uma viagem de rede à toa. É também a
+       * convenção do repositório — ver `PlansCommercialExperience`.
+       */
+      const resposta = await fetch("/api/diagnostics/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          apikey: supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`,
-          Prefer: "return=minimal",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
+      // A checagem que faltava. Sem ela, 4xx e 5xx passam como sucesso.
+      if (!resposta.ok) {
+        setFalhaAoGravar(true);
+        console.error("[diagnostico] lead não gravado:", resposta.status, await resposta.text());
+      }
     } catch (err) {
-      console.error("Failed to save diagnostic:", err);
+      setFalhaAoGravar(true);
+      console.error("[diagnostico] lead não gravado (rede):", err);
     } finally {
       setSubmitting(false);
     }
@@ -213,7 +239,7 @@ export function DiagnosticoFlow() {
           />
         )}
         {step === "result" && result && (
-          <ResultSection result={result} segment={segment} gateData={gateData} diagData={diagData} />
+          <ResultSection result={result} segment={segment} gateData={gateData} diagData={diagData} falhaAoGravar={falhaAoGravar} />
         )}
       </main>
     </div>
@@ -418,12 +444,16 @@ function DiagnosticSection({
 
 /* ─── Result Section ─── */
 function ResultSection({
-  result, segment, gateData, diagData,
+  result, segment, gateData, diagData, falhaAoGravar,
 }: {
   result: ResultData;
   segment: typeof segmentsData[0];
   gateData: GateData;
   diagData: DiagnosticData;
+  /* Ver `enviarLead`: o resultado é local e continua correto mesmo quando a
+     gravação falha — o que não pode é o visitante achar que o contato dele
+     chegou quando não chegou. */
+  falhaAoGravar: boolean;
 }) {
   const insightText = result.isHealthy
     ? `${gateData.restaurantName || "Seu restaurante"} fatura acima do Ponto de Equilíbrio. Sua margem de segurança é de ${formatCurrency(result.revenueGap)}. Mas atenção: se o CMV subir ${result.cmvDiff > 0 ? "mais" : ""}, essa margem desaparece rapidamente.`
@@ -458,6 +488,19 @@ function ResultSection({
               <p className="text-xl font-bold text-cream">{formatCurrency(result.breakevenPoint)}</p>
             </div>
           </div>
+
+          {falhaAoGravar && (
+            <div className="rounded-lg border border-terracota/40 bg-terracota/10 p-4 mb-6">
+              <p className="text-sm font-semibold text-terracota">
+                Não conseguimos salvar seu contato.
+              </p>
+              <p className="text-xs mt-1 text-terracota/80">
+                O seu diagnóstico abaixo está completo e correto — mas o envio para a nossa equipe
+                falhou. Se quiser falar com a gente, escreva para contato@rook.com.br com o nome do
+                restaurante.
+              </p>
+            </div>
+          )}
 
           {/* Gap indicator */}
           <div className={`rounded-lg p-4 mb-6 ${result.isHealthy ? "bg-floresta/10 border border-floresta/20" : "bg-terracota/10 border border-terracota/20"}`}>
