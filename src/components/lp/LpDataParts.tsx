@@ -155,11 +155,16 @@ export function CmvBar() {
           style={{ left: `${(meta / scaleMax) * 100}%`, backgroundColor: "var(--lp-ink)" }}
         />
       </div>
+      {/* v6: era "2,0 p.p. acima da meta no período". "p.p." é a sigla que o
+          público desta página não usa, e um desvio percentual sozinho não diz
+          se dói. O mesmo desvio, em reais, diz — e é o número que o Rook.AI
+          explica mais abaixo. Os R$ saem de EXEMPLO_DRE como todo o resto: se
+          o percentual mudar lá, este valor acompanha. */}
       <p
         className="mt-2 font-mono text-[10px] uppercase tracking-wider"
         style={{ color: "var(--lp-muted)" }}
       >
-        {num(real - meta)} p.p. acima da meta no período
+        {num(real - meta, 0)} pontos acima da meta — R$ {reais(real - meta)} a mais no mês
       </p>
     </div>
   );

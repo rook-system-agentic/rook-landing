@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
+import { OG_IMAGE, OG_IMAGE_PATH, TWITTER_CARD } from "@/lib/og-image";
 import LpHero from "@/components/lp/LpHero";
+import LpManifesto from "@/components/lp/LpManifesto";
 import LpMethod from "@/components/lp/LpMethod";
 import LpSources from "@/components/lp/LpSources";
-import LpManifesto from "@/components/lp/LpManifesto";
 import LpBoard from "@/components/lp/LpBoard";
-import LpBriefing from "@/components/lp/LpBriefing";
 import LpIntelligence from "@/components/lp/LpIntelligence";
+import LpBriefing from "@/components/lp/LpBriefing";
+import LpAuthority from "@/components/lp/LpAuthority";
 import LpSector from "@/components/lp/LpSector";
 import LpPartners from "@/components/lp/LpPartners";
 import LpPricing from "@/components/lp/LpPricing";
@@ -14,12 +16,37 @@ import LpFaq from "@/components/lp/LpFaq";
 import LpCta from "@/components/lp/LpCta";
 
 /**
- * Home — redesenho v5, alinhado ao preview aprovado com Daniel em 18/08/2026.
+ * Home — v6 (24/08/2026), "o Rook na língua do dono".
  *
- * A ordem conta uma história: promessa (hero), prova (vitrine), método,
- * fontes de dados, a pergunta do dono (manifesto), o produto por dentro
- * (tabuleiro, briefing, inteligência), contexto de mercado (setor),
- * integrações, oferta, dúvidas e a chamada final.
+ * A ordem é a conversa que o dono precisa ter, e mudou na v6 porque a anterior
+ * pedia paciência antes de dar motivo para tê-la:
+ *
+ *   promessa (hero) → integrações, que respondem "vai funcionar com o que eu já
+ *   uso?" e emprestam a credibilidade dos parceiros → a dor dele (manifesto) →
+ *   como funciona (método) → o consultor digital em ação (Rook.AI) → o produto
+ *   por dentro (fontes, tabuleiro) → o hábito (briefing) → quem está por trás
+ *   (autoridade) → você não está sozinho (setor) → oferta → dúvidas → fecho.
+ *
+ * O que saiu de lugar e por quê:
+ *   - O MÉTODO era a segunda seção, antes de a página ter nomeado a dor.
+ *     Explicar como funciona a quem ainda não se reconheceu no problema é
+ *     responder pergunta que ninguém fez; agora vem depois do manifesto.
+ *   - O ROOK.AI sobe de novo (24/08/2026), agora para logo depois do método.
+ *     Na v6 ele já tinha subido para depois do tabuleiro, e não bastou: com
+ *     três seções de produto na frente (método, fontes, tabuleiro), o Gabriel
+ *     percorreu a home e não chegou nele — disse ter sentido falta de uma
+ *     seção que estava lá. Se quem conhece o produto não alcança, o dono
+ *     também não. É a melhor prova que a página tem (um vazamento achado,
+ *     quantificado e resolvido em reais) e agora vem ANTES do detalhamento:
+ *     primeiro o que o Rook faz por você, depois como ele faz.
+ *   - O SETOR desceu para perto da oferta: a estatística agora conforta quem já
+ *     entendeu a proposta, em vez de abrir a página com dado de mercado.
+ *   - AS INTEGRAÇÕES subiram para logo abaixo do hero (24/08/2026). A v6 tinha
+ *     posto ali uma faixa estática de logos, e a página passou a mostrar a
+ *     MESMA lista duas vezes: a faixa nova e o marquee desta seção. Ficou a
+ *     original — ela já rola sozinha, já traz o argumento em texto e já tem o
+ *     CTA de solicitar integração. Uma lista só, no lugar onde a dúvida "vai
+ *     funcionar com o meu sistema?" de fato aparece: logo depois da promessa.
  *
  * O atributo `data-lp-home` é o que aplica a paleta desta página. Ele é lido
  * por `body:has([data-lp-home])` no `globals.css`, e é assim que o Header e o
@@ -35,8 +62,44 @@ import LpCta from "@/components/lp/LpCta";
  * O resto do metadata (título, descrição, openGraph) continua no layout, que é
  * onde faz sentido — a home É o padrão do site.
  */
+/*
+ * Título e descrição PRÓPRIOS da home, e não no layout (v6).
+ *
+ * O layout continua com o texto institucional porque ele é o padrão herdado
+ * por toda rota que não declara o seu — inclusive /termos/ e /privacidade/,
+ * onde "saiba todo dia se o seu restaurante deu lucro" seria mentira de
+ * catálogo. Aqui a promessa é a mesma da manchete, que é o que o dono digita
+ * no Google e o que ele vê quando alguém manda o link no WhatsApp.
+ */
+const TITULO = "Rook — Saiba todo dia se o seu restaurante deu lucro";
+const DESCRICAO =
+  "O Rook conecta vendas, notas e banco do seu restaurante e mostra, em reais, quanto sobrou — com resumo diário no WhatsApp e diagnóstico gratuito em 2 minutos.";
+
 export const metadata: Metadata = {
+  title: TITULO,
+  description: DESCRICAO,
   alternates: { canonical: siteUrl() },
+  /*
+   * `images` PRECISA ser repetido aqui. O Next substitui o objeto `openGraph`
+   * inteiro quando a página declara o seu — não faz merge campo a campo. Sem
+   * esta linha, a home (a página mais compartilhada do site) ficaria justamente
+   * sem imagem, que é o defeito que a do layout existe para consertar.
+   */
+  openGraph: {
+    title: TITULO,
+    description: DESCRICAO,
+    url: siteUrl(),
+    siteName: "Rook System",
+    type: "website",
+    locale: "pt_BR",
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: TWITTER_CARD,
+    title: TITULO,
+    description: DESCRICAO,
+    images: [OG_IMAGE_PATH],
+  },
 };
 
 export default function HomePage() {
@@ -46,14 +109,15 @@ export default function HomePage() {
           invisível onde o navegador não tem timeline de scroll no CSS. */}
       <div className="lp-progress" aria-hidden="true" />
       <LpHero />
-      <LpMethod />
-      <LpSources />
+      <LpPartners />
       <LpManifesto />
+      <LpMethod />
+      <LpIntelligence />
+      <LpSources />
       <LpBoard />
       <LpBriefing />
-      <LpIntelligence />
+      <LpAuthority />
       <LpSector />
-      <LpPartners />
       <LpPricing />
       <LpFaq />
       <LpCta />

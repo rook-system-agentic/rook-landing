@@ -659,3 +659,29 @@
     color: #ffffff;
   }
 }
+
+/*
+ * O header do site durante o diagnóstico. (24/08/2026)
+ *
+ * A /diagnostico é página de funil: enquanto o visitante preenche os passos,
+ * cada item do menu é uma porta de saída, e o `DiagnosticoFlow` desenha um
+ * cabeçalho enxuto só com a marca. O que faltava era ESCONDER o do site —
+ * os dois ficavam empilhados no topo, ambos `fixed`, ambos `z-50` e ambos com
+ * fundo 92% opaco, então a navegação aparecia fantasma através do de cima.
+ *
+ * A supressão termina no resultado. Depois de converter, o menu deixa de ser
+ * fuga e vira caminho (calculadora, planos, o resto do site), então
+ * `data-diagnostico-etapa="resultado"` não casa aqui e o header completo volta.
+ *
+ * O seletor segue o padrão que a paleta da home já usa (`body:has([data-lp-home])`).
+ * Sem suporte a `:has()`, a página degrada para os dois cabeçalhos — que é
+ * exatamente o estado anterior a esta regra, e não pior que ele.
+ */
+body:has([data-diagnostico-etapa="formulario"]) > header {
+  display: none;
+}
+
+/* Sem o header do site, o respiro do topo é do cabeçalho enxuto (64px). */
+body:has([data-diagnostico-etapa="formulario"]) > main {
+  padding-top: 0;
+}

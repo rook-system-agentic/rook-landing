@@ -2,23 +2,28 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { segmentsData, type SegmentoCmv } from "@/lib/cmv-benchmarks.mjs";
 import Image from "next/image";
 import { track, TRACKING_EVENTS } from "@/lib/track";
 
 /* ─── Benchmark Data ─── */
-const segmentsData = [
-  { name: "Restaurante à la carte", slug: "a_la_carte", defaultCmvTarget: 32.0, cmvMin: 30.9, cmvMax: 33.1 },
-  { name: "Alta gastronomia (fine dining)", slug: "fine_dining", defaultCmvTarget: 27.5, cmvMin: 26.5, cmvMax: 28.5 },
-  { name: "Comida Italiana", slug: "italiana", defaultCmvTarget: 33.0, cmvMin: 31.8, cmvMax: 34.2 },
-  { name: "Comida Japonesa / Sushi", slug: "japonesa_sushi", defaultCmvTarget: 35.8, cmvMin: 34.5, cmvMax: 37.1 },
-  { name: "Self-service / Comida a quilo", slug: "self_service_kilo", defaultCmvTarget: 36.6, cmvMin: 35.3, cmvMax: 37.9 },
-  { name: "Pizzaria", slug: "pizzaria", defaultCmvTarget: 28.4, cmvMin: 27.4, cmvMax: 29.4 },
-  { name: "Hamburgueria", slug: "hamburgueria", defaultCmvTarget: 31.7, cmvMin: 30.5, cmvMax: 32.8 },
-  { name: "Lanchonete / Fast food", slug: "fast_food", defaultCmvTarget: 30.8, cmvMin: 29.6, cmvMax: 31.9 },
-  { name: "Bar / Boteco", slug: "bar_boteco", defaultCmvTarget: 25.0, cmvMin: 24.1, cmvMax: 25.9 },
-  { name: "Padaria / Cafeteria / Confeitaria", slug: "padaria_cafeteria", defaultCmvTarget: 34.8, cmvMin: 33.6, cmvMax: 36.1 },
-  { name: "Delivery especializado", slug: "delivery", defaultCmvTarget: 30.3, cmvMin: 29.2, cmvMax: 31.4 },
-];
+/*
+ * A tabela de benchmark vem de `@/lib/cmv-benchmarks.mjs` desde 24/08/2026.
+ *
+ * Havia uma cópia local aqui, com os mesmos onze segmentos e os mesmos
+ * percentuais da compartilhada — mas com duas diferenças que ninguém tinha
+ * reparado: o nome do primeiro segmento ("Restaurante à la carte" contra
+ * "Restaurante à la carte - Tradicional") e o slug do delivery ("delivery"
+ * contra "delivery_especializado"). Duas listas do mesmo dado divergem no
+ * primeiro reajuste; estas já tinham começado a divergir sozinhas.
+ *
+ * Trocar o slug foi verificado antes, não presumido: o valor só viajava para a
+ * coluna `segment` de `onboarding_diagnostics`, e não há nenhuma linha gravada
+ * com os slugs desta tabela (a gravação estava quebrada — ver a rota
+ * /api/diagnostics). O tracking manda apenas `ab_variant`, nunca o segmento.
+ * Ou seja: não há histórico para preservar.
+ */
+
 
 const taxRegimes = [
   { name: "Simples Nacional", slug: "simples", rate: 8 },
@@ -211,19 +216,41 @@ export function DiagnosticoFlow() {
     }
   }
 
+  /*
+   * O CABEÇALHO DESTA PÁGINA (24/08/2026)
+   *
+   * Havia DOIS headers empilhados aqui, e ninguém tinha reparado: o do site,
+   * vindo do layout, e este — os dois `fixed`, os dois em `z-50`, os dois no
+   * topo, os dois com fundo 92% opaco. O de baixo aparecia fantasma através do
+   * de cima, e a página ficava visivelmente diferente das outras sem que a
+   * causa fosse óbvia.
+   *
+   * A intenção original era legítima: página de funil não exibe menu, porque
+   * cada link é uma porta de saída no meio de um formulário de vários passos.
+   * O que faltou foi suprimir o header do site — o `data-diagnostico-etapa`
+   * abaixo é lido por `body:has(...)` no globals.css e faz isso.
+   *
+   * E a supressão vale só ATÉ o resultado. Depois que o visitante converteu, o
+   * menu deixa de ser fuga e vira caminho: é dali que ele vai para a
+   * calculadora, para os planos, para o resto do site. Na etapa `result` este
+   * cabeçalho enxuto sai de cena e o header completo assume.
+   */
+  const etapaFinal = step === "result";
+
   /* ─── Render ─── */
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Minimal Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4" style={{ backgroundColor: "var(--color-header-bg)", backdropFilter: "blur(12px)" }}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/">
-            <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={98} height={32} className="hidden dark:block" />
-            <Image src="/brand/rook-logo-horizontal-light.webp" alt="Rook System" width={94} height={32} className="dark:hidden" />
-          </Link>
-          <span className="font-mono text-[10px] text-muted uppercase tracking-widest">Diagnóstico Gratuito</span>
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col" data-diagnostico-etapa={etapaFinal ? "resultado" : "formulario"}>
+      {!etapaFinal && (
+        <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4" style={{ backgroundColor: "var(--color-header-bg)", backdropFilter: "blur(12px)" }}>
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <Link href="/">
+              <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={98} height={32} className="hidden dark:block" />
+              <Image src="/brand/rook-logo-horizontal-light.webp" alt="Rook System" width={94} height={32} className="dark:hidden" />
+            </Link>
+            <span className="font-mono text-[10px] text-muted uppercase tracking-widest">Diagnóstico Gratuito</span>
+          </div>
+        </header>
+      )}
 
       <main className="flex-1 pt-20">
         {step === "hero" && <HeroSection onStart={handleHeroCta} />}
@@ -324,6 +351,17 @@ function GateSection({
             <button type="submit" className="btn-primary w-full mt-4 py-3">
               Ver meu resultado
             </button>
+            {/*
+              * A microcopy de confiança fica ABAIXO do botão e não no topo do
+              * formulário: é aqui que o visitante decide entregar o contato, e
+              * é aqui que ele precisa saber o que acontece com ele. Sem isso, o
+              * passo 02 lê como captura de lista fria — e quem chegou até aqui
+              * já respondeu faturamento, CMV e folha da casa.
+              */}
+            <p className="text-muted text-xs leading-relaxed text-center">
+              Seus números ficam com você. Usamos o contato só para enviar o resultado — nada de
+              spam, nada de lista fria.
+            </p>
           </form>
         </div>
       </div>
@@ -337,7 +375,7 @@ function DiagnosticSection({
 }: {
   data: DiagnosticData;
   onChange: (d: DiagnosticData) => void;
-  segment: typeof segmentsData[0];
+  segment: SegmentoCmv;
   onSubmit: (e: React.FormEvent) => void;
 }) {
   const update = <K extends keyof DiagnosticData>(field: K, value: DiagnosticData[K]) =>
@@ -447,7 +485,7 @@ function ResultSection({
   result, segment, gateData, diagData, falhaAoGravar,
 }: {
   result: ResultData;
-  segment: typeof segmentsData[0];
+  segment: SegmentoCmv;
   gateData: GateData;
   diagData: DiagnosticData;
   /* Ver `enviarLead`: o resultado é local e continua correto mesmo quando a
@@ -530,7 +568,7 @@ function ResultSection({
             </div>
             {result.cmvDiff > 0 && (
               <p className="text-xs text-terracota mt-2">
-                Seu CMV está {result.cmvDiff.toFixed(1)}pp acima do benchmark. Isso representa ~{formatCurrency((result.cmvDiff / 100) * diagData.monthlyRevenue)} a mais em custos por mês.
+                Seu CMV está {result.cmvDiff.toFixed(1).replace(".", ",")} pontos acima da referência do segmento — cerca de {formatCurrency((result.cmvDiff / 100) * diagData.monthlyRevenue)} a mais em custos por mês.
               </p>
             )}
           </div>
@@ -556,15 +594,39 @@ function ResultSection({
             </div>
           </div>
 
-          {/* CTA */}
+          {/*
+            * O FECHO (24/08/2026). Duas correções.
+            *
+            * A ÂNCORA: o resultado entregava o número e passava direto ao
+            * botão. Aqui o próprio número da casa vira a razão do próximo
+            * passo — é o dado mais persuasivo da página inteira, e ele é dele,
+            * não de um exemplo. O texto muda conforme a casa esteja acima ou
+            * abaixo do ponto de equilíbrio: chamar margem de segurança de
+            * "déficit" seria mentir para quem está bem.
+            *
+            * O CARTÃO: dizia "7 dias grátis. Cancele quando quiser." O teste
+            * pede cartão no início, e a /planos explica isso com data. Prometer
+            * "grátis" aqui e mostrar o campo de cartão no clique seguinte é o
+            * jeito mais caro de perder quem já entregou os números da casa.
+            */}
           <div className="text-center">
-            <p className="text-muted text-sm mb-4">
-              O Rook monitora esses indicadores automaticamente, todos os dias, e te avisa quando algo sai do controle.
+            <p className="text-cream text-base leading-relaxed mb-2">
+              {result.isHealthy
+                ? `Esse é o tamanho da sua folga: ${formatCurrency(Math.abs(result.revenueGap))} por mês acima do ponto de equilíbrio.`
+                : `Esse é o tamanho do jogo: ${formatCurrency(Math.abs(result.revenueGap))} por mês entre onde a casa está e onde ela empata.`}
+            </p>
+            <p className="text-muted text-sm mb-6 max-w-md mx-auto">
+              {result.isHealthy
+                ? "O Rook existe para essa folga não sumir sem aviso: acompanha as seis paradas do dinheiro todo dia e avisa quando uma delas começa a comer a margem — em reais."
+                : "O Rook existe para achar onde esse dinheiro está escapando — parada por parada, em reais, todo dia."}
             </p>
             <Link href="/planos/" className="btn-primary text-lg px-8 py-4 inline-block">
-              Quer controlar isso de verdade?
+              Testar o Rook por 7 dias
             </Link>
-            <p className="text-[10px] text-muted mt-3">7 dias grátis. Cancele quando quiser.</p>
+            <p className="text-[10px] text-muted mt-3">
+              7 dias de uso. O cartão entra no início e a data da primeira cobrança aparece antes de
+              você confirmar — cancelando antes dela, nada é cobrado.
+            </p>
           </div>
         </div>
       </div>

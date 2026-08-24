@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DiagnosticoFlow } from "@/components/DiagnosticoFlow";
 import { siteUrl } from "@/lib/site-origin";
+import { OG_IMAGE } from "@/lib/og-image";
 
 export const metadata: Metadata = {
   title: "Diagnóstico Financeiro Gratuito para Restaurantes | Rook System",
@@ -18,6 +19,8 @@ export const metadata: Metadata = {
     canonical: siteUrl("/diagnostico/"),
   },
   openGraph: {
+    /* Ver `@/lib/og-image`: sem isto, esta rota compartilha sem imagem. */
+    images: [OG_IMAGE],
     title: "Diagnóstico Financeiro Gratuito | Rook System",
     description: "Descubra quanto seu restaurante precisa faturar para ter lucro real.",
     type: "website",
