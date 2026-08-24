@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { INTELLIGENCE } from "@/lib/lp-content";
+import Rich from "./LpRich";
 import Reveal from "./LpReveal";
 
 /*
@@ -16,9 +17,15 @@ const PANEL = {
 };
 
 /**
- * Inteligência viva: o chat escuro do Rook.AI à esquerda, o argumento à
- * direita — espelhado como no preview. Os números das respostas fecham com
- * EXEMPLO_DRE: 2 p.p. de CMV sobre R$ 412.800 são os R$ 8.256 citados.
+ * O Rook.AI em ação — a melhor prova da página.
+ *
+ * v6: a manchete era "O Rook.AI mora no produto", uma frase sobre arquitetura
+ * de software anunciando a única cena da página em que o produto acha dinheiro
+ * perdido. Passou a contar o caso: o filé subiu, ninguém viu, o Rook viu.
+ *
+ * O fecho em R$ 4.100/mês é novo e é o que amarra esta seção ao preço, três
+ * seções abaixo: a economia de uma decisão contra a mensalidade. Os números
+ * fecham com EXEMPLO_DRE — 2 p.p. de CMV sobre R$ 412.800 são os R$ 8.256.
  */
 export default function LpIntelligence() {
   return (
@@ -69,8 +76,15 @@ export default function LpIntelligence() {
           >
             {INTELLIGENCE.headlinePlain}
             <span style={{ color: "#e54c00" }}>{INTELLIGENCE.headlineEmphasis}</span>
+            {INTELLIGENCE.headlineTail}
           </h2>
-          <p className="lp-body mb-8">{INTELLIGENCE.productParagraph}</p>
+          <p className="lp-body mb-6">{INTELLIGENCE.productParagraph}</p>
+          <p
+            className="mb-8 pt-5 text-[15px] leading-relaxed"
+            style={{ borderTop: "1px solid var(--lp-line)", color: "var(--lp-muted)" }}
+          >
+            <Rich paragraph={INTELLIGENCE.payoff} />
+          </p>
           <Link href={INTELLIGENCE.ctaHref} className="btn-primary">
             {INTELLIGENCE.ctaLabel}
           </Link>

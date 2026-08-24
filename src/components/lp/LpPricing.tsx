@@ -15,6 +15,12 @@ import Reveal from "./LpReveal";
  * A hierarquia é do desenho original e não se mexe: os dois planos base são a
  * escolha, o Chess soma a um deles. Num grid de três colunas iguais o add-on
  * apareceria como a opção mais barata da linha, que é o oposto do que ele é.
+ *
+ * v6: o que o card anuncia primeiro é a FAIXA DE FATURAMENTO, não o nome da
+ * peça de xadrez. Knight, Rook e Chess são bons nomes de marca e péssimos
+ * critérios de escolha — obrigavam o visitante a decodificar três peças para
+ * saber o que assinar. Viraram assinatura discreta no rodapé do card; o
+ * enquadramento sobe para o topo, que é o que de fato separa os planos.
  */
 export default function LpPricing() {
   const parsePrice = (s: string) => Number(s.replace(/[^\d,]/g, "").replace(",", "."));
@@ -44,19 +50,21 @@ export default function LpPricing() {
             {PRICING.headlinePlain}
             <span style={{ color: "#e54c00" }}>{PRICING.headlineEmphasis}</span>
           </h2>
+          {/* A âncora: o preço ao lado do vazamento que a página já mostrou. */}
           <p className="lp-body mx-auto text-center">{PRICING.intro}</p>
         </div>
 
-        <div className="mx-auto grid max-w-3xl gap-6 md:grid-cols-2">
+        <ul className="mx-auto grid max-w-3xl gap-6 md:grid-cols-2">
           {PLANS.map((plan, i) => (
-            <Reveal key={plan.name} delay={i * 80}>
+            <Reveal key={plan.faixa} delay={i * 80} as="li">
               <div
                 className="lp-card group h-full p-6 text-center"
-                style={
-                  plan.highlighted ? { borderColor: "rgba(229,76,0,0.35)" } : undefined
-                }
+                style={plan.highlighted ? { borderColor: "rgba(229,76,0,0.35)" } : undefined}
               >
-                <p className="lp-label mb-2">{plan.name}</p>
+                <p className="lp-label mb-2">{plan.faixa}</p>
+                <h3 className="mb-3 font-display text-lg font-bold" style={{ color: "var(--lp-ink)" }}>
+                  {plan.name}
+                </h3>
                 <p className="font-mono text-3xl font-bold" style={{ color: "var(--lp-ink)" }}>
                   {plan.price}
                   <span className="text-sm font-normal" style={{ color: "var(--lp-muted)" }}>
@@ -74,11 +82,6 @@ export default function LpPricing() {
                 <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--lp-muted)" }}>
                   {plan.description}
                 </p>
-                {/* Sem `opacity`: com 0.7 a nota do plano media 3,07:1 no claro
-                    e 3,55:1 no escuro. O cinza cru mede 5,85:1 e 5,71:1. */}
-                <p className="mt-2 text-xs" style={{ color: "var(--lp-muted)" }}>
-                  {plan.note}
-                </p>
                 {/* v5.1: botão por card, como no preview — o destacado leva o
                     primário, o outro o fantasma. */}
                 <Link
@@ -87,10 +90,17 @@ export default function LpPricing() {
                 >
                   {PRICING.cardCtaLabel}
                 </Link>
+                {/* O nome da peça, agora como assinatura e não como critério. */}
+                <p
+                  className="mt-3 font-mono text-[10px] uppercase tracking-wider"
+                  style={{ color: "var(--lp-muted)" }}
+                >
+                  {plan.note}
+                </p>
               </div>
             </Reveal>
           ))}
-        </div>
+        </ul>
 
         <div className="mx-auto mt-6 max-w-3xl">
           <div className="lp-card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-6">
@@ -107,18 +117,31 @@ export default function LpPricing() {
                 </Link>
               </p>
             </div>
-            <p
-              className="whitespace-nowrap text-center font-mono text-2xl font-bold sm:text-right"
-              style={{ color: "var(--lp-ink)" }}
-            >
-              {CHESS_ADDON.price}
-              <span className="text-sm font-normal" style={{ color: "var(--lp-muted)" }}>
-                {CHESS_ADDON.period}
-              </span>
-            </p>
+            <div className="text-center sm:text-right">
+              <p
+                className="whitespace-nowrap font-mono text-2xl font-bold"
+                style={{ color: "var(--lp-ink)" }}
+              >
+                {CHESS_ADDON.price}
+                <span className="text-sm font-normal" style={{ color: "var(--lp-muted)" }}>
+                  {CHESS_ADDON.period}
+                </span>
+              </p>
+              <p
+                className="mt-1 font-mono text-[10px] uppercase tracking-wider"
+                style={{ color: "var(--lp-muted)" }}
+              >
+                {CHESS_ADDON.note}
+              </p>
+            </div>
           </div>
         </div>
 
+        {/* O cartão entra no início do teste. Dizer aqui evita a surpresa no
+            checkout — e é a mesma regra que a /planos detalha. */}
+        <p className="mt-6 text-center text-sm" style={{ color: "var(--lp-muted)" }}>
+          {PRICING.note}
+        </p>
       </div>
     </section>
   );

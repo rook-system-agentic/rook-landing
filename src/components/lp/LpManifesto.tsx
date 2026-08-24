@@ -1,37 +1,41 @@
-import { MANIFESTO, MANIFESTO_PARAGRAPHS, CONTRASTS } from "@/lib/lp-content";
+import { MANIFESTO, MANIFESTO_PARAGRAPHS, PAINS } from "@/lib/lp-content";
 import Rich from "./LpRich";
 import Reveal from "./LpReveal";
 import LpGapChart from "./LpGapChart";
 
 /**
- * Manifesto.
+ * A dor espelhada.
  *
- * Os três contrastes viram balanças: os dois lados do "≠" ficam em blocos
- * separados, e a separação é o argumento. O lado direito — o que importa — é
- * o que recebe o terracota.
+ * v6: os três cards eram balanças — "Receita ≠ Lucro", "Movimento ≠ Margem",
+ * "Dívida ≠ Estratégia". O argumento era bom e continua idêntico; o que saiu
+ * foi a notação. Um público que a própria página descreve como controlando no
+ * caderno (39%) não lê "≠" como retórica, lê como matemática — e matemática é
+ * exatamente o que ele evita.
+ *
+ * No lugar, a frase que o dono diz em voz alta: "Vendeu bem e não sobrou?".
+ * O gráfico ao lado (LpGapChart) continua mostrando a distância entre receita
+ * e lucro, que é o que a seção afirma.
  */
 export default function LpManifesto() {
   return (
     <section className="lp-band py-20 lg:py-28" style={{ borderTop: "1px solid var(--lp-line)" }}>
       <div className="mx-auto max-w-7xl px-6">
-        {/* Texto e gráfico lado a lado: a seção afirma que receita e lucro são
-            coisas diferentes, e o gráfico mostra a distância entre as duas. */}
         <div className="mb-12 grid items-center gap-12 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <p className="lp-label mb-4">{MANIFESTO.label}</p>
-          <h2
-            className="mb-6 font-display font-extrabold"
-            style={{
-              color: "var(--lp-ink)",
-              fontSize: "clamp(2rem, 4.2vw, 3.4rem)",
-              lineHeight: 1.05,
-              letterSpacing: "-0.03em",
-            }}
-          >
-            {MANIFESTO.headlinePlain}
-            <span style={{ color: "#e54c00" }}>{MANIFESTO.headlineEmphasis}</span>
-            {MANIFESTO.headlineTail}
-          </h2>
+            <h2
+              className="mb-6 font-display font-extrabold"
+              style={{
+                color: "var(--lp-ink)",
+                fontSize: "clamp(2rem, 4.2vw, 3.4rem)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              {MANIFESTO.headlinePlain}
+              <span style={{ color: "#e54c00" }}>{MANIFESTO.headlineEmphasis}</span>
+              {MANIFESTO.headlineTail}
+            </h2>
             <div className="space-y-4">
               {MANIFESTO_PARAGRAPHS.map((p, i) => (
                 <p key={i} className="lp-body">
@@ -46,40 +50,23 @@ export default function LpManifesto() {
           </Reveal>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-3">
-          {CONTRASTS.map((item, i) => {
-            const [left, right] = item.contrast.split("≠").map((s) => s.trim());
-            return (
-              <Reveal key={item.contrast} delay={i * 70}>
-                <article className="lp-card h-full p-6">
-                  <div className="mb-4 flex items-center gap-3">
-                    <span
-                      className="flex-1 rounded-lg py-2 text-center text-sm font-semibold"
-                      style={{ backgroundColor: "var(--lp-elevated)", color: "var(--lp-muted)" }}
-                    >
-                      {left}
-                    </span>
-                    <span aria-hidden="true" className="font-mono text-lg" style={{ color: "#e54c00" }}>
-                      ≠
-                    </span>
-                    {/* Fundo em `--color-cta`, não no terracota da marca: o
-                        rótulo branco de 14px media 3,91:1 sobre #e54c00 e passa
-                        a 5,19:1. Mesma correção do botão primário. */}
-                    <span
-                      className="flex-1 rounded-lg py-2 text-center text-sm font-semibold"
-                      style={{ backgroundColor: "var(--color-cta)", color: "#ffffff" }}
-                    >
-                      {right}
-                    </span>
-                  </div>
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--lp-muted)" }}>
-                    {item.desc}
-                  </p>
-                </article>
-              </Reveal>
-            );
-          })}
-        </div>
+        <ul className="grid gap-5 lg:grid-cols-3">
+          {PAINS.map((item, i) => (
+            <Reveal key={item.title} delay={i * 70} as="li">
+              <article className="lp-card h-full p-6">
+                <h3
+                  className="mb-3 font-display text-xl font-bold"
+                  style={{ color: "var(--lp-ink)", letterSpacing: "-0.015em" }}
+                >
+                  {item.title}
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: "var(--lp-muted)" }}>
+                  {item.desc}
+                </p>
+              </article>
+            </Reveal>
+          ))}
+        </ul>
       </div>
     </section>
   );
