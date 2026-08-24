@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
 import LpHero from "@/components/lp/LpHero";
-import LpPartnersStrip from "@/components/lp/LpPartnersStrip";
 import LpManifesto from "@/components/lp/LpManifesto";
 import LpMethod from "@/components/lp/LpMethod";
 import LpSources from "@/components/lp/LpSources";
@@ -21,11 +20,11 @@ import LpCta from "@/components/lp/LpCta";
  * A ordem é a conversa que o dono precisa ter, e mudou na v6 porque a anterior
  * pedia paciência antes de dar motivo para tê-la:
  *
- *   promessa (hero) → credibilidade emprestada (parceiros) → a dor dele
- *   (manifesto) → como funciona (método) → o produto por dentro (fontes,
- *   tabuleiro) → a prova que vale dinheiro (Rook.AI) → o hábito (briefing) →
- *   quem está por trás (autoridade) → você não está sozinho (setor) →
- *   integrações → oferta → dúvidas → chamada final.
+ *   promessa (hero) → integrações, que respondem "vai funcionar com o que eu já
+ *   uso?" e emprestam a credibilidade dos parceiros → a dor dele (manifesto) →
+ *   como funciona (método) → o produto por dentro (fontes, tabuleiro) → a prova
+ *   que vale dinheiro (Rook.AI) → o hábito (briefing) → quem está por trás
+ *   (autoridade) → você não está sozinho (setor) → oferta → dúvidas → fecho.
  *
  * O que saiu de lugar e por quê:
  *   - O MÉTODO era a segunda seção, antes de a página ter nomeado a dor.
@@ -35,6 +34,12 @@ import LpCta from "@/components/lp/LpCta";
  *     achado, quantificado e resolvido — e subiu para logo depois do tabuleiro.
  *   - O SETOR desceu para perto da oferta: a estatística agora conforta quem já
  *     entendeu a proposta, em vez de abrir a página com dado de mercado.
+ *   - AS INTEGRAÇÕES subiram para logo abaixo do hero (24/08/2026). A v6 tinha
+ *     posto ali uma faixa estática de logos, e a página passou a mostrar a
+ *     MESMA lista duas vezes: a faixa nova e o marquee desta seção. Ficou a
+ *     original — ela já rola sozinha, já traz o argumento em texto e já tem o
+ *     CTA de solicitar integração. Uma lista só, no lugar onde a dúvida "vai
+ *     funcionar com o meu sistema?" de fato aparece: logo depois da promessa.
  *
  * O atributo `data-lp-home` é o que aplica a paleta desta página. Ele é lido
  * por `body:has([data-lp-home])` no `globals.css`, e é assim que o Header e o
@@ -83,7 +88,7 @@ export default function HomePage() {
           invisível onde o navegador não tem timeline de scroll no CSS. */}
       <div className="lp-progress" aria-hidden="true" />
       <LpHero />
-      <LpPartnersStrip />
+      <LpPartners />
       <LpManifesto />
       <LpMethod />
       <LpSources />
@@ -92,7 +97,6 @@ export default function HomePage() {
       <LpBriefing />
       <LpAuthority />
       <LpSector />
-      <LpPartners />
       <LpPricing />
       <LpFaq />
       <LpCta />
