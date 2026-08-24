@@ -2,23 +2,28 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { segmentsData, type SegmentoCmv } from "@/lib/cmv-benchmarks.mjs";
 import Image from "next/image";
 import { track, TRACKING_EVENTS } from "@/lib/track";
 
 /* ─── Benchmark Data ─── */
-const segmentsData = [
-  { name: "Restaurante à la carte", slug: "a_la_carte", defaultCmvTarget: 32.0, cmvMin: 30.9, cmvMax: 33.1 },
-  { name: "Alta gastronomia (fine dining)", slug: "fine_dining", defaultCmvTarget: 27.5, cmvMin: 26.5, cmvMax: 28.5 },
-  { name: "Comida Italiana", slug: "italiana", defaultCmvTarget: 33.0, cmvMin: 31.8, cmvMax: 34.2 },
-  { name: "Comida Japonesa / Sushi", slug: "japonesa_sushi", defaultCmvTarget: 35.8, cmvMin: 34.5, cmvMax: 37.1 },
-  { name: "Self-service / Comida a quilo", slug: "self_service_kilo", defaultCmvTarget: 36.6, cmvMin: 35.3, cmvMax: 37.9 },
-  { name: "Pizzaria", slug: "pizzaria", defaultCmvTarget: 28.4, cmvMin: 27.4, cmvMax: 29.4 },
-  { name: "Hamburgueria", slug: "hamburgueria", defaultCmvTarget: 31.7, cmvMin: 30.5, cmvMax: 32.8 },
-  { name: "Lanchonete / Fast food", slug: "fast_food", defaultCmvTarget: 30.8, cmvMin: 29.6, cmvMax: 31.9 },
-  { name: "Bar / Boteco", slug: "bar_boteco", defaultCmvTarget: 25.0, cmvMin: 24.1, cmvMax: 25.9 },
-  { name: "Padaria / Cafeteria / Confeitaria", slug: "padaria_cafeteria", defaultCmvTarget: 34.8, cmvMin: 33.6, cmvMax: 36.1 },
-  { name: "Delivery especializado", slug: "delivery", defaultCmvTarget: 30.3, cmvMin: 29.2, cmvMax: 31.4 },
-];
+/*
+ * A tabela de benchmark vem de `@/lib/cmv-benchmarks.mjs` desde 24/08/2026.
+ *
+ * Havia uma cópia local aqui, com os mesmos onze segmentos e os mesmos
+ * percentuais da compartilhada — mas com duas diferenças que ninguém tinha
+ * reparado: o nome do primeiro segmento ("Restaurante à la carte" contra
+ * "Restaurante à la carte - Tradicional") e o slug do delivery ("delivery"
+ * contra "delivery_especializado"). Duas listas do mesmo dado divergem no
+ * primeiro reajuste; estas já tinham começado a divergir sozinhas.
+ *
+ * Trocar o slug foi verificado antes, não presumido: o valor só viajava para a
+ * coluna `segment` de `onboarding_diagnostics`, e não há nenhuma linha gravada
+ * com os slugs desta tabela (a gravação estava quebrada — ver a rota
+ * /api/diagnostics). O tracking manda apenas `ab_variant`, nunca o segmento.
+ * Ou seja: não há histórico para preservar.
+ */
+
 
 const taxRegimes = [
   { name: "Simples Nacional", slug: "simples", rate: 8 },
@@ -322,7 +327,7 @@ function DiagnosticSection({
 }: {
   data: DiagnosticData;
   onChange: (d: DiagnosticData) => void;
-  segment: typeof segmentsData[0];
+  segment: SegmentoCmv;
   onSubmit: (e: React.FormEvent) => void;
 }) {
   const update = <K extends keyof DiagnosticData>(field: K, value: DiagnosticData[K]) =>
@@ -432,7 +437,7 @@ function ResultSection({
   result, segment, gateData, diagData,
 }: {
   result: ResultData;
-  segment: typeof segmentsData[0];
+  segment: SegmentoCmv;
   gateData: GateData;
   diagData: DiagnosticData;
 }) {
