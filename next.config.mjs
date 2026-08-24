@@ -41,6 +41,29 @@ const nextConfig = {
    * Em produção `NEXT_PUBLIC_ENV` não é definido, então o bloco de noindex não
    * é emitido e nada muda.
    */
+  /*
+   * /setores/ → /restaurantes/ (redirect permanente, 24/08/2026)
+   *
+   * As duas nasceram stub no redesenho v5 e diziam quase a mesma coisa. Com
+   * /restaurantes/ virando a página de segmentos de verdade — dor por tipo de
+   * casa e CMV de referência de cada uma —, manter /setores/ era conteúdo
+   * duplicado disputando a mesma busca e dividindo a autoridade entre duas
+   * URLs.
+   *
+   * `permanent: true` porque a decisão é definitiva: o Google transfere o
+   * histórico da URL antiga, e quem tiver o link velho chega no lugar certo.
+   * Reverter é reescrever a página; o redirect sozinho não segura conteúdo.
+   *
+   * O Next responde 308, e não 301 — a diferença é que o 308 preserva o método
+   * da requisição. Para buscador os dois valem como permanente. Com
+   * `trailingSlash: true`, /setores ganha antes um 308 para /setores/, então
+   * são dois saltos até /restaurantes/; declarar a origem sem barra é o que
+   * casa com as duas formas.
+   */
+  async redirects() {
+    return [{ source: "/setores", destination: "/restaurantes/", permanent: true }];
+  },
+
   async headers() {
     const cacheEstatico = [
       {

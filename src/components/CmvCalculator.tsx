@@ -2,20 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { segmentsData } from "@/lib/cmv-benchmarks.mjs";
 
-export const segmentsData = [
-  { name: "Restaurante à la carte - Tradicional", slug: "a_la_carte", defaultCmvTarget: 32.0, cmvMin: 30.9, cmvMax: 33.1 },
-  { name: "Alta gastronomia (fine dining)", slug: "fine_dining", defaultCmvTarget: 27.5, cmvMin: 26.5, cmvMax: 28.5 },
-  { name: "Comida Italiana", slug: "italiana", defaultCmvTarget: 33.0, cmvMin: 31.8, cmvMax: 34.2 },
-  { name: "Comida Japonesa / Sushi", slug: "japonesa_sushi", defaultCmvTarget: 35.8, cmvMin: 34.5, cmvMax: 37.1 },
-  { name: "Self-service / Comida a quilo", slug: "self_service_kilo", defaultCmvTarget: 36.6, cmvMin: 35.3, cmvMax: 37.9 },
-  { name: "Pizzaria", slug: "pizzaria", defaultCmvTarget: 28.4, cmvMin: 27.4, cmvMax: 29.4 },
-  { name: "Hamburgueria", slug: "hamburgueria", defaultCmvTarget: 31.7, cmvMin: 30.5, cmvMax: 32.8 },
-  { name: "Lanchonete / Fast food", slug: "fast_food", defaultCmvTarget: 30.8, cmvMin: 29.6, cmvMax: 31.9 },
-  { name: "Bar / Boteco", slug: "bar_boteco", defaultCmvTarget: 25.0, cmvMin: 24.1, cmvMax: 25.9 },
-  { name: "Padaria / Cafeteria / Confeitaria", slug: "padaria_cafeteria", defaultCmvTarget: 34.8, cmvMin: 33.6, cmvMax: 36.1 },
-  { name: "Delivery especializado", slug: "delivery_especializado", defaultCmvTarget: 30.3, cmvMin: 29.2, cmvMax: 31.4 }
-];
+/*
+ * A tabela de benchmark mora em `@/lib/cmv-benchmarks` desde 24/08/2026: a
+ * página de segmentos passou a citar os mesmos números e duas listas do mesmo
+ * dado divergem no primeiro reajuste. Continua reexportada aqui porque havia
+ * import a partir deste arquivo — remover quebraria quem já importava.
+ */
+export { segmentsData };
 
 export function CmvCalculator() {
   const [faturamento, setFaturamento] = useState(100000);

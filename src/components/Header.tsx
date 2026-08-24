@@ -7,7 +7,9 @@ const navLinks = [
   { href: "/sobre/", label: "Sobre" },
   { href: "/restaurantes/", label: "Restaurantes" },
   { href: "/diagnostico/", label: "Diagnóstico" },
-  { href: "/calculadora-cmv/", label: "CMV" },
+  // "CMV" sozinho era a última sigla crua da navegação e não
+  // prometia nada; nomeando a ferramenta, o item vira oferta.
+  { href: "/calculadora-cmv/", label: "Calculadora CMV" },
   { href: "/blog/", label: "Blog" },
 ];
 

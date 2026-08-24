@@ -16,12 +16,12 @@ import { CONTACT_EMAIL } from "@/lib/lp-content";
 export const revalidate = BILLING_CATALOG_REVALIDATE_SECONDS;
 
 export const metadata: Metadata = {
-  title: "Planos Knight, Rook e Chess — Rook System",
+  title: "Planos e teste | Rook System",
   description:
     "Planos mensais do Rook System para restaurantes e grupos multiunidade, com 7 dias de utilização mediante cadastro do cartão.",
   alternates: { canonical: siteUrl("/planos/") },
   openGraph: {
-    title: "Planos Knight, Rook e Chess — Rook System",
+    title: "Planos e teste | Rook System",
     description:
       "Acesso completo com enquadramento por faturamento e Chess para organizações multiunidade.",
     url: siteUrl("/planos/"),
@@ -113,9 +113,20 @@ export default async function PlanosPage() {
           <h1 className="heading-hero mb-6">
             O mesmo acesso. O enquadramento <em>certo.</em>
           </h1>
-          <p className="text-body mx-auto mb-12 text-center">
+          <p className="text-body mx-auto mb-4 text-center">
             Knight e Rook entregam acesso completo. A diferença não está nos
             recursos: está no faturamento bruto mensal de cada estabelecimento.
+          </p>
+          {/*
+            * A âncora de valor, a mesma da home: o preço sozinho compete com
+            * "grátis" (a planilha); ao lado do vazamento que ele evita, compete
+            * com o prejuízo. Os R$ 8.256 são o CMV 2 pontos fora da meta da
+            * casa exemplo — 2% de R$ 412.800 (EXEMPLO_DRE em lp-content.ts).
+            * "a partir de" porque 479,90 é 5,8% e 779,90 é 9,4%.
+            */}
+          <p className="text-body mx-auto mb-12 text-center">
+            Para dar régua: um CMV 2 pontos fora da meta custa{" "}
+            <strong>R$ 8.256 por mês</strong> numa casa exemplo. O Rook custa a partir de 6% disso.
           </p>
 
           <PlansCommercialExperience
@@ -133,8 +144,26 @@ export default async function PlanosPage() {
             <h2 id="trial-title" className="heading-section mb-5">
               {view.trialDays} dias para usar. <em>Com data clara.</em>
             </h2>
-            <p className="text-body">
+            <p className="text-body mb-6">
               <TrialDateEstimate trialDays={view.trialDays} />
+            </p>
+            {/*
+              * A saída de menor compromisso. O cartão no início do teste é uma
+              * barreira legítima, mas sem alternativa ela é um beco: quem ainda
+              * está avaliando fecha a aba. O diagnóstico é gratuito e sem
+              * cartão de verdade, e devolve um número da casa dele — é a porta
+              * certa para quem chegou aqui cedo demais.
+              */}
+            <p className="text-sm" style={{ color: "var(--color-muted)" }}>
+              Ainda não tem certeza?{" "}
+              <Link
+                href="/diagnostico/"
+                className="underline underline-offset-4"
+                style={{ color: "var(--color-terracota-text)" }}
+              >
+                Comece pelo diagnóstico
+              </Link>{" "}
+              — 2 minutos, sem cartão.
             </p>
           </div>
           <div className="card grid gap-5 p-6 sm:grid-cols-3">
