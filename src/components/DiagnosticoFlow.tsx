@@ -298,6 +298,17 @@ function GateSection({
             <button type="submit" className="btn-primary w-full mt-4 py-3">
               Ver meu resultado
             </button>
+            {/*
+              * A microcopy de confiança fica ABAIXO do botão e não no topo do
+              * formulário: é aqui que o visitante decide entregar o contato, e
+              * é aqui que ele precisa saber o que acontece com ele. Sem isso, o
+              * passo 02 lê como captura de lista fria — e quem chegou até aqui
+              * já respondeu faturamento, CMV e folha da casa.
+              */}
+            <p className="text-muted text-xs leading-relaxed text-center">
+              Seus números ficam com você. Usamos o contato só para enviar o resultado — nada de
+              spam, nada de lista fria.
+            </p>
           </form>
         </div>
       </div>
@@ -487,7 +498,7 @@ function ResultSection({
             </div>
             {result.cmvDiff > 0 && (
               <p className="text-xs text-terracota mt-2">
-                Seu CMV está {result.cmvDiff.toFixed(1)}pp acima do benchmark. Isso representa ~{formatCurrency((result.cmvDiff / 100) * diagData.monthlyRevenue)} a mais em custos por mês.
+                Seu CMV está {result.cmvDiff.toFixed(1).replace(".", ",")} pontos acima da referência do segmento — cerca de {formatCurrency((result.cmvDiff / 100) * diagData.monthlyRevenue)} a mais em custos por mês.
               </p>
             )}
           </div>
@@ -513,15 +524,39 @@ function ResultSection({
             </div>
           </div>
 
-          {/* CTA */}
+          {/*
+            * O FECHO (24/08/2026). Duas correções.
+            *
+            * A ÂNCORA: o resultado entregava o número e passava direto ao
+            * botão. Aqui o próprio número da casa vira a razão do próximo
+            * passo — é o dado mais persuasivo da página inteira, e ele é dele,
+            * não de um exemplo. O texto muda conforme a casa esteja acima ou
+            * abaixo do ponto de equilíbrio: chamar margem de segurança de
+            * "déficit" seria mentir para quem está bem.
+            *
+            * O CARTÃO: dizia "7 dias grátis. Cancele quando quiser." O teste
+            * pede cartão no início, e a /planos explica isso com data. Prometer
+            * "grátis" aqui e mostrar o campo de cartão no clique seguinte é o
+            * jeito mais caro de perder quem já entregou os números da casa.
+            */}
           <div className="text-center">
-            <p className="text-muted text-sm mb-4">
-              O Rook monitora esses indicadores automaticamente, todos os dias, e te avisa quando algo sai do controle.
+            <p className="text-cream text-base leading-relaxed mb-2">
+              {result.isHealthy
+                ? `Esse é o tamanho da sua folga: ${formatCurrency(Math.abs(result.revenueGap))} por mês acima do ponto de equilíbrio.`
+                : `Esse é o tamanho do jogo: ${formatCurrency(Math.abs(result.revenueGap))} por mês entre onde a casa está e onde ela empata.`}
+            </p>
+            <p className="text-muted text-sm mb-6 max-w-md mx-auto">
+              {result.isHealthy
+                ? "O Rook existe para essa folga não sumir sem aviso: acompanha as seis paradas do dinheiro todo dia e avisa quando uma delas começa a comer a margem — em reais."
+                : "O Rook existe para achar onde esse dinheiro está escapando — parada por parada, em reais, todo dia."}
             </p>
             <Link href="/planos/" className="btn-primary text-lg px-8 py-4 inline-block">
-              Quer controlar isso de verdade?
+              Testar o Rook por 7 dias
             </Link>
-            <p className="text-[10px] text-muted mt-3">7 dias grátis. Cancele quando quiser.</p>
+            <p className="text-[10px] text-muted mt-3">
+              7 dias de uso. O cartão entra no início e a data da primeira cobrança aparece antes de
+              você confirmar — cancelando antes dela, nada é cobrado.
+            </p>
           </div>
         </div>
       </div>

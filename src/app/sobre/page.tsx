@@ -123,15 +123,30 @@ export default function SobrePage() {
       <section className="section-spacing border-t border-border">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div>
-            <p className="section-label mb-4">— Conheça por dentro</p>
+            <p className="section-label mb-4">— Pronto para ver os seus números</p>
             <h2 className="heading-section mb-3">
-              Veja como o Rook <em>funciona.</em>
+              Veja a sua casa pelos <em>olhos do Rook.</em>
             </h2>
-            <p className="text-body">Calculadora interativa, Relatório Anual editorial e Chess para redes multi-unidade.</p>
+            {/*
+              * A página terminava em "Explorar funcionalidades", que manda quem
+              * acabou de comprar a história para mais uma página de leitura. O
+              * próximo passo do site inteiro é o diagnóstico: gratuito, dois
+              * minutos, e devolve um número da casa dele. As funcionalidades
+              * continuam a um clique, como caminho secundário.
+              */}
+            <p className="text-body">
+              Em dois minutos, o diagnóstico mostra se o restaurante está no lucro ou no
+              prejuízo — e quanto precisa faturar para virar o mês. Sem cartão.
+            </p>
           </div>
-          <Link href="/funcionalidades/" className="btn-primary whitespace-nowrap">
-            Explorar funcionalidades →
-          </Link>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/diagnostico/" className="btn-primary whitespace-nowrap">
+              Fazer meu diagnóstico
+            </Link>
+            <Link href="/funcionalidades/" className="btn-ghost whitespace-nowrap">
+              Explorar funcionalidades →
+            </Link>
+          </div>
         </div>
       </section>
     </>
