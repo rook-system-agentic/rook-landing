@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { PARTNERS, PARTNERS_SECTION, CONTACT_EMAIL, type Partner } from "@/lib/lp-content";
+import { PARTNERS, PARTNERS_SECTION, type Partner } from "@/lib/lp-content";
+import LpIntegrationRequest from "./LpIntegrationRequest";
 
 /**
  * Um parceiro na faixa.
@@ -71,12 +72,12 @@ export default function LpPartners() {
             <span style={{ color: "#e54c00" }}>{PARTNERS_SECTION.headlineEmphasis}</span>
           </h2>
           <p className="lp-body mb-6">{PARTNERS_SECTION.intro}</p>
-          <a
-            href={`mailto:${CONTACT_EMAIL}?subject=Solicita%C3%A7%C3%A3o%20de%20integra%C3%A7%C3%A3o`}
-            className="btn-ghost text-sm"
-          >
-            {PARTNERS_SECTION.ctaLabel}
-          </a>
+          {/*
+            * Era um `mailto:` — que depende de cliente de e-mail configurado,
+            * não registra o pedido e chega ao Comercial sem dizer qual sistema
+            * foi pedido. Virou formulário; ver LpIntegrationRequest.
+            */}
+          <LpIntegrationRequest label={PARTNERS_SECTION.ctaLabel} />
         </div>
       </div>
 
