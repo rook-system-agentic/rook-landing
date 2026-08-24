@@ -59,11 +59,15 @@ export function WhatsMessage({ message }: { message: BriefingMessage }) {
 /** O painel que emoldura as mensagens, com o cabeçalho do contato. */
 export function WhatsPanel({
   contactName,
-  contactNumber,
+  contactTag,
   children,
 }: {
   contactName: string;
-  contactNumber: string;
+  /*
+   * Rótulo do canal — NÃO um telefone. Ver o comentário em BRIEFING
+   * (`lp-content.ts`): o número real saiu daqui em 24/08/2026 e não volta.
+   */
+  contactTag: string;
   children: React.ReactNode;
 }) {
   return (
@@ -79,7 +83,7 @@ export function WhatsPanel({
           {contactName}
         </p>
         <p className="font-mono text-xs" style={{ color: PANEL.muted }}>
-          {contactNumber}
+          {contactTag}
         </p>
       </div>
       {children}
