@@ -155,7 +155,7 @@ export default function SobrePage() {
             <ul className="grid gap-5 sm:grid-cols-2">
               {SOBRE_COMPOSICAO.blocos.map((b) => (
                 <li key={b.n} className="card flex h-full flex-col p-6">
-                  <span className="font-mono text-2xl font-bold text-ocre">{b.n}</span>
+                  <span className="font-mono text-2xl font-bold" style={{ color: "var(--color-ocre-text)" }}>{b.n}</span>
                   <h3 className="heading-sub mb-3 mt-3">{b.titulo}</h3>
                   <p className="flex-1 text-sm leading-relaxed" style={{ color: "var(--color-muted)" }}>
                     {b.texto}
@@ -192,7 +192,7 @@ export default function SobrePage() {
           <ul className="grid gap-6 md:grid-cols-3">
             {SOBRE_PRODUTO.principios.map((p) => (
               <li key={p.n} className="card p-8">
-                <span className="font-mono text-3xl font-bold text-ocre">{p.n}</span>
+                <span className="font-mono text-3xl font-bold" style={{ color: "var(--color-ocre-text)" }}>{p.n}</span>
                 <h3 className="heading-sub mb-3 mt-4">{p.titulo}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--color-muted)" }}>
                   {p.texto}
