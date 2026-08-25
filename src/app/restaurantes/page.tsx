@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
 import { BENCHMARK_FONTE } from "@/lib/cmv-benchmarks.mjs";
+import TelasDoProduto from "@/components/restaurantes/TelasDoProduto";
 
 export const metadata: Metadata = {
   title: "O Rook para o seu tipo de casa | Rook System",
@@ -132,6 +133,17 @@ export default function RestaurantesPage() {
           </div>
         </div>
       </section>
+
+      {/*
+        * As telas entram DEPOIS dos cards de segmento e antes do fecho.
+        *
+        * A ordem é o argumento: o visitante acabou de se reconhecer numa dor
+        * ("a proteína sobe sem avisar", "a dose mal tirada não aparece no
+        * caixa") e a seção seguinte mostra a tela que responde exatamente
+        * aquilo. Antes dos cards, seriam três telas de um produto que ele
+        * ainda não sabe se é para ele.
+        */}
+      <TelasDoProduto />
 
       <section className="section-spacing" style={{ borderTop: "1px solid var(--color-border)" }}>
         <div className="max-w-7xl mx-auto px-6">

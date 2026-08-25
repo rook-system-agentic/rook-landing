@@ -1,4 +1,5 @@
 import { EXEMPLO_DRE } from "@/lib/lp-content";
+import { PRECO_INSUMO, resumoDoInsumo } from "@/lib/telas-do-produto.mjs";
 
 /**
  * As peças de interface da home: a vitrine "Tabuleiro · Casa exemplo"
@@ -270,6 +271,80 @@ export function DreLines() {
       </div>
       <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: "var(--lp-muted)" }}>
         margem {num(EXEMPLO_DRE.margemPct)}% no mês
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Evolução do preço do insumo em doze meses — a linha que a lista não conta.
+ *
+ * POR QUE ESTE GRÁFICO EXISTE AO LADO DA LISTA
+ *
+ * A aba Compras/CMV já mostrava "Inflação de insumo · 30 dias", com o filé
+ * mignon em +8,4%. O número tem uma fraqueza: 8% num item lê como pouco, e o
+ * leitor segue em frente. É o degrau, não a escada.
+ *
+ * Este gráfico é a escada. Mesmo insumo, doze meses: passos de 2%, 3%, 4%, um
+ * por mês, nenhum grande o bastante para virar decisão — e +37,8% no fim. O
+ * "+8,4%" da lista é o ÚLTIMO PONTO desta linha, não outro número; a trava em
+ * `tests/telas-do-produto-coerentes.test.mjs` garante isso.
+ *
+ * Sem eixos de propósito: aqui o que convence é a forma da curva, e o valor
+ * exato de cada mês fica na versão cheia, em /restaurantes.
+ */
+export function PrecoInsumoChart() {
+  const w = 260;
+  const h = 64;
+  const precos = PRECO_INSUMO.map((p) => p.preco);
+  const { variacaoPct, minimo, maximo } = resumoDoInsumo();
+  const pts = precos.map((v, i) => {
+    const x = (i / (precos.length - 1)) * w;
+    const y = h - ((v - minimo) / (maximo - minimo)) * (h - 8) - 4;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="mb-1 flex items-baseline justify-between">
+        <span className="font-mono text-lg font-semibold" style={{ color: "var(--lp-ink)" }}>
+          R$ {num(maximo, 2)}/kg
+        </span>
+        <span
+          className="font-mono text-[11px]"
+          style={{ color: "var(--color-terracota-text)" }}
+        >
+          ▲ {num(variacaoPct)}% em 12 meses
+        </span>
+      </div>
+      <svg
+        viewBox={`0 0 ${w} ${h}`}
+        className="lp-spark min-h-16 w-full flex-1"
+        preserveAspectRatio="none"
+        role="img"
+        aria-label={`Preço médio do filé mignon subindo ${num(variacaoPct)} por cento em doze meses`}
+      >
+        <polyline
+          points={`0,${h} ${pts.join(" ")} ${w},${h}`}
+          fill={TERRACOTA}
+          opacity="0.08"
+          stroke="none"
+        />
+        <polyline
+          points={pts.join(" ")}
+          fill="none"
+          stroke={TERRACOTA}
+          strokeWidth="2"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      <p
+        className="mt-1 font-mono text-[10px] uppercase tracking-wider"
+        style={{ color: "var(--lp-muted)" }}
+      >
+        Filé mignon · preço médio por mês
       </p>
     </div>
   );
