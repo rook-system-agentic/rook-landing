@@ -10,6 +10,7 @@ import { siteUrl } from "@/lib/site-origin";
 import { OG_IMAGE, OG_IMAGE_PATH, TWITTER_CARD } from "@/lib/og-image";
 import { FAQ_ITEMS } from "@/lib/lp-content";
 import { descricaoParaBuscador } from "@/lib/planos-copy.mjs";
+import { COMPANY_INFO } from "@/lib/company";
 import { getLandingBillingCatalog } from "@/lib/billing-catalog-server";
 import type { PublicBillingCatalog } from "@/lib/public-billing-catalog.mjs";
 
@@ -153,10 +154,30 @@ function construirJsonLd(catalogo: PublicBillingCatalog | null) {
           "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, DRE gerencial automático, score de saúde financeira e recomendações com impacto em R$.",
       },
       {
+        /*
+         * A identidade jurídica sai de `lib/company.ts`, a mesma fonte do
+         * rodapé, das páginas jurídicas e da /sobre. Estava faltando aqui: o
+         * nó trazia só nome, url e logo, enquanto razão social e CNPJ já
+         * existiam no repositório. Para quem vai ligar o produto ao banco,
+         * empresa identificável é sinal — e para o buscador, é o que liga
+         * este site à pessoa jurídica.
+         *
+         * `foundingDate` fica de fora até alguém confirmar a data do
+         * contrato social. Data de fundação inventada em dado estruturado é
+         * exatamente o tipo de número que este site não publica.
+         */
         "@type": "Organization",
         name: "Rook System",
+        legalName: COMPANY_INFO.razaoSocial,
+        taxID: COMPANY_INFO.cnpj,
         url: siteUrl(),
         logo: siteUrl("/brand/rook-logo-horizontal-light.png"),
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Brasília",
+          addressRegion: "DF",
+          addressCountry: "BR",
+        },
       },
       {
         "@type": "FAQPage",

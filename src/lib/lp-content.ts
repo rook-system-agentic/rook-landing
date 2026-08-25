@@ -849,3 +849,166 @@ export const TELAS = {
     },
   ],
 } as const;
+
+/* ─── A página /sobre ─── */
+
+/**
+ * A copy da página de procedência.
+ *
+ * POR QUE ELA MUDOU DE EIXO (25/08/2026)
+ *
+ * A /sobre era manifesto: declarava valores ("Visão. Estratégia. Controle.")
+ * e contava uma história. Três defeitos, todos medidos antes de reescrever:
+ *
+ *   1. REPETIA A HOME. A seção de história abria com a mesma manchete do
+ *      bloco AUTHORITY — "O Rook começou em planilhas." — e a mesma
+ *      narrativa. E o botão que traz o visitante para cá, na home, é
+ *      "Conheça o Rook por dentro": o clique prometia aprofundar e entregava
+ *      releitura. As duas cópias já tinham divergido ("vinte anos" na home,
+ *      "20 anos" aqui). Há teste travando essa duplicação.
+ *   2. NÃO PROVAVA NADA. Zero elemento visual, zero nome, zero dado da
+ *      empresa — mesmo com razão social, CNPJ e endereço já no repositório,
+ *      em `lib/company.ts`, usados só no rodapé e nas páginas jurídicas.
+ *   3. CITAVA UM NÚMERO QUE O SITE DESMENTE: "30% de CMV ideal", quando a
+ *      tabela canônica não tem nenhum segmento em 30% (a faixa vai de 25% a
+ *      36,6%). A página que existe para provar rigor contradizia a
+ *      calculadora duas telas depois.
+ *
+ * O eixo agora é PROCEDÊNCIA, porque é a pergunta que o visitante traz: não
+ * "no que vocês acreditam", mas "posso confiar meus números a essa gente?".
+ *
+ * SOBRE OS NOMES (decisão do PO, 25/08/2026): a sociedade tem cinco sócios e
+ * nem todos querem exposição. A saída não foi voltar ao "nós" vago — foi
+ * atribuir COMPETÊNCIA em vez de identificar PESSOA. Vinte anos de
+ * consultoria sem nome, a Polla nomeada como firma, e uma assinatura só, de
+ * quem responde pela operação. Página sem nenhuma pessoa vira institucional;
+ * com uma que assina, deixa de ser anônima.
+ *
+ * A história do sócio investidor (portais imobiliários) ficou de fora de
+ * propósito: é o pilar mais fraco para dono de restaurante, é de outro setor,
+ * e as alegações fortes dela ("primeiro do Brasil", "liderança absoluta")
+ * pediriam fonte que não temos. O que interessa dela — durabilidade — cabe em
+ * uma linha sem nome e sem superlativo.
+ */
+export const SOBRE_HERO = {
+  label: "— Sobre o Rook",
+  headlinePlain: "Quem está atrás dos ",
+  headlineEmphasis: "seus números.",
+  lead: "O Rook não é uma startup que resolveu olhar para restaurantes. É o encontro de uma consultoria de controladoria com vinte anos de estrada, uma contabilidade com mais de quarenta e o trabalho de transformar as duas em software.",
+} as const;
+
+export const SOBRE_METODO = {
+  label: "— De onde vem o método",
+  headlinePlain: "Antes de existir produto, existia ",
+  headlineEmphasis: "método.",
+  paragraphs: [
+    "Controladoria é a função que quase nenhum restaurante tem e toda empresa grande tem: alguém que olha o número antes de ele virar problema. Não se confunde com contabilidade — a contabilidade registra o que já aconteceu, para o fisco. A controladoria pergunta o que fazer no mês que ainda está correndo.",
+    "Foi esse o trabalho que um dos sócios fez por mais de vinte anos, em consultoria de finanças corporativas, controladoria e reestruturação: entrar onde a operação estava apertando, olhar o número sem romantizar e apontar a decisão. Modelo de DRE, disciplina de caixa, rotina de gestão — o que faz uma empresa voltar a respirar.",
+    "Nos restaurantes, o diagnóstico vinha rápido e quase sempre igual: o aperto não estava na cozinha nem no salão. Estava no intervalo entre o pedido e o extrato — o insumo que subiu sem virar decisão, a taxa de aplicativo que ninguém somou, o imposto pago fora do regime que caberia. Nada disso aparece no caixa do dia. Tudo isso aparece no ano.",
+  ],
+  /** A prova. Ver o comentário de SOBRE_PROVA. */
+  provaLabel: "A pesquisa não ficou no papel",
+} as const;
+
+/**
+ * A ligação entre a história e o produto — a parte verificável da página.
+ *
+ * O CMV de referência que a calculadora exibe (`BENCHMARK_FONTE`, em
+ * `lib/cmv-benchmarks.mjs`) é a pesquisa que nasceu daquelas consultorias. No
+ * código do produto ela aparece nomeada: `cmv-target.ts` resolve a meta pela
+ * "média do estudo" e o motor de insights rotula a fonte como a pesquisa de
+ * 2024. Ou seja: os vinte anos não são alegação sobre o passado, são o número
+ * que calcula o CMV do cliente hoje.
+ *
+ * É o argumento mais forte da página, e o único que o visitante pode conferir
+ * sozinho — basta abrir a calculadora.
+ */
+export const SOBRE_PROVA = {
+  texto: "O CMV de referência que a nossa calculadora usa não veio de artigo na internet. É a pesquisa que nasceu dessas consultorias, hoje publicada como",
+  textoFim: "com faixa própria para cada um dos onze segmentos. Toda vez que o Rook diz que a sua casa está dois pontos acima da meta, é esse método fazendo a conta.",
+  ctaLabel: "Ver o CMV de referência da minha casa",
+  ctaHref: "/calculadora-cmv/",
+} as const;
+
+export const SOBRE_COMPOSICAO = {
+  label: "— Quem está por trás",
+  headlinePlain: "Não é um fundador. É uma ",
+  headlineEmphasis: "composição.",
+  intro: "Cinco sócios. O que cada origem trouxe está dentro do produto, não só na apresentação.",
+  blocos: [
+    {
+      n: "01",
+      titulo: "O método",
+      texto: "Vinte anos de consultoria em finanças corporativas, controladoria e reestruturação. É de lá que vem o jeito do Rook de tratar número: sem romantizar, com critério, e com o impacto em reais ao lado de cada recomendação.",
+      assinatura: null,
+    },
+    {
+      n: "02",
+      titulo: "O rigor fiscal",
+      texto: "A Polla Contadores e Auditores, com mais de quarenta anos de história, está entre os sócios. É por isso que imposto, folha e regime tributário não são campo para você preencher: são conta que o sistema faz, a partir do que a sua operação já emite.",
+      assinatura: null,
+    },
+    {
+      n: "03",
+      titulo: "O produto",
+      texto: "Oito anos de controladoria, gestão e tecnologia. O trabalho de virar método em software que o dono abre no celular entre dois turnos — e entende em trinta segundos.",
+      assinatura: "Gabriel Abdala",
+    },
+    {
+      n: "04",
+      titulo: "O lastro",
+      texto: "Entre os sócios há quem já tenha fundado, escalado e vendido uma empresa de tecnologia no Brasil. Isso não aparece na tela. Aparece na resposta para a pergunta que todo dono faz antes de entregar seus números a alguém: essa empresa vai existir daqui a três anos?",
+      assinatura: null,
+    },
+  ],
+} as const;
+
+export const SOBRE_PRODUTO = {
+  label: "— Como isso aparece na tela",
+  headlinePlain: "Origem que não vira tela é ",
+  headlineEmphasis: "história bonita.",
+  intro: "Entre o pedido no salão e o lucro no fim do mês há seis paradas: vendas, impostos, insumos, despesas, dívidas e o que sobra. Qualquer uma pode estar corroendo a margem agora. Três compromissos governam como o Rook mostra isso.",
+  principios: [
+    {
+      n: "01",
+      titulo: "Clareza vence achismo",
+      texto: "Toda recomendação vem com um número em reais ao lado. Sem promessa vaga, sem \"otimização\" sem cifrão. Se o Rook sugere algo, é porque calculou o impacto.",
+    },
+    {
+      n: "02",
+      titulo: "Todo número tem origem",
+      texto: "Cada linha do diagnóstico é rastreável até a fonte: a nota que a SEFAZ tem, o extrato que o banco mandou, a folha do eSocial. Nada de número que aparece sem dizer de onde veio.",
+    },
+    {
+      n: "03",
+      titulo: "A língua é a sua",
+      texto: "Sem sigla e sem jargão. O Rook conta a história da sua casa como um controlador experiente contaria numa conversa: o que aconteceu, o que isso custa e qual é o próximo passo.",
+    },
+  ],
+} as const;
+
+/**
+ * A procedência verificável.
+ *
+ * Os dados vêm de `lib/company.ts`, a mesma fonte do rodapé e das páginas
+ * jurídicas — nada digitado aqui. Existe porque é o que separa empresa de
+ * landing page para quem está prestes a pagar uma mensalidade: dá para
+ * conferir o CNPJ antes de confiar o extrato bancário.
+ */
+export const SOBRE_EMPRESA = {
+  label: "— A empresa",
+  headlinePlain: "Dá para conferir ",
+  headlineEmphasis: "antes de confiar.",
+  intro: "Você vai ligar o Rook ao seu banco e às suas notas. Antes disso, é justo saber com quem está falando.",
+} as const;
+
+export const SOBRE_CTA = {
+  label: "— O próximo passo",
+  headlinePlain: "Veja a sua casa pelos ",
+  headlineEmphasis: "olhos do Rook.",
+  texto: "Em dois minutos, o diagnóstico mostra se o restaurante está no lucro ou no prejuízo — e quanto precisa faturar para virar o mês. Sem cartão.",
+  primaryLabel: "Fazer meu diagnóstico",
+  primaryHref: "/diagnostico/",
+  secondaryLabel: "Ver o Rook por dentro →",
+  secondaryHref: "/restaurantes/",
+} as const;
