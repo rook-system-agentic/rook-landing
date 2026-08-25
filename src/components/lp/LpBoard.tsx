@@ -11,7 +11,16 @@ import {
   EXEMPLO_DRE,
   type BoardTab,
 } from "@/lib/lp-content";
-import { Sparkline, CmvBar, ExpenseBars, DreLines, pctDe, reais, num } from "./LpDataParts";
+import {
+  Sparkline,
+  CmvBar,
+  ExpenseBars,
+  DreLines,
+  PrecoInsumoChart,
+  pctDe,
+  reais,
+  num,
+} from "./LpDataParts";
 
 /**
  * O tabuleiro: as seis etapas em abas.
@@ -44,6 +53,18 @@ function CmvPanel() {
         </div>
       </div>
       <div>
+        {/*
+          * O gráfico vem ANTES da lista, e a ordem é o argumento.
+          *
+          * A lista sozinha diz "+8,4%" e o leitor lê "pouco". O gráfico mostra
+          * doze meses de passos pequenos virando +37,8%, e aí o "+8,4%" abaixo
+          * dele deixa de ser um item e passa a ser o último degrau de uma
+          * escada. Invertido, o leitor já descartou o assunto antes de chegar
+          * na curva. Ver `PrecoInsumoChart` em LpDataParts.
+          */}
+        <div className="mb-6">
+          <PrecoInsumoChart />
+        </div>
         <p
           className="mb-1 font-mono text-[10px] uppercase tracking-wider"
           style={{ color: "var(--lp-muted)" }}
