@@ -23,6 +23,7 @@ import {
   PLANOS_COPY,
   copyDoPlano,
   planoParaExibicao,
+  descricaoParaBuscador,
   LIMIAR_KNIGHT_CENTAVOS_ESPERADO,
 } from "../src/lib/planos-copy.mjs";
 
@@ -163,4 +164,73 @@ test("o texto cru do catálogo não atravessa para o componente de cliente", asy
       );
     }
   }
+});
+
+/**
+ * O JSON-LD do layout vai em TODA página e é lido pelo buscador. Preço
+ * digitado ali não quebra build nem teste de estrutura — só passa a mentir no
+ * dia do reajuste, enquanto a /planos (que lê o catálogo) mostra o certo.
+ */
+test("o dado estruturado não traz preço, limiar nem teste digitados à mão", async () => {
+  const fonte = await readFile(path.join(RAIZ, "src/app/layout.tsx"), "utf8");
+  const { offers, classification, trial } = await lerSnapshot();
+
+  const literais = [
+    ...offers.map((o) => (o.unitAmountCents / 100).toFixed(2)),
+    `R$ ${classification.knightMaxMonthlyRevenueCents / 100 / 1000} mil`,
+    `${trial.durationDays} dias de teste`,
+  ];
+
+  const encontrados = literais.filter((lit) => fonte.includes(lit));
+  assert.deepEqual(
+    encontrados,
+    [],
+    "`src/app/layout.tsx` traz valor do catálogo digitado à mão: " +
+      `${encontrados.join(", ")}. Esses números vivem no catálogo de billing e ` +
+      "a /planos já os lê de lá. Repetidos aqui, eles passam a mentir para o " +
+      "buscador no dia do reajuste — em todas as páginas do site.",
+  );
+});
+
+test("o layout monta as ofertas a partir do catálogo, não de literal", async () => {
+  const fonte = await readFile(path.join(RAIZ, "src/app/layout.tsx"), "utf8");
+  for (const marca of ["getLandingBillingCatalog", "descricaoParaBuscador"]) {
+    assert.ok(
+      fonte.includes(marca),
+      `\`layout.tsx\` deixou de usar ${marca} — as ofertas do JSON-LD voltaram a ser literais.`,
+    );
+  }
+});
+
+test("a descrição do buscador nasce da copy do cartão", async () => {
+  const { offers, trial } = await lerSnapshot();
+  for (const offer of offers) {
+    const dias = offer.productCode === "chess" ? null : trial.durationDays;
+    const texto = descricaoParaBuscador(offer.productCode, dias);
+    assert.ok(texto, `sem descrição para ${offer.productCode}`);
+    assert.ok(
+      texto.startsWith(PLANOS_COPY[offer.productCode].descricao),
+      `A descrição de ${offer.productCode} para o buscador divergiu da copy do ` +
+        "cartão. O texto do buscador tem de ser o texto que o visitante lê.",
+    );
+    for (const erro of GRAFIAS_ERRADAS) {
+      assert.ok(!texto.includes(erro), `"${erro}" voltou na descrição de ${offer.productCode}.`);
+    }
+  }
+});
+
+/**
+ * A regra "Chess não anuncia teste" mora em quem CHAMA (o layout), porque é
+ * lá que existe a distinção entre plano-base e adicional de organização — o
+ * catálogo tem um `trial` só, sem dizer a quais produtos se aplica. Então o
+ * que se trava aqui é o layout passando `null` para o Chess.
+ */
+test("o layout não anuncia teste para o Chess", async () => {
+  const fonte = await readFile(path.join(RAIZ, "src/app/layout.tsx"), "utf8");
+  assert.match(
+    fonte,
+    /productCode === "chess" \? null :/,
+    "O layout deixou de excluir o Chess do período de teste. Ele é adicional " +
+      "de organização e não tem teste próprio — anunciar um é promessa falsa.",
+  );
 });

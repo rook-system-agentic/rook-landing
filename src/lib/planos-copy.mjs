@@ -110,3 +110,51 @@ export function planoParaExibicao(plano) {
     features: copy?.features ?? plano.publicFeatures,
   };
 }
+
+/**
+ * Complemento que só faz sentido no dado estruturado, não no cartão.
+ *
+ * O cartão da /planos já está dentro de uma seção que fala de multiunidade;
+ * repetir "para redes e franquias" ali seria redundante. No JSON-LD não há
+ * seção nem contexto — o buscador lê a frase sozinha.
+ */
+const COMPLEMENTO_BUSCADOR = Object.freeze({
+  chess: "Para redes e franquias.",
+});
+
+/**
+ * Descrição do plano para o dado estruturado (JSON-LD do `layout.tsx`).
+ *
+ * POR QUE ELA NASCE DA MESMA COPY DO CARTÃO
+ *
+ * Antes desta função, o `layout.tsx` trazia as três frases DIGITADAS À MÃO,
+ * junto com o preço, o limiar de faturamento e os dias de teste — tudo em
+ * literal, dentro do bloco que vai em TODA página do site e é lido pelo
+ * Google. Os valores batiam com o catálogo por coincidência de terem sido
+ * escritos no mesmo dia.
+ *
+ * O dia em que deixassem de bater seria silencioso e caro: a /planos lê o
+ * catálogo e mudaria sozinha; o JSON-LD continuaria anunciando o preço
+ * antigo para o buscador, em todas as páginas. Preço errado em dado
+ * estruturado não é erro de texto — é promessa comercial que a própria
+ * página de planos contradiz.
+ *
+ * `diasDeTeste` vem do catálogo (`trial.durationDays`) e só é passado para os
+ * planos-base; o Chess é adicional de organização e não tem teste próprio.
+ * Passe `null` e a frase sai sem essa parte.
+ *
+ * @param {string} productCode
+ * @param {number | null} [diasDeTeste]
+ * @returns {string | undefined} `undefined` para código sem copy escrita.
+ */
+export function descricaoParaBuscador(productCode, diasDeTeste = null) {
+  const copy = copyDoPlano(productCode);
+  if (!copy) return undefined;
+  const partes = [copy.descricao];
+  const complemento = COMPLEMENTO_BUSCADOR[productCode];
+  if (complemento) partes.push(complemento);
+  if (typeof diasDeTeste === "number" && diasDeTeste > 0) {
+    partes.push(`${diasDeTeste} dias de teste grátis.`);
+  }
+  return partes.join(" ");
+}
