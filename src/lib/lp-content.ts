@@ -793,3 +793,59 @@ export const CTA = {
   secondaryLabel: "Ver planos e teste",
   secondaryHref: "/planos/",
 } as const;
+
+/* ─── As telas do produto (seção da /restaurantes) ─── */
+
+/**
+ * A prova visual da página de segmentos.
+ *
+ * POR QUE ESTA SEÇÃO EXISTE, E POR QUE NÃO É "INDICADOR POR SEGMENTO"
+ *
+ * A primeira proposta era dar a cada card de segmento três indicadores
+ * próprios — o que o Rook mostraria "na sua casa". Foi descartada depois de
+ * ler o produto: o Rook mostra os MESMOS módulos para toda casa. O que muda
+ * por segmento é a régua de CMV (tabela `restaurant_segments`, com estudo
+ * atrás), não a lista de telas.
+ *
+ * Escrever indicador por segmento sairia plausível e falso — o defeito que
+ * esta página inteira foi feita para evitar. Então a prova é outra: as telas
+ * são as mesmas para todo mundo, e o que muda é POR ONDE cada casa entra.
+ * Cada tela nomeia a dor que responde, e essas dores são as mesmas de `BLOCOS`
+ * em `app/restaurantes/page.tsx`.
+ *
+ * Os NÚMEROS vivem em `lib/telas-do-produto.mjs` e derivam da casa exemplo do
+ * resto do site. Aqui só texto.
+ */
+export const TELAS = {
+  label: "— O que o Rook mostra",
+  headlinePlain: "Onde o dinheiro some, ",
+  headlineEmphasis: "em três telas.",
+  intro:
+    "São telas do Rook, com os números da mesma casa exemplo que aparece no resto do site. Cada uma responde uma das dores logo acima — e são as mesmas três para qualquer segmento. O que muda de casa para casa é por qual delas você entra.",
+  telas: [
+    {
+      id: "mapa-de-calor",
+      modulo: "Vendas · Mapa de calor",
+      titulo: "Qual turno paga o dia, e qual não paga",
+      texto:
+        "Que sábado à noite é forte, você já sabe. O que não aparece no caixa é a sexta ter caído 17% contra as oito semanas anteriores dela mesma — nem que a segunda no delivery entrega mais do que devolve. Cada quadro se compara com o mesmo dia e o mesmo turno das últimas oito semanas, nunca com a média do mês.",
+      paraQuem: "Responde: bar e boteco, à la carte",
+    },
+    {
+      id: "preco-do-insumo",
+      modulo: "Compras/CMV · Histórico do insumo",
+      titulo: "A alta que nunca virou decisão",
+      texto:
+        "Nenhum mês assustou. Dois por cento aqui, três ali, o fornecedor sempre o mesmo, a nota sempre paga. Doze meses depois o quilo subiu 37,8% e o cardápio segue com o preço do ano passado. Não foi uma decisão ruim — foi a ausência de uma decisão.",
+      paraQuem: "Responde: à la carte, pizzaria, hamburgueria",
+    },
+    {
+      id: "extrato-classificado",
+      modulo: "Central de Dados · Extrato bancário",
+      titulo: "O caixa se classifica sozinho",
+      texto:
+        "O extrato entra pelo Open Finance e 78% dele já chega separado no seu plano de contas: venda, taxa de app, folha, insumo. O que sobra é revisar o resto, não digitar tudo. É daqui que sai o fluxo de caixa, sem ninguém abrir planilha no fim do mês.",
+      paraQuem: "Responde: delivery, padaria e cafeteria",
+    },
+  ],
+} as const;
