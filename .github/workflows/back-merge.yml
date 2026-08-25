@@ -1,0 +1,97 @@
+name: Back-merge — main → homolog
+
+# POR QUE ESTE WORKFLOW EXISTE
+#
+# O trilho é `branch de trabalho → homolog → main`, e as promoções entram como
+# squash. O squash leva o CONTEÚDO da homolog para a main sem levar os COMMITS
+# dela — então o git perde a base de comparação entre as duas branches.
+#
+# O sintoma cresce a cada ciclo. Em 24/08/2026 a homolog aparecia como 14
+# commits à frente e 12 atrás da main com as duas IDÊNTICAS arquivo a arquivo,
+# e a base comum tinha três dias. Na promoção do #123 deixou de ser cosmético:
+# virou conflito real em `src/app/restaurantes/page.tsx` e `src/lib/lp-content.ts`
+# — conflito espúrio, o git tentando reaplicar na main o que ela já tinha.
+# Resolver exigiu branch auxiliar e levar a árvore inteira. Funciona, mas cada
+# promoção fica mais cara que a anterior.
+#
+# A alternativa era pedir "Create a merge commit" em toda promoção. Foi pedido
+# três vezes e não pegou — e não por esquecimento: o botão do GitHub lembra a
+# última escolha, então o squash é o caminho de menor resistência e sempre vai
+# ser. Processo que depende de um clique não-padrão falha.
+#
+# Este workflow torna a escolha do botão irrelevante: depois de cada push na
+# main, a homolog recebe a main de volta num merge de dois pais, e a base comum
+# nunca envelhece. A promoção seguinte volta a ser um diff limpo.
+#
+# ⚠️ ELE NUNCA MUDA CONTEÚDO. Se o merge não for automático, o job FALHA e não
+# empurra nada — conflito aqui significa que alguém escreveu na main coisa que
+# a homolog não tem, e isso é decisão humana, não de robô.
+
+on:
+  push:
+    branches: [main]
+  # Manual, para rodar depois de uma promoção antiga sem precisar de push novo.
+  workflow_dispatch:
+
+concurrency:
+  group: back-merge-homolog
+  cancel-in-progress: false
+
+jobs:
+  back-merge:
+    name: Devolver a main para a homolog
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Clonar com histórico completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: homolog
+
+      - name: Mesclar e empurrar, se houver o que devolver
+        env:
+          MAIN_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin main homolog
+
+          # Nada a fazer quando a homolog já contém o topo da main. É o caso
+          # normal depois que este workflow roda uma vez por promoção.
+          if git merge-base --is-ancestor origin/main HEAD; then
+            echo "A homolog já contém o topo da main ($(git rev-parse --short origin/main)). Nada a devolver."
+            exit 0
+          fi
+
+          echo "Devolvendo main ($(git rev-parse --short origin/main)) para a homolog ($(git rev-parse --short HEAD))."
+
+          MENSAGEM=$(printf '%s\n\n%s\n%s\n' \
+            "chore: back-merge main → homolog (automático)" \
+            "Restabelece a base comum entre as duas branches depois da promoção $(git rev-parse --short origin/main)." \
+            "Ver .github/workflows/back-merge.yml para o motivo.")
+
+          if ! git merge --no-ff --no-edit -m "$MENSAGEM" origin/main; then
+            git merge --abort || true
+            echo "::error::O back-merge não é automático: a main tem mudanças que conflitam com a homolog."
+            echo "::error::Isso quer dizer que alguém escreveu direto na main (hotfix/revert) e a"
+            echo "::error::homolog não recebeu. Resolva à mão antes da próxima promoção, senão ela"
+            echo "::error::vai carregar o conflito."
+            exit 1
+          fi
+
+          # Cinto de segurança: back-merge que MUDA arquivo não é back-merge.
+          # Ou a main trouxe conteúdo novo (hotfix não devolvido), e aí é
+          # decisão humana, ou algo saiu errado aqui.
+          if ! git diff --quiet origin/homolog HEAD; then
+            echo "::error::O merge alterou arquivos, o que não deveria acontecer num back-merge limpo:"
+            git diff --stat origin/homolog HEAD >&2
+            echo "::error::Nada foi empurrado. Confira à mão."
+            exit 1
+          fi
+
+          git push origin HEAD:homolog
+          echo "Base comum restabelecida em $(git rev-parse --short HEAD)."
