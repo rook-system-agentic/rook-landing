@@ -35,17 +35,7 @@ const DIR_TESTES = path.join(RAIZ, "tests");
  * Suítes que NÃO rodam no CI. Cada entrada precisa de motivo e de saída.
  * Se você está adicionando uma linha aqui, prefira consertar o teste.
  */
-const FORA_DO_GATE = [
-  {
-    arquivo: "billing-catalog.test.mjs",
-    motivo:
-      "depende de um snapshot que expira em 7 dias — fica vermelho sozinho, " +
-      "sem ninguém mexer no código, e treinaria o time a ignorar o CI",
-    saida:
-      "rode `pnpm test:billing` à mão, ou regenere o snapshot; a validade é " +
-      "verificada em `parseBillingCatalogSnapshot`",
-  },
-];
+const FORA_DO_GATE = [];
 
 const excluidos = new Map(FORA_DO_GATE.map((e) => [e.arquivo, e]));
 
