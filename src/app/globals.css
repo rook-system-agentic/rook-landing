@@ -685,3 +685,19 @@ body:has([data-diagnostico-etapa="formulario"]) > header {
 body:has([data-diagnostico-etapa="formulario"]) > main {
   padding-top: 0;
 }
+
+/*
+ * Experimento de /planos (ROO-1207): o HTML publica os dois CTAs e só um
+ * aparece. `data-lp-variant` é posto no <html> por um script inline do layout,
+ * lido do cookie antes da pintura — por isso não há flicker. `display: none`
+ * também tira o CTA escondido da árvore de acessibilidade e da ordem do Tab.
+ */
+[data-lp-only="assisted"] {
+  display: none;
+}
+html[data-lp-variant="assisted"] [data-lp-only="assisted"] {
+  display: flex;
+}
+html[data-lp-variant="assisted"] [data-lp-only="direct"] {
+  display: none;
+}

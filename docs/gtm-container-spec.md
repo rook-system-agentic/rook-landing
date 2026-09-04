@@ -183,6 +183,31 @@ como **segundo** gatilho de `Meta - PageView`.
 Não há disparo em dobro: quem recusa não emite o evento, e quem volta não vê
 o banner, então nunca passa por esse caminho.
 
+## Experimento AsaFlow — `lp_asaflow_v1` (ROO-1207, ainda não publicado)
+
+O código emite os eventos abaixo desde a ROO-1207; o contêiner ainda não tem
+as tags. Publicar **antes** de subir `LP_ASAFLOW_ASSISTED_PCT` acima de 0. Toda
+tag leva `Page Hostname` igual a `www.rook.com.br`, como as demais.
+
+Variáveis da camada de dados: `experiment_id`, `variant`, `destination`,
+`plan`, `channel`, `component`, `error_code`.
+
+| Evento | Parâmetros | Observação |
+| :-- | :-- | :-- |
+| `experiment_exposure` | `experiment_id`, `variant`, `page_type` | uma vez por sessão do navegador, em `/planos` |
+| `cta_click` | `experiment_id`, `variant`, `destination`, `plan` | `destination` ∈ `contratar` (A), `chat`, `form` (B) |
+| `chat_open` | `experiment_id`, `variant`, `page_type` | script do widget carregou |
+| `form_view` | `experiment_id`, `variant`, `page_type` | modal do formulário AsaFlow abriu |
+| `integration_error` | `experiment_id`, `variant`, `component`, `error_code` | `component=asaflow_widget`; `error_code` ∈ `timeout`, `load_error` |
+
+Os eventos já existentes `generate_lead` e `app_handoff` passaram a carregar
+`experiment_id` e `variant` (e `generate_lead` ganhou `channel`). Acrescentar os
+parâmetros nas tags `GA4 - generate_lead` e `GA4 - app_handoff`. Não criar
+`checkout_start`: `app_handoff` com `destino=contratar` já é essa saída.
+
+Depois de publicar, registrar `experiment_id` e `variant` como dimensões
+personalizadas no GA4 (mesmo passo descrito em "Depois de publicar").
+
 ## Pendências
 
 - **Separação por página real, não só por página de entrada.** Hoje
