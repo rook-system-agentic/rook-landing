@@ -137,3 +137,63 @@ test("resolve saida para o app exige fronteira de segmento em /contratar", () =>
     "contratar",
   );
 });
+
+// ── Experimento da LP (ROO-1207) ─────────────────────────────────────────────
+
+test("os eventos do experimento aceitam so as dimensoes do funil", () => {
+  const dims = { experiment_id: "lp_asaflow_v1", variant: "assisted" };
+  assert.deepEqual(
+    buildTrackingEvent(TRACKING_EVENTS.experimentExposure, { ...dims, page_type: "planos" }),
+    { event: "experiment_exposure", ...dims, page_type: "planos" },
+  );
+  assert.deepEqual(
+    buildTrackingEvent(TRACKING_EVENTS.ctaClick, { ...dims, destination: "chat", plan: "knight" }),
+    { event: "cta_click", ...dims, destination: "chat", plan: "knight" },
+  );
+  assert.deepEqual(
+    buildTrackingEvent(TRACKING_EVENTS.chatOpen, { ...dims, page_type: "planos" }),
+    { event: "chat_open", ...dims, page_type: "planos" },
+  );
+  assert.deepEqual(
+    buildTrackingEvent(TRACKING_EVENTS.formView, { ...dims, page_type: "planos" }),
+    { event: "form_view", ...dims, page_type: "planos" },
+  );
+  assert.deepEqual(
+    buildTrackingEvent(TRACKING_EVENTS.integrationError, { ...dims, component: "asaflow_widget", error_code: "timeout" }),
+    { event: "integration_error", ...dims, component: "asaflow_widget", error_code: "timeout" },
+  );
+});
+
+test("lead e saida para o app aceitam as dimensoes do experimento, e continuam aceitando sem elas", () => {
+  const dims = { experiment_id: "lp_asaflow_v1", variant: "direct" };
+  assert.deepEqual(
+    buildTrackingEvent(TRACKING_EVENTS.lead, { plano: "chess", channel: "site_form", ...dims }),
+    { event: "generate_lead", plano: "chess", channel: "site_form", ...dims },
+  );
+  assert.deepEqual(
+    buildTrackingEvent(TRACKING_EVENTS.appHandoff, { destino: "contratar", ...dims }),
+    { event: "app_handoff", destino: "contratar", ...dims },
+  );
+  assert.deepEqual(buildTrackingEvent(TRACKING_EVENTS.lead, { plano: "rook" }), {
+    event: "generate_lead",
+    plano: "rook",
+  });
+});
+
+test("os eventos do experimento recusam dado pessoal e texto livre", () => {
+  for (const evento of [
+    TRACKING_EVENTS.experimentExposure,
+    TRACKING_EVENTS.ctaClick,
+    TRACKING_EVENTS.chatOpen,
+    TRACKING_EVENTS.formView,
+    TRACKING_EVENTS.integrationError,
+  ]) {
+    for (const campo of ["email", "phone", "cnpj", "name", "message", "utm_term"]) {
+      assert.throws(
+        () => buildTrackingEvent(evento, { experiment_id: "lp_asaflow_v1", variant: "assisted", [campo]: "x" }),
+        new RegExp(campo),
+        `${evento} deveria recusar ${campo}`,
+      );
+    }
+  }
+});

@@ -14,6 +14,8 @@ import type { CommercialInterest } from "@/lib/commercial-lead-validation.mjs";
 import { buildDirectCheckoutHref } from "@/lib/direct-checkout-link.mjs";
 import type { PlanoExibido } from "@/lib/planos-copy.mjs";
 import { track, TRACKING_EVENTS } from "@/lib/track";
+import { lpExperimentDims } from "@/lib/lp-experiment-client";
+import { AsaflowAssistedCta } from "./AsaflowAssistedCta";
 import { INPUT_CLASSNAME } from "@/lib/form-styles";
 
 /*
@@ -106,7 +108,7 @@ function CommercialLeadDialog({
 
       form.reset();
       setStatus("success");
-      track(TRACKING_EVENTS.lead, { plano: interest });
+      track(TRACKING_EVENTS.lead, { plano: interest, channel: "site_form", ...lpExperimentDims() });
     } catch {
       setMessage("Erro de conexão. Verifique sua internet e tente novamente.");
       setStatus("error");
@@ -406,12 +408,28 @@ export function PlansCommercialExperience({
               <span>Mesma cobertura funcional de Knight e Rook</span>
             </li>
           </ul>
+          {/*
+            * Experimento ROO-1207: os dois CTAs vão no HTML; o CSS de
+            * `[data-lp-only]` (globals.css) mostra só o da variante do cookie.
+            * A Variante A é o link de sempre. O `cta_click` aqui é o passo
+            * comum do funil das duas variantes; a saída para o checkout em si
+            * continua medida pelo `app_handoff` do AppHandoffTracker.
+            */}
           <a
             href={buildDirectCheckoutHref(selected.productCode)}
             className="btn-primary mt-8 text-center"
+            data-lp-only="direct"
+            onClick={() =>
+              track(TRACKING_EVENTS.ctaClick, {
+                destination: "contratar",
+                plan: selected.productCode,
+                ...lpExperimentDims(),
+              })
+            }
           >
             Testar por 7 dias
           </a>
+          <AsaflowAssistedCta plan={selected.productCode} />
         </article>
 
         <aside

@@ -37,6 +37,10 @@ Business logic lives in dependency-free `.mjs` modules with adjacent `.d.mts` ty
 
 `src/lib/tracking-events.mjs` defines the only events and payload fields that may reach GA4/Meta. Unknown event or field **throws** — the plans form collects name/email/phone/CNPJ and none of it may be sent to analytics. To add a tracked field, add it to `ALLOWED_FIELDS` explicitly; never bypass `buildTrackingEvent`.
 
+### `/planos` experiment (ROO-1207)
+
+`src/middleware.ts` allocates visitors of `/` and `/planos` to `direct`/`assisted` via the `rook_lp_exp` cookie; `LP_ASAFLOW_ASSISTED_PCT=0` (default) is the kill switch. Both CTAs ship in the HTML and `[data-lp-only]` CSS shows one, driven by `data-lp-variant` set on `<html>` by an inline script in the layout — never read the cookie in the `/planos` server component (it would make the route dynamic and drop the catalog ISR). Rules in `src/lib/lp-experiment.mjs`; runbook in `docs/ROO-1207-experimento-asaflow.md`.
+
 ### Degradation with a visible `source` field
 
 External data sources never fail silently — they return a `source`/state field that travels in the response and is asserted in tests:

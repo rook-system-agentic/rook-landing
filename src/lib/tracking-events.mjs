@@ -22,13 +22,36 @@ export const TRACKING_EVENTS = Object.freeze({
   diagnostic: "diagnostic_complete",
   newsletter: "newsletter_signup",
   appHandoff: "app_handoff",
+  // Experimento contratação direta × assistida (ROO-1207). Ver lp-experiment.mjs.
+  experimentExposure: "experiment_exposure",
+  ctaClick: "cta_click",
+  chatOpen: "chat_open",
+  formView: "form_view",
+  integrationError: "integration_error",
 });
 
+/**
+ * Dimensões do experimento da LP. Entram em todo evento do funil de /planos,
+ * inclusive nos que já existiam (`generate_lead`, `app_handoff`), para o
+ * relatório fechar por variante. São dois valores fixos de um conjunto fechado
+ * — nada que identifique a pessoa.
+ *
+ * `app_handoff` com `destino=contratar` É a saída para o checkout: o
+ * `checkout_start` da issue não ganhou evento próprio para não contar a mesma
+ * saída duas vezes com nomes diferentes.
+ */
+const EXPERIMENT_FIELDS = ["experiment_id", "variant"];
+
 const ALLOWED_FIELDS = Object.freeze({
-  [TRACKING_EVENTS.lead]: ["plano"],
+  [TRACKING_EVENTS.lead]: ["plano", "channel", ...EXPERIMENT_FIELDS],
   [TRACKING_EVENTS.diagnostic]: ["ab_variant"],
   [TRACKING_EVENTS.newsletter]: [],
-  [TRACKING_EVENTS.appHandoff]: ["destino"],
+  [TRACKING_EVENTS.appHandoff]: ["destino", ...EXPERIMENT_FIELDS],
+  [TRACKING_EVENTS.experimentExposure]: ["page_type", ...EXPERIMENT_FIELDS],
+  [TRACKING_EVENTS.ctaClick]: ["destination", "plan", ...EXPERIMENT_FIELDS],
+  [TRACKING_EVENTS.chatOpen]: ["page_type", ...EXPERIMENT_FIELDS],
+  [TRACKING_EVENTS.formView]: ["page_type", ...EXPERIMENT_FIELDS],
+  [TRACKING_EVENTS.integrationError]: ["component", "error_code", ...EXPERIMENT_FIELDS],
 });
 
 export function buildTrackingEvent(name, payload = {}) {

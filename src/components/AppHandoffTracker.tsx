@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { track, TRACKING_EVENTS } from "@/lib/track";
 import { resolveAppHandoff } from "@/lib/tracking-events.mjs";
+import { lpExperimentDims } from "@/lib/lp-experiment-client";
 
 /**
  * Registra o momento em que a pessoa sai da LP para o app.
@@ -26,7 +27,9 @@ export default function AppHandoffTracker() {
       const destino = resolveAppHandoff(link.href, window.location.href);
       if (!destino) return;
 
-      track(TRACKING_EVENTS.appHandoff, { destino });
+      // As dimensões do experimento de /planos (ROO-1207) viajam junto: com
+      // `destino=contratar` este evento é o início do checkout por variante.
+      track(TRACKING_EVENTS.appHandoff, { destino, ...lpExperimentDims() });
     }
 
     document.addEventListener("click", onClick);
