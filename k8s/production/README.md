@@ -14,9 +14,11 @@ Este diretório descreve a instância interna do site `rook-landing` no namespac
 A imagem deve usar o código extraído desse commit e o Dockerfile deste
 diretório. Não use a imagem de homologação: os valores `NEXT_PUBLIC_*` são
 compilados no bundle e a imagem de homologação desativa rastreamento e indexação.
-Durante o build, a URL e a chave pública `anon` do Supabase atual são usadas
-para gerar as seis páginas do blog já publicadas. Em runtime, `SUPABASE_URL`
-tem precedência e aponta somente para `supabase-production` dentro do cluster.
+Durante o build, `SUPABASE_URL` e `SUPABASE_ANON_KEY` consultam o Supabase atual
+para gerar as seis páginas do blog já publicadas. Essas variáveis existem só no
+estágio de compilação. Os valores `NEXT_PUBLIC_SUPABASE_*` são sempre os do
+destino, e em runtime `SUPABASE_URL` aponta somente para `supabase-production`
+dentro do cluster.
 
 ## Segredos
 

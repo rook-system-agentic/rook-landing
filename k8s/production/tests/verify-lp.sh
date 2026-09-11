@@ -15,6 +15,11 @@ test -f "$MANIFEST" || fail "manifesto de produção ausente"
 test -f "$DOCKERFILE" || fail "Dockerfile de produção ausente"
 test -x "$SECRET_GENERATOR" || fail "gerador de Secret ausente ou não executável"
 
+grep -q '^ARG NEXT_PUBLIC_SUPABASE_URL$' "$DOCKERFILE" || fail "URL pública do destino não é parâmetro do build"
+grep -q '^ARG NEXT_PUBLIC_SUPABASE_ANON_KEY$' "$DOCKERFILE" || fail "chave pública do destino não é parâmetro do build"
+grep -q '^ARG SUPABASE_URL$' "$DOCKERFILE" || fail "origem privada do CMS não é separada no build"
+grep -q '^ARG SUPABASE_ANON_KEY$' "$DOCKERFILE" || fail "chave privada de build do CMS não é separada"
+
 grep -q '^  namespace: rook-production$' "$MANIFEST" || fail "namespace incorreto"
 grep -q '^  name: rook-lp$' "$MANIFEST" || fail "Deployment/Service rook-lp ausente"
 grep -q '^  replicas: 1$' "$MANIFEST" || fail "réplica única ausente"
