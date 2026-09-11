@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rook-lp
+  namespace: rook-production
+  labels:
+    app.kubernetes.io/name: rook-lp
+    app.kubernetes.io/part-of: rook-production
+    rooksystem.com/environment: production
+  annotations:
+    rooksystem.com/source-revision: a7b1a939e39a4afd7a05cf15f0733fad74bf1651
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rook-lp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-lp
+        app.kubernetes.io/part-of: rook-production
+        rooksystem.com/environment: production
+        rooksystem.com/supabase-api-client: "true"
+      annotations:
+        rooksystem.com/source-revision: a7b1a939e39a4afd7a05cf15f0733fad74bf1651
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: lp
+          image: rook-lp:prod-a7b1a939
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: rook-lp-production-env
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: NEXT_PUBLIC_ENV
+              value: production
+            - name: NEXT_PUBLIC_SITE_URL
+              value: https://rooksystem.com.br
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 768Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: next-cache
+              mountPath: /app/.next/cache
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: next-cache
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rook-lp
+  namespace: rook-production
+  labels:
+    app.kubernetes.io/name: rook-lp
+    app.kubernetes.io/part-of: rook-production
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: rook-lp
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
