@@ -21,6 +21,7 @@ export function buildLeadDescription(lead) {
       `Entradas: ${JSON.stringify(lead.simulation.inputs)}`,`Fórmula: ${lead.simulation.formulaVersion}`,
       ...lead.simulation.assumptions);
   }
+  if(lead.diagnosticNotes?.length) lines.push('',...lead.diagnosticNotes);
   return lines.join('\n').slice(0,5000);
 }
 

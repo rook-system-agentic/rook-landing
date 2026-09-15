@@ -23,3 +23,12 @@ test('consentimento, e-mail, telefone e segmento são validados',()=>{
  for(const patch of [{consent:false},{email:'a'},{phone:'00000000000'},{segment:'other',segmentOther:''}]) assert.equal(validateAcquisition({...lead,...patch},cities).ok,false);
  assert.equal(normalizePhone('(11) 99999-9999'),'+5511999999999'); assert.equal(deriveRevenueBand('100.000,01'),'100k_to_200k');
 });
+
+test('caminho não sei preserva números conhecidos sem completar os ausentes com zero',()=>{
+ const parsed=validateAcquisition({...lead,intent:'breakeven',period:'2026-08',revenue:'150.000,00',cmvPercent:'35'},cities);
+ assert.equal(parsed.ok,true);assert.equal(parsed.value.simulation,null);
+ const notes=parsed.value.diagnosticNotes.join(' ');
+ assert.match(notes,/Receita mensal \(R\$\): 150000/);assert.match(notes,/CMV \(%\): 35/);
+ assert.match(notes,/Dados ainda não informados: Custos fixos/);
+ assert.ok(!notes.includes('Custos fixos (R$): 0'));
+});

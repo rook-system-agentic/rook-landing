@@ -56,6 +56,7 @@ export function validateAcquisition(candidate,cities) {
   const submissionId=text('submissionId',36);
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submissionId)) errors.form='Atualize a página e tente novamente.';
   let simulation=null;
+  const diagnosticNotes=[];
   const period=text('period',7);
   if(candidate.simulation){
     if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(period)) errors.period='Informe o mês do cenário.';
@@ -63,8 +64,26 @@ export function validateAcquisition(candidate,cities) {
     if(!calculated.ok) errors.simulation='Revise os números do cenário antes de enviar.';
     else simulation=calculated;
   }
+  if(!simulation && ['cmv','breakeven'].includes(candidate.intent)) {
+    const fields=candidate.intent==='cmv'
+      ? ['revenue','cmvPercent']
+      : ['revenue','cmvPercent','fixedCosts','taxPercent','feesPercent','otherVariablePercent'];
+    const labels={revenue:'Receita mensal (R$)',cmvPercent:'CMV (%)',fixedCosts:'Custos fixos (R$)',taxPercent:'Impostos (%)',feesPercent:'Taxas (%)',otherVariablePercent:'Outros variáveis (%)'};
+    const known=[];const missing=[];
+    for(const field of fields){
+      const value=parseBrazilianNumber(candidate[field]);
+      if(value!==null && value>=0 && value<=(field.endsWith('Percent')?100:1_000_000_000) && (field!=='revenue'||value>0)) known.push(`${labels[field]}: ${value}`);
+      else missing.push(labels[field]);
+    }
+    if(known.length){
+      diagnosticNotes.push('Diagnóstico interrompido ou incompleto: não foi emitido resultado financeiro.',
+        `Base: ${candidate.intent==='cmv'?'receita líquida':'receita bruta'}. Mês: ${/^\d{4}-(0[1-9]|1[0-2])$/.test(period)?period:'não informado'}.`,
+        `Dados informados: ${known.join('; ')}.`,
+        missing.length?`Dados ainda não informados: ${missing.join(', ')}.`:'Valores ainda precisam de confirmação e cálculo.');
+    }
+  }
   if(Object.keys(errors).length) return {ok:false,errors};
   return {ok:true,value:{submissionId,name,company,email,phone,city,segment,segmentOther:segment==='other'?segmentOther:null,
     revenueBand,usesErp:usesErp==='yes',erp:usesErp==='yes'?erp:null,erpOther:usesErp==='yes'&&erp==='other'?erpOther:null,
-    intent:['cmv','breakeven','demo'].includes(candidate.intent)?candidate.intent:'demo',consent:true,period:simulation?period:null,simulation}};
+    intent:['cmv','breakeven','demo'].includes(candidate.intent)?candidate.intent:'demo',consent:true,period:simulation?period:null,simulation,diagnosticNotes}};
 }

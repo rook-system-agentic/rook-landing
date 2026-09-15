@@ -5,7 +5,7 @@ Escopo da revisão de 15/09/2026: coletar o cadastro gradualmente durante a conv
 ## Contrato da primeira versão
 
 - Entradas: conhecer o Rook, analisar CMV, estimar ponto de equilíbrio, atendimento à equipe.
-- Perguntas curtas com correção e caminho explícito para quem não sabe um número.
+- Perguntas curtas com correção e caminho explícito para quem não sabe um número. O card preserva números já informados e aponta os ausentes, sem produzir resultado incompleto.
 - Cadastro: responsável, estabelecimento, WhatsApp, e-mail, cidade/UF com ID IBGE, segmento, faturamento e ERP/PDV (sim/não; lista; outro).
 - CMV: percentual já conhecido sobre receita líquida. Convenção segue o texto explícito da calculadora atual; referência Rook 2026 é indicativa e sua metodologia continua pendente de validação. Não converter receita bruta em líquida implicitamente.
 - PE: receita bruta, CMV na mesma base, fixos em reais, impostos, taxas e outros custos variáveis em %. Sem alíquotas médias ou custo por empregado silenciosos.
@@ -45,7 +45,7 @@ Base homolog 58f9ca122997bd6565f0af87bb5f6edb6a50fb9a; branch isolada codex/roo-
 ## Evidências locais em 15/09/2026
 
 - `pnpm exec tsc --noEmit`: aprovado.
-- `pnpm test:ci`: **141/141 testes aprovados**.
+- `pnpm test:ci`: **142/142 testes aprovados**.
 - `NEXT_PUBLIC_ENV=homolog pnpm build`: aprovado. Snapshot de cobrança atualizado pelo prebuild foi restaurado ao conteúdo inicial para não incluir mudança alheia ao escopo.
 - Browser: CMV líquido 100.000 / 38% / à la carte → diferença indicativa 6.000; PE bruto 150.000 / CMV 35% / fixos 60.000 / impostos 8% / taxas 2% / outros 5% → PE 120.000.
 - Cidade São Paulo/SP selecionada por teclado e por clique; ERP “Outro” com texto e “Não” exercitados; troca para formulário preserva cadastro/cenário. Prévia termina sem enviar ao CRM.
