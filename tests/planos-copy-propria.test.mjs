@@ -192,14 +192,10 @@ test("o dado estruturado não traz preço, limiar nem teste digitados à mão", 
   );
 });
 
-test("o layout monta as ofertas a partir do catálogo, não de literal", async () => {
+test("o layout segue a aquisição sem preços públicos", async () => {
   const fonte = await readFile(path.join(RAIZ, "src/app/layout.tsx"), "utf8");
-  for (const marca of ["getLandingBillingCatalog", "descricaoParaBuscador"]) {
-    assert.ok(
-      fonte.includes(marca),
-      `\`layout.tsx\` deixou de usar ${marca} — as ofertas do JSON-LD voltaram a ser literais.`,
-    );
-  }
+  assert.ok(!fonte.includes('"@type": "Offer"'));
+  assert.ok(!fonte.includes('getLandingBillingCatalog'));
 });
 
 test("a descrição do buscador nasce da copy do cartão", async () => {
@@ -217,20 +213,4 @@ test("a descrição do buscador nasce da copy do cartão", async () => {
       assert.ok(!texto.includes(erro), `"${erro}" voltou na descrição de ${offer.productCode}.`);
     }
   }
-});
-
-/**
- * A regra "Chess não anuncia teste" mora em quem CHAMA (o layout), porque é
- * lá que existe a distinção entre plano-base e adicional de organização — o
- * catálogo tem um `trial` só, sem dizer a quais produtos se aplica. Então o
- * que se trava aqui é o layout passando `null` para o Chess.
- */
-test("o layout não anuncia teste para o Chess", async () => {
-  const fonte = await readFile(path.join(RAIZ, "src/app/layout.tsx"), "utf8");
-  assert.match(
-    fonte,
-    /productCode === "chess" \? null :/,
-    "O layout deixou de excluir o Chess do período de teste. Ele é adicional " +
-      "de organização e não tem teste próprio — anunciar um é promessa falsa.",
-  );
 });

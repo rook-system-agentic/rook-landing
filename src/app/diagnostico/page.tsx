@@ -6,7 +6,7 @@ import { OG_IMAGE } from "@/lib/og-image";
 export const metadata: Metadata = {
   title: "Diagnóstico Financeiro Gratuito para Restaurantes | Rook System",
   description:
-    "Descubra se seu restaurante está no lucro ou no prejuízo. Calcule seu Ponto de Equilíbrio e compare com o benchmark do seu segmento. 100% gratuito.",
+    "Estime a receita mensal necessária para cobrir os custos do restaurante, com os valores informados por você.",
   keywords: [
     "diagnóstico financeiro restaurante",
     "ponto de equilíbrio restaurante",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     /* Ver `@/lib/og-image`: sem isto, esta rota compartilha sem imagem. */
     images: [OG_IMAGE],
     title: "Diagnóstico Financeiro Gratuito | Rook System",
-    description: "Descubra quanto seu restaurante precisa faturar para ter lucro real.",
+    description: "Estime o ponto de equilíbrio com os números informados da sua operação.",
     type: "website",
   },
 };

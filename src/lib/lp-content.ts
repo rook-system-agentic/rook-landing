@@ -53,10 +53,10 @@ export const HERO = {
   headlineTail: " no fim do mês?",
   primaryLabel: "Fazer meu diagnóstico gratuito",
   primaryHref: "/diagnostico/",
-  secondaryLabel: "Testar 7 dias",
+  secondaryLabel: "Conhecer o Rook",
   secondaryHref: "/planos/",
   /** Remove o risco na mesma linha de visão do botão. */
-  micro: "2 minutos · Sem cartão · Resultado na hora",
+  micro: "Com os seus números · Sem cartão",
 } as const;
 
 export const HERO_PARAGRAPH: Paragraph = [
@@ -750,7 +750,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   },
   {
     q: "Quanto custa?",
-    a: "R$ 479,90/mês para casas que faturam até R$ 250 mil por mês, R$ 779,90/mês acima disso — mesmo acesso completo nos dois. Redes somam R$ 279,90/mês por grupo para ver todas as casas numa tela. Todos com 7 dias de teste, uma vez por CNPJ.",
+    a: "Conte sobre seu estabelecimento para conhecer a proposta adequada à sua operação. Solicite uma demonstração pelo formulário ou pelo assistente virtual.",
   },
   {
     q: "Funciona em qualquer cidade?",
@@ -787,10 +787,10 @@ export const CTA = {
   headlineEmphasis: "diagnóstico.",
   headlineTail: " Sem cartão.",
   intro:
-    "Em dois minutos você vê se o restaurante está no lucro ou no prejuízo — e quanto precisa faturar para virar o mês.",
+    "Informe os números da sua operação para estimar o ponto de equilíbrio e entender quais dados merecem atenção.",
   primaryLabel: "Fazer meu diagnóstico",
   primaryHref: "/diagnostico/",
-  secondaryLabel: "Ver planos e teste",
+  secondaryLabel: "Conhecer o Rook",
   secondaryHref: "/planos/",
 } as const;
 
@@ -1012,3 +1012,9 @@ export const SOBRE_CTA = {
   secondaryLabel: "Ver o Rook por dentro →",
   secondaryHref: "/restaurantes/",
 } as const;
+
+export const ACQUISITION_CTA = {
+ title: "Entenda onde o seu restaurante pode melhorar o resultado.",
+ description: "Conte sobre sua operação. Conheça o Rook em uma demonstração ou comece por uma conversa sobre seus números.",
+ formLabel: "Solicitar demonstração", chatLabel: "Conversar sobre meus números",
+};

@@ -15,6 +15,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: siteUrl("/funcionalidades/"), lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: siteUrl("/calculadora-cmv/"), lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: siteUrl("/diagnostico/"), lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: siteUrl("/assistente/"), lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: siteUrl("/cadastro/"), lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: siteUrl("/planos/"), lastModified: now, changeFrequency: "monthly", priority: 0.9 },
     { url: siteUrl("/sobre/"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: siteUrl("/restaurantes/"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },

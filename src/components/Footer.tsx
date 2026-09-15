@@ -38,7 +38,7 @@ export default function Footer() {
           <ul className="space-y-2.5 text-sm">
             <li><Link href="/diagnostico/">Diagnóstico</Link></li>
             <li><Link href="/calculadora-cmv/">Calculadora de CMV</Link></li>
-            <li><Link href="/planos/">Planos e teste</Link></li>
+            <li><Link href="/planos/">Conhecer o Rook</Link></li>
             <li><Link href="/sobre/">Sobre o Rook</Link></li>
           </ul>
         </div>
