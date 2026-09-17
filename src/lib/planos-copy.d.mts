@@ -26,3 +26,8 @@ export declare function planoParaExibicao(plano: {
   description: string;
   publicFeatures: readonly string[];
 }): PlanoExibido;
+
+export declare function descricaoParaBuscador(
+  productCode: string,
+  diasDeTeste?: number | null,
+): string | undefined;

@@ -92,6 +92,31 @@
      */
     --color-cta: #c24100;
     --color-terracota-text: #c24100;
+
+    /*
+     * O ocre tem o MESMO problema que o terracota tinha, e nunca ganhou a
+     * mesma solução.
+     *
+     * `ocre` (#E79F4A, em tailwind.config) nasceu para o tema escuro, onde
+     * mede confortavelmente. No tema claro ele reprova em TODA superfície,
+     * inclusive no piso frouxo de 3:1 para texto grande. Medido na página, com
+     * o site rodando:
+     *
+     *                      claro        escuro
+     *   sobre o cartão .... 2,22:1       6,88:1
+     *   sobre o fundo ..... 2,09:1       7,81:1
+     *   sobre o elevado ... 1,96:1       5,86:1
+     *
+     * `--color-ocre-text` é o ocre no papel de TEXTO, e inverte por tema
+     * exatamente como `--color-terracota-text`: escurece no claro, volta ao
+     * ocre da marca no escuro. No claro mede 5,12:1 no cartão, 4,82:1 no fundo
+     * e 4,52:1 no elevado — passa no piso de 4,5:1 até em texto miúdo.
+     *
+     * ⚠️ Isto NÃO substitui `ocre` em todo lugar. Onde o ocre é FUNDO, ou
+     * elemento decorativo sem função de texto, ele continua sendo o da marca.
+     * A troca é só onde ele carrega informação que precisa ser lida.
+     */
+    --color-ocre-text: #9c601c;
   }
 
   .dark {
@@ -115,6 +140,10 @@
        elevada. Clareado, mede 5,32:1 na pior superfície do tema. O `--color-cta`
        não muda: é fundo sólido com texto branco em cima. */
     --color-terracota-text: #ff8345;
+
+    /* No escuro o ocre da marca já é legível (5,86:1 na pior superfície do
+       tema), então a face de texto volta a ser ele mesmo. */
+    --color-ocre-text: #e79f4a;
   }
 
   html { scroll-behavior: smooth; }
