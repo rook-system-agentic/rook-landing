@@ -205,6 +205,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             __html: `(function(){try{var t=localStorage.getItem('rook-theme');if(t==='dark')document.documentElement.classList.add('dark')}catch(e){}})()`,
           }}
         />
+        {/*
+          * Variante do experimento de /planos (ROO-1207), lida do cookie que o
+          * middleware gravou, ANTES da pintura — pelo mesmo motivo do script do
+          * tema logo acima: o HTML traz os dois CTAs e o CSS de
+          * `[data-lp-only]` mostra um só; decidir depois da hidratação faria o
+          * botão trocar na frente do visitante. A regra do cookie mora em
+          * `lp-experiment.mjs`; aqui só se casa o valor exato — nas duas grafias,
+          * porque o Next grava o `:` do valor como `%3A` e o navegador devolve
+          * `document.cookie` sem decodificar.
+          */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(/(?:^|;\s*)rook_lp_exp=lp_asaflow_v1(?::|%3A)assisted(?:;|$)/.test(document.cookie))document.documentElement.setAttribute('data-lp-variant','assisted')}catch(e){}})()`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
