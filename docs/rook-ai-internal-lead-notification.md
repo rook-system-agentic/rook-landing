@@ -1,6 +1,6 @@
 # Aviso interno de novo lead — contrato preparado
 
-> Recorte de produção endpoint-first (16/09/2026): o formatter continua sem chamador. Referências abaixo à UI/chat descrevem o recorte completo preparado separadamente, que não está montado nesta branch. A validação histórica de 15/09 não substitui os checks desta entrega.
+> Recorte de interface de produção (18/09/2026): o formatter continua sem chamador na landing. A UI incorpora o formulário e o widget; os avisos operacionais no Slack pertencem à integração do ADM. Este documento preserva o contrato histórico e não comprova ativação de WhatsApp. A validação de 15/09 não substitui os checks desta entrega.
 
 **Estado em 15/09/2026:** formatter puro e testes locais. Nenhum envio, destinatário, credencial, template, fila ou ativação. A rota de cadastro permanece como está; não importa este módulo.
 

@@ -243,10 +243,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <p className="section-label mb-3">— Próximo passo</p>
             <h2 className="text-2xl font-bold text-cream mb-3">Quer enxergar estes números no seu restaurante?</h2>
             <p className="text-sm text-muted leading-relaxed mb-5">
-              Teste o Rook por 7 dias e transforme faturamento, compras e margem em uma leitura mais clara.
+              Conheça o Rook em uma demonstração e veja como transformar faturamento, compras e margem em uma leitura mais clara.
             </p>
-            <Link href="/planos/" className="btn-primary">
-              Ver planos e testar
+            <Link href="#cadastro" className="btn-primary">
+              Agendar demonstração
             </Link>
           </section>
         </div>
