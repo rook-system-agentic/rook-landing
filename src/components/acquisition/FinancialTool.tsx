@@ -28,7 +28,7 @@ const percent = (value: number) => `${value.toLocaleString('pt-BR')}%`;
  * O contexto só chega ao formulário no clique explícito depois do resultado ou
  * de um cenário incompleto; as contas continuam no mesmo motor validado da API.
  */
-export default function FinancialTool({ tool }: { tool: FinancialToolKind }) {
+export default function FinancialTool({ tool, embedded = false }: { tool: FinancialToolKind; embedded?: boolean }) {
   const id = useId();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [unknown, setUnknown] = useState<Record<string, boolean>>({});
@@ -39,6 +39,7 @@ export default function FinancialTool({ tool }: { tool: FinancialToolKind }) {
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const errorSummary = useRef<HTMLParagraphElement>(null);
   const isCmv = tool === 'cmv';
+  const ContentHeading = embedded ? 'h3' : 'h2';
 
   const fields: NumericField[] = [
     {
@@ -147,18 +148,18 @@ export default function FinancialTool({ tool }: { tool: FinancialToolKind }) {
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <section className={styles.section} aria-labelledby={`${id}-title`}>
-      <header className={styles.header}>
+    <section className={`${styles.section}${embedded ? ` ${styles.embedded}` : ''}`} aria-labelledby={embedded ? undefined : `${id}-title`} aria-label={embedded ? 'Calculadora de CMV' : undefined}>
+      {!embedded && <header className={styles.header}>
         <p className={styles.eyebrow}>{isCmv ? 'Calculadora de CMV' : 'Ponto de equilíbrio'}</p>
         <h1 id={`${id}-title`}>{isCmv ? 'Entenda o CMV da sua operação.' : 'Quanto sua operação precisa faturar?'}</h1>
         <p>{isCmv
           ? 'Compare o CMV que você já apurou com a referência do seu segmento e veja o que a diferença representa em reais.'
           : 'Estime a receita mensal necessária para cobrir os custos, a partir dos números da sua operação.'}</p>
-      </header>
+      </header>}
 
       <div className={styles.layout}>
         <form className={styles.form} onSubmit={calculate} noValidate aria-busy={busy}>
-          <h2>Dados do cenário</h2>
+          <ContentHeading>Dados do cenário</ContentHeading>
           <p className={styles.hint}>Use valores do mesmo mês. Se não souber um número, marque “Não sei informar”.{!isCmv && ' Informe zero somente quando esse custo não existir.'}</p>
           <fieldset disabled={busy} className={styles.fields}>
             <legend className={styles.srOnly}>Valores mensais para {isCmv ? 'análise de CMV' : 'ponto de equilíbrio'}</legend>
@@ -194,10 +195,10 @@ export default function FinancialTool({ tool }: { tool: FinancialToolKind }) {
         <aside className={styles.result} aria-live="polite" aria-atomic="true">
           {result ? <>
             <p className={styles.eyebrow}>Resultado do cenário · {answers.period}</p>
-            <h2 ref={resultHeading} tabIndex={-1}>{result.result.status === 'non_positive_margin'
+            <ContentHeading ref={resultHeading} tabIndex={-1}>{result.result.status === 'non_positive_margin'
               ? 'A margem precisa de atenção.'
               : result.result.status === 'no_reference' ? 'Ainda não há referência para esse segmento.'
-                : isCmv ? 'Seu CMV em perspectiva.' : 'Seu ponto de equilíbrio estimado.'}</h2>
+                : isCmv ? 'Seu CMV em perspectiva.' : 'Seu ponto de equilíbrio estimado.'}</ContentHeading>
             {typeof breakEven === 'number' && <p className={styles.figure}>{currency(breakEven)}<span>de receita por mês para cobrir os custos</span></p>}
             {isCmv && typeof difference === 'number' && difference > 0 && <p className={styles.figure}>{currency(difference)}<span>de diferença mensal estimada para investigar</span></p>}
             <p className={styles.summary}>{result.summary}</p>
@@ -215,13 +216,13 @@ export default function FinancialTool({ tool }: { tool: FinancialToolKind }) {
             <div className={styles.nextStep}><h3>Vamos conversar sobre esse resultado?</h3><p>O cenário será incluído no formulário abaixo. O envio acontece quando você confirmar sua solicitação.</p><a href="#cadastro" className="btn-primary" onClick={shareWithForm}>Solicitar demonstração</a></div>
           </> : incomplete ? <>
             <p className={styles.eyebrow}>Cenário incompleto</p>
-            <h2 ref={resultHeading} tabIndex={-1}>Podemos começar pelo que você já sabe.</h2>
+            <ContentHeading ref={resultHeading} tabIndex={-1}>Podemos começar pelo que você já sabe.</ContentHeading>
             <p className={styles.summary}>Ainda faltam dados para calcular. Os campos desconhecidos foram mantidos sem valor, e nenhum resultado financeiro foi estimado.</p>
             <ul className={styles.missing}>{missingFields.map(field => <li key={field.key}>{field.label}</li>)}</ul>
             <div className={styles.nextStep}><p>Leve os dados disponíveis ao formulário para conversar com a equipe sobre os próximos passos.</p><a href="#cadastro" className="btn-primary" onClick={shareWithForm}>Solicitar demonstração</a></div>
           </> : <>
             <p className={styles.eyebrow}>Como usar</p>
-            <h2>Um cenário para orientar a próxima decisão.</h2>
+            <ContentHeading>Um cenário para orientar a próxima decisão.</ContentHeading>
             <ol className={styles.steps}><li>Escolha o mês e informe os números da operação.</li><li>Confira o resultado e as premissas da conta.</li><li>Se quiser, leve esse contexto a uma demonstração do Rook.</li></ol>
             <p className={styles.note}>A análise é gratuita. Você pode calcular antes de informar seus dados de contato.</p>
           </>}

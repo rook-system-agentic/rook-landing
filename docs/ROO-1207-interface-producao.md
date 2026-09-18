@@ -6,7 +6,7 @@ Base: `origin/main` em `a977b6422af529c056263ed953292424a781a947`, que já cont�
 Branch: `hotfix/roo-1207-landing-publicacao`.
 Origem: patch incremental da interface aprovada, preparado sobre a árvore de `a3217e3`, idêntica à base atual. O histórico `docs/ROO-1207-entrega-producao.md` foi preservado.
 
-Este recorte adiciona apenas a interface ao servidor já publicado. Não altera rotas de API, normalização de perfil, adaptador do AsaFlow, cálculos ou proteção contra abuso. **A publicação exige `/api/acquisition` operacional e validação própria do widget.** A autorização para produção foi dada por Gabriel na sessão; a integração e os canários são verificados separadamente da compilação.
+Este recorte adiciona a interface ao servidor já publicado e permite ponto decimal dos teclados móveis na leitura dos campos numéricos. Não altera rotas de API, normalização de perfil, adaptador do AsaFlow, fórmulas ou proteção contra abuso. **A publicação exige `/api/acquisition` operacional e validação própria do widget.** A autorização para produção foi dada por Gabriel na sessão; a integração e os canários são verificados separadamente da compilação.
 
 ## Interface incluída
 
@@ -46,7 +46,7 @@ O merge em `main` publica a landing automaticamente na Vercel. O canal/fluxo do 
 ## Verificação local em 18/09/2026
 
 - `./node_modules/.bin/tsc --noEmit --incremental false`: aprovado.
-- `node scripts/run-ci-tests.mjs`: 179/179 testes aprovados. A exclusão de `billing-catalog.test.mjs` por validade temporal do snapshot já existe em main e não foi alterada.
+- `node scripts/run-ci-tests.mjs`: 180/180 testes aprovados após as correções da revisão. A exclusão de `billing-catalog.test.mjs` por validade temporal do snapshot já existe em main e não foi alterada.
 - Build direto Next.js em modo `production`, aquisição e widget desligados: aprovado. O comando direto evita o prebuild de sincronização remota do catálogo; o build da Vercel ainda deve validar esse prebuild. O blog usou a semente local por ausência de Supabase configurado.
 - Segundo build em `production`, com widget habilitado e a chave pública do canal confirmado no AsaFlow: aprovado. A chave é fornecida pelo ambiente de build, não gravada no código; o bundle contém a configuração esperada. Aquisição local permaneceu desligada.
 - GET somente leitura de `https://app.rook.com.br/api/billing/catalog`: HTTP 200, validado por `parsePublicBillingCatalog`, release `p0-monthly` versão 1. O snapshot não foi alterado; a disponibilidade no instante do deploy continua sendo verificada pelo prebuild.
@@ -55,3 +55,8 @@ O merge em `main` publica a landing automaticamente na Vercel. O canal/fluxo do 
 - HTML gerado de home, planos, cadastro, assistente, diagnóstico, calculadora, sobre, restaurantes, funcionalidades, privacidade e termos: uma seção `#cadastro` por rota, uma referência ao script do widget e nenhuma oferta/preço de assinatura no JSON-LD ou nos cards. Outros formulários existentes, como calculadoras e newsletter, permanecem independentes.
 
 Só existe `.env.local.example` nesta árvore; nenhum segredo real foi copiado. Testes locais não comprovam entrega no CRM/ADM/Slack, conversa ou agendamento. Essas evidências devem ser registradas na publicação, após os testes reais correspondentes.
+
+## Ajustes da revisão automática
+
+- `/funcionalidades/` incorpora a calculadora sem repetir o título principal ou o espaçamento da página própria. A copy explica a comparação indicativa do CMV e os títulos internos respeitam a hierarquia da seção.
+- O parser aceita `38.5` e `150000.50` dos teclados móveis, mantendo `1.234` como milhar pt-BR e rejeitando formatos misturados. A regressão percorre o parser e o cálculo real; 28 testes focados de simulação, aquisição e ferramentas passaram antes da suíte completa.

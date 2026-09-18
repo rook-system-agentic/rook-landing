@@ -6,8 +6,19 @@ const cmv = {tool:'cmv',revenueBasis:'net',revenue:100000,cmvPercent:38,segment:
 const pe = {tool:'breakeven',revenueBasis:'gross',revenue:150000,cmvPercent:35,fixedCosts:60000,taxPercent:8,feesPercent:2,otherVariablePercent:5};
 test('leitura brasileira preserva centavos e percentuais',()=>{
   assert.equal(parse('R$ 1.500,50'),1500.50); assert.equal(parse('8,5%'),8.5);
-  for(const value of ['',null,'abc','1.5','1,2,3','Infinity']) assert.equal(parse(value),null);
+  for(const value of ['',null,'abc','1,2,3','Infinity']) assert.equal(parse(value),null);
   assert.equal(parse('-2'),-2);
+});
+test('teclado decimal móvel aceita ponto sem reinterpretar milhares brasileiros',()=>{
+  for(const [input,expected] of [['38.5',38.5],['150000.50',150000.5],['1.5',1.5],['R$ 150000.50',150000.5],['8.25%',8.25],['-2.5',-2.5],['1.234',1234],['150.000',150000],['1.234.567,89',1234567.89]]) {
+    assert.equal(parse(input),expected,input);
+  }
+  for(const input of ['1,234.56','1.234.5','150000.500','1..5','1.','1.234,567']) assert.equal(parse(input),null,input);
+  const response=calculate({...cmv,revenue:parse('150000.50'),cmvPercent:parse('38.5')});
+  assert.equal(response.ok,true);
+  assert.equal(response.inputs.revenue,150000.5);
+  assert.equal(response.inputs.cmvPercent,38.5);
+  assert.equal(response.result.monthlyDifference,9750.03);
 });
 test('CMV compara mesma base com diferença estimada, não lucro',()=>{
   const response=calculate(cmv); assert.equal(response.ok,true);

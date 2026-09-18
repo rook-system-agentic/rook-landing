@@ -173,11 +173,11 @@ function Calculator() {
           Qual o impacto do CMV no seu <em>lucro?</em>
         </h2>
         <p className="text-body text-center mx-auto mb-12">
-          Simule o potencial de economia ao otimizar seu Custo de Mercadoria Vendida
-          para a faixa ideal do seu segmento.
+          Compare o CMV já apurado com a referência do seu segmento e veja o que
+          a diferença representa em reais. Use a receita e o CMV do mesmo mês.
         </p>
 
-        <CmvCalculator />
+        <CmvCalculator embedded />
       </div>
     </section>
   );
