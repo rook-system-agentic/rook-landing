@@ -164,3 +164,30 @@ test("o texto cru do catálogo não atravessa para o componente de cliente", asy
     }
   }
 });
+
+test("o dado estruturado não traz preço, limiar nem teste digitados à mão", async () => {
+  const fonte = await readFile(path.join(RAIZ, "src/app/layout.tsx"), "utf8");
+  const { offers, classification, trial } = await lerSnapshot();
+
+  const literais = [
+    ...offers.map((o) => (o.unitAmountCents / 100).toFixed(2)),
+    `R$ ${classification.knightMaxMonthlyRevenueCents / 100 / 1000} mil`,
+    `${trial.durationDays} dias de teste`,
+  ];
+
+  const encontrados = literais.filter((lit) => fonte.includes(lit));
+  assert.deepEqual(
+    encontrados,
+    [],
+    "`src/app/layout.tsx` traz valor do catálogo digitado à mão: " +
+      `${encontrados.join(", ")}. Esses números vivem no catálogo de billing e ` +
+      "a aquisição pública não anuncia preços. Repetidos aqui, eles passam a mentir para o " +
+      "buscador no dia do reajuste — em todas as páginas do site.",
+  );
+});
+
+test("o layout segue a aquisição sem preços públicos", async () => {
+  const fonte = await readFile(path.join(RAIZ, "src/app/layout.tsx"), "utf8");
+  assert.ok(!fonte.includes('"@type": "Offer"'));
+  assert.ok(!fonte.includes('getLandingBillingCatalog'));
+});

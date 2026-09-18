@@ -685,3 +685,22 @@ body:has([data-diagnostico-etapa="formulario"]) > header {
 body:has([data-diagnostico-etapa="formulario"]) > main {
   padding-top: 0;
 }
+
+/* O launcher do fornecedor respeita o banner de cookies, inclusive no mobile. */
+.asaflow-chat-root { bottom: calc(24px + var(--rook-cookie-height, 0px)) !important; }
+@media (max-width:480px) {
+  .asaflow-chat-root { bottom: calc(16px + var(--rook-cookie-height, 0px)) !important; }
+}
+
+/* Identidade do widget oficial. A especificidade do body preserva os tokens
+   mesmo quando o provedor injeta seu CSS depois do carregamento do site. */
+body .asaflow-chat-root{font-family:inherit;color:var(--color-text-primary)}
+body .asaflow-chat-header,body .asaflow-chat-launcher,body .asaflow-chat-send,body .asaflow-chat-msg-inbound{background:var(--color-cta);color:#fff}
+body .asaflow-chat-panel,body .asaflow-chat-inputbar,body .asaflow-chat-bubble,body .asaflow-chat-msg-outbound{background:var(--color-bg-card);color:var(--color-text-primary);border-color:var(--color-border)}
+body .asaflow-chat-list,body .asaflow-chat-input{background:var(--color-bg);color:var(--color-text-primary);border-color:var(--color-border)}
+body .asaflow-chat-input:disabled{background:var(--color-bg-elevated)}
+body .asaflow-chat-time,body .asaflow-chat-ended-text,body .asaflow-chat-bubble-close{color:var(--color-text-muted)}
+body .asaflow-chat-qr,body .asaflow-chat-restart{background:var(--color-bg-card);color:var(--color-terracota-text);border-color:var(--color-terracota-text)}
+body .asaflow-chat-header-avatar,body .asaflow-chat-bubble-avatar{object-fit:contain;border-radius:8px;background:transparent}
+body .asaflow-chat-bubble-avatar{background:var(--color-cta)}
+body .asaflow-chat-root button:focus-visible,body .asaflow-chat-root a:focus-visible,body .asaflow-chat-input:focus-visible{outline:2px solid var(--color-terracota-text);outline-offset:3px}

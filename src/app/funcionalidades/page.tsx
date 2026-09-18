@@ -263,8 +263,8 @@ function PdfDemo() {
               </li>
             ))}
           </ul>
-          <Link href="/planos/" className="btn-ghost">
-            Ver exemplo real (11 páginas) →
+          <Link href="#cadastro" className="btn-ghost">
+            Ver em uma demonstração →
           </Link>
         </div>
       </div>
@@ -314,7 +314,7 @@ function ChessExpanded() {
                 </div>
               </div>
             ))}
-            <Link href="/planos/" className="btn-ghost inline-flex">
+            <Link href="#cadastro" className="btn-ghost inline-flex">
               Conhecer o módulo Chess →
             </Link>
           </div>
@@ -367,14 +367,14 @@ function FuncCTA() {
         <div>
           <p className="section-label mb-4">— Pronto para ver os seus números?</p>
           <h2 className="heading-section mb-2">
-            Teste por <em>7 dias.</em>
+            Conheça o Rook <em>na prática.</em>
           </h2>
           <p className="text-body">
-            Escolha Knight ou Rook conforme o faturamento da unidade. Para grupos multiunidade, adicione o módulo Chess.
+            Conte sobre sua operação e veja como o Rook pode ajudar a entender seus números.
           </p>
         </div>
-        <Link href="/planos/" className="btn-primary shrink-0">
-          Ver planos →
+        <Link href="#cadastro" className="btn-primary shrink-0">
+          Agendar demonstração →
         </Link>
       </div>
     </section>

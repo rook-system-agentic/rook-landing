@@ -53,10 +53,10 @@ export const HERO = {
   headlineTail: " no fim do mês?",
   primaryLabel: "Fazer meu diagnóstico gratuito",
   primaryHref: "/diagnostico/",
-  secondaryLabel: "Testar 7 dias",
-  secondaryHref: "/planos/",
+  secondaryLabel: "Conhecer o Rook",
+  secondaryHref: "#cadastro",
   /** Remove o risco na mesma linha de visão do botão. */
-  micro: "2 minutos · Sem cartão · Resultado na hora",
+  micro: "Com os seus números · Sem cartão",
 } as const;
 
 export const HERO_PARAGRAPH: Paragraph = [
@@ -452,8 +452,8 @@ export const BRIEFING = {
   intro:
     "Não é mais um aplicativo para abrir. É o informe da casa chegando onde você já está: quanto vendeu ontem, quanto comprou e quanto ainda pode gastar na semana. Segunda-feira chega o limite semanal de compras; dia 1, o fechamento do mês.",
   ctaLabel: "Quero o resumo no WhatsApp",
-  ctaHref: "/planos/",
-  note: "Você ativa no cadastro, no seu número. Sem spam — só o informe da sua casa.",
+  ctaHref: "#cadastro",
+  note: "Conheça o briefing e as possibilidades de acompanhamento em uma demonstração.",
   /*
    * O CABEÇALHO DO MOCK NÃO CARREGA NÚMERO DE TELEFONE. (24/08/2026)
    *
@@ -648,70 +648,6 @@ export const PARTNERS_SECTION = {
   ctaLabel: "Não encontrou o seu sistema? Solicite a integração →",
 } as const;
 
-/* ─── Oferta ─── */
-
-export interface Plan {
-  name: string;
-  /** Faixa de faturamento — é o que diferencia os dois planos, então vem primeiro. */
-  faixa: string;
-  price: string;
-  period: string;
-  description: string;
-  note: string;
-  highlighted: boolean;
-}
-
-/*
- * v6: o preço ganhou âncora. R$ 479,90 no vácuo compete com "grátis" (a
- * planilha); ao lado do vazamento que a própria página acabou de mostrar —
- * R$ 8.256/mês de CMV fora da meta — ele compete com o prejuízo.
- *
- * "a partir de 6%" e não "6%": 479,90 é 5,8% de 8.256, mas 779,90 é 9,4%. O
- * "a partir de" é o que mantém a frase verdadeira nos dois planos.
- */
-export const PRICING = {
-  label: "— Oferta",
-  headlinePlain: "Quanto custa o ",
-  headlineEmphasis: "Rook?",
-  intro:
-    "Lembra o CMV 2 pontos fora da meta lá de cima? Ele custa R$ 8.256 por mês numa casa exemplo. O Rook custa a partir de 6% disso — e é o mesmo acesso completo nos dois planos: a diferença é só o faturamento da casa.",
-  cardCtaLabel: "Testar 7 dias",
-  ctaLabel: "Ver detalhes →",
-  ctaHref: "/planos/",
-  /** O cartão entra no início do teste — dizer isso aqui evita a surpresa no checkout. */
-  note: "7 dias de teste nos dois planos. A data da primeira cobrança aparece antes de você confirmar.",
-} as const;
-
-export const PLANS: readonly Plan[] = [
-  {
-    name: "Para a sua casa",
-    faixa: "Até R$ 250 mil/mês",
-    price: "R$ 479,90",
-    period: "/mês",
-    description: "Até R$ 250 mil de faturamento mensal. Acesso completo.",
-    note: "Plano Knight",
-    highlighted: false,
-  },
-  {
-    name: "Para a sua casa",
-    faixa: "Acima de R$ 250 mil/mês",
-    price: "R$ 779,90",
-    period: "/mês",
-    description: "Acima de R$ 250 mil de faturamento mensal. Acesso completo.",
-    note: "Plano Rook",
-    highlighted: true,
-  },
-];
-
-export const CHESS_ADDON = {
-  label: "Para redes",
-  description:
-    "Todas as suas casas numa tela só: consolidação de grupo e visão multiunidade, somada ao plano de cada casa. Cobrança por grupo.",
-  price: "+ R$ 279,90",
-  period: "/mês",
-  note: "Add-on Chess",
-} as const;
-
 /* ─── FAQ ─── */
 
 export interface FaqItem {
@@ -750,15 +686,16 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   },
   {
     q: "Quanto custa?",
-    a: "R$ 479,90/mês para casas que faturam até R$ 250 mil por mês, R$ 779,90/mês acima disso — mesmo acesso completo nos dois. Redes somam R$ 279,90/mês por grupo para ver todas as casas numa tela. Todos com 7 dias de teste, uma vez por CNPJ.",
+    a: "Conte sobre seu estabelecimento para conhecer a proposta adequada à sua operação. Solicite uma demonstração pelo formulário ou pelo assistente virtual.",
   },
   {
     q: "Funciona em qualquer cidade?",
     a: "Sim. 26 estados + DF. O cálculo tributário considera a UF do estabelecimento pelo CNPJ.",
   },
   {
-    q: "Posso testar sem cartão?",
-    a: "O diagnóstico e a calculadora de CMV são gratuitos e sem cartão — é por eles que recomendamos começar. O teste de 7 dias da plataforma pede cartão válido, com a data da primeira cobrança mostrada antes de você confirmar; cancelando antes dela, nada é cobrado.",
+    q: "Como posso conhecer o Rook?",
+    a: "Você pode começar pelo diagnóstico e pela calculadora de CMV, gratuitos e sem cartão. Para conhecer a plataforma, solicite uma demonstração pelo formulário. Nossa equipe combina o melhor horário com você.",
+    cta: { label: "Solicitar demonstração", href: "#cadastro" },
   },
   {
     q: "Não sou bom com números — vou conseguir usar?",
@@ -787,11 +724,11 @@ export const CTA = {
   headlineEmphasis: "diagnóstico.",
   headlineTail: " Sem cartão.",
   intro:
-    "Em dois minutos você vê se o restaurante está no lucro ou no prejuízo — e quanto precisa faturar para virar o mês.",
+    "Informe os números da sua operação para estimar o ponto de equilíbrio e entender quais dados merecem atenção.",
   primaryLabel: "Fazer meu diagnóstico",
   primaryHref: "/diagnostico/",
-  secondaryLabel: "Ver planos e teste",
-  secondaryHref: "/planos/",
+  secondaryLabel: "Conhecer o Rook",
+  secondaryHref: "#cadastro",
 } as const;
 
 /* ─── As telas do produto (seção da /restaurantes) ─── */
@@ -849,3 +786,9 @@ export const TELAS = {
     },
   ],
 } as const;
+
+export const ACQUISITION_CTA = {
+ title: "Entenda onde o seu restaurante pode melhorar o resultado.",
+ description: "Conte sobre sua operação. Conheça o Rook em uma demonstração ou comece por uma conversa sobre seus números.",
+ formLabel: "Solicitar demonstração", chatLabel: "Conversar sobre meus números",
+};

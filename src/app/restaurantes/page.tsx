@@ -156,8 +156,8 @@ export default function RestaurantesPage() {
             <Link href="/diagnostico/" className="btn-primary">
               Fazer meu diagnóstico
             </Link>
-            <Link href="/planos/" className="btn-ghost">
-              Ver planos e teste
+            <Link href="#cadastro" className="btn-ghost">
+              Agendar demonstração
             </Link>
           </div>
         </div>

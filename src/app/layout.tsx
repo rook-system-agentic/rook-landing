@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import DemoSection from "@/components/acquisition/DemoSection";
+import SiteChat from "@/components/acquisition/SiteChat";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import AppHandoffTracker from "@/components/AppHandoffTracker";
 import CookieConsent from "@/components/CookieConsent";
@@ -88,35 +90,6 @@ const jsonLd = {
       "url": siteUrl(),
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, iOS, Android",
-      "offers": [
-        {
-          "@type": "Offer",
-          "name": "Knight",
-          "price": "479.90",
-          "priceCurrency": "BRL",
-          "priceValidUntil": "2027-12-31",
-          "url": siteUrl("/planos/"),
-          "description": "Plano para restaurantes com faturamento mensal de até R$ 250 mil. Acesso completo à plataforma. 7 dias de teste grátis."
-        },
-        {
-          "@type": "Offer",
-          "name": "Rook",
-          "price": "779.90",
-          "priceCurrency": "BRL",
-          "priceValidUntil": "2027-12-31",
-          "url": siteUrl("/planos/"),
-          "description": "Plano para restaurantes com faturamento mensal acima de R$ 250 mil. Acesso completo à plataforma. 7 dias de teste grátis."
-        },
-        {
-          "@type": "Offer",
-          "name": "Chess",
-          "price": "279.90",
-          "priceCurrency": "BRL",
-          "priceValidUntil": "2027-12-31",
-          "url": siteUrl("/planos/"),
-          "description": "Add-on organizacional para consolidação multiunidade (redes e franquias)."
-        }
-      ],
       "description": "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, DRE gerencial automático, score de saúde financeira e recomendações com impacto em R$."
     },
     {
@@ -156,9 +129,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GoogleTagManager />
         <AppHandoffTracker />
         <Header />
-        <main className="pt-[72px]">{children}</main>
+        <main className="pt-[72px]">{children}<DemoSection /></main>
         <CookieConsent />
         <Footer />
+        <SiteChat />
         <Analytics />
       </body>
     </html>
