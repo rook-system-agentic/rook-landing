@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   CONSENT_STORAGE_KEY,
@@ -66,6 +66,16 @@ function atualizarConsentimento(estado: Record<string, string>) {
 
 export default function CookieConsent() {
   const [visivel, setVisivel] = useState(false);
+  const banner = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!visivel || !banner.current) return;
+    const updateOffset = () => document.documentElement.style.setProperty('--rook-cookie-height', `${banner.current?.getBoundingClientRect().height || 0}px`);
+    const observer = new ResizeObserver(updateOffset);
+    observer.observe(banner.current);
+    updateOffset();
+    return () => {observer.disconnect(); document.documentElement.style.removeProperty('--rook-cookie-height');};
+  }, [visivel]);
 
   useEffect(() => {
     if (!isTrackingEnabled()) return;
@@ -83,6 +93,7 @@ export default function CookieConsent() {
 
   return (
     <div
+      ref={banner}
       role="dialog"
       aria-label="Preferências de cookies"
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-bg-card p-4 shadow-lg"
