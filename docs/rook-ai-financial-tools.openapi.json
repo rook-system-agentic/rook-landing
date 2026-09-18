@@ -1,0 +1,1188 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Rook AI — ferramentas financeiras",
+    "version": "1.0.0",
+    "description": "Contrato local para integração com uma IA conversacional. Este arquivo não comprova publicação nem conexão ao AsaFlow. A IA conduz a conversa; as rotas validam o cenário e calculam. Campos confirmed não provam, sozinhos, uma confirmação real: a plataforma de conversa deve vinculá-los à mensagem do visitante. A qualificação e o cadastro de lead são fluxos separados."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Origem do ambiente em que estas rotas estiverem publicadas; o arquivo não comprova publicação."
+    }
+  ],
+  "paths": {
+    "/api/ai/tools/analisar-cmv/": {
+      "post": {
+        "operationId": "analisar_cmv",
+        "summary": "Compara o CMV já apurado com a referência indicativa do segmento. Não calcula consumo de estoque e não cadastra contato.",
+        "description": "Cálculo puro, sem CRM, armazenamento, dados privados ou chamada a LLM. Máximo de 4.096 bytes em JSON UTF-8. Retorne o JSON da resposta ao contexto da mesma conversa de IA. Dados podem vir em qualquer ordem. Nunca complete campos financeiros desconhecidos com zero. Confirme o cenário antes de confirmed=true; toda correção invalida a confirmação anterior.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/analisar_cmv_request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success: apresentar o resultado e as premissas; needs_information: perguntar apenas o que falta; needs_confirmation: mostrar cenário para confirmação. Não há cálculo nos dois últimos estados.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/analisar_cmv_success"
+                    },
+                    {
+                      "$ref": "#/components/schemas/analisar_cmv_needs_information"
+                    },
+                    {
+                      "$ref": "#/components/schemas/analisar_cmv_needs_confirmation"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Corpo vazio, JSON inválido, UTF-8 inválido ou falha de leitura. A mensagem não reflete o corpo.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_input"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "O corpo excede 4.096 bytes. O limite é aplicado durante a leitura, inclusive sem Content-Length.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_input"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type diferente de application/json. Parâmetros como charset=utf-8 são aceitos.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_input"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Campo inválido ou extra, base incompatível ou cenário que não atende ao contrato. Não usar resultado anterior.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_input"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/tools/estimar-ponto-equilibrio/": {
+      "post": {
+        "operationId": "estimar_ponto_equilibrio",
+        "summary": "Estima o ponto de equilíbrio mensal usando custos fixos e percentuais variáveis separados. Não cadastra contato.",
+        "description": "Cálculo puro, sem CRM, armazenamento, dados privados ou chamada a LLM. Máximo de 4.096 bytes em JSON UTF-8. Retorne o JSON da resposta ao contexto da mesma conversa de IA. Dados podem vir em qualquer ordem. Nunca complete campos financeiros desconhecidos com zero. Confirme o cenário antes de confirmed=true; toda correção invalida a confirmação anterior.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/estimar_ponto_equilibrio_request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success: apresentar o resultado e as premissas; needs_information: perguntar apenas o que falta; needs_confirmation: mostrar cenário para confirmação. Não há cálculo nos dois últimos estados.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/estimar_ponto_equilibrio_success"
+                    },
+                    {
+                      "$ref": "#/components/schemas/estimar_ponto_equilibrio_needs_information"
+                    },
+                    {
+                      "$ref": "#/components/schemas/estimar_ponto_equilibrio_needs_confirmation"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Corpo vazio, JSON inválido, UTF-8 inválido ou falha de leitura. A mensagem não reflete o corpo.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_input"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "O corpo excede 4.096 bytes. O limite é aplicado durante a leitura, inclusive sem Content-Length.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_input"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Content-Type diferente de application/json. Parâmetros como charset=utf-8 são aceitos.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_input"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Campo inválido ou extra, base incompatível ou cenário que não atende ao contrato. Não usar resultado anterior.",
+            "headers": {
+              "Cache-Control": {
+                "description": "O cenário e o resultado não podem ser armazenados em cache.",
+                "schema": {
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/invalid_input"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "invalid_input": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "invalid_input"
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "minProperties": 1
+          }
+        },
+        "required": [
+          "status",
+          "errors"
+        ],
+        "additionalProperties": false
+      },
+      "cmv_valid": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "valid"
+          },
+          "referencePercent": {
+            "type": "number"
+          },
+          "differencePoints": {
+            "type": "number"
+          },
+          "monthlyDifference": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "status",
+          "referencePercent",
+          "differencePoints",
+          "monthlyDifference"
+        ],
+        "additionalProperties": false
+      },
+      "cmv_no_reference": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "no_reference"
+          },
+          "referencePercent": {
+            "type": "null"
+          },
+          "monthlyDifference": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "status",
+          "referencePercent",
+          "monthlyDifference"
+        ],
+        "additionalProperties": false
+      },
+      "breakeven_valid": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "valid"
+          },
+          "contributionPercent": {
+            "type": "number"
+          },
+          "breakEvenRevenue": {
+            "type": "number"
+          },
+          "revenueGap": {
+            "type": "number"
+          },
+          "operationalResult": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "status",
+          "contributionPercent",
+          "breakEvenRevenue",
+          "revenueGap",
+          "operationalResult"
+        ],
+        "additionalProperties": false
+      },
+      "breakeven_non_positive_margin": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "non_positive_margin"
+          },
+          "contributionPercent": {
+            "type": "number"
+          },
+          "breakEvenRevenue": {
+            "type": "null"
+          },
+          "revenueGap": {
+            "type": "null"
+          },
+          "operationalResult": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "status",
+          "contributionPercent",
+          "breakEvenRevenue",
+          "revenueGap",
+          "operationalResult"
+        ],
+        "additionalProperties": false
+      },
+      "analisar_cmv_confirmed": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "minLength": 7,
+            "maxLength": 7,
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+          },
+          "currency": {
+            "type": "string",
+            "const": "BRL",
+            "description": "Valores monetários em reais."
+          },
+          "revenue": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 1000000000,
+            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+          },
+          "cmvPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "description": "True somente após o visitante confirmar este cenário. Uma correção exige nova confirmação."
+          },
+          "revenueBasis": {
+            "type": "string",
+            "const": "net",
+            "description": "Receita líquida e CMV sobre essa mesma base, explicitamente confirmados."
+          },
+          "segment": {
+            "type": "string",
+            "enum": [
+              "a_la_carte",
+              "fine_dining",
+              "italiana",
+              "japonesa_sushi",
+              "self_service_kilo",
+              "pizzaria",
+              "hamburgueria",
+              "fast_food",
+              "bar_boteco",
+              "padaria_cafeteria",
+              "delivery_especializado",
+              "other"
+            ],
+            "description": "Segmento confirmado. Use other quando não houver correspondência; não escolha uma referência por aproximação."
+          }
+        },
+        "required": [
+          "period",
+          "currency",
+          "revenue",
+          "cmvPercent",
+          "confirmed",
+          "revenueBasis",
+          "segment"
+        ],
+        "additionalProperties": false
+      },
+      "analisar_cmv_request": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 7,
+                "maxLength": 7,
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BRL",
+                "description": "Valores monetários em reais."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valores monetários em reais."
+          },
+          "revenue": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.01,
+                "maximum": 1000000000,
+                "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+          },
+          "cmvPercent": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+          },
+          "confirmed": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "True somente após confirmação do visitante. False, null ou ausência pedem confirmação; uma correção exige nova confirmação."
+          },
+          "revenueBasis": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "net",
+                "description": "Receita líquida e CMV sobre essa mesma base, explicitamente confirmados."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Receita líquida e CMV sobre essa mesma base, explicitamente confirmados."
+          },
+          "segment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "a_la_carte",
+                  "fine_dining",
+                  "italiana",
+                  "japonesa_sushi",
+                  "self_service_kilo",
+                  "pizzaria",
+                  "hamburgueria",
+                  "fast_food",
+                  "bar_boteco",
+                  "padaria_cafeteria",
+                  "delivery_especializado",
+                  "other"
+                ],
+                "description": "Segmento confirmado. Use other quando não houver correspondência; não escolha uma referência por aproximação."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Segmento confirmado. Use other quando não houver correspondência; não escolha uma referência por aproximação."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use também o descritor *_confirmed. Não envie nomes, contato, mensagens, resultados prévios ou outros campos."
+      },
+      "analisar_cmv_inputs": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string",
+            "const": "cmv"
+          },
+          "revenue": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 1000000000,
+            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+          },
+          "cmvPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+          },
+          "revenueBasis": {
+            "type": "string",
+            "const": "net",
+            "description": "Receita líquida e CMV sobre essa mesma base, explicitamente confirmados."
+          },
+          "segment": {
+            "type": "string",
+            "enum": [
+              "a_la_carte",
+              "fine_dining",
+              "italiana",
+              "japonesa_sushi",
+              "self_service_kilo",
+              "pizzaria",
+              "hamburgueria",
+              "fast_food",
+              "bar_boteco",
+              "padaria_cafeteria",
+              "delivery_especializado",
+              "other"
+            ],
+            "description": "Segmento confirmado. Use other quando não houver correspondência; não escolha uma referência por aproximação."
+          }
+        },
+        "required": [
+          "tool",
+          "revenue",
+          "cmvPercent",
+          "revenueBasis",
+          "segment"
+        ],
+        "additionalProperties": false
+      },
+      "analisar_cmv_needs_information": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "needs_information"
+          },
+          "toolName": {
+            "type": "string",
+            "const": "analisar_cmv"
+          },
+          "missingFields": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "period",
+                "currency",
+                "revenue",
+                "cmvPercent",
+                "revenueBasis",
+                "segment"
+              ]
+            }
+          }
+        },
+        "required": [
+          "status",
+          "toolName",
+          "missingFields"
+        ],
+        "additionalProperties": false
+      },
+      "analisar_cmv_needs_confirmation": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "needs_confirmation"
+          },
+          "toolName": {
+            "type": "string",
+            "const": "analisar_cmv"
+          },
+          "period": {
+            "type": "string",
+            "minLength": 7,
+            "maxLength": 7,
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+          },
+          "currency": {
+            "type": "string",
+            "const": "BRL"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/analisar_cmv_inputs"
+          }
+        },
+        "required": [
+          "status",
+          "toolName",
+          "period",
+          "currency",
+          "inputs"
+        ],
+        "additionalProperties": false
+      },
+      "analisar_cmv_success": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "success"
+          },
+          "toolName": {
+            "type": "string",
+            "const": "analisar_cmv"
+          },
+          "period": {
+            "type": "string",
+            "minLength": 7,
+            "maxLength": 7,
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+          },
+          "currency": {
+            "type": "string",
+            "const": "BRL"
+          },
+          "ok": {
+            "type": "boolean",
+            "const": true
+          },
+          "tool": {
+            "type": "string",
+            "const": "cmv"
+          },
+          "formulaVersion": {
+            "type": "string",
+            "description": "Versão do motor que produziu o resultado."
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/analisar_cmv_inputs"
+          },
+          "assumptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "summary": {
+            "type": "string",
+            "description": "Explicação calculada, incluindo limites do cenário. A IA pode contextualizar sem alterar números ou omitir as premissas."
+          },
+          "result": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/cmv_valid"
+              },
+              {
+                "$ref": "#/components/schemas/cmv_no_reference"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "toolName",
+          "period",
+          "currency",
+          "ok",
+          "tool",
+          "formulaVersion",
+          "inputs",
+          "assumptions",
+          "summary",
+          "result"
+        ],
+        "additionalProperties": false
+      },
+      "estimar_ponto_equilibrio_confirmed": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "minLength": 7,
+            "maxLength": 7,
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+          },
+          "currency": {
+            "type": "string",
+            "const": "BRL",
+            "description": "Valores monetários em reais."
+          },
+          "revenue": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 1000000000,
+            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+          },
+          "cmvPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+          },
+          "confirmed": {
+            "type": "boolean",
+            "const": true,
+            "description": "True somente após o visitante confirmar este cenário. Uma correção exige nova confirmação."
+          },
+          "revenueBasis": {
+            "type": "string",
+            "const": "gross",
+            "description": "Receita bruta e todos os percentuais sobre essa mesma base, explicitamente confirmados."
+          },
+          "fixedCosts": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000000,
+            "description": "Custos fixos mensais em reais. Zero somente se informado; desconhecido não é zero."
+          },
+          "taxPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Impostos sobre a receita bruta do mês."
+          },
+          "feesPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Taxas de cartão e delivery sobre a receita bruta total, sem repetir custos."
+          },
+          "otherVariablePercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Outros custos variáveis sobre a mesma receita bruta, sem repetir custos."
+          }
+        },
+        "required": [
+          "period",
+          "currency",
+          "revenue",
+          "cmvPercent",
+          "confirmed",
+          "revenueBasis",
+          "fixedCosts",
+          "taxPercent",
+          "feesPercent",
+          "otherVariablePercent"
+        ],
+        "additionalProperties": false
+      },
+      "estimar_ponto_equilibrio_request": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 7,
+                "maxLength": 7,
+                "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "BRL",
+                "description": "Valores monetários em reais."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valores monetários em reais."
+          },
+          "revenue": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.01,
+                "maximum": 1000000000,
+                "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+          },
+          "cmvPercent": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+          },
+          "confirmed": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "True somente após confirmação do visitante. False, null ou ausência pedem confirmação; uma correção exige nova confirmação."
+          },
+          "revenueBasis": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "gross",
+                "description": "Receita bruta e todos os percentuais sobre essa mesma base, explicitamente confirmados."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Receita bruta e todos os percentuais sobre essa mesma base, explicitamente confirmados."
+          },
+          "fixedCosts": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000,
+                "description": "Custos fixos mensais em reais. Zero somente se informado; desconhecido não é zero."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custos fixos mensais em reais. Zero somente se informado; desconhecido não é zero."
+          },
+          "taxPercent": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Impostos sobre a receita bruta do mês."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Impostos sobre a receita bruta do mês."
+          },
+          "feesPercent": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Taxas de cartão e delivery sobre a receita bruta total, sem repetir custos."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Taxas de cartão e delivery sobre a receita bruta total, sem repetir custos."
+          },
+          "otherVariablePercent": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Outros custos variáveis sobre a mesma receita bruta, sem repetir custos."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Outros custos variáveis sobre a mesma receita bruta, sem repetir custos."
+          }
+        },
+        "additionalProperties": false,
+        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use também o descritor *_confirmed. Não envie nomes, contato, mensagens, resultados prévios ou outros campos."
+      },
+      "estimar_ponto_equilibrio_inputs": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string",
+            "const": "breakeven"
+          },
+          "revenue": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 1000000000,
+            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+          },
+          "cmvPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+          },
+          "revenueBasis": {
+            "type": "string",
+            "const": "gross",
+            "description": "Receita bruta e todos os percentuais sobre essa mesma base, explicitamente confirmados."
+          },
+          "fixedCosts": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000000,
+            "description": "Custos fixos mensais em reais. Zero somente se informado; desconhecido não é zero."
+          },
+          "taxPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Impostos sobre a receita bruta do mês."
+          },
+          "feesPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Taxas de cartão e delivery sobre a receita bruta total, sem repetir custos."
+          },
+          "otherVariablePercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Outros custos variáveis sobre a mesma receita bruta, sem repetir custos."
+          }
+        },
+        "required": [
+          "tool",
+          "revenue",
+          "cmvPercent",
+          "revenueBasis",
+          "fixedCosts",
+          "taxPercent",
+          "feesPercent",
+          "otherVariablePercent"
+        ],
+        "additionalProperties": false
+      },
+      "estimar_ponto_equilibrio_needs_information": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "needs_information"
+          },
+          "toolName": {
+            "type": "string",
+            "const": "estimar_ponto_equilibrio"
+          },
+          "missingFields": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "period",
+                "currency",
+                "revenue",
+                "cmvPercent",
+                "revenueBasis",
+                "fixedCosts",
+                "taxPercent",
+                "feesPercent",
+                "otherVariablePercent"
+              ]
+            }
+          }
+        },
+        "required": [
+          "status",
+          "toolName",
+          "missingFields"
+        ],
+        "additionalProperties": false
+      },
+      "estimar_ponto_equilibrio_needs_confirmation": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "needs_confirmation"
+          },
+          "toolName": {
+            "type": "string",
+            "const": "estimar_ponto_equilibrio"
+          },
+          "period": {
+            "type": "string",
+            "minLength": 7,
+            "maxLength": 7,
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+          },
+          "currency": {
+            "type": "string",
+            "const": "BRL"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/estimar_ponto_equilibrio_inputs"
+          }
+        },
+        "required": [
+          "status",
+          "toolName",
+          "period",
+          "currency",
+          "inputs"
+        ],
+        "additionalProperties": false
+      },
+      "estimar_ponto_equilibrio_success": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "success"
+          },
+          "toolName": {
+            "type": "string",
+            "const": "estimar_ponto_equilibrio"
+          },
+          "period": {
+            "type": "string",
+            "minLength": 7,
+            "maxLength": 7,
+            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+          },
+          "currency": {
+            "type": "string",
+            "const": "BRL"
+          },
+          "ok": {
+            "type": "boolean",
+            "const": true
+          },
+          "tool": {
+            "type": "string",
+            "const": "breakeven"
+          },
+          "formulaVersion": {
+            "type": "string",
+            "description": "Versão do motor que produziu o resultado."
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/estimar_ponto_equilibrio_inputs"
+          },
+          "assumptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "summary": {
+            "type": "string",
+            "description": "Explicação calculada, incluindo limites do cenário. A IA pode contextualizar sem alterar números ou omitir as premissas."
+          },
+          "result": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/breakeven_valid"
+              },
+              {
+                "$ref": "#/components/schemas/breakeven_non_positive_margin"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "toolName",
+          "period",
+          "currency",
+          "ok",
+          "tool",
+          "formulaVersion",
+          "inputs",
+          "assumptions",
+          "summary",
+          "result"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}
