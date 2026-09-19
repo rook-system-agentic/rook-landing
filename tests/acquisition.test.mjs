@@ -37,3 +37,16 @@ test('caminho não sei preserva números conhecidos sem completar os ausentes co
  assert.match(notes,/Dados ainda não informados: Custos fixos/);
  assert.ok(!notes.includes('Custos fixos (R$): 0'));
 });
+
+test('diagnóstico sem números lista todas as ausências; demonstração simples continua sem diagnóstico',()=>{
+ for(const intent of ['cmv','breakeven']) {
+  const parsed=validateAcquisition({...lead,intent,period:'2026-08'},cities);
+  assert.equal(parsed.ok,true); assert.equal(parsed.value.simulation,null);
+  assert.equal(parsed.value.diagnosticNotes.length,4);
+  assert.equal(parsed.value.diagnosticNotes[2],'Dados informados: nenhum valor financeiro informado.');
+  assert.match(parsed.value.diagnosticNotes[1],/Mês: 2026-08/);
+  assert.match(parsed.value.diagnosticNotes[3],/Receita mensal \(R\$\), CMV \(%\)/);
+  if(intent==='breakeven') assert.match(parsed.value.diagnosticNotes[3],/Custos fixos \(R\$\), Impostos \(%\), Taxas \(%\), Outros variáveis \(%\)/);
+ }
+ assert.deepEqual(validateAcquisition({...lead,intent:'demo'},cities).value.diagnosticNotes,[]);
+});
