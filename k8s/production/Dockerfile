@@ -1,5 +1,5 @@
-# Imagem da landing candidata a produção. O contexto deve ser o commit publicado
-# em produção, hoje a7b1a939e39a4afd7a05cf15f0733fad74bf1651.
+# Imagem da landing de produção servida em https://www.rook.com.br pelo k3s da
+# Hostinger. Construída pelo workflow deploy-production.yml a partir da `main`.
 FROM node:22-alpine AS deps
 RUN apk add --no-cache libc6-compat
 RUN corepack enable && corepack prepare pnpm@9.1.0 --activate
@@ -14,7 +14,7 @@ FROM deps AS builder
 COPY . .
 
 ARG NEXT_PUBLIC_ENV=production
-ARG NEXT_PUBLIC_SITE_URL=https://rooksystem.com.br
+ARG NEXT_PUBLIC_SITE_URL=https://www.rook.com.br
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG SUPABASE_URL
@@ -29,7 +29,7 @@ ENV NEXT_PUBLIC_ENV=$NEXT_PUBLIC_ENV \
     NODE_OPTIONS=--max-old-space-size=4096
 
 RUN test "$NEXT_PUBLIC_ENV" = production
-RUN test "$NEXT_PUBLIC_SITE_URL" = https://rooksystem.com.br
+RUN test "$NEXT_PUBLIC_SITE_URL" = https://www.rook.com.br
 RUN --mount=type=cache,id=next-landing-production,target=/app/.next/cache \
     npx next build
 

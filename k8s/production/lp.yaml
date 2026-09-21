@@ -7,8 +7,6 @@ metadata:
     app.kubernetes.io/name: rook-lp
     app.kubernetes.io/part-of: rook-production
     rooksystem.com/environment: production
-  annotations:
-    rooksystem.com/source-revision: a7b1a939e39a4afd7a05cf15f0733fad74bf1651
 spec:
   replicas: 1
   revisionHistoryLimit: 3
@@ -24,8 +22,8 @@ spec:
         app.kubernetes.io/part-of: rook-production
         rooksystem.com/environment: production
         rooksystem.com/supabase-api-client: "true"
-      annotations:
-        rooksystem.com/source-revision: a7b1a939e39a4afd7a05cf15f0733fad74bf1651
+        # Resend (newsletter) e GTM saem para a internet.
+        rooksystem.com/internet-egress: "true"
     spec:
       automountServiceAccountToken: false
       securityContext:
@@ -33,7 +31,8 @@ spec:
           type: RuntimeDefault
       containers:
         - name: lp
-          image: rook-lp:prod-a7b1a939
+          # Placeholder: deploy-production.yml troca por rook-lp:prod-<sha> antes do apply.
+          image: rook-lp:production
           imagePullPolicy: Never
           ports:
             - name: http
@@ -47,7 +46,7 @@ spec:
             - name: NEXT_PUBLIC_ENV
               value: production
             - name: NEXT_PUBLIC_SITE_URL
-              value: https://rooksystem.com.br
+              value: https://www.rook.com.br
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
@@ -105,3 +104,31 @@ spec:
     - name: http
       port: 80
       targetPort: http
+---
+# TLS pelo Secret `rook-origin` (Origin CA da Cloudflare para rook.com.br),
+# como os Ingress do rook-system. Só anotações simples: o admission webhook do
+# ingress-nginx recusa snippets e variáveis. O apex rook.com.br e os aliases
+# rooksystem.com.br redirecionam para cá pelo Ingress `rook-redirects` do rook-system.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rook-lp
+  namespace: rook-production
+  labels:
+    app.kubernetes.io/name: rook-lp
+    app.kubernetes.io/part-of: rook-production
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [www.rook.com.br]
+      secretName: rook-origin
+  rules:
+    - host: www.rook.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: rook-lp, port: { name: http } } }
