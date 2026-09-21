@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { segmentsData } from '@/lib/cmv-benchmarks.mjs';
 import { ERP_SYSTEMS, REVENUE_BANDS, normalizePhone } from '@/lib/acquisition.mjs';
 import { DIAGNOSTIC_CONTEXT_EVENT, readDiagnosticContext, type DiagnosticContext } from '@/lib/diagnostic-context.mjs';
+import { createVisitAttributionCapture, type LeadAttribution } from '@/lib/lead-attribution.mjs';
+import { track, TRACKING_EVENTS } from '@/lib/track';
 import CityPicker from './CityPicker';
 import PreviewModeWatcher from './PreviewModeWatcher';
 import styles from './demo.module.css';
@@ -13,6 +15,8 @@ type Profile = Record<string, string>;
 type Errors = Record<string, string>;
 const fieldId = (key: string) => `demo-${key}`;
 const errorId = (key: string) => `demo-${key}-error`;
+// Compartilhado entre remontagens; não grava URL nem dados pessoais em storage.
+const captureVisitAttribution = createVisitAttributionCapture();
 
 function validateProfile(profile: Profile, consent: boolean): Errors {
   const errors: Errors = {};
@@ -46,12 +50,14 @@ export default function DemoSection() {
   const inFlight = useRef(false);
   const completed = useRef(false);
   const frozen = useRef<Record<string, unknown> | null>(null);
+  const attribution = useRef<LeadAttribution | null>(null);
   const segmentEdited = useRef(false);
   const pendingInvalidation = useRef({ navigation: false, sources: new Set<string>() });
   const receipt = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     setSubmissionId(crypto.randomUUID());
+    attribution.current = captureVisitAttribution({ href: window.location.href, referrer: document.referrer });
 
     function receiveContext(event: Event) {
       if (completed.current) return;
@@ -165,6 +171,7 @@ export default function DemoSection() {
           consent,
           submissionId,
           simulation: context?.result?.inputs || null,
+          attribution: attribution.current,
         };
       }
       const response = await fetch('/api/acquisition/', {
@@ -189,6 +196,10 @@ export default function DemoSection() {
       completed.current = true;
       setReceiptPreview(false);
       setSent(true);
+      // A resposta do CRM foi confirmada. O evento não leva perfil, UTMs nem
+      // diagnóstico; track mantém o gate de ambiente e o Consent Mode/GTM
+      // existente continua responsável pelo consentimento publicitário.
+      track(TRACKING_EVENTS.lead);
     } catch (problem) {
       setMessage(problem instanceof Error && problem.name !== 'TimeoutError'
         ? problem.message
