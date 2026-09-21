@@ -46,7 +46,7 @@ O código da rota `/api/acquisition/` exige:
 | `COMMERCIAL_LEAD_ABUSE_SECRET` | Segredo de pelo menos 32 caracteres; o código atual usa a service role como alternativa quando ele não existe. Conferir a configuração sem imprimir valores. |
 | IP encaminhado | O ambiente precisa fornecer um dos cabeçalhos IP aceitos; sem IP, o desafio falha fechado. |
 
-Para o chat são outros controles: `NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED` e `NEXT_PUBLIC_ASAFLOW_CHAT_KEY`, que é a chave pública do snippet. `NEXT_PUBLIC_ENV=homolog` bloqueia o widget real no código atual; a prévia visual não testa a integração. `?preview=1` só impede envio do formulário quando o ambiente é homolog.
+Para o chat são outros controles: `NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED`, `NEXT_PUBLIC_ASAFLOW_CHAT_TENANT` e `NEXT_PUBLIC_ASAFLOW_CHAT_FLOW`. Tenant e flow são os slugs públicos do link externo do fluxo. A chave antiga do snippet não é mais usada pelo wrapper. `NEXT_PUBLIC_ENV=homolog` bloqueia o widget real no código atual; a prévia visual não testa a integração. `?preview=1` só impede envio do formulário quando o ambiente é homolog. Ver [montagem persistente do chat](rook-ai-chat-persistente.md).
 
 Inspeção local desta rodada verificou somente existência dos arquivos `.env`, `.env.local`, `.env.development` e `.env.development.local`: **todos ausentes**. Não foram lidos valores secretos, não foram editadas variáveis e não foi inspecionada a configuração do Vercel ou do processo já em execução. Portanto, não se conclui que o ambiente remoto está sem configuração.
 
