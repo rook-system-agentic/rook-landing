@@ -1,5 +1,6 @@
 import { segmentsData } from './cmv-benchmarks.mjs';
 import { parseBrazilianNumber, calculateFinancialSimulation } from './financial-simulation.mjs';
+import { normalizeLeadAttribution } from './lead-attribution.mjs';
 
 export const ERP_SYSTEMS = ['Saipos','Consumer','Colibri','Linx','Sischef','Teknisa','Omie','Conta Azul','Bling','Tiny'];
 export const REVENUE_BANDS = [
@@ -84,5 +85,6 @@ export function validateAcquisition(candidate,cities) {
   if(Object.keys(errors).length) return {ok:false,errors};
   return {ok:true,value:{submissionId,name,company,email,phone,city,segment,segmentOther:segment==='other'?segmentOther:null,
     revenueBand,usesErp:usesErp==='yes',erp:usesErp==='yes'?erp:null,erpOther:usesErp==='yes'&&erp==='other'?erpOther:null,
-    intent:['cmv','breakeven','demo'].includes(candidate.intent)?candidate.intent:'demo',consent:true,period:simulation?period:null,simulation,diagnosticNotes}};
+    intent:['cmv','breakeven','demo'].includes(candidate.intent)?candidate.intent:'demo',consent:true,period:simulation?period:null,simulation,diagnosticNotes,
+    attribution:normalizeLeadAttribution(candidate.attribution)}};
 }

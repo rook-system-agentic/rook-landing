@@ -130,3 +130,12 @@ test('duas identidades equivalentes após normalizar telefone continuam ambígua
  await assert.rejects(()=>client.create(lead),/asaflow_contact_ambiguous/);
  assert.deepEqual(methods,['GET']);
 });
+
+test('relatório fora do teto falha antes de gravar contato e não corta diagnóstico',async()=>{
+ const calls=[];
+ const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(...args)=>{
+  calls.push(args);throw new Error('não deve chamar o CRM');
+ }});
+ await assert.rejects(()=>client.create({...lead,diagnosticNotes:['x'.repeat(5000)]}),/asaflow_description_too_long/);
+ assert.equal(calls.length,0);
+});
