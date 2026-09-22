@@ -68,9 +68,12 @@ test("checkout direto aceita somente as faixas Knight e Rook", () => {
 });
 
 test("catálogo inválido usa o snapshot; ambos inválidos falham fechado", () => {
+  // `now` fixo no instante do snapshot: sem isso o teste dependia do relógio
+  // da máquina e ficava vermelho sozinho 7 dias depois do último commit.
   const fallback = resolvePublicBillingCatalog(
     { release: { key: "incompleto" } },
     snapshotCandidate,
+    Date.parse(snapshotCandidate.generatedAt),
   );
   assert.equal(fallback.source, "snapshot");
   assert.equal(fallback.catalog?.release.key, "p0-monthly");
