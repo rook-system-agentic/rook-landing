@@ -1,0 +1,60 @@
+# Substitui o cron da Vercel (vercel.json) para a landing servida no k3s: um pod
+# curl chama a rota interna com `Authorization: Bearer $CRON_SECRET`, como o
+# render-cronjobs.mjs do rook-system faz para as apps.
+#
+# Nasce suspenso: deploy-production.yml só liga quando a variável de
+# repositório PROD_EXTERNAL_EFFECTS=true (portão do corte). Depende do
+# NetworkPolicy allow-cron-to-apps/allow-apps-from-cron do rook-system incluir
+# rook-lp entre os alvos; até lá o pod curl não alcança o Service.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-lp-publish-scheduled
+  namespace: rook-production
+  labels:
+    app.kubernetes.io/name: cron-lp-publish-scheduled
+    app.kubernetes.io/part-of: rook-production-cron
+    rooksystem.com/cron-app: lp
+  annotations:
+    rooksystem.com/route: /api/content/cron/publish-scheduled
+spec:
+  schedule: "0 * * * *"
+  suspend: true
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 360
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/part-of: rook-production-cron
+            rooksystem.com/cron-client: "true"
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          containers:
+            - name: curl
+              image: docker.io/curlimages/curl:8.10.1
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: rook-lp-production-env
+                      key: CRON_SECRET
+              # $(CRON_SECRET) é expandido pelo próprio Kubernetes.
+              args:
+                - -fsS
+                - --max-time
+                - "330"
+                - -H
+                - "Authorization: Bearer $(CRON_SECRET)"
+                - http://rook-lp.rook-production.svc.cluster.local/api/content/cron/publish-scheduled
+              resources:
+                requests: { cpu: 10m, memory: 16Mi }
+                limits: { memory: 64Mi }
