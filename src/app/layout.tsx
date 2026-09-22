@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import DemoSection from "@/components/acquisition/DemoSection";
+import SiteChat from "@/components/acquisition/SiteChat";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import AppHandoffTracker from "@/components/AppHandoffTracker";
 import CookieConsent from "@/components/CookieConsent";
@@ -9,10 +11,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { siteUrl } from "@/lib/site-origin";
 import { OG_IMAGE, OG_IMAGE_PATH, TWITTER_CARD } from "@/lib/og-image";
 import { FAQ_ITEMS } from "@/lib/lp-content";
-import { descricaoParaBuscador } from "@/lib/planos-copy.mjs";
 import { COMPANY_INFO } from "@/lib/company";
-import { getLandingBillingCatalog } from "@/lib/billing-catalog-server";
-import type { PublicBillingCatalog } from "@/lib/public-billing-catalog.mjs";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -83,77 +82,18 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * Ofertas do dado estruturado, montadas a partir do CATÁLOGO.
- *
- * POR QUE ISTO NÃO É MAIS LITERAL (25/08/2026)
- *
- * Aqui estavam os três planos digitados à mão — preço, limiar de faturamento,
- * dias de teste e a frase — dentro do bloco que vai em TODA página do site e é
- * lido pelo Google. Batiam com o catálogo por terem sido escritos no mesmo dia,
- * não por construção.
- *
- * O dia em que deixassem de bater seria silencioso: a /planos lê o catálogo e
- * mudaria sozinha, enquanto este bloco seguiria anunciando o preço velho para o
- * buscador, no site inteiro. Preço errado em dado estruturado não é erro de
- * texto — é promessa comercial que a própria página de planos desmente.
- *
- * É o mesmo princípio que o FAQPage logo abaixo já seguia: uma fonte só, sem
- * cópia para dessincronizar.
- *
- * SEM CATÁLOGO, SEM OFERTAS. Se o catálogo e o snapshot falharem, o nó sai sem
- * a chave `offers` em vez de cair num valor de reserva. Dado estruturado
- * ausente é neutro para o buscador; dado estruturado errado é que custa caro.
- * Mesmo tratamento de falha que a /planos já dá.
- */
-function ofertasParaBuscador(catalogo: PublicBillingCatalog | null) {
-  if (!catalogo) return [];
-  const diasDeTeste = catalogo.trial.durationDays;
-  return catalogo.offers.flatMap((oferta) => {
-    // O teste é dos planos-base; o Chess é adicional de organização.
-    const dias = oferta.productCode === "chess" ? null : diasDeTeste;
-    const description = descricaoParaBuscador(oferta.productCode, dias);
-    if (!description) return [];
-    return [
-      {
-        "@type": "Offer",
-        name: oferta.displayName,
-        price: (oferta.unitAmountCents / 100).toFixed(2),
-        priceCurrency: oferta.currency,
-        priceValidUntil: PRECO_VALIDO_ATE,
-        url: siteUrl("/planos/"),
-        description,
-      },
-    ];
-  });
-}
-
-/**
- * Até quando o preço anunciado vale, no formato do schema.org.
- *
- * Continua literal porque o catálogo não expressa validade de preço — a
- * release tem início (`effectiveFrom`) e não tem fim. É data de vitrine, não
- * de cobrança: passar dela não quebra nada, só faz o buscador tratar o preço
- * como desatualizado.
- */
-const PRECO_VALIDO_ATE = "2027-12-31";
-
-function construirJsonLd(catalogo: PublicBillingCatalog | null) {
-  const ofertas = ofertasParaBuscador(catalogo);
-  return {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "SoftwareApplication",
-        name: "Rook System",
-        url: siteUrl(),
-        applicationCategory: "BusinessApplication",
-        operatingSystem: "Web, iOS, Android",
-        ...(ofertas.length > 0 ? { offers: ofertas } : {}),
-        description:
-          "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, DRE gerencial automático, score de saúde financeira e recomendações com impacto em R$.",
-      },
-      {
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "Rook System",
+      "url": siteUrl(),
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "description": "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, DRE gerencial automático, score de saúde financeira e recomendações com impacto em R$."
+    },
+    {
         /*
          * A identidade jurídica sai de `lib/company.ts`, a mesma fonte do
          * rodapé, das páginas jurídicas e da /sobre. Estava faltando aqui: o
@@ -166,36 +106,33 @@ function construirJsonLd(catalogo: PublicBillingCatalog | null) {
          * contrato social. Data de fundação inventada em dado estruturado é
          * exatamente o tipo de número que este site não publica.
          */
-        "@type": "Organization",
-        name: "Rook System",
-        legalName: COMPANY_INFO.razaoSocial,
-        taxID: COMPANY_INFO.cnpj,
-        url: siteUrl(),
-        logo: siteUrl("/brand/rook-logo-horizontal-light.png"),
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: "Brasília",
-          addressRegion: "DF",
-          addressCountry: "BR",
-        },
+      "@type": "Organization",
+      "name": "Rook System",
+      legalName: COMPANY_INFO.razaoSocial,
+      taxID: COMPANY_INFO.cnpj,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Brasília",
+        addressRegion: "DF",
+        addressCountry: "BR",
       },
-      {
-        "@type": "FAQPage",
-        // Derivado do FAQ visível da home: uma fonte só, sem cópia para
-        // dessincronizar. O texto do buscador é o texto que o visitante lê.
-        mainEntity: FAQ_ITEMS.map((f) => ({
-          "@type": "Question",
-          name: f.q,
-          acceptedAnswer: { "@type": "Answer", text: f.a },
-        })),
-      },
-    ],
-  };
-}
+      "url": siteUrl(),
+      "logo": siteUrl("/brand/rook-logo-horizontal-light.png")
+    },
+    {
+      "@type": "FAQPage",
+      // Derivado do FAQ visível da home: uma fonte só, sem cópia para
+      // dessincronizar. O texto do buscador é o texto que o visitante lê.
+      "mainEntity": FAQ_ITEMS.map((f) => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a }
+      }))
+    }
+  ]
+};
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { catalog } = await getLandingBillingCatalog();
-  const jsonLd = construirJsonLd(catalog);
+export default function RootLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <html lang="pt-BR" suppressHydrationWarning>
@@ -229,9 +166,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <GoogleTagManager />
         <AppHandoffTracker />
         <Header />
-        <main className="pt-[72px]">{children}</main>
+        <main className="pt-[72px]">{children}<DemoSection /></main>
         <CookieConsent />
         <Footer />
+        <SiteChat />
         <Analytics />
       </body>
     </html>

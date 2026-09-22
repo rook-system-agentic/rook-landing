@@ -1,0 +1,23 @@
+.root{position:fixed;right:24px;bottom:calc(24px + var(--rook-cookie-height,0px));z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:14px;font-size:14px;color:var(--color-text-primary)}
+.launcher{height:60px;width:60px;border-radius:50%;display:grid;place-items:center;background:var(--color-cta);color:#fff;box-shadow:0 8px 24px var(--color-border);border:1px solid var(--color-cta);font-size:32px}
+.launcher:hover{filter:brightness(1.08)}.root button:focus-visible,.root a:focus-visible{outline:3px solid var(--color-terracota-text);outline-offset:4px}
+.teaser{position:relative;max-width:280px;border:1px solid var(--color-border);background:var(--color-bg-card);padding:20px 28px 20px 20px;border-radius:15px;box-shadow:0 8px 30px var(--color-border);line-height:1.55}.teaser>button:not(.dismiss){text-align:left}.teaser strong{display:block;font-size:13px;font-weight:700;color:var(--color-terracota-text);margin-bottom:5px}.teaser span{display:block}.dismiss{position:absolute;right:8px;top:3px;font-size:20px;color:var(--color-text-muted)}
+.panel{width:390px;max-width:calc(100vw - 32px);height:570px;max-height:calc(100dvh - 115px - var(--rook-cookie-height,0px));display:flex;flex-direction:column;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:18px;box-shadow:0 16px 60px var(--color-border);overflow:hidden}
+.header{display:flex;align-items:center;gap:12px;background:var(--color-cta);color:#fff;padding:17px 18px}.avatar{background:transparent;border-radius:8px;height:42px;width:42px;flex-shrink:0;display:grid;place-items:center}.avatar img,.launcher img{object-fit:contain}.header strong{display:block;font-size:16px}.header div>span{display:block;font-size:12px;color:#fff;margin-top:2px}.header button{margin-left:auto;font-size:26px;padding:0 6px}
+.messages{padding:20px;overflow:auto;flex:1;background:var(--color-bg)}.note{font-size:11px;color:var(--color-text-muted);margin-bottom:20px;text-align:center}.bubble{padding:14px 16px;border:1px solid var(--color-border);border-radius:2px 14px 14px 14px;background:var(--color-bg-card);line-height:1.6}.explanation{font-size:12px;line-height:1.65;color:var(--color-text-muted);margin:18px 0}.tools{display:grid;gap:8px}.tools a{border:1px solid var(--color-border);border-radius:9px;padding:11px 12px;display:flex;align-items:center;justify-content:space-between;background:var(--color-bg-card);gap:8px}.tools a:hover{border-color:var(--color-cta)}
+.composer{border-top:1px solid var(--color-border);padding:12px;display:flex;gap:8px}.composer input{min-width:0;flex:1;background:var(--color-bg);border-radius:7px;padding:10px;font-size:12px}.composer button{width:36px;border-radius:7px;background:var(--color-cta);color:#fff;font-size:22px;cursor:not-allowed;opacity:.4}
+@media(max-width:480px){.root{right:16px;bottom:calc(16px + var(--rook-cookie-height,0px))}.panel{position:fixed;inset:0;width:100%;max-width:none;height:100dvh;max-height:none;border:0;border-radius:0}.panel:not([hidden])~.launcher{display:none}.composer{padding-bottom:max(14px,env(safe-area-inset-bottom))}.header{padding-top:max(17px,env(safe-area-inset-top))}}
+
+/* Atributo hidden preserva a instância e retira a caixa da navegação/foco. */
+.panel[hidden],.providerHost[hidden]{display:none}
+.header{flex-shrink:0;position:relative;z-index:1}
+.providerHost{flex:1;min-height:0;overflow:hidden;position:relative}
+.loading{flex:1;display:grid;place-items:center;padding:24px;background:var(--color-bg);color:var(--color-text-muted)}
+/* O SDK standalone herda regras mobile do widget flutuante. Confinamos sua
+   caixa para que ela não cubra nosso cabeçalho e botão de fechar. */
+.providerHost :global(.asaflow-chat-root.asaflow-chat-standalone){position:relative;inset:auto;width:100%;height:100%;z-index:auto;align-items:stretch;font-family:inherit}
+.providerHost :global(.asaflow-chat-standalone .asaflow-chat-panel){position:relative;inset:auto;width:100%;height:100%;max-height:none;margin:0;border-radius:0;box-shadow:none}
+.providerHost :global(.asaflow-chat-header){display:none}
+@media(max-width:480px){.providerHost :global(.asaflow-chat-inputbar){padding-bottom:max(14px,env(safe-area-inset-bottom))}}
+
+.privacy{flex-shrink:0;padding:10px 16px;font-size:11px;line-height:1.45;color:var(--color-text-muted);background:var(--color-bg-card);border-bottom:1px solid var(--color-border)}.privacy a{text-decoration:underline;text-underline-offset:2px}
