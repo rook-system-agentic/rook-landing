@@ -1,0 +1,42 @@
+[
+  {
+    "name": "all visit fields",
+    "candidate": {"utm_source":"Facebook","utm_medium":"paid_social","utm_campaign":"Campanha de setembro","utm_term":"gestão de restaurantes","utm_content":"video-cmv","landing_path":"/diagnostico/","referrer_host":"WWW.FACEBOOK.COM"},
+    "normalized": {"version":1,"source":"site_form","utm_source":"Facebook","utm_medium":"paid_social","utm_campaign":"Campanha de setembro","utm_term":"gestão de restaurantes","utm_content":"video-cmv","landing_path":"/diagnostico","referrer_host":"www.facebook.com"}
+  },
+  {
+    "name": "absent optional campaign fields",
+    "candidate": {"landing_path":"/"},
+    "normalized": {"version":1,"source":"site_form","landing_path":"/"}
+  },
+  {
+    "name": "invalid supplied fields are explicit omissions",
+    "candidate": {"utm_source":null,"utm_campaign":"Campanha\nforjada","utm_term":"person@example.invalid","landing_path":"/diagnostico?private=value","referrer_host":"127.0.0.1"},
+    "normalized": {"version":1,"source":"site_form","omitted_fields":["utm_source","utm_campaign","utm_term","landing_path","referrer_host"]}
+  },
+  {
+    "name": "unknown fields never become attribution",
+    "candidate": {"version":99,"source":"meta_native","unrecognized":"discard","utm_content":" cmv-ação ","omitted_fields":["utm_source","utm_content","unrecognized"]},
+    "normalized": {"version":1,"source":"site_form","utm_content":"cmv-ação","omitted_fields":["utm_source"]}
+  },
+  {
+    "name": "common campaign naming punctuation",
+    "candidate": {"utm_campaign":"[ROOK] | Leads Setembro + Gestão (2026)"},
+    "normalized": {"version":1,"source":"site_form","utm_campaign":"[ROOK] | Leads Setembro + Gestão (2026)"}
+  },
+  {
+    "name": "campaign naming with day and month",
+    "candidate": {"utm_campaign":"[ES] - LEADS ROOK LP 21/09"},
+    "normalized": {"version":1,"source":"site_form","utm_campaign":"[ES] - LEADS ROOK LP 21/09"}
+  },
+  {
+    "name": "reject formatted phone and URL labels",
+    "candidate": {"utm_source":"+55 (11) 99999-9999","utm_medium":"/cadastro","utm_campaign":"www.example.com","utm_term":"example.com/path"},
+    "normalized": {"version":1,"source":"site_form","omitted_fields":["utm_source","utm_medium","utm_campaign","utm_term"]}
+  },
+  {
+    "name": "reject credential-shaped campaign labels",
+    "candidate": {"utm_source":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0In0.signature","utm_medium":"marketing-token"},
+    "normalized": {"version":1,"source":"site_form","omitted_fields":["utm_source","utm_medium"]}
+  }
+]
