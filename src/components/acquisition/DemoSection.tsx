@@ -1,27 +1,22 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { segmentsData } from '@/lib/cmv-benchmarks.mjs';
 import { ERP_SYSTEMS, REVENUE_BANDS, normalizePhone } from '@/lib/acquisition.mjs';
-import { calculateFinancialSimulation, type FinancialSuccess } from '@/lib/financial-simulation.mjs';
+import { DIAGNOSTIC_CONTEXT_EVENT, readDiagnosticContext, type DiagnosticContext } from '@/lib/diagnostic-context.mjs';
+import { createVisitAttributionCapture, type LeadAttribution } from '@/lib/lead-attribution.mjs';
+import { track, TRACKING_EVENTS } from '@/lib/track';
 import CityPicker from './CityPicker';
 import PreviewModeWatcher from './PreviewModeWatcher';
 import styles from './demo.module.css';
 
 type Profile = Record<string, string>;
 type Errors = Record<string, string>;
-type DiagnosticContext = {
-  intent: 'cmv' | 'breakeven';
-  answers: Record<string, string>;
-  result: FinancialSuccess | null;
-};
-
-const financialFields = [
-  'period', 'revenue', 'cmvPercent', 'fixedCosts',
-  'taxPercent', 'feesPercent', 'otherVariablePercent',
-];
 const fieldId = (key: string) => `demo-${key}`;
 const errorId = (key: string) => `demo-${key}-error`;
+// Compartilhado entre remontagens; não grava URL nem dados pessoais em storage.
+const captureVisitAttribution = createVisitAttributionCapture();
 
 function validateProfile(profile: Profile, consent: boolean): Errors {
   const errors: Errors = {};
@@ -41,6 +36,7 @@ function validateProfile(profile: Profile, consent: boolean): Errors {
 }
 
 export default function DemoSection() {
+  const pathname = usePathname();
   const [profile, setProfile] = useState<Profile>({});
   const [consent, setConsent] = useState(false);
   const [context, setContext] = useState<DiagnosticContext | null>(null);
@@ -54,42 +50,56 @@ export default function DemoSection() {
   const inFlight = useRef(false);
   const completed = useRef(false);
   const frozen = useRef<Record<string, unknown> | null>(null);
+  const attribution = useRef<LeadAttribution | null>(null);
+  const segmentEdited = useRef(false);
+  const pendingInvalidation = useRef({ navigation: false, sources: new Set<string>() });
   const receipt = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     setSubmissionId(crypto.randomUUID());
+    attribution.current = captureVisitAttribution({ href: window.location.href, referrer: document.referrer });
 
     function receiveContext(event: Event) {
-      if (inFlight.current || frozen.current || completed.current) return;
+      if (completed.current) return;
       const detail = (event as CustomEvent).detail;
-      if (!detail || !['cmv', 'breakeven'].includes(detail.intent)) return;
-      const answers: Record<string, string> = {};
-      for (const key of financialFields) {
-        if (typeof detail.answers?.[key] === 'string') answers[key] = detail.answers[key].slice(0, 40);
+      if (detail?.clear === true) {
+        if (inFlight.current || frozen.current) {
+          if (typeof detail.sourceId === 'string') pendingInvalidation.current.sources.add(detail.sourceId);
+          return;
+        }
+        setContext(previous => previous?.sourceId === detail.sourceId ? null : previous);
+        return;
       }
-      const calculated = detail.simulation ? calculateFinancialSimulation(detail.simulation) : null;
+      if (inFlight.current || frozen.current) return;
+      const next = readDiagnosticContext(detail);
+      if (!next) return;
       // O diagnóstico acrescenta contexto. Nunca substitui nome, contato ou
       // estabelecimento já preenchidos nesta experiência independente.
-      if (calculated?.ok && calculated.tool === 'cmv' && detail.intent === 'cmv') {
-        const segment = calculated.inputs.segment;
-        if (segment) {
-          setProfile(previous => previous.segment ? previous : { ...previous, segment });
+      if (next.intent === 'cmv') {
+        const segment = next.answers.segment;
+        if (segmentsData.some(item => item.slug === segment) || segment === 'other') {
+          setProfile(previous => segmentEdited.current ? previous : { ...previous, segment });
           setErrors(previous => { const next = { ...previous }; delete next.segment; return next; });
         }
       }
-      setContext({
-        intent: detail.intent,
-        answers,
-        result: calculated?.ok && calculated.tool === detail.intent ? calculated : null,
-      });
+      setContext(next);
     }
-    window.addEventListener('rook:diagnostic-context', receiveContext);
-    return () => window.removeEventListener('rook:diagnostic-context', receiveContext);
+    window.addEventListener(DIAGNOSTIC_CONTEXT_EVENT, receiveContext);
+    return () => window.removeEventListener(DIAGNOSTIC_CONTEXT_EVENT, receiveContext);
   }, []);
+
+  useEffect(() => {
+    // A navegação não leva o cenário de uma página para outra. Uma tentativa já
+    // iniciada mantém seu snapshot para que a repetição envie a mesma solicitação.
+    if (completed.current) return;
+    if (inFlight.current || frozen.current) pendingInvalidation.current.navigation = true;
+    else setContext(null);
+  }, [pathname]);
 
   useEffect(() => { if (sent) receipt.current?.focus(); }, [sent]);
 
   function change(key: string, value: string) {
+    if (key === 'segment') segmentEdited.current = true;
     setProfile(previous => {
       const next = { ...previous, [key]: value };
       if (key === 'segment' && value !== 'other') delete next.segmentOther;
@@ -161,6 +171,7 @@ export default function DemoSection() {
           consent,
           submissionId,
           simulation: context?.result?.inputs || null,
+          attribution: attribution.current,
         };
       }
       const response = await fetch('/api/acquisition/', {
@@ -185,6 +196,10 @@ export default function DemoSection() {
       completed.current = true;
       setReceiptPreview(false);
       setSent(true);
+      // A resposta do CRM foi confirmada. O evento não leva perfil, UTMs nem
+      // diagnóstico; track mantém o gate de ambiente e o Consent Mode/GTM
+      // existente continua responsável pelo consentimento publicitário.
+      track(TRACKING_EVENTS.lead);
     } catch (problem) {
       setMessage(problem instanceof Error && problem.name !== 'TimeoutError'
         ? problem.message
@@ -192,6 +207,13 @@ export default function DemoSection() {
     } finally {
       inFlight.current = false;
       setBusy(false);
+      // Se a tentativa falhou antes de congelar dados, ou a validação os
+      // liberou (422), aplique a edição/navegação ocorrida durante a espera.
+      if (!frozen.current && !completed.current) {
+        const pending = pendingInvalidation.current;
+        pendingInvalidation.current = { navigation: false, sources: new Set<string>() };
+        setContext(previous => pending.navigation || (previous && pending.sources.has(previous.sourceId)) ? null : previous);
+      }
     }
   }
 
@@ -238,7 +260,7 @@ export default function DemoSection() {
 
               {context && (
                 <div className={styles.context}>
-                  <div><strong>{context.intent === 'cmv' ? 'Seu diagnóstico de CMV' : 'Seu diagnóstico do ponto de equilíbrio'}</strong>
+                  <div><strong>{context.intent === 'cmv' ? 'Diagnóstico de CMV incluído' : 'Diagnóstico do ponto de equilíbrio incluído'}</strong>
                     <button type="button" onClick={removeDiagnostic} disabled={readonly} aria-label="Remover diagnóstico desta solicitação">Remover</button>
                   </div>
                   <p>{context.result?.summary || 'Os valores informados serão incluídos para a equipe continuar a análise com você.'}</p>

@@ -11,6 +11,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { siteUrl } from "@/lib/site-origin";
 import { OG_IMAGE, OG_IMAGE_PATH, TWITTER_CARD } from "@/lib/og-image";
 import { FAQ_ITEMS } from "@/lib/lp-content";
+import { COMPANY_INFO } from "@/lib/company";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
@@ -93,8 +94,28 @@ const jsonLd = {
       "description": "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, DRE gerencial automático, score de saúde financeira e recomendações com impacto em R$."
     },
     {
+        /*
+         * A identidade jurídica sai de `lib/company.ts`, a mesma fonte do
+         * rodapé, das páginas jurídicas e da /sobre. Estava faltando aqui: o
+         * nó trazia só nome, url e logo, enquanto razão social e CNPJ já
+         * existiam no repositório. Para quem vai ligar o produto ao banco,
+         * empresa identificável é sinal — e para o buscador, é o que liga
+         * este site à pessoa jurídica.
+         *
+         * `foundingDate` fica de fora até alguém confirmar a data do
+         * contrato social. Data de fundação inventada em dado estruturado é
+         * exatamente o tipo de número que este site não publica.
+         */
       "@type": "Organization",
       "name": "Rook System",
+      legalName: COMPANY_INFO.razaoSocial,
+      taxID: COMPANY_INFO.cnpj,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Brasília",
+        addressRegion: "DF",
+        addressCountry: "BR",
+      },
       "url": siteUrl(),
       "logo": siteUrl("/brand/rook-logo-horizontal-light.png")
     },
@@ -112,12 +133,28 @@ const jsonLd = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('rook-theme');if(t==='dark')document.documentElement.classList.add('dark')}catch(e){}})()`,
+          }}
+        />
+        {/*
+          * Variante do experimento de /planos (ROO-1207), lida do cookie que o
+          * middleware gravou, ANTES da pintura — pelo mesmo motivo do script do
+          * tema logo acima: o HTML traz os dois CTAs e o CSS de
+          * `[data-lp-only]` mostra um só; decidir depois da hidratação faria o
+          * botão trocar na frente do visitante. A regra do cookie mora em
+          * `lp-experiment.mjs`; aqui só se casa o valor exato — nas duas grafias,
+          * porque o Next grava o `:` do valor como `%3A` e o navegador devolve
+          * `document.cookie` sem decodificar.
+          */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(/(?:^|;\s*)rook_lp_exp=lp_asaflow_v1(?::|%3A)assisted(?:;|$)/.test(document.cookie))document.documentElement.setAttribute('data-lp-variant','assisted')}catch(e){}})()`,
           }}
         />
         <script

@@ -18,9 +18,9 @@ const lead = {
   company: 'Casa Teste', email: 'teste@example.invalid', phone: '11999999999',
   cityId: '3550308', segment: 'pizzaria', revenueBand: 'up_to_100k', usesErp: 'no', consent: true,
 };
-const request = token => new Request('http://localhost/api/acquisition/', {
+const request = (token, extra = {}) => new Request('http://localhost/api/acquisition/', {
   method: 'POST', headers: { 'content-type': 'application/json' },
-  body: JSON.stringify({ ...lead, antiBot: { token, solution: '0' } }),
+  body: JSON.stringify({ ...lead, ...extra, antiBot: { token, solution: '0' } }),
 });
 function loadRoute({ gate, create = async () => {} }) {
   const calls = { gate: [], clients: 0, crm: [], network: 0 };
@@ -60,6 +60,27 @@ function loadRoute({ gate, create = async () => {} }) {
   }, { filename: 'api/acquisition/route.cjs' });
   return { post: module.exports.POST, calls };
 }
+
+test('servidor transmite apenas atribuição normalizada e mantém sucesso com atribuição inválida', async () => {
+  for (const input of [
+    { source: 'meta_native_form', utm_source: 'facebookads', utm_campaign: '[ES] - LEADS ROOK LP 21/09',
+      landing_path: '/diagnostico/', referrer_host: 'WWW.FACEBOOK.COM', fbclid: 'private', email: 'não transportar' },
+    { utm_campaign: 'teste@example.invalid', landing_path: 'https://invalid.test/private' },
+    'malformado',
+  ]) {
+    const { post, calls } = loadRoute({ gate: async () => ({ allowed: true, reason: 'allowed', retryAfterSeconds: 0 }) });
+    const response = await post(request('fresh-proof', { attribution: input }));
+    assert.equal(response.status, 201);
+    assert.deepEqual(await response.json(), { success: true });
+    assert.equal(calls.crm.length, 1);
+    const saved = calls.crm[0].attribution;
+    assert.doesNotMatch(JSON.stringify(saved), /fbclid|private|example.invalid|não transportar|meta_native_form/);
+    if (typeof input === 'object' && input.utm_source) assert.deepEqual(saved, {
+      version: 1, source: 'site_form', utm_source: 'facebookads', utm_campaign: '[ES] - LEADS ROOK LP 21/09',
+      landing_path: '/diagnostico', referrer_host: 'www.facebook.com',
+    });
+  }
+});
 
 test('desafio já usado retorna 400 renovável, sem espera de rate limit nem CRM', async () => {
   const { post, calls } = loadRoute({ gate: async () => ({ allowed: false, reason: 'nonce_replayed', retryAfterSeconds: 0 }) });

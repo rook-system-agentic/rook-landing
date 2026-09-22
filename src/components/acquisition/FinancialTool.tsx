@@ -1,8 +1,9 @@
 'use client';
 
-import { FormEvent, useId, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { segmentsData } from '@/lib/cmv-benchmarks.mjs';
 import { buildSimulationInput } from '@/lib/acquisition.mjs';
+import { DIAGNOSTIC_CONTEXT_EVENT } from '@/lib/diagnostic-context.mjs';
 import {
   calculateFinancialSimulation,
   type FinancialResponse,
@@ -25,8 +26,9 @@ const percent = (value: number) => `${value.toLocaleString('pt-BR')}%`;
 
 /**
  * Ferramenta financeira independente da aquisição. Calcular não cadastra lead.
- * O contexto só chega ao formulário no clique explícito depois do resultado ou
- * de um cenário incompleto; as contas continuam no mesmo motor validado da API.
+ * O cenário concluído fica disponível no formulário desta página, mesmo sem
+ * clique no CTA. Editar ou sair da ferramenta retira o cenário anterior; os
+ * dados só são enviados quando a pessoa confirma o formulário com consentimento.
  */
 export default function FinancialTool({ tool, embedded = false }: { tool: FinancialToolKind; embedded?: boolean }) {
   const id = useId();
@@ -40,6 +42,24 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const errorSummary = useRef<HTMLParagraphElement>(null);
   const isCmv = tool === 'cmv';
   const ContentHeading = embedded ? 'h3' : 'h2';
+
+  const shareWithForm = useCallback(() => {
+    window.dispatchEvent(new CustomEvent(DIAGNOSTIC_CONTEXT_EVENT, {
+      detail: { sourceId: id, intent: tool, answers, unknown, simulation: result?.inputs || null },
+    }));
+  }, [id, tool, answers, unknown, result]);
+
+  useEffect(() => {
+    if (!result && !incomplete) return;
+    shareWithForm();
+    // O formulário vive no layout e permanece entre rotas. O contexto pertence
+    // à ferramenta que o produziu: edição, novo cálculo ou saída o invalidam.
+    return () => {
+      window.dispatchEvent(new CustomEvent(DIAGNOSTIC_CONTEXT_EVENT, {
+        detail: { sourceId: id, clear: true },
+      }));
+    };
+  }, [id, result, incomplete, shareWithForm]);
 
   const fields: NumericField[] = [
     {
@@ -134,12 +154,6 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     } finally {
       setBusy(false);
     }
-  }
-
-  function shareWithForm() {
-    window.dispatchEvent(new CustomEvent('rook:diagnostic-context', {
-      detail: { intent: tool, answers: scenarioAnswers(), simulation: result?.inputs || null },
-    }));
   }
 
   const breakEven = result?.result.breakEvenRevenue;

@@ -1,5 +1,6 @@
 import { segmentsData } from './cmv-benchmarks.mjs';
 import { parseBrazilianNumber, calculateFinancialSimulation } from './financial-simulation.mjs';
+import { normalizeLeadAttribution } from './lead-attribution.mjs';
 
 export const ERP_SYSTEMS = ['Saipos','Consumer','Colibri','Linx','Sischef','Teknisa','Omie','Conta Azul','Bling','Tiny'];
 export const REVENUE_BANDS = [
@@ -76,15 +77,14 @@ export function validateAcquisition(candidate,cities) {
       if(value!==null && value>=0 && value<=(field.endsWith('Percent')?100:1_000_000_000) && (field!=='revenue'||value>0)) known.push(`${labels[field]}: ${value}`);
       else missing.push(labels[field]);
     }
-    if(known.length){
-      diagnosticNotes.push('Diagnóstico interrompido ou incompleto: não foi emitido resultado financeiro.',
-        `Base: ${candidate.intent==='cmv'?'receita líquida':'receita bruta'}. Mês: ${/^\d{4}-(0[1-9]|1[0-2])$/.test(period)?period:'não informado'}.`,
-        `Dados informados: ${known.join('; ')}.`,
-        missing.length?`Dados ainda não informados: ${missing.join(', ')}.`:'Valores ainda precisam de confirmação e cálculo.');
-    }
+    diagnosticNotes.push('Diagnóstico interrompido ou incompleto: não foi emitido resultado financeiro.',
+      `Base: ${candidate.intent==='cmv'?'receita líquida':'receita bruta'}. Mês: ${/^\d{4}-(0[1-9]|1[0-2])$/.test(period)?period:'não informado'}.`,
+      `Dados informados: ${known.length ? known.join('; ') : 'nenhum valor financeiro informado'}.`,
+      missing.length?`Dados ainda não informados: ${missing.join(', ')}.`:'Valores ainda precisam de confirmação e cálculo.');
   }
   if(Object.keys(errors).length) return {ok:false,errors};
   return {ok:true,value:{submissionId,name,company,email,phone,city,segment,segmentOther:segment==='other'?segmentOther:null,
     revenueBand,usesErp:usesErp==='yes',erp:usesErp==='yes'?erp:null,erpOther:usesErp==='yes'&&erp==='other'?erpOther:null,
-    intent:['cmv','breakeven','demo'].includes(candidate.intent)?candidate.intent:'demo',consent:true,period:simulation?period:null,simulation,diagnosticNotes}};
+    intent:['cmv','breakeven','demo'].includes(candidate.intent)?candidate.intent:'demo',consent:true,period:simulation?period:null,simulation,diagnosticNotes,
+    attribution:normalizeLeadAttribution(candidate.attribution)}};
 }

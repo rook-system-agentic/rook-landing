@@ -1,0 +1,143 @@
+name: Deploy — Produção (k3s Hostinger)
+
+# POR QUE ESTE WORKFLOW EXISTE (LOCAL-1, 21/09/2026)
+#
+# A landing deixa a Vercel e passa a ser servida em https://www.rook.com.br pelo
+# mesmo k3s da Hostinger que já serve a homologação, no namespace
+# `rook-production`, ao lado das apps do rook-system. Este workflow é o ÚNICO
+# caminho de publicação lá e espelha o deploy-homolog.yml: build no runner
+# self-hosted da própria VPS, import no containerd, rollout com rollback e smoke
+# pelo ingress local. `vercel.json` desliga o deploy automático da Vercel na main.
+#
+# ⚠️ A IMAGEM EMBUTE OS NEXT_PUBLIC_* DE PRODUÇÃO no bundle do browser: URL
+# canônica www.rook.com.br, Supabase de produção (supabase.rook.com.br) e a anon
+# key pública. Não existe promoção de imagem entre homolog e produção; o que se
+# promove é código, pela branch `main`.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Nunca cancelar um deploy pela metade.
+  group: deploy-production-lp
+  cancel-in-progress: false
+
+env:
+  # Portão do corte: enquanto `false` (padrão) o CronJob de publicação agendada
+  # nasce suspenso e nada dispara a partir de dados copiados. No corte, o humano
+  # define a variável de repositório PROD_EXTERNAL_EFFECTS=true e reexecuta.
+  EXTERNAL_EFFECTS: ${{ vars.PROD_EXTERNAL_EFFECTS || 'false' }}
+  SITE_URL: https://www.rook.com.br
+  PUBLIC_SUPABASE_URL: https://supabase.rook.com.br
+
+jobs:
+  build:
+    name: Build da imagem
+    runs-on: [self-hosted, linux, x64, rook-vps]
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Exigir a anon key pública do Supabase de produção
+        env:
+          ANON: ${{ secrets.PROD_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$ANON" ]; then
+            echo "::error::PROD_SUPABASE_ANON_KEY é obrigatório (anon key do supabase-production; valor em /etc/rook-production/public.env na VPS)."
+            echo "::error::Configure com: gh secret set PROD_SUPABASE_ANON_KEY -R ${{ github.repository }}"
+            exit 1
+          fi
+
+      - name: Construir imagem
+        env:
+          ANON: ${{ secrets.PROD_SUPABASE_ANON_KEY }}
+        # SUPABASE_URL/SUPABASE_ANON_KEY de build geram as páginas do blog já
+        # publicadas; existem só no estágio de compilação (ver k8s/production/README.md).
+        run: |
+          set -euo pipefail
+          docker build \
+            -f k8s/production/Dockerfile \
+            --build-arg NEXT_PUBLIC_ENV=production \
+            --build-arg NEXT_PUBLIC_SITE_URL="$SITE_URL" \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL="$PUBLIC_SUPABASE_URL" \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON" \
+            --build-arg SUPABASE_URL="$PUBLIC_SUPABASE_URL" \
+            --build-arg SUPABASE_ANON_KEY="$ANON" \
+            -t "rook-lp:prod-${GITHUB_SHA}" \
+            .
+
+      - name: Importar no containerd do k3s
+        # O k3s não enxerga o daemon do docker. `rook-image-import` é o único
+        # comando que o gha-runner executa como root; lê o tar por stdin.
+        run: |
+          set -euo pipefail
+          docker save "rook-lp:prod-${GITHUB_SHA}" | sudo /usr/local/bin/rook-image-import
+          echo "importado: rook-lp:prod-${GITHUB_SHA}"
+
+  deploy:
+    name: Rollout no k3s
+    runs-on: [self-hosted, linux, x64, rook-vps]
+    timeout-minutes: 15
+    needs: [build]
+    env:
+      # Injetado só neste job, para um kubectl solto em outro workflow que caia
+      # neste runner não alcançar o cluster por acidente.
+      KUBECONFIG: /opt/actions-runner/.kube/config
+      NS: rook-production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reconciliar manifesto com a imagem do commit
+        run: |
+          set -euo pipefail
+          # Substituir ANTES do apply: aplicar :production e depois `set image`
+          # geraria dois rollouts e um ReplicaSet órfão.
+          sed -i "s|image: rook-lp:production|image: rook-lp:prod-${GITHUB_SHA}|" k8s/production/lp.yaml
+          grep -h 'image: rook-lp' k8s/production/lp.yaml
+          # Manifesto inteiro (Deployment, Service e Ingress), não só a imagem.
+          kubectl -n "$NS" apply -f k8s/production/lp.yaml
+
+      - name: Rollout com rollback em falha
+        run: |
+          set -euo pipefail
+          if ! kubectl -n "$NS" rollout status deploy/rook-lp --timeout=180s; then
+            echo "::error::Rollout falhou. Revertendo para a revisão anterior."
+            kubectl -n "$NS" rollout undo deploy/rook-lp || true
+            kubectl -n "$NS" rollout status deploy/rook-lp --timeout=120s || true
+            kubectl -n "$NS" describe deploy/rook-lp | tail -30
+            kubectl -n "$NS" logs -l app.kubernetes.io/name=rook-lp --tail=60 || true
+            exit 1
+          fi
+
+      - name: CronJob de publicação agendada
+        run: |
+          set -euo pipefail
+          if [ "$EXTERNAL_EFFECTS" = "true" ]; then
+            CRON_SUSPEND=false
+            sed -i 's/suspend: true/suspend: false/' k8s/production/cron/publish-scheduled.yaml
+          else
+            CRON_SUSPEND=true
+            echo "::warning::PROD_EXTERNAL_EFFECTS=false: cron-lp-publish-scheduled permanece suspenso"
+          fi
+          kubectl -n "$NS" apply -f k8s/production/cron/publish-scheduled.yaml
+          echo "  suspend=$CRON_SUSPEND"
+
+      # O runner está na própria VPS: `--resolve` para 127.0.0.1 atinge o
+      # ingress-nginx (hostNetwork) sem depender de DNS ou da Cloudflare, e por
+      # isso funciona antes e depois do corte.
+      - name: Smoke pelo ingress local
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 10); do
+            code=$(curl -sk -o /dev/null -w '%{http_code}' --max-time 30 --resolve www.rook.com.br:443:127.0.0.1 https://www.rook.com.br/ || echo 000)
+            echo "tentativa $i: HTTP $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 6
+          done
+          echo "::error::www.rook.com.br não respondeu 200 pelo ingress local após o rollout."
+          exit 1

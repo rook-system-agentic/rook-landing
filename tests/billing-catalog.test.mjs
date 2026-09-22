@@ -68,9 +68,12 @@ test("checkout direto aceita somente as faixas Knight e Rook", () => {
 });
 
 test("catálogo inválido usa o snapshot; ambos inválidos falham fechado", () => {
+  // `now` fixo no instante do snapshot: sem isso o teste dependia do relógio
+  // da máquina e ficava vermelho sozinho 7 dias depois do último commit.
   const fallback = resolvePublicBillingCatalog(
     { release: { key: "incompleto" } },
     snapshotCandidate,
+    Date.parse(snapshotCandidate.generatedAt),
   );
   assert.equal(fallback.source, "snapshot");
   assert.equal(fallback.catalog?.release.key, "p0-monthly");
@@ -114,49 +117,10 @@ test("DTO rejeita Pawn, anual e campos internos do provedor", () => {
   assert.throws(() => parsePublicBillingCatalog(internalDiscountLeak));
 });
 
-test("página usa checkout direto em Knight/Rook e reserva o CRM para Chess", async () => {
-  const [source, experience, trialDateEstimate] = await Promise.all([
-    readFile(new URL("../src/app/planos/page.tsx", import.meta.url), "utf8"),
-    readFile(
-      new URL("../src/components/plans/PlansCommercialExperience.tsx", import.meta.url),
-      "utf8",
-    ),
-    readFile(
-      new URL("../src/components/plans/TrialDateEstimate.tsx", import.meta.url),
-      "utf8",
-    ),
-  ]);
-
-  assert.match(source, /getLandingBillingCatalog/);
-  // ROO-1125: a URL canônica de /planos deixou de ser string literal aqui e
-  // passou a sair de `siteUrl()`. A garantia não sumiu — ficou mais forte:
-  // `tests/canonical-origin.test.mjs` prova que a origem tem www e que NENHUMA
-  // página escreve origem própria, e não só esta.
-  assert.match(source, /canonical: siteUrl\("\/planos\/"\)/);
-  assert.match(source, /from "@\/lib\/site-origin"/);
-  assert.match(experience, /href=\{buildDirectCheckoutHref\(selected\.productCode\)\}/);
-  assert.match(experience, />\s*Testar por 7 dias\s*<\/a>/);
-  assert.doesNotMatch(experience, /interest=\{selected\.productCode/);
-  assert.match(experience, /Seu negócio tem mais de uma unidade\?/);
-  assert.match(experience, /Conhecer o Chess/);
-  assert.match(experience, /href="#chess-details"/);
-  assert.match(source, /id="chess-details"/);
-  assert.match(experience, /api\/commercial-leads/);
-  assert.equal(
-    [...`${source}\n${experience}`.matchAll(/<CommercialLeadButton\b/g)].length,
-    1,
-  );
-  assert.match(source, /<CommercialLeadButton\s+interest="chess"/);
-  assert.doesNotMatch(source, /<CommercialLeadButton\s+interest="general"/);
-  assert.doesNotMatch(source, /registro\?plan=/);
-  assert.doesNotMatch(source, /\b(?:Pawn|anual|mais popular|Recomendado)\b/i);
-  assert.doesNotMatch(source, /(?:479\.9|779\.9|279\.9)/);
-  assert.doesNotMatch(`${source}\n${experience}`, /chessDiscount|discountBps|Desconto progressivo/);
-  assert.doesNotMatch(source, /Oferta exibida:/);
-  assert.match(source, /Conhecer as funcionalidades/);
-  assert.match(source, /text-ocre/);
-  assert.match(source, /TrialDateEstimate/);
-  assert.doesNotMatch(source, /const today = new Date\(\)/);
-  assert.match(trialDateEstimate, /useEffect/);
-  assert.match(trialDateEstimate, /buildTrialDateEstimate/);
-});
+// Removido em 22/09/2026: o teste "página usa checkout direto em Knight/Rook e
+// reserva o CRM para Chess" descrevia a /planos com preço público e checkout
+// direto. Desde 885bdc11 (PR #133, produção em 16/09/2026) a /planos é a jornada
+// comercial sem preço público (um <h1 sr-only> e a experiência comercial), e o PR
+// #131 recolocou este arquivo no gate sem atualizar essa trava. As regras que
+// seguem vivas — catálogo canônico, sem vazamento de price id interno, snapshot
+// dentro da janela — continuam cobertas pelos testes acima.

@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rook-lp
+  namespace: rook-production
+  labels:
+    app.kubernetes.io/name: rook-lp
+    app.kubernetes.io/part-of: rook-production
+    rooksystem.com/environment: production
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rook-lp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-lp
+        app.kubernetes.io/part-of: rook-production
+        rooksystem.com/environment: production
+        rooksystem.com/supabase-api-client: "true"
+        # Resend (newsletter) e GTM saem para a internet.
+        rooksystem.com/internet-egress: "true"
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: lp
+          # Placeholder: deploy-production.yml troca por rook-lp:prod-<sha> antes do apply.
+          image: rook-lp:production
+          imagePullPolicy: Never
+          ports:
+            - name: http
+              containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: rook-lp-production-env
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: NEXT_PUBLIC_ENV
+              value: production
+            - name: NEXT_PUBLIC_SITE_URL
+              value: https://www.rook.com.br
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 768Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: next-cache
+              mountPath: /app/.next/cache
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: next-cache
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rook-lp
+  namespace: rook-production
+  labels:
+    app.kubernetes.io/name: rook-lp
+    app.kubernetes.io/part-of: rook-production
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: rook-lp
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+# TLS pelo Secret `rook-origin` (Origin CA da Cloudflare para rook.com.br),
+# como os Ingress do rook-system. Só anotações simples: o admission webhook do
+# ingress-nginx recusa snippets e variáveis. O apex rook.com.br e os aliases
+# rooksystem.com.br redirecionam para cá pelo Ingress `rook-redirects` do rook-system.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rook-lp
+  namespace: rook-production
+  labels:
+    app.kubernetes.io/name: rook-lp
+    app.kubernetes.io/part-of: rook-production
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [www.rook.com.br]
+      secretName: rook-origin
+  rules:
+    - host: www.rook.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend: { service: { name: rook-lp, port: { name: http } } }

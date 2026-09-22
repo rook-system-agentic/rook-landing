@@ -1,0 +1,10 @@
+export type AttributionField = 'utm_source' | 'utm_medium' | 'utm_campaign' | 'utm_term' | 'utm_content' | 'landing_path' | 'referrer_host';
+export type LeadAttribution = Readonly<{ version: 1; source: 'site_form'; omitted_fields?: readonly AttributionField[] } & Partial<Record<AttributionField, string>>>;
+export const ATTRIBUTION_PREFIX: string;
+export const ATTRIBUTION_MAX_LENGTH: number;
+export const LEAD_DESCRIPTION_MAX_LENGTH: number;
+export const ATTRIBUTION_FIELDS: readonly AttributionField[];
+export function normalizeLeadAttribution(candidate: unknown): LeadAttribution | null;
+export function captureLeadAttribution(input?: { href?: unknown; referrer?: unknown }): LeadAttribution | null;
+export function createVisitAttributionCapture(): (input?: { href?: unknown; referrer?: unknown }) => LeadAttribution | null;
+export function appendLeadAttribution(description: string, candidate: unknown): string;
