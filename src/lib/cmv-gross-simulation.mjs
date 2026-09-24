@@ -1,5 +1,6 @@
 import { segmentoPorSlug, BENCHMARK_FONTE } from './cmv-benchmarks.mjs';
 import { estimateCmvRevenue, CMV_TAX_MODEL_VERSION, TAX_STATES } from './cmv-tax-estimate.mjs';
+import { validateFinancialReference, financialReferenceAssumptions } from './financial-reference.mjs';
 
 export const CMV_GROSS_FORMULA_VERSION = 'rook-cmv-gross-1';
 const money = value => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -8,6 +9,8 @@ const percent = (value, maximumFractionDigits = 2) => `${value.toLocaleString('p
 
 /** Inputs stay in the visitor's original basis, so revalidation never deducts tax twice. */
 export function calculateGrossCmv(candidate) {
+  const reference = validateFinancialReference(candidate, { required: false });
+  if (!reference.ok) return reference;
   const errors = {};
   if (typeof candidate.revenue !== 'number' || !Number.isFinite(candidate.revenue)
     || money(candidate.revenue) <= 0 || candidate.revenue > 1_000_000_000) {
@@ -32,6 +35,7 @@ export function calculateGrossCmv(candidate) {
     tool: 'cmv', revenueBasis: 'gross', revenue: money(candidate.revenue),
     cmvInputMode: candidate.cmvInputMode, [field]: money(candidate[field]),
     segment: candidate.segment, taxState: candidate.taxState, taxModelVersion: CMV_TAX_MODEL_VERSION,
+    ...reference.value,
   };
   // Tax, net revenue and all result fields are derived here, never trusted from the client.
   const estimate = estimateCmvRevenue(inputs.revenue, inputs.taxState);
@@ -42,6 +46,7 @@ export function calculateGrossCmv(candidate) {
   const assumptions = [
     'Cenário mensal estimado. Não comprova lucro contábil, economia realizada ou imposto efetivamente devido.',
     ...estimate.assumptions,
+    ...financialReferenceAssumptions(inputs),
     `Conta: ${currency(inputs.revenue)} de faturamento bruto − ${currency(estimate.taxAmount)} de impostos estimados (${percent(estimate.taxPercent, 3)}) = ${currency(estimate.netRevenue)} de receita líquida estimada.`,
     inputs.cmvInputMode === 'amount'
       ? `CMV informado: ${currency(cmvAmount)} de ingredientes consumidos. Compras isoladas não medem consumo de estoque.`

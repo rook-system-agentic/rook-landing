@@ -1,5 +1,6 @@
 import { segmentoPorSlug, BENCHMARK_FONTE } from './cmv-benchmarks.mjs';
 import { calculateGrossCmv } from './cmv-gross-simulation.mjs';
+import { validateFinancialReference, financialReferenceAssumptions } from './financial-reference.mjs';
 
 export const FORMULA_VERSION = 'rook-consultivo-1';
 const money = value => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -27,8 +28,10 @@ export function calculateFinancialSimulation(candidate) {
   }
   // Explicit gross scenarios use the versioned estimate. Legacy net and PE are unchanged.
   if (candidate.tool === 'cmv' && candidate.revenueBasis === 'gross') return calculateGrossCmv(candidate);
+  const reference = validateFinancialReference(candidate, { required: false });
+  if (!reference.ok) return reference;
   const errors = {};
-  const inputs = { tool: candidate.tool, revenueBasis: candidate.revenueBasis };
+  const inputs = { tool: candidate.tool, revenueBasis: candidate.revenueBasis, ...reference.value };
   if (!['cmv', 'breakeven'].includes(candidate.tool)) errors.tool = 'Escolha uma ferramenta.';
   const fields = candidate.tool === 'breakeven'
     ? ['revenue', 'cmvPercent', 'fixedCosts', 'taxPercent', 'feesPercent', 'otherVariablePercent']
@@ -50,7 +53,7 @@ export function calculateFinancialSimulation(candidate) {
     } else inputs.segment = candidate.segment;
   }
   if (Object.keys(errors).length) return { ok: false, errors };
-  const assumptions = ['Cenário mensal baseado nos valores informados. Não comprova lucro contábil, economia realizada ou fluxo de caixa.'];
+  const assumptions = ['Cenário mensal baseado nos valores informados. Não comprova lucro contábil, economia realizada ou fluxo de caixa.', ...financialReferenceAssumptions(inputs)];
   if (inputs.tool === 'cmv') {
     const segment = segmentoPorSlug(inputs.segment);
     assumptions.push('Receita e CMV usam a mesma base líquida; não há conversão automática de bases.');

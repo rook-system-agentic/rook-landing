@@ -2,7 +2,10 @@
 
 ## Experiência aprovada
 
-O visitante informa quanto vendeu no mês, sem precisar calcular receita líquida.
+O visitante informa quanto vendeu no último mês ou sua média mensal de vendas
+dos últimos 12 meses, sem precisar calcular receita líquida nem informar data.
+Receita e custos precisam representar a mesma janela. Uma média já informada
+em valores mensais não é dividida por 12 novamente.
 O resultado explicita a sequência:
 
 1. Faturamento bruto informado.
@@ -23,7 +26,9 @@ Origem: `rook-system/apps/web/src/lib/tax-calculator.ts`, commit
 - Snapshot gerado do TypeScript por remoção de tipos, sem reescrever fórmulas.
 - Versão do motor: 2.2.0. Parâmetros da origem: 2025, vigência 01/01/2025.
 - Versão desta premissa pública: `rook-cmv-tax-2026-09-24`.
-- O mês multiplicado por 12 representa um cenário anual, não o histórico fiscal.
+- O faturamento mensal informado, seja do último mês ou uma média mensal,
+  multiplicado por 12 representa um cenário anual. Isso não comprova o histórico
+  fiscal, o RBT12 real nem a média dos impostos efetivamente pagos.
 - O enquadramento é inferido pelo motor, com UF e hipótese de regime especial
   de ICMS onde aplicável. Não comprova o regime ou benefício real da empresa.
 - A dedução usa `taxOnRevenue`: no Presumido, IRPJ/CSLL não reduzem esta receita
@@ -64,6 +69,13 @@ de economia ou lucro.
 e resultado sempre são recalculados no servidor; valores derivados recebidos
 do navegador não são confiados.
 
+A referência é `referenceBasis=last_month` ou
+`referenceBasis=monthly_average_12m`. O mês `period=YYYY-MM` continua aceito
+somente quando já informado, como alternativa legada; nunca use os dois campos
+nem converta uma referência relativa em data. Na média mensal, os percentuais
+representam custo total dividido pela receita total dos mesmos 12 meses,
+não a média simples dos percentuais mensais.
+
 O cenário incluído no formulário leva inputs, resultado e premissas ao cadastro
 e à descrição do negócio no CRM. O card interno é construído do mesmo cálculo.
 Cenários incompletos preservam dados disponíveis, modo do CMV e metadados
@@ -71,9 +83,18 @@ validados da estimativa, sem emitir resultados. Alterar valores, modo ou UF
 remove o cenário anterior do formulário até um novo cálculo.
 
 O contrato líquido legado `rook-consultivo-1` e o ponto de equilíbrio continuam
-compatíveis. A ferramenta HTTP do chatbot ainda usa seu contrato líquido
-atual; atualizar o agente AsaFlow e seu contrato é uma etapa separada. Esta
-mudança não altera configuração de chat, credenciais ou infraestrutura.
+compatíveis. As ferramentas HTTP já aceitam a referência sem mês e
+`analisar_cmv` aceita o contrato bruto, mantendo a entrada líquida explicitamente
+confirmada sem descontar impostos novamente. Antes de calcular, o adaptador
+exige confirmação de receita e sua base, modo/base do CMV, custos na mesma
+janela, referência e UF usada na estimativa.
+
+**Integração com o chat:** na configuração inspecionada em 24/09/2026, o agente
+nativo do AsaFlow não chama esses endpoints HTTP. O contrato no repositório
+não comprova execução determinística pela IA, publicação ou retorno do cálculo
+à conversa. A conexão e sua validação ponta a ponta continuam sendo uma etapa
+separada. Consulte a orientação atual em
+[Ferramentas financeiras do Rook AI](./rook-ai-financial-tools.md).
 
 ## Verificação
 

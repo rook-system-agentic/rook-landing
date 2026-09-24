@@ -3,6 +3,8 @@ export interface FinancialInput {
   tool: FinancialTool;
   revenueBasis: 'net' | 'gross';
   revenue: number;
+  referenceBasis?: 'last_month' | 'monthly_average_12m';
+  period?: string;
   cmvPercent?: number;
   cmvAmount?: number;
   cmvInputMode?: 'amount' | 'gross_percent' | 'net_percent';

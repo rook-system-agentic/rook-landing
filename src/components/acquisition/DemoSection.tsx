@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { segmentsData } from '@/lib/cmv-benchmarks.mjs';
 import { ERP_SYSTEMS, REVENUE_BANDS, normalizePhone } from '@/lib/acquisition.mjs';
 import { DIAGNOSTIC_CONTEXT_EVENT, readDiagnosticContext, type DiagnosticContext } from '@/lib/diagnostic-context.mjs';
+import { financialReferenceLabel } from '@/lib/financial-reference.mjs';
 import { createVisitAttributionCapture, type LeadAttribution } from '@/lib/lead-attribution.mjs';
 import { track, TRACKING_EVENTS } from '@/lib/track';
 import CityPicker from './CityPicker';
@@ -132,6 +133,7 @@ export default function DemoSection() {
       const next = { ...previous };
       delete next.simulation;
       delete next.period;
+      delete next.referenceBasis;
       return next;
     });
   }
@@ -265,7 +267,7 @@ export default function DemoSection() {
                   </div>
                   <p>{context.result?.summary || 'Os valores informados serão incluídos para a equipe continuar a análise com você.'}</p>
                   {context.result?.tool === 'cmv' && <small>Segmento usado no cálculo: {segmentsData.find(segment => segment.slug === context.result?.inputs.segment)?.name || 'Outro segmento'}</small>}
-                  {context.answers.period && <small>Mês informado: {context.answers.period.split('-').reverse().join('/')}</small>}
+                  <small>Referência informada: {financialReferenceLabel(context.answers)}</small>
                 </div>
               )}
 

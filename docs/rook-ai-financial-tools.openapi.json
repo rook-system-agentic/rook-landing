@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Rook AI — ferramentas financeiras",
-    "version": "1.0.0",
-    "description": "Contrato local para integração com uma IA conversacional. Este arquivo não comprova publicação nem conexão ao AsaFlow. A IA conduz a conversa; as rotas validam o cenário e calculam. Campos confirmed não provam, sozinhos, uma confirmação real: a plataforma de conversa deve vinculá-los à mensagem do visitante. A qualificação e o cadastro de lead são fluxos separados."
+    "version": "1.1.0",
+    "description": "Contrato local para integração com uma IA conversacional. Este arquivo não comprova publicação nem conexão ao AsaFlow. A IA conduz a conversa; as rotas validam o cenário e calculam. Campos confirmed não provam, sozinhos, uma confirmação real: a plataforma de conversa deve vinculá-los à mensagem do visitante. A qualificação e o cadastro de lead são fluxos separados. CMV usa preferencialmente faturamento bruto e impostos estimados pelo modelo Rook versionado. Use last_month ou monthly_average_12m sem solicitar data; period segue aceito somente se já informado. Não misture custos e receita de janelas diferentes nem transforme referência relativa em mês calendário. Na configuração inspecionada em 24/09/2026, o agente nativo do AsaFlow não chama estas ferramentas HTTP; a conexão e o retorno do cálculo à mesma conversa ainda precisam ser implementados e comprovados."
   },
   "servers": [
     {
@@ -15,8 +15,8 @@
     "/api/ai/tools/analisar-cmv/": {
       "post": {
         "operationId": "analisar_cmv",
-        "summary": "Compara o CMV já apurado com a referência indicativa do segmento. Não calcula consumo de estoque e não cadastra contato.",
-        "description": "Cálculo puro, sem CRM, armazenamento, dados privados ou chamada a LLM. Máximo de 4.096 bytes em JSON UTF-8. Retorne o JSON da resposta ao contexto da mesma conversa de IA. Dados podem vir em qualquer ordem. Nunca complete campos financeiros desconhecidos com zero. Confirme o cenário antes de confirmed=true; toda correção invalida a confirmação anterior.",
+        "summary": "Peça faturamento bruto e CMV em reais ou percentual com base confirmada. Estima impostos pelo modelo Rook e compara o CMV sobre receita líquida estimada. Prefira último mês ou média mensal dos últimos 12 meses, sem pedir data. Receita líquida informada permanece aceita no contrato legado. Não cadastra contato.",
+        "description": "Cálculo puro, sem CRM, armazenamento, dados privados ou chamada a LLM. Máximo de 4.096 bytes em JSON UTF-8. Retorne o JSON da resposta ao contexto da mesma conversa de IA. Dados podem vir em qualquer ordem. Nunca complete campos financeiros desconhecidos com zero. Confirme o cenário antes de confirmed=true; toda correção invalida a confirmação anterior. A referência deve ser confirmada como último mês ou média mensal dos últimos 12 meses; não inferir data. Na média, receita e custos são médias mensais da mesma janela e percentuais são razões entre totais. No CMV bruto, confirme receita, modo/base do CMV, UF e uso de impostos estimados antes de calcular. taxModelVersion é preenchido pela integração, não solicitado ao visitante.",
         "security": [],
         "requestBody": {
           "required": true,
@@ -24,6 +24,65 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/analisar_cmv_request"
+              },
+              "examples": {
+                "lastMonthConfirmation": {
+                  "summary": "Confirmar faturamento e consumo do último mês, sem pedir data.",
+                  "value": {
+                    "currency": "BRL",
+                    "revenueBasis": "gross",
+                    "revenue": 100000,
+                    "segment": "a_la_carte",
+                    "taxState": "SP",
+                    "taxModelVersion": "rook-cmv-tax-2026-09-24",
+                    "referenceBasis": "last_month",
+                    "cmvInputMode": "amount",
+                    "cmvAmount": 35000,
+                    "confirmed": false
+                  }
+                },
+                "monthlyAverageConfirmed": {
+                  "summary": "Médias mensais já confirmadas; percentual é consumo total / faturamento total dos mesmos 12 meses.",
+                  "value": {
+                    "currency": "BRL",
+                    "revenueBasis": "gross",
+                    "revenue": 100000,
+                    "segment": "a_la_carte",
+                    "taxState": "SP",
+                    "taxModelVersion": "rook-cmv-tax-2026-09-24",
+                    "referenceBasis": "monthly_average_12m",
+                    "cmvInputMode": "gross_percent",
+                    "cmvPercent": 35,
+                    "confirmed": true
+                  }
+                },
+                "estimatedNetPercent": {
+                  "summary": "Percentual explicitamente confirmado sobre a receita líquida estimada.",
+                  "value": {
+                    "currency": "BRL",
+                    "revenueBasis": "gross",
+                    "revenue": 100000,
+                    "segment": "a_la_carte",
+                    "taxState": "SP",
+                    "taxModelVersion": "rook-cmv-tax-2026-09-24",
+                    "referenceBasis": "last_month",
+                    "cmvInputMode": "net_percent",
+                    "cmvPercent": 35,
+                    "confirmed": true
+                  }
+                },
+                "legacyNetConfirmed": {
+                  "summary": "Compatibilidade com receita líquida e mês já informados; sem estimar imposto novamente.",
+                  "value": {
+                    "period": "2026-08",
+                    "currency": "BRL",
+                    "revenueBasis": "net",
+                    "revenue": 100000,
+                    "cmvPercent": 35,
+                    "segment": "a_la_carte",
+                    "confirmed": true
+                  }
+                }
               }
             }
           }
@@ -140,8 +199,8 @@
     "/api/ai/tools/estimar-ponto-equilibrio/": {
       "post": {
         "operationId": "estimar_ponto_equilibrio",
-        "summary": "Estima o ponto de equilíbrio mensal usando custos fixos e percentuais variáveis separados. Não cadastra contato.",
-        "description": "Cálculo puro, sem CRM, armazenamento, dados privados ou chamada a LLM. Máximo de 4.096 bytes em JSON UTF-8. Retorne o JSON da resposta ao contexto da mesma conversa de IA. Dados podem vir em qualquer ordem. Nunca complete campos financeiros desconhecidos com zero. Confirme o cenário antes de confirmed=true; toda correção invalida a confirmação anterior.",
+        "summary": "Estima o ponto de equilíbrio mensal usando custos fixos e percentuais variáveis separados. Prefira último mês ou média mensal dos últimos 12 meses, sem pedir data; receita e custos precisam da mesma janela. Não cadastra contato.",
+        "description": "Cálculo puro, sem CRM, armazenamento, dados privados ou chamada a LLM. Máximo de 4.096 bytes em JSON UTF-8. Retorne o JSON da resposta ao contexto da mesma conversa de IA. Dados podem vir em qualquer ordem. Nunca complete campos financeiros desconhecidos com zero. Confirme o cenário antes de confirmed=true; toda correção invalida a confirmação anterior. A referência deve ser confirmada como último mês ou média mensal dos últimos 12 meses; não inferir data. Na média, receita e custos são médias mensais da mesma janela e percentuais são razões entre totais. No CMV bruto, confirme receita, modo/base do CMV, UF e uso de impostos estimados antes de calcular. taxModelVersion é preenchido pela integração, não solicitado ao visitante.",
         "security": [],
         "requestBody": {
           "required": true,
@@ -149,6 +208,38 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/estimar_ponto_equilibrio_request"
+              },
+              "examples": {
+                "lastMonthConfirmed": {
+                  "summary": "Último mês informado, mantendo custos e receita na mesma janela.",
+                  "value": {
+                    "referenceBasis": "last_month",
+                    "currency": "BRL",
+                    "revenueBasis": "gross",
+                    "revenue": 150000,
+                    "cmvPercent": 35,
+                    "fixedCosts": 60000,
+                    "taxPercent": 8,
+                    "feesPercent": 2,
+                    "otherVariablePercent": 5,
+                    "confirmed": true
+                  }
+                },
+                "monthlyAverageConfirmation": {
+                  "summary": "Cenário mensal médio para confirmar antes do cálculo.",
+                  "value": {
+                    "referenceBasis": "monthly_average_12m",
+                    "currency": "BRL",
+                    "revenueBasis": "gross",
+                    "revenue": 150000,
+                    "cmvPercent": 35,
+                    "fixedCosts": 60000,
+                    "taxPercent": 8,
+                    "feesPercent": 2,
+                    "otherVariablePercent": 5,
+                    "confirmed": false
+                  }
+                }
               }
             }
           }
@@ -393,12 +484,20 @@
       "analisar_cmv_confirmed": {
         "type": "object",
         "properties": {
+          "referenceBasis": {
+            "type": "string",
+            "enum": [
+              "last_month",
+              "monthly_average_12m"
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+          },
           "period": {
             "type": "string",
             "minLength": 7,
             "maxLength": 7,
             "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
-            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+            "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
           },
           "currency": {
             "type": "string",
@@ -409,23 +508,79 @@
             "type": "number",
             "minimum": 0.01,
             "maximum": 1000000000,
-            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+            "description": "Faturamento mensal na base indicada, do último mês ou média mensal dos mesmos 12 meses dos custos."
           },
           "cmvPercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+            "description": "CMV já apurado, com base explicitamente confirmada. Não inferir consumo a partir das compras. Na média mensal, use custo total / receita total da janela, não a média simples dos percentuais."
           },
           "confirmed": {
             "type": "boolean",
             "const": true,
-            "description": "True somente após o visitante confirmar este cenário. Uma correção exige nova confirmação."
+            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação."
           },
           "revenueBasis": {
             "type": "string",
-            "const": "net",
-            "description": "Receita líquida e CMV sobre essa mesma base, explicitamente confirmados."
+            "enum": [
+              "gross",
+              "net"
+            ],
+            "description": "Prefira gross: faturamento antes de impostos. net é somente para receita líquida informada e explicitamente confirmada com CMV sobre ela; não deduzir impostos novamente."
+          },
+          "cmvInputMode": {
+            "type": "string",
+            "enum": [
+              "amount",
+              "gross_percent",
+              "net_percent"
+            ],
+            "description": "No cenário bruto, amount = ingredientes consumidos em reais; gross_percent = percentual do faturamento bruto; net_percent = percentual da receita líquida estimada. Confirme a base; nunca suponha que compras são consumo."
+          },
+          "cmvAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000000,
+            "description": "Custo dos ingredientes efetivamente consumidos, em reais, no mesmo último mês ou como média mensal da mesma janela de 12 meses da receita. Não equivale às compras isoladas."
+          },
+          "taxState": {
+            "type": "string",
+            "enum": [
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MT",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ],
+            "description": "UF explicitamente confirmada para a estimativa de impostos. Não presumir SP ou o regime tributário real do visitante."
+          },
+          "taxModelVersion": {
+            "type": "string",
+            "const": "rook-cmv-tax-2026-09-24",
+            "description": "Versão das premissas internas usadas pelo motor, preenchida pela integração. Não perguntar este código ao visitante; informar que os impostos são estimados."
           },
           "segment": {
             "type": "string",
@@ -447,19 +602,172 @@
           }
         },
         "required": [
-          "period",
           "currency",
           "revenue",
-          "cmvPercent",
-          "confirmed",
           "revenueBasis",
+          "confirmed",
           "segment"
+        ],
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "required": [
+                  "referenceBasis"
+                ],
+                "not": {
+                  "required": [
+                    "period"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "period"
+                ],
+                "not": {
+                  "required": [
+                    "referenceBasis"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "revenueBasis": {
+                    "const": "net"
+                  }
+                },
+                "required": [
+                  "cmvPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "cmvInputMode"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "cmvAmount"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "taxState"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "taxModelVersion"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "revenueBasis": {
+                    "const": "gross"
+                  },
+                  "cmvInputMode": {
+                    "const": "amount"
+                  }
+                },
+                "required": [
+                  "cmvInputMode",
+                  "taxState",
+                  "taxModelVersion",
+                  "cmvAmount"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "cmvPercent"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "revenueBasis": {
+                    "const": "gross"
+                  },
+                  "cmvInputMode": {
+                    "const": "gross_percent"
+                  }
+                },
+                "required": [
+                  "cmvInputMode",
+                  "taxState",
+                  "taxModelVersion",
+                  "cmvPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "cmvAmount"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "revenueBasis": {
+                    "const": "gross"
+                  },
+                  "cmvInputMode": {
+                    "const": "net_percent"
+                  }
+                },
+                "required": [
+                  "cmvInputMode",
+                  "taxState",
+                  "taxModelVersion",
+                  "cmvPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "cmvAmount"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         ],
         "additionalProperties": false
       },
       "analisar_cmv_request": {
         "type": "object",
         "properties": {
+          "referenceBasis": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "last_month",
+                  "monthly_average_12m"
+                ],
+                "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+          },
           "period": {
             "anyOf": [
               {
@@ -467,13 +775,13 @@
                 "minLength": 7,
                 "maxLength": 7,
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
-                "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+                "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+            "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
           },
           "currency": {
             "anyOf": [
@@ -494,13 +802,13 @@
                 "type": "number",
                 "minimum": 0.01,
                 "maximum": 1000000000,
-                "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+                "description": "Faturamento mensal na base indicada, do último mês ou média mensal dos mesmos 12 meses dos custos."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+            "description": "Faturamento mensal na base indicada, do último mês ou média mensal dos mesmos 12 meses dos custos."
           },
           "cmvPercent": {
             "anyOf": [
@@ -508,33 +816,121 @@
                 "type": "number",
                 "minimum": 0,
                 "maximum": 100,
-                "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+                "description": "CMV já apurado, com base explicitamente confirmada. Não inferir consumo a partir das compras. Na média mensal, use custo total / receita total da janela, não a média simples dos percentuais."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+            "description": "CMV já apurado, com base explicitamente confirmada. Não inferir consumo a partir das compras. Na média mensal, use custo total / receita total da janela, não a média simples dos percentuais."
           },
           "confirmed": {
             "type": [
               "boolean",
               "null"
             ],
-            "description": "True somente após confirmação do visitante. False, null ou ausência pedem confirmação; uma correção exige nova confirmação."
+            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação. False, null ou ausência pedem confirmação."
           },
           "revenueBasis": {
             "anyOf": [
               {
                 "type": "string",
-                "const": "net",
-                "description": "Receita líquida e CMV sobre essa mesma base, explicitamente confirmados."
+                "enum": [
+                  "gross",
+                  "net"
+                ],
+                "description": "Prefira gross: faturamento antes de impostos. net é somente para receita líquida informada e explicitamente confirmada com CMV sobre ela; não deduzir impostos novamente."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Receita líquida e CMV sobre essa mesma base, explicitamente confirmados."
+            "description": "Prefira gross: faturamento antes de impostos. net é somente para receita líquida informada e explicitamente confirmada com CMV sobre ela; não deduzir impostos novamente."
+          },
+          "cmvInputMode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "amount",
+                  "gross_percent",
+                  "net_percent"
+                ],
+                "description": "No cenário bruto, amount = ingredientes consumidos em reais; gross_percent = percentual do faturamento bruto; net_percent = percentual da receita líquida estimada. Confirme a base; nunca suponha que compras são consumo."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "No cenário bruto, amount = ingredientes consumidos em reais; gross_percent = percentual do faturamento bruto; net_percent = percentual da receita líquida estimada. Confirme a base; nunca suponha que compras são consumo."
+          },
+          "cmvAmount": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000,
+                "description": "Custo dos ingredientes efetivamente consumidos, em reais, no mesmo último mês ou como média mensal da mesma janela de 12 meses da receita. Não equivale às compras isoladas."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custo dos ingredientes efetivamente consumidos, em reais, no mesmo último mês ou como média mensal da mesma janela de 12 meses da receita. Não equivale às compras isoladas."
+          },
+          "taxState": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "AC",
+                  "AL",
+                  "AP",
+                  "AM",
+                  "BA",
+                  "CE",
+                  "DF",
+                  "ES",
+                  "GO",
+                  "MA",
+                  "MT",
+                  "MS",
+                  "MG",
+                  "PA",
+                  "PB",
+                  "PR",
+                  "PE",
+                  "PI",
+                  "RJ",
+                  "RN",
+                  "RS",
+                  "RO",
+                  "RR",
+                  "SC",
+                  "SP",
+                  "SE",
+                  "TO"
+                ],
+                "description": "UF explicitamente confirmada para a estimativa de impostos. Não presumir SP ou o regime tributário real do visitante."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "UF explicitamente confirmada para a estimativa de impostos. Não presumir SP ou o regime tributário real do visitante."
+          },
+          "taxModelVersion": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "rook-cmv-tax-2026-09-24",
+                "description": "Versão das premissas internas usadas pelo motor, preenchida pela integração. Não perguntar este código ao visitante; informar que os impostos são estimados."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Versão das premissas internas usadas pelo motor, preenchida pela integração. Não perguntar este código ao visitante; informar que os impostos são estimados."
           },
           "segment": {
             "anyOf": [
@@ -564,7 +960,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use também o descritor *_confirmed. Não envie nomes, contato, mensagens, resultados prévios ou outros campos."
+        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use também o descritor *_confirmed. Não envie nomes, contato, mensagens, resultados prévios ou outros campos. Campos exigidos dependem da base e do modo de CMV. Use uma única referência. A validação da rota rejeita bases, referências e campos de CMV contraditórios."
       },
       "analisar_cmv_inputs": {
         "type": "object",
@@ -573,22 +969,86 @@
             "type": "string",
             "const": "cmv"
           },
+          "referenceBasis": {
+            "type": "string",
+            "enum": [
+              "last_month",
+              "monthly_average_12m"
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+          },
           "revenue": {
             "type": "number",
             "minimum": 0.01,
             "maximum": 1000000000,
-            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+            "description": "Faturamento mensal na base indicada, do último mês ou média mensal dos mesmos 12 meses dos custos."
           },
           "cmvPercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+            "description": "CMV já apurado, com base explicitamente confirmada. Não inferir consumo a partir das compras. Na média mensal, use custo total / receita total da janela, não a média simples dos percentuais."
           },
           "revenueBasis": {
             "type": "string",
-            "const": "net",
-            "description": "Receita líquida e CMV sobre essa mesma base, explicitamente confirmados."
+            "enum": [
+              "gross",
+              "net"
+            ],
+            "description": "Prefira gross: faturamento antes de impostos. net é somente para receita líquida informada e explicitamente confirmada com CMV sobre ela; não deduzir impostos novamente."
+          },
+          "cmvInputMode": {
+            "type": "string",
+            "enum": [
+              "amount",
+              "gross_percent",
+              "net_percent"
+            ],
+            "description": "No cenário bruto, amount = ingredientes consumidos em reais; gross_percent = percentual do faturamento bruto; net_percent = percentual da receita líquida estimada. Confirme a base; nunca suponha que compras são consumo."
+          },
+          "cmvAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000000,
+            "description": "Custo dos ingredientes efetivamente consumidos, em reais, no mesmo último mês ou como média mensal da mesma janela de 12 meses da receita. Não equivale às compras isoladas."
+          },
+          "taxState": {
+            "type": "string",
+            "enum": [
+              "AC",
+              "AL",
+              "AP",
+              "AM",
+              "BA",
+              "CE",
+              "DF",
+              "ES",
+              "GO",
+              "MA",
+              "MT",
+              "MS",
+              "MG",
+              "PA",
+              "PB",
+              "PR",
+              "PE",
+              "PI",
+              "RJ",
+              "RN",
+              "RS",
+              "RO",
+              "RR",
+              "SC",
+              "SP",
+              "SE",
+              "TO"
+            ],
+            "description": "UF explicitamente confirmada para a estimativa de impostos. Não presumir SP ou o regime tributário real do visitante."
+          },
+          "taxModelVersion": {
+            "type": "string",
+            "const": "rook-cmv-tax-2026-09-24",
+            "description": "Versão das premissas internas usadas pelo motor, preenchida pela integração. Não perguntar este código ao visitante; informar que os impostos são estimados."
           },
           "segment": {
             "type": "string",
@@ -612,11 +1072,126 @@
         "required": [
           "tool",
           "revenue",
-          "cmvPercent",
           "revenueBasis",
           "segment"
         ],
-        "additionalProperties": false
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "revenueBasis": {
+                    "const": "net"
+                  }
+                },
+                "required": [
+                  "cmvPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "cmvInputMode"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "cmvAmount"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "taxState"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "taxModelVersion"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "revenueBasis": {
+                    "const": "gross"
+                  },
+                  "cmvInputMode": {
+                    "const": "amount"
+                  }
+                },
+                "required": [
+                  "cmvInputMode",
+                  "taxState",
+                  "taxModelVersion",
+                  "cmvAmount"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "cmvPercent"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "revenueBasis": {
+                    "const": "gross"
+                  },
+                  "cmvInputMode": {
+                    "const": "gross_percent"
+                  }
+                },
+                "required": [
+                  "cmvInputMode",
+                  "taxState",
+                  "taxModelVersion",
+                  "cmvPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "cmvAmount"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "revenueBasis": {
+                    "const": "gross"
+                  },
+                  "cmvInputMode": {
+                    "const": "net_percent"
+                  }
+                },
+                "required": [
+                  "cmvInputMode",
+                  "taxState",
+                  "taxModelVersion",
+                  "cmvPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "cmvAmount"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "additionalProperties": false,
+        "description": "Entradas financeiras confirmadas. referenceBasis novo acompanha o cálculo; period legado fica no contexto externo. Não contém data inferida."
       },
       "analisar_cmv_needs_information": {
         "type": "object",
@@ -636,11 +1211,15 @@
             "items": {
               "type": "string",
               "enum": [
-                "period",
+                "referenceBasis",
                 "currency",
                 "revenue",
                 "cmvPercent",
                 "revenueBasis",
+                "cmvInputMode",
+                "cmvAmount",
+                "taxState",
+                "taxModelVersion",
                 "segment"
               ]
             }
@@ -669,7 +1248,7 @@
             "minLength": 7,
             "maxLength": 7,
             "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
-            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+            "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
           },
           "currency": {
             "type": "string",
@@ -677,16 +1256,49 @@
           },
           "inputs": {
             "$ref": "#/components/schemas/analisar_cmv_inputs"
+          },
+          "referenceBasis": {
+            "type": "string",
+            "enum": [
+              "last_month",
+              "monthly_average_12m"
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
           }
         },
         "required": [
           "status",
           "toolName",
-          "period",
           "currency",
           "inputs"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "required": [
+                  "referenceBasis"
+                ],
+                "not": {
+                  "required": [
+                    "period"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "period"
+                ],
+                "not": {
+                  "required": [
+                    "referenceBasis"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       },
       "analisar_cmv_success": {
         "type": "object",
@@ -704,7 +1316,7 @@
             "minLength": 7,
             "maxLength": 7,
             "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
-            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+            "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
           },
           "currency": {
             "type": "string",
@@ -742,14 +1354,27 @@
               },
               {
                 "$ref": "#/components/schemas/cmv_no_reference"
+              },
+              {
+                "$ref": "#/components/schemas/cmv_gross_valid"
+              },
+              {
+                "$ref": "#/components/schemas/cmv_gross_no_reference"
               }
             ]
+          },
+          "referenceBasis": {
+            "type": "string",
+            "enum": [
+              "last_month",
+              "monthly_average_12m"
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
           }
         },
         "required": [
           "status",
           "toolName",
-          "period",
           "currency",
           "ok",
           "tool",
@@ -759,17 +1384,51 @@
           "summary",
           "result"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "required": [
+                  "referenceBasis"
+                ],
+                "not": {
+                  "required": [
+                    "period"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "period"
+                ],
+                "not": {
+                  "required": [
+                    "referenceBasis"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       },
       "estimar_ponto_equilibrio_confirmed": {
         "type": "object",
         "properties": {
+          "referenceBasis": {
+            "type": "string",
+            "enum": [
+              "last_month",
+              "monthly_average_12m"
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+          },
           "period": {
             "type": "string",
             "minLength": 7,
             "maxLength": 7,
             "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
-            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+            "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
           },
           "currency": {
             "type": "string",
@@ -780,18 +1439,18 @@
             "type": "number",
             "minimum": 0.01,
             "maximum": 1000000000,
-            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+            "description": "Faturamento mensal na base indicada, do último mês ou média mensal dos mesmos 12 meses dos custos."
           },
           "cmvPercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+            "description": "CMV já apurado, com base explicitamente confirmada. Não inferir consumo a partir das compras. Na média mensal, use custo total / receita total da janela, não a média simples dos percentuais."
           },
           "confirmed": {
             "type": "boolean",
             "const": true,
-            "description": "True somente após o visitante confirmar este cenário. Uma correção exige nova confirmação."
+            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação."
           },
           "revenueBasis": {
             "type": "string",
@@ -802,44 +1461,85 @@
             "type": "number",
             "minimum": 0,
             "maximum": 1000000000,
-            "description": "Custos fixos mensais em reais. Zero somente se informado; desconhecido não é zero."
+            "description": "Custos fixos do último mês ou média mensal dos mesmos 12 meses da receita. Zero somente se informado; desconhecido não é zero."
           },
           "taxPercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "Impostos sobre a receita bruta do mês."
+            "description": "Impostos sobre a receita bruta da mesma janela. Na média, impostos totais / receita total, não média simples das alíquotas."
           },
           "feesPercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "Taxas de cartão e delivery sobre a receita bruta total, sem repetir custos."
+            "description": "Taxas de cartão e delivery sobre a receita bruta total da mesma janela, sem repetir custos."
           },
           "otherVariablePercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "Outros custos variáveis sobre a mesma receita bruta, sem repetir custos."
+            "description": "Outros custos variáveis sobre a mesma receita bruta e janela, sem repetir custos."
           }
         },
         "required": [
-          "period",
           "currency",
           "revenue",
-          "cmvPercent",
-          "confirmed",
           "revenueBasis",
+          "confirmed",
+          "cmvPercent",
           "fixedCosts",
           "taxPercent",
           "feesPercent",
           "otherVariablePercent"
+        ],
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "required": [
+                  "referenceBasis"
+                ],
+                "not": {
+                  "required": [
+                    "period"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "period"
+                ],
+                "not": {
+                  "required": [
+                    "referenceBasis"
+                  ]
+                }
+              }
+            ]
+          }
         ],
         "additionalProperties": false
       },
       "estimar_ponto_equilibrio_request": {
         "type": "object",
         "properties": {
+          "referenceBasis": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "last_month",
+                  "monthly_average_12m"
+                ],
+                "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+          },
           "period": {
             "anyOf": [
               {
@@ -847,13 +1547,13 @@
                 "minLength": 7,
                 "maxLength": 7,
                 "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
-                "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+                "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+            "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
           },
           "currency": {
             "anyOf": [
@@ -874,13 +1574,13 @@
                 "type": "number",
                 "minimum": 0.01,
                 "maximum": 1000000000,
-                "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+                "description": "Faturamento mensal na base indicada, do último mês ou média mensal dos mesmos 12 meses dos custos."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+            "description": "Faturamento mensal na base indicada, do último mês ou média mensal dos mesmos 12 meses dos custos."
           },
           "cmvPercent": {
             "anyOf": [
@@ -888,20 +1588,20 @@
                 "type": "number",
                 "minimum": 0,
                 "maximum": 100,
-                "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+                "description": "CMV já apurado, com base explicitamente confirmada. Não inferir consumo a partir das compras. Na média mensal, use custo total / receita total da janela, não a média simples dos percentuais."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+            "description": "CMV já apurado, com base explicitamente confirmada. Não inferir consumo a partir das compras. Na média mensal, use custo total / receita total da janela, não a média simples dos percentuais."
           },
           "confirmed": {
             "type": [
               "boolean",
               "null"
             ],
-            "description": "True somente após confirmação do visitante. False, null ou ausência pedem confirmação; uma correção exige nova confirmação."
+            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação. False, null ou ausência pedem confirmação."
           },
           "revenueBasis": {
             "anyOf": [
@@ -922,13 +1622,13 @@
                 "type": "number",
                 "minimum": 0,
                 "maximum": 1000000000,
-                "description": "Custos fixos mensais em reais. Zero somente se informado; desconhecido não é zero."
+                "description": "Custos fixos do último mês ou média mensal dos mesmos 12 meses da receita. Zero somente se informado; desconhecido não é zero."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Custos fixos mensais em reais. Zero somente se informado; desconhecido não é zero."
+            "description": "Custos fixos do último mês ou média mensal dos mesmos 12 meses da receita. Zero somente se informado; desconhecido não é zero."
           },
           "taxPercent": {
             "anyOf": [
@@ -936,13 +1636,13 @@
                 "type": "number",
                 "minimum": 0,
                 "maximum": 100,
-                "description": "Impostos sobre a receita bruta do mês."
+                "description": "Impostos sobre a receita bruta da mesma janela. Na média, impostos totais / receita total, não média simples das alíquotas."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Impostos sobre a receita bruta do mês."
+            "description": "Impostos sobre a receita bruta da mesma janela. Na média, impostos totais / receita total, não média simples das alíquotas."
           },
           "feesPercent": {
             "anyOf": [
@@ -950,13 +1650,13 @@
                 "type": "number",
                 "minimum": 0,
                 "maximum": 100,
-                "description": "Taxas de cartão e delivery sobre a receita bruta total, sem repetir custos."
+                "description": "Taxas de cartão e delivery sobre a receita bruta total da mesma janela, sem repetir custos."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Taxas de cartão e delivery sobre a receita bruta total, sem repetir custos."
+            "description": "Taxas de cartão e delivery sobre a receita bruta total da mesma janela, sem repetir custos."
           },
           "otherVariablePercent": {
             "anyOf": [
@@ -964,17 +1664,17 @@
                 "type": "number",
                 "minimum": 0,
                 "maximum": 100,
-                "description": "Outros custos variáveis sobre a mesma receita bruta, sem repetir custos."
+                "description": "Outros custos variáveis sobre a mesma receita bruta e janela, sem repetir custos."
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Outros custos variáveis sobre a mesma receita bruta, sem repetir custos."
+            "description": "Outros custos variáveis sobre a mesma receita bruta e janela, sem repetir custos."
           }
         },
         "additionalProperties": false,
-        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use também o descritor *_confirmed. Não envie nomes, contato, mensagens, resultados prévios ou outros campos."
+        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use também o descritor *_confirmed. Não envie nomes, contato, mensagens, resultados prévios ou outros campos. Campos exigidos dependem da base e do modo de CMV. Use uma única referência. A validação da rota rejeita bases, referências e campos de CMV contraditórios."
       },
       "estimar_ponto_equilibrio_inputs": {
         "type": "object",
@@ -983,17 +1683,25 @@
             "type": "string",
             "const": "breakeven"
           },
+          "referenceBasis": {
+            "type": "string",
+            "enum": [
+              "last_month",
+              "monthly_average_12m"
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+          },
           "revenue": {
             "type": "number",
             "minimum": 0.01,
             "maximum": 1000000000,
-            "description": "Receita mensal na base indicada; todos os dados devem ser do mesmo mês."
+            "description": "Faturamento mensal na base indicada, do último mês ou média mensal dos mesmos 12 meses dos custos."
           },
           "cmvPercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "CMV já apurado, em percentual da mesma receita. Não inferir a partir das compras."
+            "description": "CMV já apurado, com base explicitamente confirmada. Não inferir consumo a partir das compras. Na média mensal, use custo total / receita total da janela, não a média simples dos percentuais."
           },
           "revenueBasis": {
             "type": "string",
@@ -1004,38 +1712,39 @@
             "type": "number",
             "minimum": 0,
             "maximum": 1000000000,
-            "description": "Custos fixos mensais em reais. Zero somente se informado; desconhecido não é zero."
+            "description": "Custos fixos do último mês ou média mensal dos mesmos 12 meses da receita. Zero somente se informado; desconhecido não é zero."
           },
           "taxPercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "Impostos sobre a receita bruta do mês."
+            "description": "Impostos sobre a receita bruta da mesma janela. Na média, impostos totais / receita total, não média simples das alíquotas."
           },
           "feesPercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "Taxas de cartão e delivery sobre a receita bruta total, sem repetir custos."
+            "description": "Taxas de cartão e delivery sobre a receita bruta total da mesma janela, sem repetir custos."
           },
           "otherVariablePercent": {
             "type": "number",
             "minimum": 0,
             "maximum": 100,
-            "description": "Outros custos variáveis sobre a mesma receita bruta, sem repetir custos."
+            "description": "Outros custos variáveis sobre a mesma receita bruta e janela, sem repetir custos."
           }
         },
         "required": [
           "tool",
           "revenue",
-          "cmvPercent",
           "revenueBasis",
+          "cmvPercent",
           "fixedCosts",
           "taxPercent",
           "feesPercent",
           "otherVariablePercent"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "description": "Entradas financeiras confirmadas. referenceBasis novo acompanha o cálculo; period legado fica no contexto externo. Não contém data inferida."
       },
       "estimar_ponto_equilibrio_needs_information": {
         "type": "object",
@@ -1055,7 +1764,7 @@
             "items": {
               "type": "string",
               "enum": [
-                "period",
+                "referenceBasis",
                 "currency",
                 "revenue",
                 "cmvPercent",
@@ -1091,7 +1800,7 @@
             "minLength": 7,
             "maxLength": 7,
             "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
-            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+            "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
           },
           "currency": {
             "type": "string",
@@ -1099,16 +1808,49 @@
           },
           "inputs": {
             "$ref": "#/components/schemas/estimar_ponto_equilibrio_inputs"
+          },
+          "referenceBasis": {
+            "type": "string",
+            "enum": [
+              "last_month",
+              "monthly_average_12m"
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
           }
         },
         "required": [
           "status",
           "toolName",
-          "period",
           "currency",
           "inputs"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "required": [
+                  "referenceBasis"
+                ],
+                "not": {
+                  "required": [
+                    "period"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "period"
+                ],
+                "not": {
+                  "required": [
+                    "referenceBasis"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       },
       "estimar_ponto_equilibrio_success": {
         "type": "object",
@@ -1126,7 +1868,7 @@
             "minLength": 7,
             "maxLength": 7,
             "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
-            "description": "Mês dos valores, confirmado pelo visitante, no formato YYYY-MM."
+            "description": "Compatibilidade: mês YYYY-MM somente se informado e confirmado pelo visitante. Use period OU referenceBasis, nunca ambos."
           },
           "currency": {
             "type": "string",
@@ -1166,12 +1908,19 @@
                 "$ref": "#/components/schemas/breakeven_non_positive_margin"
               }
             ]
+          },
+          "referenceBasis": {
+            "type": "string",
+            "enum": [
+              "last_month",
+              "monthly_average_12m"
+            ],
+            "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
           }
         },
         "required": [
           "status",
           "toolName",
-          "period",
           "currency",
           "ok",
           "tool",
@@ -1180,6 +1929,158 @@
           "assumptions",
           "summary",
           "result"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "required": [
+                  "referenceBasis"
+                ],
+                "not": {
+                  "required": [
+                    "period"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "period"
+                ],
+                "not": {
+                  "required": [
+                    "referenceBasis"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "cmv_gross_valid": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "valid"
+          },
+          "estimatedTaxAmount": {
+            "type": "number",
+            "description": "Impostos estimados sobre a receita, em reais; não comprova tributo devido."
+          },
+          "estimatedTaxPercent": {
+            "type": "number"
+          },
+          "estimatedNetRevenue": {
+            "type": "number",
+            "description": "Faturamento bruto menos os impostos estimados; não deduz novamente taxas de cartão/delivery."
+          },
+          "taxRegime": {
+            "type": "string",
+            "enum": [
+              "simples_nacional",
+              "lucro_presumido"
+            ]
+          },
+          "taxModelVersion": {
+            "type": "string",
+            "const": "rook-cmv-tax-2026-09-24",
+            "description": "Versão das premissas internas usadas pelo motor, preenchida pela integração. Não perguntar este código ao visitante; informar que os impostos são estimados."
+          },
+          "cmvAmount": {
+            "type": "number",
+            "description": "Consumo informado em reais ou convertido pela base explicitamente escolhida."
+          },
+          "comparisonCmvPercent": {
+            "type": "number",
+            "description": "CMV dividido pela receita líquida estimada, em percentual; pode exceder 100."
+          },
+          "referencePercent": {
+            "type": "number"
+          },
+          "differencePoints": {
+            "type": "number"
+          },
+          "monthlyDifference": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "status",
+          "estimatedTaxAmount",
+          "estimatedTaxPercent",
+          "estimatedNetRevenue",
+          "taxRegime",
+          "taxModelVersion",
+          "cmvAmount",
+          "comparisonCmvPercent",
+          "referencePercent",
+          "differencePoints",
+          "monthlyDifference"
+        ],
+        "additionalProperties": false
+      },
+      "cmv_gross_no_reference": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "no_reference"
+          },
+          "estimatedTaxAmount": {
+            "type": "number",
+            "description": "Impostos estimados sobre a receita, em reais; não comprova tributo devido."
+          },
+          "estimatedTaxPercent": {
+            "type": "number"
+          },
+          "estimatedNetRevenue": {
+            "type": "number",
+            "description": "Faturamento bruto menos os impostos estimados; não deduz novamente taxas de cartão/delivery."
+          },
+          "taxRegime": {
+            "type": "string",
+            "enum": [
+              "simples_nacional",
+              "lucro_presumido"
+            ]
+          },
+          "taxModelVersion": {
+            "type": "string",
+            "const": "rook-cmv-tax-2026-09-24",
+            "description": "Versão das premissas internas usadas pelo motor, preenchida pela integração. Não perguntar este código ao visitante; informar que os impostos são estimados."
+          },
+          "cmvAmount": {
+            "type": "number",
+            "description": "Consumo informado em reais ou convertido pela base explicitamente escolhida."
+          },
+          "comparisonCmvPercent": {
+            "type": "number",
+            "description": "CMV dividido pela receita líquida estimada, em percentual; pode exceder 100."
+          },
+          "referencePercent": {
+            "type": "null"
+          },
+          "differencePoints": {
+            "type": "null"
+          },
+          "monthlyDifference": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "status",
+          "estimatedTaxAmount",
+          "estimatedTaxPercent",
+          "estimatedNetRevenue",
+          "taxRegime",
+          "taxModelVersion",
+          "cmvAmount",
+          "comparisonCmvPercent",
+          "referencePercent",
+          "differencePoints",
+          "monthlyDifference"
         ],
         "additionalProperties": false
       }
