@@ -1,6 +1,7 @@
 import { segmentsData } from './cmv-benchmarks.mjs';
 import { parseBrazilianNumber, calculateFinancialSimulation } from './financial-simulation.mjs';
 import { normalizeLeadAttribution } from './lead-attribution.mjs';
+import { CMV_TAX_MODEL_VERSION, TAX_STATES } from './cmv-tax-estimate.mjs';
 
 export const ERP_SYSTEMS = ['Saipos','Consumer','Colibri','Linx','Sischef','Teknisa','Omie','Conta Azul','Bling','Tiny'];
 export const REVENUE_BANDS = [
@@ -27,6 +28,11 @@ export function deriveRevenueBand(value) {
 }
 
 export function buildSimulationInput(answers, tool) {
+  if(tool==='cmv' && answers.revenueBasis==='gross') return {
+    tool,revenueBasis:'gross',revenue:parseBrazilianNumber(answers.revenue),segment:answers.segment,
+    cmvInputMode:answers.cmvInputMode,taxState:answers.taxState,taxModelVersion:answers.taxModelVersion,
+    ...(answers.cmvInputMode==='amount' ? {cmvAmount:parseBrazilianNumber(answers.cmvAmount)} : {cmvPercent:parseBrazilianNumber(answers.cmvPercent)}),
+  };
   const common={tool,revenueBasis:tool==='cmv'?'net':'gross',revenue:parseBrazilianNumber(answers.revenue),cmvPercent:parseBrazilianNumber(answers.cmvPercent)};
   return tool==='cmv' ? {...common,segment:answers.segment} : {...common,
     fixedCosts:parseBrazilianNumber(answers.fixedCosts),taxPercent:parseBrazilianNumber(answers.taxPercent),
@@ -67,10 +73,12 @@ export function validateAcquisition(candidate,cities) {
     else simulation=calculated;
   }
   if(!simulation && ['cmv','breakeven'].includes(candidate.intent)) {
+    const grossCmv=candidate.intent==='cmv' && candidate.revenueBasis==='gross';
+    const amountCmv=grossCmv && candidate.cmvInputMode==='amount';
     const fields=candidate.intent==='cmv'
-      ? ['revenue','cmvPercent']
+      ? ['revenue',amountCmv?'cmvAmount':'cmvPercent']
       : ['revenue','cmvPercent','fixedCosts','taxPercent','feesPercent','otherVariablePercent'];
-    const labels={revenue:'Receita mensal (R$)',cmvPercent:'CMV (%)',fixedCosts:'Custos fixos (R$)',taxPercent:'Impostos (%)',feesPercent:'Taxas (%)',otherVariablePercent:'Outros variáveis (%)'};
+    const labels={revenue:grossCmv?'Faturamento bruto mensal (R$)':'Receita mensal (R$)',cmvAmount:'Ingredientes consumidos (R$)',cmvPercent:'CMV (%)',fixedCosts:'Custos fixos (R$)',taxPercent:'Impostos (%)',feesPercent:'Taxas (%)',otherVariablePercent:'Outros variáveis (%)'};
     const known=[];const missing=[];
     for(const field of fields){
       const value=parseBrazilianNumber(candidate[field]);
@@ -78,9 +86,14 @@ export function validateAcquisition(candidate,cities) {
       else missing.push(labels[field]);
     }
     diagnosticNotes.push('Diagnóstico interrompido ou incompleto: não foi emitido resultado financeiro.',
-      `Base: ${candidate.intent==='cmv'?'receita líquida':'receita bruta'}. Mês: ${/^\d{4}-(0[1-9]|1[0-2])$/.test(period)?period:'não informado'}.`,
+      `Base: ${candidate.intent==='cmv'&&!grossCmv?'receita líquida':'receita bruta'}. Mês: ${/^\d{4}-(0[1-9]|1[0-2])$/.test(period)?period:'não informado'}.`,
       `Dados informados: ${known.length ? known.join('; ') : 'nenhum valor financeiro informado'}.`,
       missing.length?`Dados ainda não informados: ${missing.join(', ')}.`:'Valores ainda precisam de confirmação e cálculo.');
+    if(grossCmv) {
+      diagnosticNotes.push(`CMV informado em ${amountCmv?'reais de consumo':candidate.cmvInputMode==='gross_percent'?'percentual do faturamento bruto':candidate.cmvInputMode==='net_percent'?'percentual da receita líquida estimada':'base ainda não confirmada'}. Impostos e receita líquida ainda não calculados.`);
+      const state=TAX_STATES.find(item=>item.code===candidate.taxState);
+      diagnosticNotes.push(`UF da estimativa: ${state?`${state.label} (${state.code})`:'não confirmada'}. Modelo: ${candidate.taxModelVersion===CMV_TAX_MODEL_VERSION?CMV_TAX_MODEL_VERSION:'não confirmado'}.`);
+    }
   }
   if(Object.keys(errors).length) return {ok:false,errors};
   return {ok:true,value:{submissionId,name,company,email,phone,city,segment,segmentOther:segment==='other'?segmentOther:null,
