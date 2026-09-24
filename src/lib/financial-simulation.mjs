@@ -1,4 +1,5 @@
 import { segmentoPorSlug, BENCHMARK_FONTE } from './cmv-benchmarks.mjs';
+import { calculateGrossCmv } from './cmv-gross-simulation.mjs';
 
 export const FORMULA_VERSION = 'rook-consultivo-1';
 const money = value => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -24,6 +25,8 @@ export function calculateFinancialSimulation(candidate) {
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
     return { ok: false, errors: { form: 'Informe os dados do cenário.' } };
   }
+  // Explicit gross scenarios use the versioned estimate. Legacy net and PE are unchanged.
+  if (candidate.tool === 'cmv' && candidate.revenueBasis === 'gross') return calculateGrossCmv(candidate);
   const errors = {};
   const inputs = { tool: candidate.tool, revenueBasis: candidate.revenueBasis };
   if (!['cmv', 'breakeven'].includes(candidate.tool)) errors.tool = 'Escolha uma ferramenta.';

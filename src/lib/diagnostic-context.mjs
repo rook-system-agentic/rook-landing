@@ -3,7 +3,7 @@ import { calculateFinancialSimulation } from './financial-simulation.mjs';
 export const DIAGNOSTIC_CONTEXT_EVENT = 'rook:diagnostic-context';
 
 const fields = {
-  cmv: ['period', 'segment', 'revenue', 'cmvPercent'],
+  cmv: ['period', 'segment', 'revenue', 'cmvPercent', 'cmvAmount', 'revenueBasis', 'cmvInputMode', 'taxState', 'taxModelVersion'],
   breakeven: ['period', 'revenue', 'cmvPercent', 'fixedCosts', 'taxPercent', 'feesPercent', 'otherVariablePercent'],
 };
 
