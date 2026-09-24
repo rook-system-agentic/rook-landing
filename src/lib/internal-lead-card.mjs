@@ -55,8 +55,11 @@ export function buildInternalLeadCard({lead, receipt} = {}) {
     }
     diagnostic = {status: 'recalculated', provenance: 'rook_deterministic_engine', formulaVersion: calculated.formulaVersion};
     const input = calculated.inputs;
-    lines.push('', `Diagnóstico: ${calculated.tool === 'cmv' ? 'CMV' : 'ponto de equilíbrio'} • ${lead.period}`,
-      `Receita ${input.revenueBasis === 'net' ? 'líquida' : 'bruta'}: ${money(input.revenue)} • CMV: ${input.cmvPercent}%`);
+    lines.push('', `Diagnóstico: ${calculated.tool === 'cmv' ? 'CMV' : 'ponto de equilíbrio'} • ${lead.period}`);
+    if(calculated.tool==='cmv' && input.revenueBasis==='gross') {
+      lines.push(`Faturamento bruto informado: ${money(input.revenue)} • UF da estimativa: ${input.taxState}`);
+      // The assumptions below carry the estimated tax/net bridge and original CMV basis.
+    } else lines.push(`Receita ${input.revenueBasis === 'net' ? 'líquida' : 'bruta'}: ${money(input.revenue)} • CMV: ${input.cmvPercent}%`);
     if (calculated.tool === 'breakeven') lines.push(
       `Custos fixos: ${money(input.fixedCosts)} • Impostos: ${input.taxPercent}% • Taxas: ${input.feesPercent}% • Outros variáveis: ${input.otherVariablePercent}%`);
     lines.push(calculated.summary, ...calculated.assumptions,

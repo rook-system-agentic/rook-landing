@@ -3,7 +3,11 @@ export interface FinancialInput {
   tool: FinancialTool;
   revenueBasis: 'net' | 'gross';
   revenue: number;
-  cmvPercent: number;
+  cmvPercent?: number;
+  cmvAmount?: number;
+  cmvInputMode?: 'amount' | 'gross_percent' | 'net_percent';
+  taxState?: string;
+  taxModelVersion?: string;
   segment?: string;
   fixedCosts?: number;
   taxPercent?: number;
