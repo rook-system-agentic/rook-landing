@@ -1,6 +1,7 @@
 import type { FinancialInput, FinancialSuccess } from './financial-simulation.mjs';
 
 export type FinancialChatToolName = 'analisar_cmv' | 'estimar_ponto_equilibrio';
+export type FinancialChatReferenceBasis = 'last_month' | 'monthly_average_12m';
 export interface FinancialChatPropertySchema {
   type: 'string' | 'number' | 'boolean';
   description: string;
@@ -19,14 +20,14 @@ export interface FinancialChatToolDefinition {
     type: 'object';
     properties: Record<string, FinancialChatPropertySchema>;
     required: string[];
+    allOf: Record<string, unknown>[];
     additionalProperties: false;
   };
 }
-export interface FinancialChatContext {
+export type FinancialChatContext = {
   toolName: FinancialChatToolName;
-  period: string;
   currency: 'BRL';
-}
+} & ({ referenceBasis: FinancialChatReferenceBasis; period?: never } | { period: string; referenceBasis?: never });
 export type FinancialChatResponse =
   | { status: 'invalid_input'; errors: Record<string, string> }
   | { status: 'needs_information'; toolName: FinancialChatToolName; missingFields: string[] }

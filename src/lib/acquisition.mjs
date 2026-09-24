@@ -2,6 +2,7 @@ import { segmentsData } from './cmv-benchmarks.mjs';
 import { parseBrazilianNumber, calculateFinancialSimulation } from './financial-simulation.mjs';
 import { normalizeLeadAttribution } from './lead-attribution.mjs';
 import { CMV_TAX_MODEL_VERSION, TAX_STATES } from './cmv-tax-estimate.mjs';
+import { validateFinancialReference, financialReferenceLabel } from './financial-reference.mjs';
 
 export const ERP_SYSTEMS = ['Saipos','Consumer','Colibri','Linx','Sischef','Teknisa','Omie','Conta Azul','Bling','Tiny'];
 export const REVENUE_BANDS = [
@@ -28,12 +29,18 @@ export function deriveRevenueBand(value) {
 }
 
 export function buildSimulationInput(answers, tool) {
+  // Older simulations kept the explicit calendar month outside the engine.
+  // New relative references travel with the inputs, including a conflicting
+  // period if supplied, so the engine rejects it instead of choosing silently.
+  const reference = answers.referenceBasis !== undefined
+    ? {referenceBasis:answers.referenceBasis,...(answers.period !== undefined ? {period:answers.period} : {})}
+    : {};
   if(tool==='cmv' && answers.revenueBasis==='gross') return {
-    tool,revenueBasis:'gross',revenue:parseBrazilianNumber(answers.revenue),segment:answers.segment,
+    tool,...reference,revenueBasis:'gross',revenue:parseBrazilianNumber(answers.revenue),segment:answers.segment,
     cmvInputMode:answers.cmvInputMode,taxState:answers.taxState,taxModelVersion:answers.taxModelVersion,
     ...(answers.cmvInputMode==='amount' ? {cmvAmount:parseBrazilianNumber(answers.cmvAmount)} : {cmvPercent:parseBrazilianNumber(answers.cmvPercent)}),
   };
-  const common={tool,revenueBasis:tool==='cmv'?'net':'gross',revenue:parseBrazilianNumber(answers.revenue),cmvPercent:parseBrazilianNumber(answers.cmvPercent)};
+  const common={tool,...reference,revenueBasis:tool==='cmv'?'net':'gross',revenue:parseBrazilianNumber(answers.revenue),cmvPercent:parseBrazilianNumber(answers.cmvPercent)};
   return tool==='cmv' ? {...common,segment:answers.segment} : {...common,
     fixedCosts:parseBrazilianNumber(answers.fixedCosts),taxPercent:parseBrazilianNumber(answers.taxPercent),
     feesPercent:parseBrazilianNumber(answers.feesPercent),otherVariablePercent:parseBrazilianNumber(answers.otherVariablePercent)};
@@ -64,12 +71,16 @@ export function validateAcquisition(candidate,cities) {
   if(!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(submissionId)) errors.form='Atualize a página e tente novamente.';
   let simulation=null;
   const diagnosticNotes=[];
-  const period=text('period',7);
+  const reference=validateFinancialReference(candidate,{required:Boolean(candidate.simulation)});
+  if(!reference.ok) Object.assign(errors,reference.errors);
+  const referenceValue=reference.ok?reference.value:{};
+  const period=referenceValue.period;
   if(candidate.simulation){
-    if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(period)) errors.period='Informe o mês do cenário.';
     const calculated=calculateFinancialSimulation(candidate.simulation);
     if(!calculated.ok) errors.simulation='Revise os números do cenário antes de enviar.';
     else if(calculated.tool==='cmv' && calculated.inputs.segment!==segment) errors.simulation='O segmento do diagnóstico difere do estabelecimento. Recalcule ou remova o cenário.';
+    else if(calculated.inputs.referenceBasis!==referenceValue.referenceBasis ||
+      (calculated.inputs.period!==undefined && calculated.inputs.period!==period)) errors.simulation='A referência dos números difere do diagnóstico. Recalcule ou remova o cenário.';
     else simulation=calculated;
   }
   if(!simulation && ['cmv','breakeven'].includes(candidate.intent)) {
@@ -86,7 +97,7 @@ export function validateAcquisition(candidate,cities) {
       else missing.push(labels[field]);
     }
     diagnosticNotes.push('Diagnóstico interrompido ou incompleto: não foi emitido resultado financeiro.',
-      `Base: ${candidate.intent==='cmv'&&!grossCmv?'receita líquida':'receita bruta'}. Mês: ${/^\d{4}-(0[1-9]|1[0-2])$/.test(period)?period:'não informado'}.`,
+      `Base: ${candidate.intent==='cmv'&&!grossCmv?'receita líquida':'receita bruta'}. ${referenceValue.referenceBasis?`Referência: ${financialReferenceLabel(referenceValue)}`:`Mês: ${period||'não informado'}`}.`,
       `Dados informados: ${known.length ? known.join('; ') : 'nenhum valor financeiro informado'}.`,
       missing.length?`Dados ainda não informados: ${missing.join(', ')}.`:'Valores ainda precisam de confirmação e cálculo.');
     if(grossCmv) {
@@ -98,6 +109,7 @@ export function validateAcquisition(candidate,cities) {
   if(Object.keys(errors).length) return {ok:false,errors};
   return {ok:true,value:{submissionId,name,company,email,phone,city,segment,segmentOther:segment==='other'?segmentOther:null,
     revenueBand,usesErp:usesErp==='yes',erp:usesErp==='yes'?erp:null,erpOther:usesErp==='yes'&&erp==='other'?erpOther:null,
-    intent:['cmv','breakeven','demo'].includes(candidate.intent)?candidate.intent:'demo',consent:true,period:simulation?period:null,simulation,diagnosticNotes,
+    intent:['cmv','breakeven','demo'].includes(candidate.intent)?candidate.intent:'demo',consent:true,period:period||null,
+    ...(referenceValue.referenceBasis?{referenceBasis:referenceValue.referenceBasis}:{}),simulation,diagnosticNotes,
     attribution:normalizeLeadAttribution(candidate.attribution)}};
 }

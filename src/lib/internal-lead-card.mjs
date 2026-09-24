@@ -2,6 +2,7 @@ import {createHash} from 'node:crypto';
 import {ERP_SYSTEMS, REVENUE_BANDS} from './acquisition.mjs';
 import {segmentoPorSlug} from './cmv-benchmarks.mjs';
 import {calculateFinancialSimulation} from './financial-simulation.mjs';
+import {validateFinancialReference, financialReferenceLabel} from './financial-reference.mjs';
 
 export const INTERNAL_LEAD_CARD_VERSION = 'rook-internal-lead-card-1';
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -49,13 +50,16 @@ export function buildInternalLeadCard({lead, receipt} = {}) {
   if (lead.simulation) {
     // O texto e o resultado recebidos não são evidência: recalcular as entradas.
     const calculated = calculateFinancialSimulation(lead.simulation.inputs);
-    if (!calculated.ok || !/^\d{4}-(0[1-9]|1[0-2])$/.test(lead.period || '') ||
+    const reference = validateFinancialReference({...lead,period:lead.period===null?undefined:lead.period});
+    if (!calculated.ok || !reference.ok ||
+        calculated.inputs.referenceBasis !== reference.value.referenceBasis ||
+        (calculated.inputs.period !== undefined && calculated.inputs.period !== reference.value.period) ||
         (calculated.tool === 'cmv' && calculated.inputs.segment !== lead.segment)) {
       throw new Error('invalid_lead_diagnostic');
     }
     diagnostic = {status: 'recalculated', provenance: 'rook_deterministic_engine', formulaVersion: calculated.formulaVersion};
     const input = calculated.inputs;
-    lines.push('', `Diagnóstico: ${calculated.tool === 'cmv' ? 'CMV' : 'ponto de equilíbrio'} • ${lead.period}`);
+    lines.push('', `Diagnóstico: ${calculated.tool === 'cmv' ? 'CMV' : 'ponto de equilíbrio'} • ${reference.value.referenceBasis?financialReferenceLabel(reference.value):lead.period}`);
     if(calculated.tool==='cmv' && input.revenueBasis==='gross') {
       lines.push(`Faturamento bruto informado: ${money(input.revenue)} • UF da estimativa: ${input.taxState}`);
       // The assumptions below carry the estimated tax/net bridge and original CMV basis.

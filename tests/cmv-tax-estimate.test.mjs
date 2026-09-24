@@ -112,7 +112,7 @@ test('expõe versão, anualização e premissas compactas sem afirmar histórico
     assert.equal(result.annualRevenue, gross * 12);
     assert.equal(result.state, 'SP');
     assert.match(assumptions, /São Paulo \(SP\)/);
-    assert.match(assumptions, /hipótese anual, não o histórico observado/);
+    assert.match(assumptions, /hipótese anual deste modelo, sem consultar histórico fiscal/);
     assert.match(assumptions, /não é apuração fiscal/);
     assert.match(assumptions, /Não comprova enquadramento tributário/);
     assert.match(assumptions, /sem consulta fiscal em tempo real/);

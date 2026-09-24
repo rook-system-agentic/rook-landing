@@ -6,6 +6,8 @@ import ts from 'typescript';
 import * as acquisition from '../src/lib/acquisition.mjs';
 import * as benchmarks from '../src/lib/cmv-benchmarks.mjs';
 import * as diagnostic from '../src/lib/diagnostic-context.mjs';
+import * as financialReference from '../src/lib/financial-reference.mjs';
+import { CMV_TAX_MODEL_VERSION } from '../src/lib/cmv-tax-estimate.mjs';
 import * as attribution from '../src/lib/lead-attribution.mjs';
 import * as trackingEvents from '../src/lib/tracking-events.mjs';
 import { defaultConsentState } from '../src/lib/consent.mjs';
@@ -29,6 +31,7 @@ function setup({ environment = 'production', href = 'https://rook.com.br/?utm_so
   let stateCursor = 0, refCursor = 0, effectCursor = 0, tree;
   let pathname = new URL(href).pathname;
   const pendingEffects = [], calls = [];
+  const listeners = new Map();
   const target = { dataLayer: [], consent: defaultConsentState() };
   const location = { href, search: new URL(href).search };
   const react = {
@@ -62,13 +65,14 @@ function setup({ environment = 'production', href = 'https://rook.com.br/?utm_so
     'next/navigation': { usePathname: () => pathname },
     '@/lib/cmv-benchmarks.mjs': benchmarks, '@/lib/acquisition.mjs': acquisition,
     '@/lib/diagnostic-context.mjs': diagnostic, '@/lib/lead-attribution.mjs': attribution,
+    '@/lib/financial-reference.mjs': financialReference,
     '@/lib/track': track, './CityPicker': CityPicker, './PreviewModeWatcher': () => null,
     './demo.module.css': {},
     '@/lib/commercial-lead-challenge-client.mjs': { solveCommercialLeadChallenge: async () => 'proof' },
   };
   const Component = evaluate(demoCode, dependencies, {
     crypto: { randomUUID: () => 'bb189bc0-1c1d-4cca-8400-44acb47fbda8' },
-    window: { location, addEventListener() {}, removeEventListener() {} },
+    window: { location, addEventListener(name, listener) { listeners.set(name, listener); }, removeEventListener(name) { listeners.delete(name); } },
     document: { referrer: 'https://www.facebook.com/path?private=1', getElementById: () => null },
     URLSearchParams, AbortSignal, requestAnimationFrame: callback => callback(),
     fetch: async (url, options = {}) => {
@@ -106,8 +110,46 @@ function setup({ environment = 'production', href = 'https://rook.com.br/?utm_so
   function navigate(next) {
     location.href = next; location.search = new URL(next).search; pathname = new URL(next).pathname; render(); render();
   }
-  return { fill, submit, render, find, navigate, calls, target };
+  function receiveDiagnostic(detail) {
+    listeners.get(diagnostic.DIAGNOSTIC_CONTEXT_EVENT)?.({ detail }); render(); render();
+  }
+  return { fill, submit, render, find, navigate, receiveDiagnostic, calls, target };
 }
+
+const averageCmvScenario = () => {
+  const answers = { referenceBasis: 'monthly_average_12m', revenueBasis: 'gross', revenue: '100000', cmvInputMode: 'amount', cmvAmount: '35000',
+    segment: 'pizzaria', taxState: 'SP', taxModelVersion: CMV_TAX_MODEL_VERSION };
+  return { sourceId: 'cmv-reference-test', intent: 'cmv', answers, simulation: acquisition.buildSimulationInput(answers, 'cmv') };
+};
+
+test('formulário mostra referência mensal e envia diagnóstico sem inventar mês e ano', async () => {
+  const app = setup(); app.fill(); app.receiveDiagnostic(averageCmvScenario());
+  const label = app.find(node => node.type === 'small' && JSON.stringify(node.props.children).includes('Média mensal dos últimos 12 meses'));
+  assert.ok(label);
+  assert.equal(app.calls.length, 0);
+  await app.submit();
+  const body = JSON.parse(app.calls.find(call => call.method === 'POST').body);
+  assert.equal(body.referenceBasis, 'monthly_average_12m');
+  assert.equal(body.simulation.referenceBasis, 'monthly_average_12m');
+  assert.equal(body.simulation.revenue, 100000);
+  assert.equal(Object.hasOwn(body, 'period'), false);
+  assert.equal(Object.hasOwn(body.simulation, 'period'), false);
+});
+
+test('invalidar cenário da calculadora retira a referência e o resultado antes de enviar o formulário', async () => {
+  const app = setup(); app.fill(); app.receiveDiagnostic(averageCmvScenario());
+  const hasDiagnostic = () => app.find(node => node.props?.['aria-label'] === 'Remover diagnóstico desta solicitação');
+  assert.ok(hasDiagnostic());
+  app.receiveDiagnostic({ sourceId: 'cmv-reference-test', clear: true });
+  assert.equal(hasDiagnostic(), null);
+  assert.equal(app.calls.length, 0);
+  await app.submit();
+  const body = JSON.parse(app.calls.find(call => call.method === 'POST').body);
+  assert.equal(body.simulation, null);
+  assert.equal(body.intent, 'demo');
+  assert.equal(Object.hasOwn(body, 'referenceBasis'), false);
+  assert.equal(Object.hasOwn(body, 'period'), false);
+});
 
 test('submit real confirma CRM e gera uma única conversão sem perfil, diagnóstico ou UTMs', async () => {
   const app = setup(); app.fill();
