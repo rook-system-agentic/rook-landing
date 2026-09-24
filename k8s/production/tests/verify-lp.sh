@@ -25,6 +25,15 @@ grep -q '^ARG NEXT_PUBLIC_SUPABASE_ANON_KEY$' "$DOCKERFILE" || fail "chave públ
 grep -q '^ARG SUPABASE_URL$' "$DOCKERFILE" || fail "origem privada do CMS não é separada no build"
 grep -q '^ARG SUPABASE_ANON_KEY$' "$DOCKERFILE" || fail "chave privada de build do CMS não é separada"
 
+# Regressão do corte para Hostinger: runtime env não configura código client.
+for name in NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED NEXT_PUBLIC_ASAFLOW_CHAT_TENANT NEXT_PUBLIC_ASAFLOW_CHAT_FLOW; do
+  grep -q "^ARG ${name}\\(=.*\\)\\?$" "$DOCKERFILE" || fail "$name não é argumento do build"
+  grep -Fq "$name=\$$name" "$DOCKERFILE" || fail "$name não chega ao ambiente do Next build"
+  grep -Fq -- "--build-arg $name=\"\$$name\"" "$WORKFLOW" || fail "$name não é passado pelo deploy"
+  grep -q "^  ${name}: " "$WORKFLOW" || fail "$name não está configurado no deploy"
+done
+grep -Fq "aria-label=\"Abrir chat Rook AI\"" "$WORKFLOW" || fail "smoke não confere a presença do chat"
+
 grep -q '^  namespace: rook-production$' "$MANIFEST" || fail "namespace incorreto"
 grep -q '^  name: rook-lp$' "$MANIFEST" || fail "Deployment/Service rook-lp ausente"
 grep -q '^  replicas: 1$' "$MANIFEST" || fail "réplica única ausente"
