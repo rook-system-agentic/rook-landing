@@ -34,6 +34,11 @@ env:
   EXTERNAL_EFFECTS: ${{ vars.PROD_EXTERNAL_EFFECTS || 'false' }}
   SITE_URL: https://www.rook.com.br
   PUBLIC_SUPABASE_URL: https://supabase.rook.com.br
+  # Canal público já ativado em 21/09 (PR138). A migração para Docker deve
+  # preservar estes valores no BUILD. Não são credenciais do CRM.
+  NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED: 'true'
+  NEXT_PUBLIC_ASAFLOW_CHAT_TENANT: hook
+  NEXT_PUBLIC_ASAFLOW_CHAT_FLOW: rook-ai-validacao-por-link
 
 jobs:
   build:
@@ -64,6 +69,9 @@ jobs:
             -f k8s/production/Dockerfile \
             --build-arg NEXT_PUBLIC_ENV=production \
             --build-arg NEXT_PUBLIC_SITE_URL="$SITE_URL" \
+            --build-arg NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED="$NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED" \
+            --build-arg NEXT_PUBLIC_ASAFLOW_CHAT_TENANT="$NEXT_PUBLIC_ASAFLOW_CHAT_TENANT" \
+            --build-arg NEXT_PUBLIC_ASAFLOW_CHAT_FLOW="$NEXT_PUBLIC_ASAFLOW_CHAT_FLOW" \
             --build-arg NEXT_PUBLIC_SUPABASE_URL="$PUBLIC_SUPABASE_URL" \
             --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON" \
             --build-arg SUPABASE_URL="$PUBLIC_SUPABASE_URL" \
@@ -133,11 +141,18 @@ jobs:
       - name: Smoke pelo ingress local
         run: |
           set -euo pipefail
+          body=$(mktemp)
+          trap 'rm -f "$body"' EXIT
           for i in $(seq 1 10); do
-            code=$(curl -sk -o /dev/null -w '%{http_code}' --max-time 30 --resolve www.rook.com.br:443:127.0.0.1 https://www.rook.com.br/ || echo 000)
+            code=$(curl -sk -o "$body" -w '%{http_code}' --max-time 30 --resolve www.rook.com.br:443:127.0.0.1 https://www.rook.com.br/ || echo 000)
             echo "tentativa $i: HTTP $code"
-            [ "$code" = "200" ] && exit 0
+            if [ "$code" = "200" ]; then
+              if [ "$NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED" != "true" ] || grep -q 'aria-label="Abrir chat Rook AI"' "$body"; then
+                exit 0
+              fi
+              echo "::warning::Home responde, mas o botão do Rook AI está ausente no HTML publicado."
+            fi
             sleep 6
           done
-          echo "::error::www.rook.com.br não respondeu 200 pelo ingress local após o rollout."
+          echo "::error::www.rook.com.br não passou no smoke de HTTP e visibilidade do Rook AI."
           exit 1

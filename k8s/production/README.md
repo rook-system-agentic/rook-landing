@@ -39,6 +39,27 @@ alcança o Service. O Ingress já é aceito por `allow-ingress-nginx`, que lista
 
 Teste de contrato: `bash k8s/production/tests/verify-lp.sh`.
 
+## Rook AI: configuração de compilação
+
+O workflow de produção preserva o canal público ativado em 21/09:
+`NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED=true`, tenant `hook` e fluxo
+`rook-ai-validacao-por-link`. Esses três valores são públicos e seguem por
+`--build-arg` para o estágio builder antes de `next build`. Não são a chave da
+API do CRM nem precisam ser copiados para o Secret de runtime.
+
+Na migração de 22/09 os argumentos não eram passados; o site continuava
+respondendo HTTP 200, mas o JavaScript era compilado com o chat desativado.
+Alterar variáveis na Vercel ou apenas reiniciar o pod não corrige esse artefato:
+é necessário recompilar e publicar a imagem. O CI verifica o encaminhamento
+das variáveis e o smoke de produção exige o botão do chat no HTML quando a
+flag estiver ligada. Isso verifica a montagem; a resposta da IA deve ser
+conferida separadamente no navegador, sem cadastrar contatos reais de teste.
+
+Para desligar deliberadamente o chat, alterar a flag pública no workflow para
+`'false'` e publicar uma nova imagem. Homologação continua usando seu próprio
+Dockerfile e mantém o canal real bloqueado. Esta correção não ativa checkout,
+agenda, pagamentos ou novos fluxos no AsaFlow.
+
 ## Validação privada (histórico)
 
 ## Fonte reproduzida

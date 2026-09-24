@@ -44,3 +44,6 @@ jobs:
 
       - name: Rodar testes
         run: pnpm test:ci
+
+      - name: Validar contrato de publicação da landing
+        run: bash k8s/production/tests/verify-lp.sh
