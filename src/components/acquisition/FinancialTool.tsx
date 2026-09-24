@@ -5,6 +5,7 @@ import { segmentsData } from '@/lib/cmv-benchmarks.mjs';
 import { CMV_TAX_MODEL_VERSION, TAX_STATES } from '@/lib/cmv-tax-estimate.mjs';
 import { buildSimulationInput } from '@/lib/acquisition.mjs';
 import { DIAGNOSTIC_CONTEXT_EVENT } from '@/lib/diagnostic-context.mjs';
+import { financialReferenceLabel } from '@/lib/financial-reference.mjs';
 import {
   calculateFinancialSimulation,
   type FinancialResponse,
@@ -17,7 +18,7 @@ type NumericField = { key: string; label: string; help: string; unit: 'R$' | '%'
 
 const FIXED_AND_VARIABLE_FIELDS: NumericField[] = [
   { key: 'fixedCosts', label: 'Custos fixos mensais', unit: 'R$', help: 'Folha, aluguel e pró-labore. Separe os custos que variam com as vendas.' },
-  { key: 'taxPercent', label: 'Impostos', unit: '%', help: 'Alíquota efetiva sobre a receita bruta do mês.' },
+  { key: 'taxPercent', label: 'Impostos', unit: '%', help: 'Percentual sobre a receita bruta da referência escolhida.' },
   { key: 'feesPercent', label: 'Taxas de cartão e delivery', unit: '%', help: 'Percentual sobre a receita bruta total, sem repetir valores do CMV.' },
   { key: 'otherVariablePercent', label: 'Outros custos variáveis', unit: '%', help: 'Comissões e demais custos variáveis, sobre a mesma receita bruta.' },
 ];
@@ -44,6 +45,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const errorSummary = useRef<HTMLParagraphElement>(null);
   const isCmv = tool === 'cmv';
+  const isAverage = answers.referenceBasis === 'monthly_average_12m';
   const cmvInputMode = answers.cmvInputMode || 'amount';
   const ContentHeading = embedded ? 'h3' : 'h2';
 
@@ -67,12 +69,14 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
 
   const fields: NumericField[] = [
     {
-      key: 'revenue', label: isCmv ? 'Quanto seu restaurante vendeu no mês?' : 'Receita bruta mensal', unit: 'R$',
+      key: 'revenue', label: isAverage ? 'Quanto seu restaurante vendeu por mês, em média?' : 'Quanto seu restaurante vendeu no último mês?', unit: 'R$',
       help: isCmv ? 'Informe o total das vendas antes dos impostos. Nós estimamos os impostos para fazer a comparação.' : 'Faturamento antes dos impostos. Use essa base em todos os percentuais.',
     },
     isCmv && cmvInputMode === 'amount' ? {
-      key: 'cmvAmount', label: 'Custo dos ingredientes consumidos', unit: 'R$',
-      help: 'Use o custo do que foi consumido no mês: estoque inicial + compras − estoque final. Só as compras do mês não medem esse consumo.',
+      key: 'cmvAmount', label: isAverage ? 'Custo médio mensal dos ingredientes consumidos' : 'Custo dos ingredientes consumidos no último mês', unit: 'R$',
+      help: isAverage
+        ? 'Use o consumo total dos mesmos 12 meses dividido por 12. Consumo = estoque inicial + compras − estoque final. Só as compras não medem consumo.'
+        : 'Use o custo do que foi consumido no último mês: estoque inicial + compras − estoque final. Só as compras do mês não medem esse consumo.',
     } : isCmv ? {
       key: 'cmvPercent', label: cmvInputMode === 'gross_percent' ? 'CMV sobre o faturamento bruto' : 'CMV sobre a receita líquida', unit: '%',
       help: cmvInputMode === 'gross_percent'
@@ -80,7 +84,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
         : 'Use apenas se seu relatório já calcula o CMV sobre a receita após impostos. Nesta simulação, aplicaremos esse percentual à receita líquida estimada.',
     } : {
       key: 'cmvPercent', label: 'CMV apurado', unit: '%',
-      help: 'CMV em percentual da receita bruta. Compras do mês, sozinhas, não medem o consumo do estoque.',
+      help: 'CMV em percentual da receita bruta da referência escolhida. Compras, sozinhas, não medem o consumo do estoque.',
     },
     ...(isCmv ? [] : FIXED_AND_VARIABLE_FIELDS),
   ];
@@ -94,6 +98,17 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
 
   function change(key: string, value: string) {
     setAnswers(previous => ({ ...previous, [key]: value }));
+    resetResult();
+  }
+
+  function changeReferenceBasis(value: string) {
+    setAnswers(previous => {
+      const next: Record<string, string> = { ...previous, referenceBasis: value };
+      delete next.period;
+      for (const key of ['revenue', 'cmvAmount', 'cmvPercent', 'fixedCosts', 'taxPercent', 'feesPercent', 'otherVariablePercent']) delete next[key];
+      return next;
+    });
+    setUnknown({});
     resetResult();
   }
 
@@ -145,8 +160,8 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     const input = buildSimulationInput(scenarioAnswers(), tool);
     const validated = calculateFinancialSimulation(input);
     const nextErrors: Record<string, string> = {};
-    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(answers.period || '')) {
-      nextErrors.period = 'Selecione o mês dos valores informados.';
+    if (!['last_month', 'monthly_average_12m'].includes(answers.referenceBasis || '')) {
+      nextErrors.referenceBasis = 'Escolha entre o último mês e a média mensal dos últimos 12 meses.';
     }
     if (!validated.ok) {
       for (const [key, message] of Object.entries(validated.errors)) {
@@ -221,13 +236,22 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
       <div className={styles.layout}>
         <form className={styles.form} onSubmit={calculate} noValidate aria-busy={busy}>
           <ContentHeading>Dados do cenário</ContentHeading>
-          <p className={styles.hint}>Use valores do mesmo mês. Se não souber um número, marque “Não sei informar”.{!isCmv && ' Informe zero somente quando esse custo não existir.'}</p>
+          <p className={styles.hint}>Escolha a referência e use a mesma para todos os valores. Se não souber um número, marque “Não sei informar”.{!isCmv && ' Informe zero somente quando esse custo não existir.'}</p>
           <fieldset disabled={busy} className={styles.fields}>
             <legend className={styles.srOnly}>Valores mensais para {isCmv ? 'análise de CMV' : 'ponto de equilíbrio'}</legend>
             <div className={styles.field}>
-              <label htmlFor={`${id}-period`}>Mês de referência</label>
-              <input id={`${id}-period`} type="month" value={answers.period || ''} onChange={event => change('period', event.target.value)} aria-invalid={!!errors.period} aria-describedby={errors.period ? `${id}-period-error` : undefined} required />
-              {errors.period && <p id={`${id}-period-error`} className={styles.fieldError}>{errors.period}</p>}
+              <label htmlFor={`${id}-referenceBasis`}>Quais números você prefere usar?</label>
+              <select id={`${id}-referenceBasis`} value={answers.referenceBasis || ''} onChange={event => changeReferenceBasis(event.target.value)} aria-invalid={!!errors.referenceBasis} aria-describedby={`${id}-referenceBasis-help${errors.referenceBasis ? ` ${id}-referenceBasis-error` : ''}`} required>
+                <option value="">Selecione a referência</option>
+                <option value="last_month">Último mês</option>
+                <option value="monthly_average_12m">Média mensal dos últimos 12 meses</option>
+              </select>
+              <p id={`${id}-referenceBasis-help`} className={styles.fieldHelp}>{isAverage
+                ? 'Informe as médias mensais de vendas e custos dos mesmos 12 meses, não os totais do ano. Nos percentuais, use o custo total dividido pela receita total dessa mesma referência. Ao trocar a referência, os valores são limpos.'
+                : answers.referenceBasis === 'last_month'
+                  ? 'Use vendas e custos do último mês. Não precisa informar mês e ano. Ao trocar a referência, os valores são limpos.'
+                  : 'Escolha o último mês ou a média mensal dos últimos 12 meses. Depois, informe vendas e custos da mesma referência, sem precisar indicar mês e ano.'}</p>
+              {errors.referenceBasis && <p id={`${id}-referenceBasis-error`} className={styles.fieldError}>{errors.referenceBasis}</p>}
             </div>
             {isCmv && <div className={styles.field}>
               <label htmlFor={`${id}-segment`}>Segmento culinário</label>
@@ -266,7 +290,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
 
         <aside className={styles.result} aria-live="polite" aria-atomic="true">
           {result ? <>
-            <p className={styles.eyebrow}>Resultado do cenário · {answers.period}</p>
+            <p className={styles.eyebrow}>Resultado do cenário · {financialReferenceLabel(answers)}</p>
             <ContentHeading ref={resultHeading} tabIndex={-1}>{result.result.status === 'non_positive_margin'
               ? 'A margem precisa de atenção.'
               : result.result.status === 'no_reference' ? 'Ainda não há referência para esse segmento.'
@@ -306,7 +330,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
           </> : <>
             <p className={styles.eyebrow}>Como usar</p>
             <ContentHeading>Um cenário para orientar a próxima decisão.</ContentHeading>
-            <ol className={styles.steps}><li>Escolha o mês e informe os números da operação.</li><li>Confira o resultado e as premissas da conta.</li><li>Se quiser, leve esse contexto a uma demonstração do Rook.</li></ol>
+            <ol className={styles.steps}><li>Escolha o último mês ou a média mensal dos últimos 12 meses e informe os números da operação.</li><li>Confira o resultado e as premissas da conta.</li><li>Se quiser, leve esse contexto a uma demonstração do Rook.</li></ol>
             <p className={styles.note}>A análise é gratuita. Você pode calcular antes de informar seus dados de contato.</p>
           </>}
         </aside>

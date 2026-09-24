@@ -58,7 +58,7 @@ export function estimateCmvRevenue(grossRevenue, state = 'SP') {
     && annualRevenue > SIMPLES_SUBLIMITE && annualRevenue <= SIMPLES_TETO;
   const assumptions = [
     'Estimativa gerencial; não é apuração fiscal nem imposto efetivamente pago.',
-    'O faturamento do mês × 12 é a hipótese anual, não o histórico observado.',
+    'O faturamento mensal informado × 12 é a hipótese anual deste modelo, sem consultar histórico fiscal.',
     `Regime estimado: ${tax.regimeName}. UF de referência: ${selectedState.label} (${state}). Não comprova enquadramento tributário.`,
     tax.regime === 'simples_nacional'
       ? (sublimitApplied

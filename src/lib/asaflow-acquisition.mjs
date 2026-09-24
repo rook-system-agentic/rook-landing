@@ -2,6 +2,7 @@ import {createHash} from 'node:crypto';
 import {ERP_SYSTEMS,REVENUE_BANDS,normalizePhone} from './acquisition.mjs';
 import {segmentoPorSlug} from './cmv-benchmarks.mjs';
 import {appendLeadAttribution,LEAD_DESCRIPTION_MAX_LENGTH} from './lead-attribution.mjs';
+import {financialReferenceLabel} from './financial-reference.mjs';
 
 const BASE='https://app.asaflow.com.br/api/v1';
 const hash=value=>createHash('sha256').update(value).digest('hex');
@@ -18,7 +19,7 @@ export function buildLeadDescription(lead) {
     `Referência da solicitação: ${lead.submissionId}`,
   ].map(line=>line.replace(/[\r\n\u0085\u2028\u2029]+/g,' '));
   if(lead.simulation) {
-    lines.push('', `Cenário financeiro informado pelo visitante — mês ${lead.period}:`,lead.simulation.summary,
+    lines.push('', `Cenário financeiro informado pelo visitante — ${lead.referenceBasis?financialReferenceLabel({referenceBasis:lead.referenceBasis}):`mês ${lead.period}`}:`,lead.simulation.summary,
       `Entradas: ${JSON.stringify(lead.simulation.inputs)}`,`Fórmula: ${lead.simulation.formulaVersion}`,
       ...lead.simulation.assumptions);
   }
