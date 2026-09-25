@@ -47,13 +47,22 @@ spec:
                     secretKeyRef:
                       name: rook-lp-production-env
                       key: CRON_SECRET
-              # $(CRON_SECRET) é expandido pelo próprio Kubernetes.
+              # O controlador de NetworkPolicy do k3s (kube-router) só libera o IP
+              # de um pod novo ~1s depois do start: chamar a rota de cara dava
+              # `curl: (7) Failed to connect` em TODAS as execuções (medido em
+              # 25/09/2026, 12:00–15:00Z; o rook-system tem a mesma espera em
+              # k8s/production/cron/render-cronjobs.mjs desde 23/09). Espera o
+              # Service responder qualquer HTTP (GET / sem efeito) e só então
+              # chama a rota UMA vez — a repetição automática do curl repetiria
+              # também em 5xx e timeout e publicaria em dobro. --fail-with-body leva o corpo do
+              # erro para o log do Job.
+              # $CRON_SECRET é expandido pelo sh, a partir do env acima; sem
+              # `$(...)` no script, que o Kubernetes expandiria.
+              command: ["sh", "-c"]
               args:
-                - -fsS
-                - --max-time
-                - "330"
-                - -H
-                - "Authorization: Bearer $(CRON_SECRET)"
+                - 'for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do curl -s -o /dev/null --max-time 2 "$1/" && break; sleep 1; done; exec curl -sS --fail-with-body --max-time 330 -H "Authorization: Bearer $CRON_SECRET" "$2"'
+                - cron
+                - http://rook-lp.rook-production.svc.cluster.local
                 - http://rook-lp.rook-production.svc.cluster.local/api/content/cron/publish-scheduled
               resources:
                 requests: { cpu: 10m, memory: 16Mi }
