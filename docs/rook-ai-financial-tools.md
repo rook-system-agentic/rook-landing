@@ -54,8 +54,8 @@ esse código ao visitante. A UF precisa ser confirmada, sem assumir SP no chat.
 
 O motor calcula os impostos estimados e a receita após esses impostos,
 converte o CMV conforme a base declarada e faz a comparação por segmento.
-Apresente bruto, imposto estimado, líquido estimado e a base do CMV com as
-premissas retornadas. Não apresente a estimativa como apuração fiscal ou
+Apresente bruto, imposto estimado, líquido estimado e a base do CMV com o
+resumo e o aviso públicos retornados. Não publique premissas internas. Não apresente a estimativa como apuração fiscal ou
 promessa de economia. Os detalhes do modelo ficam em
 [`cmv-faturamento-bruto.md`](./cmv-faturamento-bruto.md).
 
@@ -70,12 +70,35 @@ relativa ou o mês legado já informado.
 ## Ponto de equilíbrio
 
 `POST /api/ai/tools/estimar-ponto-equilibrio/` corresponde a
-`estimar_ponto_equilibrio`. A matemática permanece a mesma: receita bruta,
-CMV, impostos, taxas e outros custos variáveis em percentuais sobre a mesma
-receita, mais custos fixos em reais. A referência passa a aceitar as mesmas
-duas escolhas sem mês. Não use o CMV percentual sobre líquido diretamente
-como se fosse percentual sobre bruto, nem reaplique a dedução de imposto do
-CMV à receita desta ferramenta.
+`estimar_ponto_equilibrio`. Use receita bruta, CMV, taxas e outros custos
+variáveis em percentuais sobre a mesma receita, mais custos fixos em reais.
+Não use CMV sobre líquido como se fosse sobre bruto. Taxas de cartão e delivery
+precisam representar o custo sobre o faturamento total, não a tarifa de um
+canal aplicada a todas as vendas.
+
+### Impostos em reais ou percentual
+
+| Modo | Campo | Valor confirmado |
+| --- | --- | --- |
+| `taxInputMode=amount` | `taxAmount` | Impostos sobre vendas em reais, na mesma referência da receita. |
+| `taxInputMode=percent` | `taxPercent` | Percentual do faturamento bruto da mesma referência. |
+| Modo ausente (legado) | `taxPercent` | Compatibilidade com cenários já existentes em percentual. |
+
+Na interface do diagnóstico, o modo inicial é o valor da guia em reais. Na
+média dos 12 meses, informe a média mensal dos impostos referentes às mesmas
+vendas. Não inclua guias atrasadas, multas ou tributos da folha já contabilizados
+nos custos fixos. Zero precisa ser informado; desconhecido não é zero.
+
+Não envie `taxAmount` e `taxPercent` juntos, mesmo que um seja zero. A troca de
+modo exige novo valor e nova confirmação. O motor converte o valor em reais
+em participação sobre a receita, preservando a precisão para calcular o ponto
+de equilíbrio. O imposto continua proporcional às vendas no cenário; não se
+transforma em custo fixo. Não arredonde uma taxa calculada na integração nem
+substitua o valor em reais por esse percentual.
+
+O modo e o valor originais são preservados no contexto e nos cards internos.
+Respostas HTTP devolvem somente dados públicos; a memória de cálculo permanece
+no servidor. Esta mudança do contrato não configura o agente nativo do AsaFlow.
 
 ## Confirmação e retorno à conversa
 
@@ -86,7 +109,7 @@ CMV à receita desta ferramenta.
    estimados. Ainda não houve cálculo.
 3. Somente depois da resposta do visitante, reenviar com `confirmed=true`.
    Qualquer correção invalida a confirmação anterior.
-4. `success`: apresentar resultado e premissas retornados pelo motor.
+4. `success`: apresentar resultado, resumo e aviso públicos retornados pelo motor.
    `no_reference` não autoriza inventar benchmark; `non_positive_margin`
    não autoriza inventar um ponto de equilíbrio.
 5. `invalid_input`: corrigir o cenário e obter nova confirmação. Não reutilizar

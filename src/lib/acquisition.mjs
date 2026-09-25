@@ -47,10 +47,11 @@ export function validateAcquisition(candidate,cities) {
   if(!simulation && ['cmv','breakeven'].includes(candidate.intent)) {
     const grossCmv=candidate.intent==='cmv' && candidate.revenueBasis==='gross';
     const amountCmv=grossCmv && candidate.cmvInputMode==='amount';
+    const amountTax=candidate.intent==='breakeven' && candidate.taxInputMode==='amount';
     const fields=candidate.intent==='cmv'
       ? ['revenue',amountCmv?'cmvAmount':'cmvPercent']
-      : ['revenue','cmvPercent','fixedCosts','taxPercent','feesPercent','otherVariablePercent'];
-    const labels={revenue:grossCmv?'Faturamento bruto mensal (R$)':'Receita mensal (R$)',cmvAmount:'Ingredientes consumidos (R$)',cmvPercent:'CMV (%)',fixedCosts:'Custos fixos (R$)',taxPercent:'Impostos (%)',feesPercent:'Taxas (%)',otherVariablePercent:'Outros variáveis (%)'};
+      : ['revenue','cmvPercent','fixedCosts',amountTax?'taxAmount':'taxPercent','feesPercent','otherVariablePercent'];
+    const labels={revenue:grossCmv?'Faturamento bruto mensal (R$)':'Receita mensal (R$)',cmvAmount:'Ingredientes consumidos (R$)',cmvPercent:'CMV (%)',fixedCosts:'Custos fixos (R$)',taxPercent:'Impostos (%)',taxAmount:'Impostos sobre vendas informados (R$)',feesPercent:'Taxas (%)',otherVariablePercent:'Outros variáveis (%)'};
     const known=[];const missing=[];
     for(const field of fields){
       const value=parseBrazilianNumber(candidate[field]);

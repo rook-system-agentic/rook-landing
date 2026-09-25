@@ -38,7 +38,9 @@ export function buildSimulationInput(answers, tool) {
   };
   const common={tool,...reference,revenueBasis:tool==='cmv'?'net':'gross',revenue:parseBrazilianNumber(answers.revenue),cmvPercent:parseBrazilianNumber(answers.cmvPercent)};
   return tool==='cmv' ? {...common,segment:answers.segment} : {...common,
-    fixedCosts:parseBrazilianNumber(answers.fixedCosts),taxPercent:parseBrazilianNumber(answers.taxPercent),
+    fixedCosts:parseBrazilianNumber(answers.fixedCosts),
+    ...(answers.taxInputMode !== undefined ? {taxInputMode:answers.taxInputMode} : {}),
+    ...(answers.taxInputMode === 'amount' ? {taxAmount:parseBrazilianNumber(answers.taxAmount)} : {taxPercent:parseBrazilianNumber(answers.taxPercent)}),
     feesPercent:parseBrazilianNumber(answers.feesPercent),otherVariablePercent:parseBrazilianNumber(answers.otherVariablePercent)};
 }
 

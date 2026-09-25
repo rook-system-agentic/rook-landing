@@ -36,6 +36,13 @@ const cmvChoice = {
   ],
 };
 
+const taxChoice = {
+  oneOf: [
+    { properties: { taxInputMode: { const: 'percent' } }, required: ['taxPercent'], ...forbiddenFields(['taxAmount']) },
+    { properties: { taxInputMode: { const: 'amount' } }, required: ['taxInputMode', 'taxAmount'], ...forbiddenFields(['taxPercent']) },
+  ],
+};
+
 const definitions = [
   {
     name: 'analisar_cmv',
@@ -56,13 +63,16 @@ const definitions = [
   {
     name: 'estimar_ponto_equilibrio',
     calculation: 'breakeven',
-    description: 'Estima o ponto de equilíbrio mensal usando custos fixos e percentuais variáveis separados. Prefira último mês ou média mensal dos últimos 12 meses, sem pedir data; receita e custos precisam da mesma janela. Não cadastra contato.',
-    required: [...commonRequired, 'cmvPercent', 'fixedCosts', 'taxPercent', 'feesPercent', 'otherVariablePercent'],
-    choices: [referenceChoice],
+    description: 'Estima o ponto de equilíbrio mensal usando custos fixos e variáveis separados. Aceita impostos em reais ou percentual do faturamento bruto. Prefira último mês ou média mensal dos últimos 12 meses, sem pedir data; receita e custos precisam da mesma janela. Não cadastra contato.',
+    required: [...commonRequired, 'cmvPercent', 'fixedCosts', 'feesPercent', 'otherVariablePercent'],
+    choices: [referenceChoice, taxChoice],
     properties: {
       ...sharedProperties,
       revenueBasis: { type: 'string', const: 'gross', description: 'Receita bruta e todos os percentuais sobre essa mesma base, explicitamente confirmados.' },
+      confirmed: { ...sharedProperties.confirmed, description: `${sharedProperties.confirmed.description} Confirme também o modo e o valor dos impostos sobre vendas, sem duplicá-los nos custos fixos.` },
       fixedCosts: amount('Custos fixos do último mês ou média mensal dos mesmos 12 meses da receita. Zero somente se informado; desconhecido não é zero.'),
+      taxInputMode: { type: 'string', enum: ['amount', 'percent'], description: 'Modo confirmado pelo visitante: valor dos impostos sobre vendas em reais ou percentual do faturamento bruto. Sem modo, apenas taxPercent legado é aceito. Nunca confundir reais com percentual.' },
+      taxAmount: amount('Impostos sobre vendas em reais referentes ao mesmo último mês da receita ou média mensal dos mesmos 12 meses. Não incluir guias atrasadas, multas ou tributos de folha já nos custos fixos. Zero somente se informado. O motor converte para percentual sem arredondamento antecipado.'),
       taxPercent: percent('Impostos sobre a receita bruta da mesma janela. Na média, impostos totais / receita total, não média simples das alíquotas.'),
       feesPercent: percent('Taxas de cartão e delivery sobre a receita bruta total da mesma janela, sem repetir custos.'),
       otherVariablePercent: percent('Outros custos variáveis sobre a mesma receita bruta e janela, sem repetir custos.'),
@@ -92,6 +102,7 @@ function fieldError(field, value, schema) {
     segment: 'Selecione um segmento da lista ou other.',
     cmvInputMode: 'Confirme se o CMV é informado em reais, percentual do bruto ou percentual do líquido estimado.',
     taxState: 'Confirme uma UF válida para estimar os impostos.',
+    taxInputMode: 'Confirme se os impostos são informados em reais ou percentual.',
   }[field] ?? 'Selecione uma opção válida.';
   if (field === 'taxModelVersion' && value !== schema.const) return 'Atualize a integração para usar a versão atual das premissas de impostos.';
   return null;
@@ -142,6 +153,16 @@ export function executeFinancialChatTool(toolName, candidate) {
       required.push('cmvInputMode', 'taxState', 'taxModelVersion');
       if (candidate.cmvInputMode === 'amount') required.push('cmvAmount');
       else if (['gross_percent', 'net_percent'].includes(candidate.cmvInputMode)) required.push('cmvPercent');
+    }
+  }
+  if (toolName === 'estimar_ponto_equilibrio') {
+    if (present('taxAmount') && present('taxPercent')) errors.taxInputMode = 'Informe o imposto em reais ou percentual, sem misturar os dois.';
+    if (candidate.taxInputMode === 'amount') {
+      required.push('taxAmount');
+      if (present('taxPercent')) errors.taxPercent = 'Este campo não pertence ao modo de impostos confirmado.';
+    } else {
+      required.push('taxPercent');
+      if (present('taxAmount')) errors.taxInputMode = 'Confirme o modo amount para informar o valor da guia em reais.';
     }
   }
   if (present('confirmed') && typeof candidate.confirmed !== 'boolean') errors.confirmed = 'A confirmação precisa ser true ou false.';

@@ -16,14 +16,31 @@ export function validateFinancialInput(candidate) {
   const errors = {};
   const inputs = { tool: candidate.tool, revenueBasis: candidate.revenueBasis, ...reference.value };
   if (!['cmv', 'breakeven'].includes(candidate.tool)) errors.tool = 'Escolha uma ferramenta.';
+  if (candidate.tool === 'breakeven') {
+    const hasAmount = candidate.taxAmount !== undefined;
+    const hasPercent = candidate.taxPercent !== undefined;
+    if (candidate.taxInputMode !== undefined && !['amount', 'percent'].includes(candidate.taxInputMode)) {
+      errors.taxInputMode = 'Informe os impostos em reais ou em percentual.';
+    } else if (hasAmount && hasPercent) {
+      errors.taxInputMode = 'Informe os impostos em reais ou em percentual, sem misturar as duas formas.';
+    } else if (hasAmount && candidate.taxInputMode !== 'amount') {
+      errors.taxInputMode = 'Selecione a opção em reais para informar o valor dos impostos.';
+    } else if (hasPercent && candidate.taxInputMode === 'amount') {
+      errors.taxInputMode = 'Selecione a opção em percentual para informar a alíquota dos impostos.';
+    }
+    // A ausência do modo preserva o contrato antigo, baseado em taxPercent.
+    if (candidate.taxInputMode !== undefined) inputs.taxInputMode = candidate.taxInputMode;
+  }
+  const taxField = candidate.taxInputMode === 'amount' ? 'taxAmount' : 'taxPercent';
   const fields = candidate.tool === 'breakeven'
-    ? ['revenue', 'cmvPercent', 'fixedCosts', 'taxPercent', 'feesPercent', 'otherVariablePercent']
+    ? ['revenue', 'cmvPercent', 'fixedCosts', taxField, 'feesPercent', 'otherVariablePercent']
     : ['revenue', 'cmvPercent'];
   for (const field of fields) {
     const value = candidate[field];
     const limit = field.endsWith('Percent') ? 100 : 1_000_000_000;
     if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > limit || (field === 'revenue' && money(value) === 0)) {
-      errors[field] = field.endsWith('Percent') ? 'Informe um percentual entre 0 e 100.' : 'Informe um valor válido em reais.';
+      errors[field] = field.endsWith('Percent') ? 'Informe um percentual entre 0 e 100.'
+        : field === 'taxAmount' ? 'Informe o valor dos impostos em reais.' : 'Informe um valor válido em reais.';
     } else inputs[field] = money(value);
   }
   const expectedBasis = candidate.tool === 'cmv' ? 'net' : 'gross';

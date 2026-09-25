@@ -12,6 +12,8 @@ export interface FinancialInput {
   taxModelVersion?: string;
   segment?: string;
   fixedCosts?: number;
+  taxInputMode?: 'amount' | 'percent';
+  taxAmount?: number;
   taxPercent?: number;
   feesPercent?: number;
   otherVariablePercent?: number;

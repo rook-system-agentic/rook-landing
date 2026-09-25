@@ -7,7 +7,7 @@ export function publicFinancialInputs(inputs) {
   return pick(inputs, [
     'tool', 'revenueBasis', 'revenue', 'referenceBasis', 'period', 'segment',
     'cmvInputMode', 'cmvAmount', 'cmvPercent', 'taxState', 'fixedCosts',
-    'taxPercent', 'feesPercent', 'otherVariablePercent',
+    'taxInputMode', 'taxAmount', 'taxPercent', 'feesPercent', 'otherVariablePercent',
   ]);
 }
 

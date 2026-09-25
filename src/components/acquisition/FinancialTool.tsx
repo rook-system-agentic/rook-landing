@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useCallback, useEffect, useId, useRef, useState } from 'react';
+import { FormEvent, Fragment, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 import { culinarySegments } from '@/lib/culinary-segments.mjs';
 import { CMV_TAX_MODEL_VERSION, TAX_STATES } from '@/lib/cmv-input-options.mjs';
@@ -15,9 +15,8 @@ import styles from './financial-tool.module.css';
 type NumericField = { key: string; label: string; help: string; unit: 'R$' | '%' };
 
 const FIXED_AND_VARIABLE_FIELDS: NumericField[] = [
-  { key: 'fixedCosts', label: 'Custos fixos mensais', unit: 'R$', help: 'Folha, aluguel e pró-labore. Separe os custos que variam com as vendas.' },
-  { key: 'taxPercent', label: 'Impostos', unit: '%', help: 'Percentual sobre a receita bruta da referência escolhida.' },
-  { key: 'feesPercent', label: 'Taxas de cartão e delivery', unit: '%', help: 'Percentual sobre a receita bruta total, sem repetir valores do CMV.' },
+  { key: 'fixedCosts', label: 'Custos fixos mensais', unit: 'R$', help: 'Folha, aluguel e pró-labore. Não repita ingredientes, impostos sobre vendas ou taxas já informados nos outros campos.' },
+  { key: 'feesPercent', label: 'Taxas de cartão e delivery', unit: '%', help: 'Use o total pago em taxas de cartão e delivery como percentual de todas as vendas. A taxa do aplicativo, aplicada só ao delivery, não é esse percentual.' },
   { key: 'otherVariablePercent', label: 'Outros custos variáveis', unit: '%', help: 'Comissões e demais custos variáveis, sobre a mesma receita bruta.' },
 ];
 
@@ -34,7 +33,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const id = useId();
   const [answers, setAnswers] = useState<Record<string, string>>((): Record<string, string> => tool === 'cmv'
     ? { revenueBasis: 'gross', cmvInputMode: 'amount', taxState: 'SP', taxModelVersion: CMV_TAX_MODEL_VERSION }
-    : {});
+    : { taxInputMode: 'amount' });
   const [unknown, setUnknown] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [result, setResult] = useState<PublicFinancialSuccess | null>(null);
@@ -45,6 +44,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const isCmv = tool === 'cmv';
   const isAverage = answers.referenceBasis === 'monthly_average_12m';
   const cmvInputMode = answers.cmvInputMode || 'amount';
+  const taxInputMode = answers.taxInputMode || 'amount';
   const ContentHeading = embedded ? 'h3' : 'h2';
 
   const shareWithForm = useCallback(() => {
@@ -65,6 +65,14 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     };
   }, [id, result, incomplete, shareWithForm]);
 
+  const taxField: NumericField = taxInputMode === 'amount' ? {
+    key: 'taxAmount', label: isAverage ? 'Impostos sobre as vendas, em média por mês' : 'Impostos sobre as vendas no último mês', unit: 'R$',
+    help: `${isAverage ? 'Use a média mensal dos impostos sobre as vendas dos mesmos 12 meses.' : 'Use o valor da guia dos impostos sobre as vendas do último mês.'} Deixe de fora guias atrasadas, multas e tributos da folha já incluídos nos custos fixos.`,
+  } : {
+    key: 'taxPercent', label: 'Impostos sobre o faturamento', unit: '%',
+    help: `${isAverage ? 'Use o percentual dos impostos sobre o faturamento total dos mesmos 12 meses.' : 'Use o percentual dos impostos sobre o faturamento do último mês.'} Deixe de fora guias atrasadas, multas e tributos da folha já incluídos nos custos fixos.`,
+  };
+
   const fields: NumericField[] = [
     {
       key: 'revenue', label: isAverage ? 'Quanto seu restaurante vendeu por mês, em média?' : 'Quanto seu restaurante vendeu no último mês?', unit: 'R$',
@@ -82,9 +90,9 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
         : 'Use apenas se seu relatório já calcula o CMV sobre a receita após impostos. Nesta simulação, aplicaremos esse percentual à receita líquida estimada.',
     } : {
       key: 'cmvPercent', label: 'CMV apurado', unit: '%',
-      help: 'CMV em percentual da receita bruta da referência escolhida. Compras, sozinhas, não medem o consumo do estoque.',
+      help: 'Use o custo dos ingredientes consumidos como percentual das vendas antes dos impostos, não da receita líquida. Compras, sozinhas, não medem o consumo do estoque.',
     },
-    ...(isCmv ? [] : FIXED_AND_VARIABLE_FIELDS),
+    ...(isCmv ? [] : [FIXED_AND_VARIABLE_FIELDS[0], taxField, ...FIXED_AND_VARIABLE_FIELDS.slice(1)]),
   ];
   const missingFields = fields.filter(field => unknown[field.key]);
 
@@ -103,7 +111,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     setAnswers(previous => {
       const next: Record<string, string> = { ...previous, referenceBasis: value };
       delete next.period;
-      for (const key of ['revenue', 'cmvAmount', 'cmvPercent', 'fixedCosts', 'taxPercent', 'feesPercent', 'otherVariablePercent']) delete next[key];
+      for (const key of ['revenue', 'cmvAmount', 'cmvPercent', 'fixedCosts', 'taxAmount', 'taxPercent', 'feesPercent', 'otherVariablePercent']) delete next[key];
       return next;
     });
     setUnknown({});
@@ -131,11 +139,28 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     resetResult();
   }
 
+  function changeTaxInputMode(value: string) {
+    setAnswers(previous => {
+      const next: Record<string, string> = { ...previous, taxInputMode: value };
+      delete next.taxAmount;
+      delete next.taxPercent;
+      return next;
+    });
+    setUnknown(previous => {
+      const next = { ...previous };
+      delete next.taxAmount;
+      delete next.taxPercent;
+      return next;
+    });
+    resetResult();
+  }
+
   function scenarioAnswers() {
     const values = { ...answers };
     // Um valor marcado como desconhecido nunca vira zero nem um valor anterior.
     for (const field of fields) if (unknown[field.key]) delete values[field.key];
     if (isCmv) delete values[cmvInputMode === 'amount' ? 'cmvPercent' : 'cmvAmount'];
+    else delete values[taxInputMode === 'amount' ? 'taxPercent' : 'taxAmount'];
     return values;
   }
 
@@ -314,7 +339,18 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
                 {errors.cmvInputMode && <p id={`${id}-cmvInputMode-error`} className={styles.fieldError}>{errors.cmvInputMode}</p>}
               </div>
             </>}
-            {fields.slice(1).map(numericField)}
+            {fields.slice(1).map(field => <Fragment key={field.key}>
+              {!isCmv && field.key === taxField.key && <div className={styles.field}>
+                <label htmlFor={`${id}-taxInputMode`}>Como você prefere informar os impostos?</label>
+                <select id={`${id}-taxInputMode`} value={taxInputMode} onChange={event => changeTaxInputMode(event.target.value)} aria-invalid={!!errors.taxInputMode} aria-describedby={`${id}-taxInputMode-help${errors.taxInputMode ? ` ${id}-taxInputMode-error` : ''}`} required>
+                  <option value="amount">Valor da guia em reais (R$)</option>
+                  <option value="percent">Percentual sobre o faturamento (%)</option>
+                </select>
+                <p id={`${id}-taxInputMode-help`} className={styles.fieldHelp}>Use a mesma referência das vendas. Ao trocar a forma de informar, o valor dos impostos é limpo.</p>
+                {errors.taxInputMode && <p id={`${id}-taxInputMode-error`} className={styles.fieldError}>{errors.taxInputMode}</p>}
+              </div>}
+              {numericField(field)}
+            </Fragment>)}
           </fieldset>
           {hasErrors && <p className={styles.error} role="alert" tabIndex={-1} ref={errorSummary}>{errors.form || errors.taxModelVersion || 'Revise os campos indicados para continuar.'}</p>}
           <button className={`btn-primary ${styles.calculate}`} type="submit" disabled={busy}>{busy ? 'Calculando…' : missingFields.length ? 'Continuar com os dados disponíveis' : isCmv ? 'Analisar meu CMV' : 'Calcular ponto de equilíbrio'}</button>

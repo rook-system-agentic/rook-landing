@@ -5,7 +5,7 @@ export const DIAGNOSTIC_CONTEXT_EVENT = 'rook:diagnostic-context';
 
 const fields = {
   cmv: ['period', 'referenceBasis', 'segment', 'revenue', 'cmvPercent', 'cmvAmount', 'revenueBasis', 'cmvInputMode', 'taxState', 'taxModelVersion'],
-  breakeven: ['period', 'referenceBasis', 'revenue', 'cmvPercent', 'fixedCosts', 'taxPercent', 'feesPercent', 'otherVariablePercent'],
+  breakeven: ['period', 'referenceBasis', 'revenue', 'cmvPercent', 'fixedCosts', 'taxInputMode', 'taxAmount', 'taxPercent', 'feesPercent', 'otherVariablePercent'],
 };
 
 // Só números e metadados do cenário transitam entre calculadora e formulário.

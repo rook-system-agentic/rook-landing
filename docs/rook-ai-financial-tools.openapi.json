@@ -239,6 +239,22 @@
                     "otherVariablePercent": 5,
                     "confirmed": false
                   }
+                },
+                "taxBillConfirmed": {
+                  "summary": "Valor mensal dos impostos sobre vendas em reais, na mesma referência do faturamento.",
+                  "value": {
+                    "referenceBasis": "last_month",
+                    "currency": "BRL",
+                    "revenueBasis": "gross",
+                    "revenue": 150000,
+                    "cmvPercent": 35,
+                    "fixedCosts": 60000,
+                    "taxInputMode": "amount",
+                    "taxAmount": 12000,
+                    "feesPercent": 2,
+                    "otherVariablePercent": 5,
+                    "confirmed": true
+                  }
                 }
               }
             }
@@ -1409,7 +1425,7 @@
           "confirmed": {
             "type": "boolean",
             "const": true,
-            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação."
+            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação. Confirme também o modo e o valor dos impostos sobre vendas, sem duplicá-los nos custos fixos."
           },
           "revenueBasis": {
             "type": "string",
@@ -1421,6 +1437,20 @@
             "minimum": 0,
             "maximum": 1000000000,
             "description": "Custos fixos do último mês ou média mensal dos mesmos 12 meses da receita. Zero somente se informado; desconhecido não é zero."
+          },
+          "taxInputMode": {
+            "type": "string",
+            "enum": [
+              "amount",
+              "percent"
+            ],
+            "description": "Modo confirmado pelo visitante: valor dos impostos sobre vendas em reais ou percentual do faturamento bruto. Sem modo, apenas taxPercent legado é aceito. Nunca confundir reais com percentual."
+          },
+          "taxAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000000,
+            "description": "Impostos sobre vendas em reais referentes ao mesmo último mês da receita ou média mensal dos mesmos 12 meses. Não incluir guias atrasadas, multas ou tributos de folha já nos custos fixos. Zero somente se informado. O motor converte para percentual sem arredondamento antecipado."
           },
           "taxPercent": {
             "type": "number",
@@ -1448,7 +1478,6 @@
           "confirmed",
           "cmvPercent",
           "fixedCosts",
-          "taxPercent",
           "feesPercent",
           "otherVariablePercent"
         ],
@@ -1472,6 +1501,49 @@
                 "not": {
                   "required": [
                     "referenceBasis"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "taxInputMode": {
+                    "const": "percent"
+                  }
+                },
+                "required": [
+                  "taxPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "taxAmount"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "taxInputMode": {
+                    "const": "amount"
+                  }
+                },
+                "required": [
+                  "taxInputMode",
+                  "taxAmount"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "taxPercent"
+                      ]
+                    }
                   ]
                 }
               }
@@ -1560,7 +1632,7 @@
               "boolean",
               "null"
             ],
-            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação. False, null ou ausência pedem confirmação."
+            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação. Confirme também o modo e o valor dos impostos sobre vendas, sem duplicá-los nos custos fixos. False, null ou ausência pedem confirmação."
           },
           "revenueBasis": {
             "anyOf": [
@@ -1588,6 +1660,36 @@
               }
             ],
             "description": "Custos fixos do último mês ou média mensal dos mesmos 12 meses da receita. Zero somente se informado; desconhecido não é zero."
+          },
+          "taxInputMode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "amount",
+                  "percent"
+                ],
+                "description": "Modo confirmado pelo visitante: valor dos impostos sobre vendas em reais ou percentual do faturamento bruto. Sem modo, apenas taxPercent legado é aceito. Nunca confundir reais com percentual."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Modo confirmado pelo visitante: valor dos impostos sobre vendas em reais ou percentual do faturamento bruto. Sem modo, apenas taxPercent legado é aceito. Nunca confundir reais com percentual."
+          },
+          "taxAmount": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000,
+                "description": "Impostos sobre vendas em reais referentes ao mesmo último mês da receita ou média mensal dos mesmos 12 meses. Não incluir guias atrasadas, multas ou tributos de folha já nos custos fixos. Zero somente se informado. O motor converte para percentual sem arredondamento antecipado."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Impostos sobre vendas em reais referentes ao mesmo último mês da receita ou média mensal dos mesmos 12 meses. Não incluir guias atrasadas, multas ou tributos de folha já nos custos fixos. Zero somente se informado. O motor converte para percentual sem arredondamento antecipado."
           },
           "taxPercent": {
             "anyOf": [
@@ -1633,7 +1735,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use também o descritor *_confirmed. Não envie nomes, contato, mensagens, resultados prévios ou outros campos. Campos exigidos dependem da base e do modo de CMV. Use uma única referência. A validação da rota rejeita bases, referências e campos de CMV contraditórios."
+        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use o descritor *_confirmed. Impostos: taxInputMode=amount exige taxAmount; percent exige taxPercent; ausência de modo mantém apenas o taxPercent legado. Valores e percentuais concorrentes são rejeitados. Use uma única referência. Não envie nomes, contato, mensagens ou resultados prévios."
       },
       "estimar_ponto_equilibrio_inputs": {
         "type": "object",
@@ -1690,6 +1792,20 @@
             "minimum": 0,
             "maximum": 100,
             "description": "Outros custos variáveis sobre a mesma receita bruta e janela, sem repetir custos."
+          },
+          "taxInputMode": {
+            "type": "string",
+            "enum": [
+              "amount",
+              "percent"
+            ],
+            "description": "Modo confirmado pelo visitante: valor dos impostos sobre vendas em reais ou percentual do faturamento bruto. Sem modo, apenas taxPercent legado é aceito. Nunca confundir reais com percentual."
+          },
+          "taxAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000000,
+            "description": "Impostos sobre vendas em reais referentes ao mesmo último mês da receita ou média mensal dos mesmos 12 meses. Não incluir guias atrasadas, multas ou tributos de folha já nos custos fixos. Zero somente se informado. O motor converte para percentual sem arredondamento antecipado."
           }
         },
         "required": [
@@ -1698,12 +1814,56 @@
           "revenueBasis",
           "cmvPercent",
           "fixedCosts",
-          "taxPercent",
           "feesPercent",
           "otherVariablePercent"
         ],
         "additionalProperties": false,
-        "description": "Entradas financeiras confirmadas. referenceBasis novo acompanha o cálculo; period legado fica no contexto externo. Não contém data inferida."
+        "description": "Entradas financeiras confirmadas. referenceBasis novo acompanha o cálculo; period legado fica no contexto externo. Não contém data inferida.",
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "taxInputMode": {
+                    "const": "percent"
+                  }
+                },
+                "required": [
+                  "taxPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "taxAmount"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "taxInputMode": {
+                    "const": "amount"
+                  }
+                },
+                "required": [
+                  "taxInputMode",
+                  "taxAmount"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "taxPercent"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       },
       "estimar_ponto_equilibrio_needs_information": {
         "type": "object",
@@ -1731,7 +1891,8 @@
                 "fixedCosts",
                 "taxPercent",
                 "feesPercent",
-                "otherVariablePercent"
+                "otherVariablePercent",
+                "taxAmount"
               ]
             }
           }

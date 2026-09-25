@@ -21,7 +21,7 @@ O visitante continua sabendo que os impostos são estimados e que a análise nã
 
 ## Contrato HTTP v2
 
-`rook-ai-financial-tools.openapi.json` documenta a resposta pública v2. Os contratos de entrada e a confirmação permanecem iguais. A saída contém `inputs`, `result`, `summary` e `notice`; deixa de devolver `assumptions`, `formulaVersion`, benchmarks e demais detalhes internos. Integrações devem guardar as entradas originais para correções e confirmações, em vez de reconstruir a requisição a partir da resposta filtrada. O identificador público do modelo continua sendo exigido na entrada; não contém a tabela fiscal.
+`rook-ai-financial-tools.openapi.json` documenta a resposta pública v2. A confirmação permanece obrigatória. O ponto de equilíbrio aceita impostos em reais (`taxInputMode=amount`, `taxAmount`) ou percentual (`taxInputMode=percent`, `taxPercent`); o percentual legado sem modo continua válido. A entrada em reais é um dado do visitante, preservado como tal no contexto e na saída pública, sem expor a taxa derivada ou a memória de cálculo. A saída contém `inputs`, `result`, `summary` e `notice`; deixa de devolver `assumptions`, `formulaVersion`, benchmarks e demais detalhes internos. Integrações devem guardar as entradas originais para correções e confirmações, em vez de reconstruir a requisição a partir da resposta filtrada. O identificador público do modelo continua sendo exigido na entrada; não contém a tabela fiscal.
 
 O adaptador puro interno mantém o objeto completo; a filtragem ocorre na fronteira HTTP. Consumidores de HTTP devem utilizar o resumo e o aviso públicos. A alteração do contrato não comprova conexão das ferramentas com o agente nativo do AsaFlow.
 
