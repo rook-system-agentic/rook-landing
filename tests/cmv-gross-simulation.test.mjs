@@ -75,10 +75,12 @@ test('contexto → cadastro → CRM e card mantêm bruto, imposto estimado e lí
   const answers = { period: '2026-08', segment: 'a_la_carte', revenue: '100.000,00', cmvAmount: '35.000,00',
     cmvInputMode: 'amount', revenueBasis: 'gross', taxState: 'SP', taxModelVersion: CMV_TAX_MODEL_VERSION };
   const context = readDiagnosticContext({ sourceId: 'cmv', intent: 'cmv', answers, simulation: buildSimulationInput(answers, 'cmv') });
-  assert.equal(context.result.result.estimatedNetRevenue, 91175);
+  assert.equal(context.result.result, undefined);
+  assert.equal(context.result.assumptions, undefined);
   const parsed = validateAcquisition({ ...lead, ...context.answers, intent: 'cmv', simulation: context.result.inputs }, cities);
   assert.equal(parsed.ok, true);
-  assert.deepEqual(parsed.value.simulation, context.result);
+  assert.equal(parsed.value.simulation.result.estimatedNetRevenue, 91175);
+  assert.deepEqual(parsed.value.simulation, calculate(context.result.inputs));
   const description = buildLeadDescription(parsed.value);
   assert.match(description, /100\.000,00.*8\.825,00.*91\.175,00/);
   assert.match(description, /impostos estimados/);

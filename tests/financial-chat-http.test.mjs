@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { handleFinancialChatToolRequest as handle, MAX_FINANCIAL_CHAT_BODY_BYTES as limit } from '../src/lib/financial-chat-http.mjs';
 import { executeFinancialChatTool, FINANCIAL_CHAT_TOOLS } from '../src/lib/financial-chat-tools.mjs';
+import { toPublicFinancialChatResponse } from '../src/lib/public-financial-simulation.mjs';
 
 const cmv = { period: '2026-08', currency: 'BRL', revenueBasis: 'net', revenue: 100000, cmvPercent: 38, segment: 'a_la_carte', confirmed: true };
 const pe = { period: '2026-08', currency: 'BRL', revenueBasis: 'gross', revenue: 150000, cmvPercent: 35, fixedCosts: 60000, taxPercent: 8, feesPercent: 2, otherVariablePercent: 5, confirmed: true };
@@ -14,13 +15,13 @@ const streamRequest = (stream, headers = {}) => new Request('http://localhost/ap
   method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: stream, duplex: 'half',
 });
 
-test('cada ferramenta mantém a resposta do adaptador e nunca permite cache do cenário', async () => {
+test('cada ferramenta devolve somente resultado público e nunca permite cache do cenário', async () => {
   for (const [tool, scenario] of [['analisar_cmv', cmv], ['estimar_ponto_equilibrio', pe]]) {
     const response = await handle(request(scenario, { 'content-type': 'Application/JSON; charset=utf-8' }), tool);
     assert.equal(response.status, 200);
     assert.equal(response.headers.get('cache-control'), 'no-store');
     assert.match(response.headers.get('content-type'), /^application\/json/);
-    assert.deepEqual(await response.json(), executeFinancialChatTool(tool, scenario));
+    assert.deepEqual(await response.json(), toPublicFinancialChatResponse(executeFinancialChatTool(tool, scenario)));
   }
 });
 
@@ -29,7 +30,7 @@ test('dados parciais e confirmação ausente voltam à conversa sem emitir cálc
     const response = await handle(request(scenario), 'analisar_cmv');
     assert.equal(response.status, 200);
     const result = await response.json();
-    assert.deepEqual(result, executeFinancialChatTool('analisar_cmv', scenario));
+    assert.deepEqual(result, toPublicFinancialChatResponse(executeFinancialChatTool('analisar_cmv', scenario)));
     assert.equal(Object.hasOwn(result, 'result'), false);
   }
 });
@@ -107,7 +108,7 @@ test('JSON UTF-8 pode atravessar vários chunks sem alterar seu conteúdo', asyn
     },
   });
   const response = await handle(streamRequest(stream), 'analisar_cmv');
-  assert.deepEqual(await response.json(), executeFinancialChatTool('analisar_cmv', cmv));
+  assert.deepEqual(await response.json(), toPublicFinancialChatResponse(executeFinancialChatTool('analisar_cmv', cmv)));
 });
 
 test('falha na leitura retorna erro fixo e não revela mensagem interna', async () => {

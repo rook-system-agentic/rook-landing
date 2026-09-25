@@ -848,22 +848,15 @@ export const SOBRE_METODO = {
 } as const;
 
 /**
- * A ligação entre a história e o produto — a parte verificável da página.
- *
- * O CMV de referência que a calculadora exibe (`BENCHMARK_FONTE`, em
- * `lib/cmv-benchmarks.mjs`) é a pesquisa que nasceu daquelas consultorias. No
- * código do produto ela aparece nomeada: `cmv-target.ts` resolve a meta pela
- * "média do estudo" e o motor de insights rotula a fonte como a pesquisa de
- * 2024. Ou seja: os vinte anos não são alegação sobre o passado, são o número
- * que calcula o CMV do cliente hoje.
- *
- * É o argumento mais forte da página, e o único que o visitante pode conferir
- * sozinho — basta abrir a calculadora.
+ * A ligação entre a experiência de consultoria e a análise oferecida pelo
+ * produto. As tabelas, fórmulas e premissas de comparação são internas; a
+ * comunicação pública apresenta a utilidade da análise sem prometer acesso
+ * aos parâmetros estratégicos.
  */
 export const SOBRE_PROVA = {
-  texto: "O CMV de referência que a nossa calculadora usa não veio de artigo na internet. É a pesquisa que nasceu dessas consultorias, hoje publicada como",
-  textoFim: "com faixa própria para cada um dos onze segmentos. Toda vez que o Rook diz que a sua casa está dois pontos acima da meta, é esse método fazendo a conta.",
-  ctaLabel: "Ver o CMV de referência da minha casa",
+  texto: "A experiência dessas consultorias orienta a análise que o Rook faz dos números do seu restaurante.",
+  textoFim: "A calculadora considera o segmento e os dados da sua operação para mostrar onde vale investigar e ajudar a preparar a próxima decisão.",
+  ctaLabel: "Analisar o CMV da minha casa",
   ctaHref: "/calculadora-cmv/",
 } as const;
 

@@ -2,18 +2,14 @@
 
 import { FormEvent, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { NumericFormat } from 'react-number-format';
-import { segmentsData } from '@/lib/cmv-benchmarks.mjs';
-import { CMV_TAX_MODEL_VERSION, TAX_STATES } from '@/lib/cmv-tax-estimate.mjs';
-import { buildSimulationInput } from '@/lib/acquisition.mjs';
+import { culinarySegments } from '@/lib/culinary-segments.mjs';
+import { CMV_TAX_MODEL_VERSION, TAX_STATES } from '@/lib/cmv-input-options.mjs';
+import { buildSimulationInput } from '@/lib/acquisition-input.mjs';
 import { DIAGNOSTIC_CONTEXT_EVENT } from '@/lib/diagnostic-context.mjs';
 import { financialReferenceLabel } from '@/lib/financial-reference.mjs';
 import { formatPastedFinancialNumber } from '@/lib/financial-number-input.mjs';
-import {
-  calculateFinancialSimulation,
-  type FinancialResponse,
-  type FinancialSuccess,
-  type FinancialTool as FinancialToolKind,
-} from '@/lib/financial-simulation.mjs';
+import { validateFinancialInput, type FinancialTool as FinancialToolKind } from '@/lib/financial-input.mjs';
+import type { PublicFinancialResponse, PublicFinancialSuccess } from '@/lib/public-financial-simulation.mjs';
 import styles from './financial-tool.module.css';
 
 type NumericField = { key: string; label: string; help: string; unit: 'R$' | '%' };
@@ -41,7 +37,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     : {});
   const [unknown, setUnknown] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [result, setResult] = useState<FinancialSuccess | null>(null);
+  const [result, setResult] = useState<PublicFinancialSuccess | null>(null);
   const [incomplete, setIncomplete] = useState(false);
   const [busy, setBusy] = useState(false);
   const resultHeading = useRef<HTMLHeadingElement>(null);
@@ -53,7 +49,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
 
   const shareWithForm = useCallback(() => {
     window.dispatchEvent(new CustomEvent(DIAGNOSTIC_CONTEXT_EVENT, {
-      detail: { sourceId: id, intent: tool, answers, unknown, simulation: result?.inputs || null },
+      detail: { sourceId: id, intent: tool, answers, unknown, simulation: result ? buildSimulationInput(answers, tool) : null },
     }));
   }, [id, tool, answers, unknown, result]);
 
@@ -160,7 +156,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     setIncomplete(false);
 
     const input = buildSimulationInput(scenarioAnswers(), tool);
-    const validated = calculateFinancialSimulation(input);
+    const validated = validateFinancialInput(input);
     const nextErrors: Record<string, string> = {};
     if (!['last_month', 'monthly_average_12m'].includes(answers.referenceBasis || '')) {
       nextErrors.referenceBasis = 'Escolha entre o último mês e a média mensal dos últimos 12 meses.';
@@ -188,7 +184,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
         body: JSON.stringify(input),
         signal: AbortSignal.timeout(20_000),
       });
-      const data = await response.json() as FinancialResponse;
+      const data = await response.json() as PublicFinancialResponse;
       if (!response.ok || !data.ok) {
         showErrors(!data.ok && data.errors ? data.errors : { form: 'Não foi possível calcular agora. Tente novamente.' });
         return;
@@ -203,11 +199,8 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   }
 
   const breakEven = result?.result.breakEvenRevenue;
-  const difference = result?.result.monthlyDifference;
-  const reference = result?.result.referencePercent;
   const comparisonCmv = result?.result.comparisonCmvPercent ?? result?.inputs.cmvPercent;
   const estimatedTaxAmount = result?.result.estimatedTaxAmount;
-  const estimatedTaxPercent = result?.result.estimatedTaxPercent;
   const estimatedNetRevenue = result?.result.estimatedNetRevenue;
   const grossCmvResult = isCmv && result?.inputs.revenueBasis === 'gross';
   const hasErrors = Object.keys(errors).length > 0;
@@ -296,7 +289,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
               <label htmlFor={`${id}-segment`}>Segmento culinário</label>
               <select id={`${id}-segment`} value={answers.segment || ''} onChange={event => change('segment', event.target.value)} aria-invalid={!!errors.segment} aria-describedby={errors.segment ? `${id}-segment-error` : undefined} required>
                 <option value="">Selecione o segmento</option>
-                {segmentsData.map(segment => <option key={segment.slug} value={segment.slug}>{segment.name}</option>)}
+                {culinarySegments.map(segment => <option key={segment.slug} value={segment.slug}>{segment.name}</option>)}
                 <option value="other">Outro segmento</option>
               </select>
               {errors.segment && <p id={`${id}-segment-error`} className={styles.fieldError}>{errors.segment}</p>}
@@ -308,7 +301,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
                 <select id={`${id}-taxState`} value={answers.taxState} onChange={event => change('taxState', event.target.value)} aria-invalid={!!errors.taxState} aria-describedby={`${id}-taxState-help${errors.taxState ? ` ${id}-taxState-error` : ''}`} required>
                   {TAX_STATES.map(state => <option key={state.code} value={state.code}>{state.label} ({state.code})</option>)}
                 </select>
-                <p id={`${id}-taxState-help`} className={styles.fieldHelp}>Selecione o estado da sua operação. A estimativa usa o faturamento informado e as premissas Rook para esse estado. O imposto efetivo da sua empresa pode ser diferente.</p>
+                <p id={`${id}-taxState-help`} className={styles.fieldHelp}>Selecione o estado da sua operação para estimar os impostos. O valor efetivo da sua empresa pode ser diferente.</p>
                 {errors.taxState && <p id={`${id}-taxState-error`} className={styles.fieldError}>{errors.taxState}</p>}
               </div>
               <div className={styles.field}>
@@ -335,12 +328,11 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
               : result.result.status === 'no_reference' ? 'Ainda não há referência para esse segmento.'
                 : isCmv ? 'Seu CMV em perspectiva.' : 'Seu ponto de equilíbrio estimado.'}</ContentHeading>
             {typeof breakEven === 'number' && <p className={styles.figure}>{currency(breakEven)}<span>de receita por mês para cobrir os custos</span></p>}
-            {isCmv && typeof difference === 'number' && difference > 0 && <p className={styles.figure}>{currency(difference)}<span>de diferença mensal estimada para investigar</span></p>}
             {grossCmvResult && typeof estimatedTaxAmount === 'number' && typeof estimatedNetRevenue === 'number' && <section className={styles.estimate} aria-label="Faturamento e impostos estimados">
-              <h3>Como chegamos à base da comparação</h3>
+              <h3>Resumo dos seus números</h3>
               <dl className={styles.revenueBreakdown}>
                 <div><dt>Faturamento bruto informado</dt><dd>{currency(result.inputs.revenue)}</dd></div>
-                <div><dt>− Impostos estimados{typeof estimatedTaxPercent === 'number' ? ` (${percent(estimatedTaxPercent)})` : ''}</dt><dd>{currency(estimatedTaxAmount)}</dd></div>
+                <div><dt>− Impostos estimados</dt><dd>{currency(estimatedTaxAmount)}</dd></div>
                 <div className={styles.netRevenue}><dt>= Receita líquida estimada</dt><dd>{currency(estimatedNetRevenue)}</dd></div>
               </dl>
               <p>Usamos essa receita após os impostos estimados para comparar seu CMV. Esta simulação não apura o imposto efetivo da sua empresa.</p>
@@ -348,17 +340,8 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
             <p className={styles.summary}>{result.summary}</p>
             {isCmv && typeof comparisonCmv === 'number' && <dl className={styles.metrics}>
               <div><dt>{grossCmvResult ? 'CMV sobre a receita líquida estimada' : 'CMV informado'}</dt><dd>{percent(comparisonCmv, grossCmvResult ? 2 : 3)}</dd></div>
-              {typeof reference === 'number' && <div><dt>Referência do segmento</dt><dd>{percent(reference)}</dd></div>}
             </dl>}
-            <details className={styles.assumptions}>
-              <summary>Ver a conta e as premissas</summary>
-              {result.assumptions.map(assumption => <p key={assumption}>{assumption}</p>)}
-              <p>{isCmv
-                ? grossCmvResult
-                  ? 'Diferença mensal = custo dos ingredientes consumidos − (receita líquida estimada × referência do segmento ÷ 100).'
-                  : 'Diferença mensal = receita líquida × (CMV informado − referência) ÷ 100.'
-                : 'Ponto de equilíbrio = custos fixos ÷ [1 − (CMV + impostos + taxas + outros variáveis) ÷ 100].'}</p>
-            </details>
+            <p className={styles.notice}>{result.notice}</p>
             <div className={styles.nextStep}><h3>Vamos conversar sobre esse resultado?</h3><p>O cenário será incluído no formulário abaixo. O envio acontece quando você confirmar sua solicitação.</p><a href="#cadastro" className="btn-primary" onClick={shareWithForm}>Solicitar demonstração</a></div>
           </> : incomplete ? <>
             <p className={styles.eyebrow}>Cenário incompleto</p>
@@ -369,7 +352,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
           </> : <>
             <p className={styles.eyebrow}>Como usar</p>
             <ContentHeading>Um cenário para orientar a próxima decisão.</ContentHeading>
-            <ol className={styles.steps}><li>Escolha o último mês ou a média mensal dos últimos 12 meses e informe os números da operação.</li><li>Confira o resultado e as premissas da conta.</li><li>Se quiser, leve esse contexto a uma demonstração do Rook.</li></ol>
+            <ol className={styles.steps}><li>Escolha o último mês ou a média mensal dos últimos 12 meses e informe os números da operação.</li><li>Confira a análise dos seus números.</li><li>Se quiser, leve esse contexto a uma demonstração do Rook.</li></ol>
             <p className={styles.note}>A análise é gratuita. Você pode calcular antes de informar seus dados de contato.</p>
           </>}
         </aside>

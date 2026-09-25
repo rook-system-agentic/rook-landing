@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
 export const metadata: Metadata = {
  title: "Análise de CMV para restaurantes | Rook System",
- description: "Compare o CMV informado com uma referência de segmento e entenda a diferença estimada na sua receita.",
+ description: "Analise o custo dos ingredientes do seu restaurante e receba uma orientação a partir dos números da sua operação.",
  keywords: [
   "calculadora cmv restaurante",
   "como calcular cmv restaurante",

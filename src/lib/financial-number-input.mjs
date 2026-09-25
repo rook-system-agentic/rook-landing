@@ -1,4 +1,4 @@
-import { parseBrazilianNumber } from './financial-simulation.mjs';
+import { parseBrazilianNumber } from './financial-number.mjs';
 
 /** Colagem usa o mesmo contrato do cálculo, inclusive ponto decimal móvel. */
 export function formatPastedFinancialNumber(text) {

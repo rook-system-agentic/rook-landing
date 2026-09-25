@@ -1,4 +1,5 @@
 import { executeFinancialChatTool } from './financial-chat-tools.mjs';
+import { toPublicFinancialChatResponse } from './public-financial-simulation.mjs';
 
 export const MAX_FINANCIAL_CHAT_BODY_BYTES = 4096;
 
@@ -15,7 +16,7 @@ function cancelReader(reader) {
 
 /**
  * Transporte para uma ferramenta definida pela rota, sem CRM, armazenamento ou
- * acesso a dados privados. A IA recebe exatamente a resposta do adaptador.
+ * acesso a dados privados. A IA recebe somente a projeção pública do resultado.
  * O limite vale para os bytes lidos, mesmo sem Content-Length ou com valor falso.
  */
 export async function handleFinancialChatToolRequest(request, toolName) {
@@ -65,7 +66,7 @@ export async function handleFinancialChatToolRequest(request, toolName) {
     return invalidRequest('Envie um JSON válido com os campos do cenário.', 400);
   }
   const result = executeFinancialChatTool(toolName, candidate);
-  return Response.json(result, {
+  return Response.json(toPublicFinancialChatResponse(result), {
     status: result.status === 'invalid_input' ? 422 : 200,
     headers: responseHeaders,
   });

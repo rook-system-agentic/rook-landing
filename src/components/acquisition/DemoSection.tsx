@@ -2,8 +2,8 @@
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { segmentsData } from '@/lib/cmv-benchmarks.mjs';
-import { ERP_SYSTEMS, REVENUE_BANDS, normalizePhone } from '@/lib/acquisition.mjs';
+import { culinarySegments } from '@/lib/culinary-segments.mjs';
+import { ERP_SYSTEMS, REVENUE_BANDS, normalizePhone } from '@/lib/acquisition-input.mjs';
 import { DIAGNOSTIC_CONTEXT_EVENT, readDiagnosticContext, type DiagnosticContext } from '@/lib/diagnostic-context.mjs';
 import { financialReferenceLabel } from '@/lib/financial-reference.mjs';
 import { createVisitAttributionCapture, type LeadAttribution } from '@/lib/lead-attribution.mjs';
@@ -26,7 +26,7 @@ function validateProfile(profile: Profile, consent: boolean): Errors {
   if (!normalizePhone(profile.phone)) errors.phone = 'Informe um telefone válido com DDD.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((profile.email || '').trim())) errors.email = 'Informe um e-mail válido.';
   if (!profile.cityId) errors.cityId = 'Selecione a cidade e a UF na lista de sugestões.';
-  if (!segmentsData.some(segment => segment.slug === profile.segment) && profile.segment !== 'other') errors.segment = 'Selecione o segmento culinário.';
+  if (!culinarySegments.some(segment => segment.slug === profile.segment) && profile.segment !== 'other') errors.segment = 'Selecione o segmento culinário.';
   if (profile.segment === 'other' && (profile.segmentOther || '').trim().length < 2) errors.segmentOther = 'Informe o segmento do estabelecimento.';
   if (!REVENUE_BANDS.some(band => band.value === profile.revenueBand)) errors.revenueBand = 'Selecione a faixa de faturamento.';
   if (!['yes', 'no'].includes(profile.usesErp)) errors.usesErp = 'Selecione sim ou não.';
@@ -78,7 +78,7 @@ export default function DemoSection() {
       // estabelecimento já preenchidos nesta experiência independente.
       if (next.intent === 'cmv') {
         const segment = next.answers.segment;
-        if (segmentsData.some(item => item.slug === segment) || segment === 'other') {
+        if (culinarySegments.some(item => item.slug === segment) || segment === 'other') {
           setProfile(previous => segmentEdited.current ? previous : { ...previous, segment });
           setErrors(previous => { const next = { ...previous }; delete next.segment; return next; });
         }
@@ -266,7 +266,7 @@ export default function DemoSection() {
                     <button type="button" onClick={removeDiagnostic} disabled={readonly} aria-label="Remover diagnóstico desta solicitação">Remover</button>
                   </div>
                   <p>{context.result?.summary || 'Os valores informados serão incluídos para a equipe continuar a análise com você.'}</p>
-                  {context.result?.tool === 'cmv' && <small>Segmento usado no cálculo: {segmentsData.find(segment => segment.slug === context.result?.inputs.segment)?.name || 'Outro segmento'}</small>}
+                  {context.result?.tool === 'cmv' && <small>Segmento usado no cálculo: {culinarySegments.find(segment => segment.slug === context.result?.inputs.segment)?.name || 'Outro segmento'}</small>}
                   <small>Referência informada: {financialReferenceLabel(context.answers)}</small>
                 </div>
               )}
@@ -302,7 +302,7 @@ export default function DemoSection() {
                   <label htmlFor={fieldId('segment')}>Segmento culinário</label>
                   <select {...accessible('segment')} value={profile.segment || ''} onChange={event => change('segment', event.target.value)} required>
                     <option value="">Selecione o segmento</option>
-                    {segmentsData.map(segment => <option value={segment.slug} key={segment.slug}>{segment.name}</option>)}
+                    {culinarySegments.map(segment => <option value={segment.slug} key={segment.slug}>{segment.name}</option>)}
                     <option value="other">Outro segmento</option>
                   </select>
                   {error('segment')}

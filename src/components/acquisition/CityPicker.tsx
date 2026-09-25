@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
-import { searchMunicipalities, type Municipality } from '@/lib/acquisition.mjs';
+import { searchMunicipalities, type Municipality } from '@/lib/acquisition-input.mjs';
 
 type CityPickerProps = {
   value: string;

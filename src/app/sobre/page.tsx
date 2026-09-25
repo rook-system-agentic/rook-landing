@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
 import { COMPANY_INFO } from "@/lib/company";
-import { BENCHMARK_FONTE } from "@/lib/cmv-benchmarks.mjs";
 import {
   SOBRE_HERO,
   SOBRE_METODO,
@@ -117,18 +116,11 @@ export default function SobrePage() {
             ))}
           </div>
 
-          {/*
-            * A prova. É o único argumento da página que o visitante confere
-            * sozinho, e por isso ganha destaque e saída própria: o benchmark
-            * que a calculadora mostra é a pesquisa que nasceu daquelas
-            * consultorias. Ver SOBRE_PROVA em lp-content.
-            */}
+          {/* O método é apresentado pela análise que entrega; suas premissas ficam internas. */}
           <div className="card mt-12 max-w-3xl p-6 sm:p-8">
             <p className="section-label mb-4">{SOBRE_METODO.provaLabel}</p>
             <p className="text-[17px] leading-relaxed" style={{ color: "var(--color-cream)" }}>
-              {SOBRE_PROVA.texto}{" "}
-              <strong style={{ color: "var(--color-terracota-text)" }}>{BENCHMARK_FONTE}</strong>,{" "}
-              {SOBRE_PROVA.textoFim}
+              {SOBRE_PROVA.texto} {SOBRE_PROVA.textoFim}
             </p>
             <Link
               href={SOBRE_PROVA.ctaHref}
