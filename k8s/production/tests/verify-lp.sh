@@ -106,6 +106,10 @@ grep -q 'rooksystem.com/cron-client: "true"' "$CRONJOB" || fail "pod do cron sem
 grep -q 'app.kubernetes.io/part-of: rook-production-cron' "$CRONJOB" || fail "CronJob fora do conjunto rook-production-cron"
 grep -q 'name: rook-lp-production-env' "$CRONJOB" || fail "CRON_SECRET não vem do Secret da landing"
 grep -q 'http://rook-lp.rook-production.svc.cluster.local/api/content/cron/publish-scheduled' "$CRONJOB" || fail "rota do cron incorreta"
+grep -q 'curl -s -o /dev/null --max-time 2 "$1/" && break; sleep 1; done' "$CRONJOB" || fail "cron chama a rota sem esperar a NetworkPolicy liberar o pod (curl: (7))"
+grep -q -- '--fail-with-body' "$CRONJOB" || fail "cron sem --fail-with-body: o corpo do erro não chega ao log do Job"
+if grep -q -- '--retry' "$CRONJOB"; then fail "cron com --retry: repetiria em 5xx/timeout e publicaria em dobro"; fi
+if grep -q '\$(CRON_SECRET)' "$CRONJOB"; then fail "CRON_SECRET via \$(...) no script do sh"; fi
 
 grep -q 'branches: \[main\]' "$WORKFLOW" || fail "workflow não publica a main"
 grep -q 'group: deploy-production-lp' "$WORKFLOW" || fail "concorrência do deploy ausente"
