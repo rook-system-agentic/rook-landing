@@ -100,6 +100,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Reconciliar Secret de runtime
+        run: |
+          set -euo pipefail
+          # Wrapper root-owned e restrito à landing: lê a fonte root-only da
+          # Hostinger e executa somente a cópia root-owned do gerador. O hash
+          # impede deploy com divergência entre o runbook versionado e o host.
+          generator_sha=$(sha256sum k8s/production/generate-secret.sh | awk '{print $1}')
+          sudo /usr/local/bin/rook-lp-runtime-secret-reconcile "$GITHUB_SHA" "$generator_sha"
+
       - name: Reconciliar manifesto com a imagem do commit
         run: |
           set -euo pipefail
@@ -156,3 +165,24 @@ jobs:
           done
           echo "::error::www.rook.com.br não passou no smoke de HTTP e visibilidade do Rook AI."
           exit 1
+
+      - name: Smoke da captação AsaFlow
+        run: |
+          set -euo pipefail
+          body=$(mktemp)
+          trap 'rm -f "$body"' EXIT
+          code=$(curl -sk -o "$body" -w '%{http_code}' --max-time 30 \
+            --resolve www.rook.com.br:443:127.0.0.1 \
+            https://www.rook.com.br/api/acquisition/ || echo 000)
+          test "$code" = 200 || {
+            echo "::error::Rota de aquisição indisponível: HTTP $code"
+            exit 1
+          }
+          grep -q '"token"' "$body" || {
+            echo "::error::Rota de aquisição não retornou o desafio esperado."
+            exit 1
+          }
+          grep -q '"difficulty":3' "$body" || {
+            echo "::error::Desafio de aquisição com dificuldade inesperada."
+            exit 1
+          }

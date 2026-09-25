@@ -22,8 +22,15 @@ A landing sai da Vercel. O que muda em relação à validação privada abaixo:
 - `generate-secret.sh` substitui o Secret existente preservando as credenciais
   já geradas (`COMMERCIAL_LEAD_ABUSE_SECRET`, `CONTENT_AUTOMATION_SECRET`,
   `CRON_SECRET`), aponta `NEXT_PUBLIC_SUPABASE_URL` para `https://supabase.rook.com.br`,
-  usa `Rook <comunicacao@rook.com.br>` na newsletter e lê `RESEND_API_KEY` do
-  arquivo root-only `/etc/rook-production/vercel/landing.production.env`.
+  usa `Rook <comunicacao@rook.com.br>` na newsletter e lê `RESEND_API_KEY` e a
+  integração comercial AsaFlow do arquivo root-only
+  `/etc/rook-production/runtime/landing.production.env`.
+- O job de deploy chama o wrapper root-owned
+  `/usr/local/bin/rook-lp-runtime-secret-reconcile`, que só aceita a revisão Git
+  publicada e executa a cópia root-owned de `generate-secret.sh`. O workflow
+  compara o SHA-256 dessa cópia com o arquivo versionado antes de prosseguir; ele
+  nunca executa código privilegiado direto do checkout. O runner continua sem
+  permissão genérica para ler ou alterar Secrets do cluster.
 - `cron/publish-scheduled.yaml` substitui o cron da Vercel: CronJob
   `cron-lp-publish-scheduled`, `0 * * * *`, suspenso por padrão. O workflow só o
   liga quando a variável de repositório `PROD_EXTERNAL_EFFECTS=true`.
@@ -84,8 +91,19 @@ dentro do cluster.
 cria `rook-lp-production-env`. Ele também gera credenciais próprias para as APIs
 de leads, automação de conteúdo e cron. Nenhum valor é versionado ou impresso.
 
-`RESEND_API_KEY` vem do env de produção puxado da Vercel para a VPS
-(root-only). O GTM usa um ID versionado no código.
+`RESEND_API_KEY`, `ASAFLOW_ACQUISITION_ENABLED`,
+`ASAFLOW_ACQUISITION_API_KEY`, `ASAFLOW_ACQUISITION_PIPELINE_ID` e
+`ASAFLOW_ACQUISITION_STAGE_ID` vêm da fonte de runtime da Hostinger
+`/etc/rook-production/runtime/landing.production.env` (root:root, modo `600`).
+A chave AsaFlow é dedicada à landing e limitada a `contacts:write` e
+`deals:write`. A antiga configuração da Vercel não é fonte de verdade. O GTM
+usa um ID versionado no código.
+
+O deploy só é considerado saudável quando, além da home, o `GET
+/api/acquisition/` responde `200` com um desafio antiabuso. O teste não cria
+contato nem negócio. A validação ponta a ponta de um `POST` deve usar dados
+claramente identificados como teste, confirmar o negócio no funil correto e
+remover o registro ao fim.
 
 ## Aplicação
 
