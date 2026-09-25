@@ -119,6 +119,64 @@ grep -q 'rook-lp-runtime-secret-reconcile' "$WORKFLOW" || fail "workflow não re
 grep -q 'sha256sum k8s/production/generate-secret.sh' "$WORKFLOW" || fail "workflow não valida o gerador root-owned"
 grep -q '/usr/local/lib/rook-lp/generate-secret.sh' "$SECRET_WRAPPER" || fail "wrapper não fixa o gerador root-owned"
 grep -q 'env -i' "$SECRET_WRAPPER" || fail "wrapper herda ambiente não confiável do runner"
+
+# Executa o wrapper com um gerador fictício em diretório temporário. Só o
+# caminho fixo do gerador é trocado na cópia de teste; nenhuma chamada kubectl,
+# fonte de runtime ou escrita no cache privilegiado é realizada.
+python3 - "$SECRET_WRAPPER" <<'PY'
+import hashlib
+import os
+from pathlib import Path
+import shlex
+import subprocess
+import sys
+import tempfile
+
+source = Path(sys.argv[1]).read_text()
+fixed_generator = 'GENERATOR=/usr/local/lib/rook-lp/generate-secret.sh'
+assert source.count(fixed_generator) == 1, 'gerador deve continuar fixo no wrapper'
+revision = '1' * 40
+
+with tempfile.TemporaryDirectory(prefix='rook-lp-wrapper-') as temporary:
+    root = Path(temporary)
+    workspace = root / 'checkout'
+    workspace.mkdir()
+    generator = root / 'generator.sh'
+    generator.write_text('''#!/bin/sh
+set -eu
+test "${KUBECACHEDIR:-}" = /var/cache/rook-lp/kubectl
+test "${KUBECONFIG:-}" = /etc/rancher/k3s/k3s.yaml
+test "${NS:-}" = rook-production
+test "${SB_NS:-}" = supabase-production
+test "${SECRET:-}" = rook-lp-production-env
+test "${RUNTIME_ENV:-}" = /etc/rook-production/runtime/landing.production.env
+test "${UNTRUSTED_PARENT_ENV+x}" != x
+test "${SOURCE_REVISION:-}" = ''' + revision + '''
+printf 'gerador-ficticio-ok\\n'
+''')
+    generator.chmod(0o700)
+    wrapper = root / 'wrapper.sh'
+    wrapper.write_text(source.replace(fixed_generator, 'GENERATOR=' + shlex.quote(str(generator)), 1))
+    digest = hashlib.sha256(generator.read_bytes()).hexdigest()
+    environment = dict(os.environ, KUBECACHEDIR='./cache-herdado',
+                       UNTRUSTED_PARENT_ENV='nao-propagar')
+
+    def run(rev, checksum):
+        return subprocess.run(['bash', str(wrapper), rev, checksum], cwd=workspace,
+                              env=environment, text=True, capture_output=True)
+
+    valid = run(revision, digest)
+    assert valid.returncode == 0, valid.stderr or 'cache absoluto não chegou ao gerador'
+    assert valid.stdout == 'gerador-ficticio-ok\n', 'gerador fictício não foi executado'
+    for rev, checksum, expected_code in [(revision, '0' * 64, 1), ('../main', digest, 64)]:
+        invalid = run(rev, checksum)
+        assert invalid.returncode == expected_code, 'validação do wrapper foi alterada'
+        assert 'gerador-ficticio-ok' not in invalid.stdout, 'gerador executado sem validação'
+    assert not list(workspace.iterdir()), 'wrapper deixou artefatos no checkout'
+
+print('Wrapper validado: cache absoluto, ambiente isolado e validação preservada.')
+PY
+
 grep -q 'https://www.rook.com.br/api/acquisition/' "$WORKFLOW" || fail "workflow não valida a rota de aquisição"
 grep -q 'k8s/production/cron/publish-scheduled.yaml' "$WORKFLOW" || fail "workflow não aplica o CronJob"
 if grep -qi 'vercel deploy\|vercel --prod\|lp-homolog\|rook-homolog' "$WORKFLOW"; then

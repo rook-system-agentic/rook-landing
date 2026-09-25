@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Rook AI — ferramentas financeiras",
-    "version": "1.1.0",
-    "description": "Contrato local para integração com uma IA conversacional. Este arquivo não comprova publicação nem conexão ao AsaFlow. A IA conduz a conversa; as rotas validam o cenário e calculam. Campos confirmed não provam, sozinhos, uma confirmação real: a plataforma de conversa deve vinculá-los à mensagem do visitante. A qualificação e o cadastro de lead são fluxos separados. CMV usa preferencialmente faturamento bruto e impostos estimados pelo modelo Rook versionado. Use last_month ou monthly_average_12m sem solicitar data; period segue aceito somente se já informado. Não misture custos e receita de janelas diferentes nem transforme referência relativa em mês calendário. Na configuração inspecionada em 24/09/2026, o agente nativo do AsaFlow não chama estas ferramentas HTTP; a conexão e o retorno do cálculo à mesma conversa ainda precisam ser implementados e comprovados."
+    "version": "2.0.0",
+    "description": "Contrato local para integração com uma IA conversacional. Este arquivo não comprova publicação nem conexão ao AsaFlow. A IA conduz a conversa; as rotas validam o cenário e calculam. Campos confirmed não provam, sozinhos, uma confirmação real: a plataforma de conversa deve vinculá-los à mensagem do visitante. A qualificação e o cadastro de lead são fluxos separados. CMV usa preferencialmente faturamento bruto e impostos estimados pelo modelo Rook versionado. Use last_month ou monthly_average_12m sem solicitar data; period segue aceito somente se já informado. Não misture custos e receita de janelas diferentes nem transforme referência relativa em mês calendário. Na configuração inspecionada em 24/09/2026, o agente nativo do AsaFlow não chama estas ferramentas HTTP; a conexão e o retorno do cálculo à mesma conversa ainda precisam ser implementados e comprovados. As respostas públicas v2 retornam apenas entradas permitidas, resultado, orientação e aviso de estimativa. Premissas, memória de cálculo e benchmarks numéricos ficam no servidor; não depender de assumptions, formulaVersion ou monthlyDifference na resposta HTTP."
   },
   "servers": [
     {
@@ -89,7 +89,7 @@
         },
         "responses": {
           "200": {
-            "description": "success: apresentar o resultado e as premissas; needs_information: perguntar apenas o que falta; needs_confirmation: mostrar cenário para confirmação. Não há cálculo nos dois últimos estados.",
+            "description": "success: apresentar o resultado público e o aviso de estimativa; needs_information: perguntar apenas o que falta; needs_confirmation: mostrar cenário para confirmação. Não há cálculo nos dois últimos estados.",
             "headers": {
               "Cache-Control": {
                 "description": "O cenário e o resultado não podem ser armazenados em cache.",
@@ -239,6 +239,22 @@
                     "otherVariablePercent": 5,
                     "confirmed": false
                   }
+                },
+                "taxBillConfirmed": {
+                  "summary": "Valor mensal dos impostos sobre vendas em reais, na mesma referência do faturamento.",
+                  "value": {
+                    "referenceBasis": "last_month",
+                    "currency": "BRL",
+                    "revenueBasis": "gross",
+                    "revenue": 150000,
+                    "cmvPercent": 35,
+                    "fixedCosts": 60000,
+                    "taxInputMode": "amount",
+                    "taxAmount": 12000,
+                    "feesPercent": 2,
+                    "otherVariablePercent": 5,
+                    "confirmed": true
+                  }
                 }
               }
             }
@@ -246,7 +262,7 @@
         },
         "responses": {
           "200": {
-            "description": "success: apresentar o resultado e as premissas; needs_information: perguntar apenas o que falta; needs_confirmation: mostrar cenário para confirmação. Não há cálculo nos dois últimos estados.",
+            "description": "success: apresentar o resultado público e o aviso de estimativa; needs_information: perguntar apenas o que falta; needs_confirmation: mostrar cenário para confirmação. Não há cálculo nos dois últimos estados.",
             "headers": {
               "Cache-Control": {
                 "description": "O cenário e o resultado não podem ser armazenados em cache.",
@@ -384,21 +400,21 @@
             "type": "string",
             "const": "valid"
           },
-          "referencePercent": {
+          "comparisonCmvPercent": {
             "type": "number"
           },
-          "differencePoints": {
-            "type": "number"
-          },
-          "monthlyDifference": {
-            "type": "number"
+          "assessment": {
+            "type": "string",
+            "enum": [
+              "attention",
+              "within_reference"
+            ]
           }
         },
         "required": [
           "status",
-          "referencePercent",
-          "differencePoints",
-          "monthlyDifference"
+          "comparisonCmvPercent",
+          "assessment"
         ],
         "additionalProperties": false
       },
@@ -409,17 +425,20 @@
             "type": "string",
             "const": "no_reference"
           },
-          "referencePercent": {
-            "type": "null"
+          "comparisonCmvPercent": {
+            "type": "number"
           },
-          "monthlyDifference": {
-            "type": "null"
+          "assessment": {
+            "type": "string",
+            "enum": [
+              "no_reference"
+            ]
           }
         },
         "required": [
           "status",
-          "referencePercent",
-          "monthlyDifference"
+          "comparisonCmvPercent",
+          "assessment"
         ],
         "additionalProperties": false
       },
@@ -430,25 +449,13 @@
             "type": "string",
             "const": "valid"
           },
-          "contributionPercent": {
-            "type": "number"
-          },
           "breakEvenRevenue": {
-            "type": "number"
-          },
-          "revenueGap": {
-            "type": "number"
-          },
-          "operationalResult": {
             "type": "number"
           }
         },
         "required": [
           "status",
-          "contributionPercent",
-          "breakEvenRevenue",
-          "revenueGap",
-          "operationalResult"
+          "breakEvenRevenue"
         ],
         "additionalProperties": false
       },
@@ -459,25 +466,13 @@
             "type": "string",
             "const": "non_positive_margin"
           },
-          "contributionPercent": {
-            "type": "number"
-          },
           "breakEvenRevenue": {
             "type": "null"
-          },
-          "revenueGap": {
-            "type": "null"
-          },
-          "operationalResult": {
-            "type": "number"
           }
         },
         "required": [
           "status",
-          "contributionPercent",
-          "breakEvenRevenue",
-          "revenueGap",
-          "operationalResult"
+          "breakEvenRevenue"
         ],
         "additionalProperties": false
       },
@@ -1045,11 +1040,6 @@
             ],
             "description": "UF explicitamente confirmada para a estimativa de impostos. Não presumir SP ou o regime tributário real do visitante."
           },
-          "taxModelVersion": {
-            "type": "string",
-            "const": "rook-cmv-tax-2026-09-24",
-            "description": "Versão das premissas internas usadas pelo motor, preenchida pela integração. Não perguntar este código ao visitante; informar que os impostos são estimados."
-          },
           "segment": {
             "type": "string",
             "enum": [
@@ -1103,11 +1093,6 @@
                       "required": [
                         "taxState"
                       ]
-                    },
-                    {
-                      "required": [
-                        "taxModelVersion"
-                      ]
                     }
                   ]
                 }
@@ -1124,7 +1109,6 @@
                 "required": [
                   "cmvInputMode",
                   "taxState",
-                  "taxModelVersion",
                   "cmvAmount"
                 ],
                 "not": {
@@ -1149,7 +1133,6 @@
                 "required": [
                   "cmvInputMode",
                   "taxState",
-                  "taxModelVersion",
                   "cmvPercent"
                 ],
                 "not": {
@@ -1174,7 +1157,6 @@
                 "required": [
                   "cmvInputMode",
                   "taxState",
-                  "taxModelVersion",
                   "cmvPercent"
                 ],
                 "not": {
@@ -1330,22 +1312,12 @@
             "type": "string",
             "const": "cmv"
           },
-          "formulaVersion": {
-            "type": "string",
-            "description": "Versão do motor que produziu o resultado."
-          },
           "inputs": {
             "$ref": "#/components/schemas/analisar_cmv_inputs"
           },
-          "assumptions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
           "summary": {
             "type": "string",
-            "description": "Explicação calculada, incluindo limites do cenário. A IA pode contextualizar sem alterar números ou omitir as premissas."
+            "description": "Orientação pública do cenário. A IA pode contextualizar sem alterar os números; regras e referências internas não fazem parte da resposta."
           },
           "result": {
             "oneOf": [
@@ -1370,6 +1342,10 @@
               "monthly_average_12m"
             ],
             "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+          },
+          "notice": {
+            "type": "string",
+            "description": "Aviso de que o resultado é uma estimativa gerencial, sem comprovar apuração fiscal, lucro ou economia."
           }
         },
         "required": [
@@ -1378,11 +1354,10 @@
           "currency",
           "ok",
           "tool",
-          "formulaVersion",
           "inputs",
-          "assumptions",
           "summary",
-          "result"
+          "result",
+          "notice"
         ],
         "additionalProperties": false,
         "allOf": [
@@ -1450,7 +1425,7 @@
           "confirmed": {
             "type": "boolean",
             "const": true,
-            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação."
+            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação. Confirme também o modo e o valor dos impostos sobre vendas, sem duplicá-los nos custos fixos."
           },
           "revenueBasis": {
             "type": "string",
@@ -1462,6 +1437,20 @@
             "minimum": 0,
             "maximum": 1000000000,
             "description": "Custos fixos do último mês ou média mensal dos mesmos 12 meses da receita. Zero somente se informado; desconhecido não é zero."
+          },
+          "taxInputMode": {
+            "type": "string",
+            "enum": [
+              "amount",
+              "percent"
+            ],
+            "description": "Modo confirmado pelo visitante: valor dos impostos sobre vendas em reais ou percentual do faturamento bruto. Sem modo, apenas taxPercent legado é aceito. Nunca confundir reais com percentual."
+          },
+          "taxAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000000,
+            "description": "Impostos sobre vendas em reais referentes ao mesmo último mês da receita ou média mensal dos mesmos 12 meses. Não incluir guias atrasadas, multas ou tributos de folha já nos custos fixos. Zero somente se informado. O motor converte para percentual sem arredondamento antecipado."
           },
           "taxPercent": {
             "type": "number",
@@ -1489,7 +1478,6 @@
           "confirmed",
           "cmvPercent",
           "fixedCosts",
-          "taxPercent",
           "feesPercent",
           "otherVariablePercent"
         ],
@@ -1513,6 +1501,49 @@
                 "not": {
                   "required": [
                     "referenceBasis"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "taxInputMode": {
+                    "const": "percent"
+                  }
+                },
+                "required": [
+                  "taxPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "taxAmount"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "taxInputMode": {
+                    "const": "amount"
+                  }
+                },
+                "required": [
+                  "taxInputMode",
+                  "taxAmount"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "taxPercent"
+                      ]
+                    }
                   ]
                 }
               }
@@ -1601,7 +1632,7 @@
               "boolean",
               "null"
             ],
-            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação. False, null ou ausência pedem confirmação."
+            "description": "True somente após mostrar e obter confirmação de receita e sua base, CMV e sua base/valor, referência e custos na mesma janela e, para CMV bruto, UF e uso de impostos estimados. Toda correção exige nova confirmação. Confirme também o modo e o valor dos impostos sobre vendas, sem duplicá-los nos custos fixos. False, null ou ausência pedem confirmação."
           },
           "revenueBasis": {
             "anyOf": [
@@ -1629,6 +1660,36 @@
               }
             ],
             "description": "Custos fixos do último mês ou média mensal dos mesmos 12 meses da receita. Zero somente se informado; desconhecido não é zero."
+          },
+          "taxInputMode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "amount",
+                  "percent"
+                ],
+                "description": "Modo confirmado pelo visitante: valor dos impostos sobre vendas em reais ou percentual do faturamento bruto. Sem modo, apenas taxPercent legado é aceito. Nunca confundir reais com percentual."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Modo confirmado pelo visitante: valor dos impostos sobre vendas em reais ou percentual do faturamento bruto. Sem modo, apenas taxPercent legado é aceito. Nunca confundir reais com percentual."
+          },
+          "taxAmount": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000000000,
+                "description": "Impostos sobre vendas em reais referentes ao mesmo último mês da receita ou média mensal dos mesmos 12 meses. Não incluir guias atrasadas, multas ou tributos de folha já nos custos fixos. Zero somente se informado. O motor converte para percentual sem arredondamento antecipado."
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Impostos sobre vendas em reais referentes ao mesmo último mês da receita ou média mensal dos mesmos 12 meses. Não incluir guias atrasadas, multas ou tributos de folha já nos custos fixos. Zero somente se informado. O motor converte para percentual sem arredondamento antecipado."
           },
           "taxPercent": {
             "anyOf": [
@@ -1674,7 +1735,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use também o descritor *_confirmed. Não envie nomes, contato, mensagens, resultados prévios ou outros campos. Campos exigidos dependem da base e do modo de CMV. Use uma única referência. A validação da rota rejeita bases, referências e campos de CMV contraditórios."
+        "description": "Aceita cenário parcial: campos ausentes ou null geram needs_information. Um cenário completo sem confirmed=true gera needs_confirmation. Para registro da ferramenta, use o descritor *_confirmed. Impostos: taxInputMode=amount exige taxAmount; percent exige taxPercent; ausência de modo mantém apenas o taxPercent legado. Valores e percentuais concorrentes são rejeitados. Use uma única referência. Não envie nomes, contato, mensagens ou resultados prévios."
       },
       "estimar_ponto_equilibrio_inputs": {
         "type": "object",
@@ -1731,6 +1792,20 @@
             "minimum": 0,
             "maximum": 100,
             "description": "Outros custos variáveis sobre a mesma receita bruta e janela, sem repetir custos."
+          },
+          "taxInputMode": {
+            "type": "string",
+            "enum": [
+              "amount",
+              "percent"
+            ],
+            "description": "Modo confirmado pelo visitante: valor dos impostos sobre vendas em reais ou percentual do faturamento bruto. Sem modo, apenas taxPercent legado é aceito. Nunca confundir reais com percentual."
+          },
+          "taxAmount": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000000,
+            "description": "Impostos sobre vendas em reais referentes ao mesmo último mês da receita ou média mensal dos mesmos 12 meses. Não incluir guias atrasadas, multas ou tributos de folha já nos custos fixos. Zero somente se informado. O motor converte para percentual sem arredondamento antecipado."
           }
         },
         "required": [
@@ -1739,12 +1814,56 @@
           "revenueBasis",
           "cmvPercent",
           "fixedCosts",
-          "taxPercent",
           "feesPercent",
           "otherVariablePercent"
         ],
         "additionalProperties": false,
-        "description": "Entradas financeiras confirmadas. referenceBasis novo acompanha o cálculo; period legado fica no contexto externo. Não contém data inferida."
+        "description": "Entradas financeiras confirmadas. referenceBasis novo acompanha o cálculo; period legado fica no contexto externo. Não contém data inferida.",
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "properties": {
+                  "taxInputMode": {
+                    "const": "percent"
+                  }
+                },
+                "required": [
+                  "taxPercent"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "taxAmount"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "properties": {
+                  "taxInputMode": {
+                    "const": "amount"
+                  }
+                },
+                "required": [
+                  "taxInputMode",
+                  "taxAmount"
+                ],
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "taxPercent"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       },
       "estimar_ponto_equilibrio_needs_information": {
         "type": "object",
@@ -1772,7 +1891,8 @@
                 "fixedCosts",
                 "taxPercent",
                 "feesPercent",
-                "otherVariablePercent"
+                "otherVariablePercent",
+                "taxAmount"
               ]
             }
           }
@@ -1882,22 +2002,12 @@
             "type": "string",
             "const": "breakeven"
           },
-          "formulaVersion": {
-            "type": "string",
-            "description": "Versão do motor que produziu o resultado."
-          },
           "inputs": {
             "$ref": "#/components/schemas/estimar_ponto_equilibrio_inputs"
           },
-          "assumptions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
           "summary": {
             "type": "string",
-            "description": "Explicação calculada, incluindo limites do cenário. A IA pode contextualizar sem alterar números ou omitir as premissas."
+            "description": "Orientação pública do cenário. A IA pode contextualizar sem alterar os números; regras e referências internas não fazem parte da resposta."
           },
           "result": {
             "oneOf": [
@@ -1916,6 +2026,10 @@
               "monthly_average_12m"
             ],
             "description": "Prefira last_month (último mês) ou monthly_average_12m (média mensal dos últimos 12 meses), conforme o visitante. Não peça nem invente data. Receita e custos devem usar a mesma janela; médias mensais já estão em valores mensais."
+          },
+          "notice": {
+            "type": "string",
+            "description": "Aviso de que o resultado é uma estimativa gerencial, sem comprovar apuração fiscal, lucro ou economia."
           }
         },
         "required": [
@@ -1924,11 +2038,10 @@
           "currency",
           "ok",
           "tool",
-          "formulaVersion",
           "inputs",
-          "assumptions",
           "summary",
-          "result"
+          "result",
+          "notice"
         ],
         "additionalProperties": false,
         "allOf": [
@@ -1965,59 +2078,29 @@
             "type": "string",
             "const": "valid"
           },
-          "estimatedTaxAmount": {
-            "type": "number",
-            "description": "Impostos estimados sobre a receita, em reais; não comprova tributo devido."
+          "comparisonCmvPercent": {
+            "type": "number"
           },
-          "estimatedTaxPercent": {
+          "assessment": {
+            "type": "string",
+            "enum": [
+              "attention",
+              "within_reference"
+            ]
+          },
+          "estimatedTaxAmount": {
             "type": "number"
           },
           "estimatedNetRevenue": {
-            "type": "number",
-            "description": "Faturamento bruto menos os impostos estimados; não deduz novamente taxas de cartão/delivery."
-          },
-          "taxRegime": {
-            "type": "string",
-            "enum": [
-              "simples_nacional",
-              "lucro_presumido"
-            ]
-          },
-          "taxModelVersion": {
-            "type": "string",
-            "const": "rook-cmv-tax-2026-09-24",
-            "description": "Versão das premissas internas usadas pelo motor, preenchida pela integração. Não perguntar este código ao visitante; informar que os impostos são estimados."
-          },
-          "cmvAmount": {
-            "type": "number",
-            "description": "Consumo informado em reais ou convertido pela base explicitamente escolhida."
-          },
-          "comparisonCmvPercent": {
-            "type": "number",
-            "description": "CMV dividido pela receita líquida estimada, em percentual; pode exceder 100."
-          },
-          "referencePercent": {
-            "type": "number"
-          },
-          "differencePoints": {
-            "type": "number"
-          },
-          "monthlyDifference": {
             "type": "number"
           }
         },
         "required": [
           "status",
-          "estimatedTaxAmount",
-          "estimatedTaxPercent",
-          "estimatedNetRevenue",
-          "taxRegime",
-          "taxModelVersion",
-          "cmvAmount",
           "comparisonCmvPercent",
-          "referencePercent",
-          "differencePoints",
-          "monthlyDifference"
+          "assessment",
+          "estimatedTaxAmount",
+          "estimatedNetRevenue"
         ],
         "additionalProperties": false
       },
@@ -2028,59 +2111,28 @@
             "type": "string",
             "const": "no_reference"
           },
-          "estimatedTaxAmount": {
-            "type": "number",
-            "description": "Impostos estimados sobre a receita, em reais; não comprova tributo devido."
+          "comparisonCmvPercent": {
+            "type": "number"
           },
-          "estimatedTaxPercent": {
+          "assessment": {
+            "type": "string",
+            "enum": [
+              "no_reference"
+            ]
+          },
+          "estimatedTaxAmount": {
             "type": "number"
           },
           "estimatedNetRevenue": {
-            "type": "number",
-            "description": "Faturamento bruto menos os impostos estimados; não deduz novamente taxas de cartão/delivery."
-          },
-          "taxRegime": {
-            "type": "string",
-            "enum": [
-              "simples_nacional",
-              "lucro_presumido"
-            ]
-          },
-          "taxModelVersion": {
-            "type": "string",
-            "const": "rook-cmv-tax-2026-09-24",
-            "description": "Versão das premissas internas usadas pelo motor, preenchida pela integração. Não perguntar este código ao visitante; informar que os impostos são estimados."
-          },
-          "cmvAmount": {
-            "type": "number",
-            "description": "Consumo informado em reais ou convertido pela base explicitamente escolhida."
-          },
-          "comparisonCmvPercent": {
-            "type": "number",
-            "description": "CMV dividido pela receita líquida estimada, em percentual; pode exceder 100."
-          },
-          "referencePercent": {
-            "type": "null"
-          },
-          "differencePoints": {
-            "type": "null"
-          },
-          "monthlyDifference": {
-            "type": "null"
+            "type": "number"
           }
         },
         "required": [
           "status",
-          "estimatedTaxAmount",
-          "estimatedTaxPercent",
-          "estimatedNetRevenue",
-          "taxRegime",
-          "taxModelVersion",
-          "cmvAmount",
           "comparisonCmvPercent",
-          "referencePercent",
-          "differencePoints",
-          "monthlyDifference"
+          "assessment",
+          "estimatedTaxAmount",
+          "estimatedNetRevenue"
         ],
         "additionalProperties": false
       }

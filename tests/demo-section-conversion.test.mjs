@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
-import * as acquisition from '../src/lib/acquisition.mjs';
-import * as benchmarks from '../src/lib/cmv-benchmarks.mjs';
+import * as acquisition from '../src/lib/acquisition-input.mjs';
+import * as culinarySegments from '../src/lib/culinary-segments.mjs';
 import * as diagnostic from '../src/lib/diagnostic-context.mjs';
 import * as financialReference from '../src/lib/financial-reference.mjs';
-import { CMV_TAX_MODEL_VERSION } from '../src/lib/cmv-tax-estimate.mjs';
+import { CMV_TAX_MODEL_VERSION } from '../src/lib/cmv-input-options.mjs';
 import * as attribution from '../src/lib/lead-attribution.mjs';
 import * as trackingEvents from '../src/lib/tracking-events.mjs';
 import { defaultConsentState } from '../src/lib/consent.mjs';
@@ -63,7 +63,7 @@ function setup({ environment = 'production', href = 'https://rook.com.br/?utm_so
   const dependencies = {
     react, 'react/jsx-runtime': { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) },
     'next/navigation': { usePathname: () => pathname },
-    '@/lib/cmv-benchmarks.mjs': benchmarks, '@/lib/acquisition.mjs': acquisition,
+    '@/lib/culinary-segments.mjs': culinarySegments, '@/lib/acquisition-input.mjs': acquisition,
     '@/lib/diagnostic-context.mjs': diagnostic, '@/lib/lead-attribution.mjs': attribution,
     '@/lib/financial-reference.mjs': financialReference,
     '@/lib/track': track, './CityPicker': CityPicker, './PreviewModeWatcher': () => null,

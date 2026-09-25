@@ -1,10 +1,10 @@
-import type { FinancialSuccess } from './financial-simulation.mjs';
+import type { FinancialInput, FinancialTool } from './financial-input.mjs';
 
 export interface DiagnosticContext {
   sourceId: string;
   intent: 'cmv' | 'breakeven';
   answers: Record<string, string>;
-  result: FinancialSuccess | null;
+  result: { tool: FinancialTool; inputs: FinancialInput; summary: string } | null;
 }
 
 export const DIAGNOSTIC_CONTEXT_EVENT: string;

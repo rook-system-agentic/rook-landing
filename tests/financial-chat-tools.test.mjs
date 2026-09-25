@@ -261,5 +261,5 @@ test('exemplos entregues na OpenAPI podem ser usados pela integração sem perde
       examples += 1;
     }
   }
-  assert.equal(examples, 6);
+  assert.equal(examples, 7);
 });

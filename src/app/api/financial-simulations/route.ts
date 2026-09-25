@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calculateFinancialSimulation } from '@/lib/financial-simulation.mjs';
+import { toPublicFinancialSimulation } from '@/lib/public-financial-simulation.mjs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,5 +15,5 @@ export async function POST(request: NextRequest) {
   try { data = JSON.parse(raw); }
   catch { return NextResponse.json({error:'Dados inválidos.'}, {status:400,headers}); }
   const result = calculateFinancialSimulation(data);
-  return NextResponse.json(result, {status:result.ok ? 200 : 422,headers});
+  return NextResponse.json(toPublicFinancialSimulation(result), {status:result.ok ? 200 : 422,headers});
 }

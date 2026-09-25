@@ -115,3 +115,23 @@ kubectl -n rook-production rollout status deployment/rook-lp --timeout=180s
 
 O `Service` é `ClusterIP`; o tráfego externo entra só pelo Ingress `rook-lp`
 via ingress-nginx.
+
+## Cache do kubectl no runner
+
+O wrapper privilegiado executa o gerador com ambiente limpo e fixa
+`KUBECACHEDIR=/var/cache/rook-lp/kubectl`, fora do checkout. Sem esse caminho,
+o kubectl pode criar `.kube/cache` no diretório de trabalho quando `HOME` não
+está definido. Como o gerador roda como root com `umask 077`, esse resíduo
+impede a limpeza do checkout pelo usuário do runner no próximo deploy.
+
+A correção versionada precisa ser instalada na cópia root-owned
+`/usr/local/bin/rook-lp-runtime-secret-reconcile`; o merge não substitui esse
+arquivo no host. Ela preserva o kubeconfig, os namespaces e as permissões do
+comando. Se já houver `.kube` dentro do checkout, conferir com o runner ocioso
+que se trata apenas de cache e movê-lo para quarentena fora do workspace.
+Manter a limpeza do `actions/checkout` habilitada e as permissões restritas;
+não tornar o cache root-owned acessível ao runner para contornar a falha.
+
+`bash k8s/production/tests/verify-lp.sh` testa o ambiente entregue pelo wrapper
+com um gerador fictício, incluindo cache herdado e revisão/checksum inválidos.
+O teste não executa kubectl nem modifica o servidor.

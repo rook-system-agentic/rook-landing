@@ -1,13 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-origin";
-import { BENCHMARK_FONTE } from "@/lib/cmv-benchmarks.mjs";
 import TelasDoProduto from "@/components/restaurantes/TelasDoProduto";
 
 export const metadata: Metadata = {
   title: "O Rook para o seu tipo de casa | Rook System",
   description:
-    "À la carte, delivery, bar, padaria, pizzaria ou hamburgueria: cada segmento perde margem de um jeito. Veja o CMV de referência do seu e onde o dinheiro escapa.",
+    "À la carte, delivery, bar, padaria, pizzaria ou hamburgueria: cada segmento perde margem de um jeito. Analise o CMV da sua operação e entenda onde investigar.",
   alternates: {
     canonical: siteUrl("/restaurantes/"),
   },
@@ -20,15 +19,8 @@ export const metadata: Metadata = {
  * depois"). Este é o conteúdo.
  *
  * A REGRA DE CADA BLOCO: uma dor que só aquele segmento tem, na língua de quem
- * a vive, e o CMV de referência do segmento ao lado. Sem isso o texto viraria
- * "o Rook também atende pizzaria" — que não diz nada a um dono de pizzaria.
- *
- * O CMV DE REFERÊNCIA NÃO APARECE AQUI, e isso é decisão de conversão
- * (Gabriel, 24/08/2026). A primeira versão estampava o percentual de cada
- * segmento no card — e entregar o número de graça encerra o assunto: quem já
- * leu "32,0%" não tem motivo nenhum para abrir a calculadora. A página passa a
- * fazer a pergunta e mandar para a ferramenta que responde, que é onde o
- * visitante vira lead.
+ * a vive, e um convite para analisar a própria operação. Os parâmetros de
+ * comparação são internos; a página e a calculadora não publicam a tabela.
  *
  * O `slug` continua aqui porque é a chave que leva cada card ao segmento certo
  * dentro da calculadora — não é enfeite.
@@ -95,9 +87,9 @@ export default function RestaurantesPage() {
           <p className="section-label mb-6">— Onde a margem escapa em cada casa</p>
           <h2 className="heading-section mb-4">Ache a sua casa aqui.</h2>
           <p className="text-body max-w-2xl mb-10">
-            Cada segmento tem um CMV saudável diferente — o que é ótimo numa pizzaria é sinal de
-            alerta num bar. A calculadora mostra a faixa da sua casa pelo {BENCHMARK_FONTE} e,
-            com o seu faturamento, quanto dinheiro está em jogo por mês.
+            O custo dos ingredientes precisa ser lido no contexto da operação. A calculadora
+            considera o seu segmento e os números que você informa para ajudar a identificar
+            onde investigar e qual pode ser o próximo passo.
           </p>
 
           <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -113,7 +105,7 @@ export default function RestaurantesPage() {
                     className="font-mono text-xs uppercase tracking-wider pt-4 underline underline-offset-4"
                     style={{ borderTop: "1px solid var(--color-border)", color: "var(--color-terracota-text)" }}
                   >
-                    Ver o CMV ideal de {b.titulo.toLowerCase()} →
+                    Analisar o CMV de {b.titulo.toLowerCase()} →
                   </Link>
                 </li>
               );
@@ -124,8 +116,8 @@ export default function RestaurantesPage() {
             <h3 className="heading-section text-2xl mb-3">Quanto o CMV está comendo do seu lucro?</h3>
             <p className="text-body mx-auto mb-6 max-w-2xl">
               São onze segmentos, do fine dining ao self-service. Escolha o seu, informe o
-              faturamento e o CMV de hoje: em segundos você vê a faixa saudável da sua casa e
-              quanto sobra por mês ao chegar nela. Gratuito e sem cadastro.
+              faturamento e o custo dos ingredientes: você recebe uma análise inicial para
+              orientar a próxima decisão. Gratuito e sem cadastro.
             </p>
             <Link href="/calculadora-cmv/" className="btn-primary">
               Calcular o CMV da minha casa →

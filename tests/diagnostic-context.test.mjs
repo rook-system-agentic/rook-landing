@@ -23,8 +23,10 @@ function capture(context) {
 
 test('cenário recebido preserva mês, base, centavos e resultado até a descrição comercial', () => {
   const context = readDiagnosticContext(scenario);
-  assert.equal(context.result.result.monthlyDifference, 4100.02);
+  assert.equal(Object.hasOwn(context.result, 'result'), false);
+  assert.equal(Object.hasOwn(context.result, 'assumptions'), false);
   const captured = capture(context);
+  assert.equal(captured.simulation.result.monthlyDifference, 4100.02);
   assert.equal(captured.intent, 'cmv');
   assert.equal(captured.period, '2026-08');
   assert.equal(captured.simulation.inputs.revenue, 100000.5);
