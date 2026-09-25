@@ -1,4 +1,7 @@
-export const CMV_TAX_MODEL_VERSION: 'rook-cmv-tax-2026-09-24';
+import { CMV_TAX_MODEL_VERSION } from './cmv-input-options.mjs';
+import type { TaxStateCode } from './cmv-input-options.mjs';
+export { CMV_TAX_MODEL_VERSION, TAX_STATES } from './cmv-input-options.mjs';
+export type { TaxStateCode } from './cmv-input-options.mjs';
 export const CMV_TAX_MODEL_SOURCE: Readonly<{
   repository: string;
   path: string;
@@ -9,11 +12,6 @@ export const CMV_TAX_MODEL_SOURCE: Readonly<{
   parameterEffectiveDate: string;
   snapshotDate: string;
 }>;
-
-export type TaxStateCode = 'AC' | 'AL' | 'AP' | 'AM' | 'BA' | 'CE' | 'DF' | 'ES'
-  | 'GO' | 'MA' | 'MT' | 'MS' | 'MG' | 'PA' | 'PB' | 'PR' | 'PE' | 'PI'
-  | 'RJ' | 'RN' | 'RS' | 'RO' | 'RR' | 'SC' | 'SP' | 'SE' | 'TO';
-export const TAX_STATES: readonly Readonly<{ code: TaxStateCode; label: string }>[];
 
 export interface CmvRevenueEstimate {
   grossRevenue: number;

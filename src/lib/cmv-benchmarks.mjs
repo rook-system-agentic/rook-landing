@@ -1,25 +1,8 @@
-/**
- * Benchmark de CMV por segmento — Benchmark Rook 2026.
- *
- * POR QUE ISTO EXISTE COMO MÓDULO PRÓPRIO (24/08/2026)
- *
- * A tabela nasceu dentro de `CmvCalculator.tsx`, que é `"use client"`. Enquanto
- * só a calculadora usava, tudo bem. A página de segmentos (`/restaurantes/`)
- * passou a citar os mesmos números — e havia duas saídas ruins:
- *
- *   1. Digitar os percentuais de novo na página. Duas listas do mesmo dado
- *      divergem no primeiro reajuste, e a página passa a dizer um número que a
- *      calculadora contradiz na tela seguinte.
- *   2. Importar de dentro do componente cliente. Funciona, mas arrasta a
- *      fronteira de cliente para uma página que é estática e não precisa de JS.
- *
- * Aqui os dados são `.mjs` puro, sem dependência: a calculadora importa, a
- * página importa, e `node --test` lê direto, sem passo de build — como manda o
- * padrão do repositório (ver CLAUDE.md).
- *
- * A FONTE é o Benchmark Rook 2026, exibido ao usuário na calculadora. Se algum
- * número mudar, muda aqui e os dois lugares acompanham.
+/** Referências internas de CMV. Importar somente no servidor.
+ * Os nomes e slugs públicos ficam em culinary-segments para que seletores
+ * não levem os parâmetros de comparação ao navegador.
  */
+import { culinarySegments } from './culinary-segments.mjs';
 
 /**
  * @typedef {object} SegmentoCmv
@@ -30,20 +13,24 @@
  * @property {number} cmvMax Teto da faixa saudável, em %.
  */
 
+const benchmarkBySlug = {
+  "a_la_carte": { defaultCmvTarget: 32.0, cmvMin: 30.9, cmvMax: 33.1 },
+  "fine_dining": { defaultCmvTarget: 27.5, cmvMin: 26.5, cmvMax: 28.5 },
+  "italiana": { defaultCmvTarget: 33.0, cmvMin: 31.8, cmvMax: 34.2 },
+  "japonesa_sushi": { defaultCmvTarget: 35.8, cmvMin: 34.5, cmvMax: 37.1 },
+  "self_service_kilo": { defaultCmvTarget: 36.6, cmvMin: 35.3, cmvMax: 37.9 },
+  "pizzaria": { defaultCmvTarget: 28.4, cmvMin: 27.4, cmvMax: 29.4 },
+  "hamburgueria": { defaultCmvTarget: 31.7, cmvMin: 30.5, cmvMax: 32.8 },
+  "fast_food": { defaultCmvTarget: 30.8, cmvMin: 29.6, cmvMax: 31.9 },
+  "bar_boteco": { defaultCmvTarget: 25.0, cmvMin: 24.1, cmvMax: 25.9 },
+  "padaria_cafeteria": { defaultCmvTarget: 34.8, cmvMin: 33.6, cmvMax: 36.1 },
+  "delivery_especializado": { defaultCmvTarget: 30.3, cmvMin: 29.2, cmvMax: 31.4 },
+};
+
 /** @type {readonly SegmentoCmv[]} */
-export const segmentsData = [
-  { name: "Restaurante à la carte - Tradicional", slug: "a_la_carte", defaultCmvTarget: 32.0, cmvMin: 30.9, cmvMax: 33.1 },
-  { name: "Alta gastronomia (fine dining)", slug: "fine_dining", defaultCmvTarget: 27.5, cmvMin: 26.5, cmvMax: 28.5 },
-  { name: "Comida Italiana", slug: "italiana", defaultCmvTarget: 33.0, cmvMin: 31.8, cmvMax: 34.2 },
-  { name: "Comida Japonesa / Sushi", slug: "japonesa_sushi", defaultCmvTarget: 35.8, cmvMin: 34.5, cmvMax: 37.1 },
-  { name: "Self-service / Comida a quilo", slug: "self_service_kilo", defaultCmvTarget: 36.6, cmvMin: 35.3, cmvMax: 37.9 },
-  { name: "Pizzaria", slug: "pizzaria", defaultCmvTarget: 28.4, cmvMin: 27.4, cmvMax: 29.4 },
-  { name: "Hamburgueria", slug: "hamburgueria", defaultCmvTarget: 31.7, cmvMin: 30.5, cmvMax: 32.8 },
-  { name: "Lanchonete / Fast food", slug: "fast_food", defaultCmvTarget: 30.8, cmvMin: 29.6, cmvMax: 31.9 },
-  { name: "Bar / Boteco", slug: "bar_boteco", defaultCmvTarget: 25.0, cmvMin: 24.1, cmvMax: 25.9 },
-  { name: "Padaria / Cafeteria / Confeitaria", slug: "padaria_cafeteria", defaultCmvTarget: 34.8, cmvMin: 33.6, cmvMax: 36.1 },
-  { name: "Delivery especializado", slug: "delivery_especializado", defaultCmvTarget: 30.3, cmvMin: 29.2, cmvMax: 31.4 },
-];
+export const segmentsData = culinarySegments.map(segment => ({
+  ...segment, ...benchmarkBySlug[segment.slug],
+}));
 
 /** Rótulo da fonte, exibido junto de qualquer número desta tabela. */
 export const BENCHMARK_FONTE = "Benchmark Rook 2026";

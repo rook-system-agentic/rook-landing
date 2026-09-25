@@ -20,7 +20,6 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { segmentsData } from "../src/lib/cmv-benchmarks.mjs";
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CONTEUDO = path.join(RAIZ, "src/lib/lp-content.ts");
@@ -91,21 +90,22 @@ test("a copy da /sobre não cita percentual solto", async () => {
   assert.deepEqual(
     percentuais,
     [],
-    `A copy da /sobre cita ${percentuais.join(", ")}%. A página trazia "30% de CMV ideal" ` +
-      "e a tabela canônica não tem nenhum segmento em 30% — a página que existe para " +
-      "provar rigor contradizia a calculadora. Qualquer percentual aqui tem de vir de " +
-      "`cmv-benchmarks.mjs`, nunca digitado.",
+    `A copy da /sobre cita ${percentuais.join(", ")}%. Parâmetros de comparação são internos ` +
+      "e não devem ser publicados na apresentação institucional.",
   );
 });
 
-test("a tabela de CMV segue sem nenhum segmento em 30%", () => {
-  // Guarda o motivo do teste acima: se algum dia 30% virar um valor real da
-  // tabela, a mensagem de erro dele passa a mentir e precisa ser revista.
-  const alvos = segmentsData.map((s) => s.defaultCmvTarget);
-  assert.ok(
-    !alvos.includes(30),
-    "Agora existe segmento em 30% — revise a justificativa do teste de percentual.",
-  );
+test("páginas institucionais não publicam nem prometem a tabela interna de CMV", async () => {
+  const { sobre } = await regioes();
+  const pages = await Promise.all([
+    readFile(PAGINA, "utf8"),
+    readFile(path.join(RAIZ, "src/app/restaurantes/page.tsx"), "utf8"),
+  ]);
+  for (const pagina of pages) {
+    assert.doesNotMatch(pagina, /from\s+["'][^"']*cmv-benchmarks/);
+    assert.doesNotMatch(pagina, /Ver o CMV ideal|calculadora mostra a faixa|você vê a faixa saudável/);
+  }
+  assert.doesNotMatch(sobre, /hoje publicada como|dois pontos acima|Ver o CMV de referência/);
 });
 
 test("a identidade da empresa vem de company.ts, não digitada na página", async () => {

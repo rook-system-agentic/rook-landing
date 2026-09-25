@@ -7,7 +7,8 @@ import {
   SIMPLES_TETO,
 } from './vendor/rook-tax-calculator-4b6c69ee.mjs';
 
-export const CMV_TAX_MODEL_VERSION = 'rook-cmv-tax-2026-09-24';
+import { CMV_TAX_MODEL_VERSION, TAX_STATES } from './cmv-input-options.mjs';
+export { CMV_TAX_MODEL_VERSION, TAX_STATES } from './cmv-input-options.mjs';
 export const CMV_TAX_MODEL_SOURCE = Object.freeze({
   repository: 'rook-system-agentic/rook-system',
   path: 'apps/web/src/lib/tax-calculator.ts',
@@ -18,16 +19,6 @@ export const CMV_TAX_MODEL_SOURCE = Object.freeze({
   parameterEffectiveDate: PARAMETER_EFFECTIVE_DATE,
   snapshotDate: '2026-09-24',
 });
-
-export const TAX_STATES = Object.freeze([
-  ['AC', 'Acre'], ['AL', 'Alagoas'], ['AP', 'Amapá'], ['AM', 'Amazonas'],
-  ['BA', 'Bahia'], ['CE', 'Ceará'], ['DF', 'Distrito Federal'], ['ES', 'Espírito Santo'],
-  ['GO', 'Goiás'], ['MA', 'Maranhão'], ['MT', 'Mato Grosso'], ['MS', 'Mato Grosso do Sul'],
-  ['MG', 'Minas Gerais'], ['PA', 'Pará'], ['PB', 'Paraíba'], ['PR', 'Paraná'],
-  ['PE', 'Pernambuco'], ['PI', 'Piauí'], ['RJ', 'Rio de Janeiro'], ['RN', 'Rio Grande do Norte'],
-  ['RS', 'Rio Grande do Sul'], ['RO', 'Rondônia'], ['RR', 'Roraima'], ['SC', 'Santa Catarina'],
-  ['SP', 'São Paulo'], ['SE', 'Sergipe'], ['TO', 'Tocantins'],
-].map(([code, label]) => Object.freeze({ code, label })));
 
 const toCents = value => Math.round((value + Number.EPSILON) * 100);
 

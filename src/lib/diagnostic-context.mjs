@@ -1,11 +1,11 @@
-import { calculateFinancialSimulation } from './financial-simulation.mjs';
+import { validateFinancialInput } from './financial-input.mjs';
 import { validateFinancialReference } from './financial-reference.mjs';
 
 export const DIAGNOSTIC_CONTEXT_EVENT = 'rook:diagnostic-context';
 
 const fields = {
   cmv: ['period', 'referenceBasis', 'segment', 'revenue', 'cmvPercent', 'cmvAmount', 'revenueBasis', 'cmvInputMode', 'taxState', 'taxModelVersion'],
-  breakeven: ['period', 'referenceBasis', 'revenue', 'cmvPercent', 'fixedCosts', 'taxPercent', 'feesPercent', 'otherVariablePercent'],
+  breakeven: ['period', 'referenceBasis', 'revenue', 'cmvPercent', 'fixedCosts', 'taxInputMode', 'taxAmount', 'taxPercent', 'feesPercent', 'otherVariablePercent'],
 };
 
 // Só números e metadados do cenário transitam entre calculadora e formulário.
@@ -24,10 +24,16 @@ export function readDiagnosticContext(detail) {
   }
   const reference = validateFinancialReference(answers);
   if (!reference.ok) return null;
-  const calculated = detail.simulation ? calculateFinancialSimulation(detail.simulation) : null;
-  if (detail.simulation && (!calculated?.ok || calculated.tool !== detail.intent
+  const validated = detail.simulation ? validateFinancialInput(detail.simulation) : null;
+  if (detail.simulation && (!validated?.ok || validated.inputs.tool !== detail.intent
     || fields[detail.intent].some(key => detail.unknown?.[key]))) return null;
-  if (calculated?.ok && (calculated.inputs.referenceBasis !== reference.value.referenceBasis
-    || (calculated.inputs.period !== undefined && calculated.inputs.period !== reference.value.period))) return null;
-  return { sourceId: detail.sourceId, intent: detail.intent, answers, result: calculated };
+  if (validated?.ok && (validated.inputs.referenceBasis !== reference.value.referenceBasis
+    || (validated.inputs.period !== undefined && validated.inputs.period !== reference.value.period))) return null;
+  // O formulário transporta entradas, nunca recompõe o cálculo no navegador.
+  // A aquisição recalcula e registra premissas e resultados no servidor.
+  const result = validated?.ok ? {
+    tool: validated.inputs.tool, inputs: validated.inputs,
+    summary: 'Os números deste cenário serão incluídos para a equipe continuar a análise com você.',
+  } : null;
+  return { sourceId: detail.sourceId, intent: detail.intent, answers, result };
 }

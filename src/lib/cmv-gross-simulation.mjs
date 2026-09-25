@@ -1,6 +1,7 @@
+import { validateFinancialInput } from './financial-input.mjs';
 import { segmentoPorSlug, BENCHMARK_FONTE } from './cmv-benchmarks.mjs';
-import { estimateCmvRevenue, CMV_TAX_MODEL_VERSION, TAX_STATES } from './cmv-tax-estimate.mjs';
-import { validateFinancialReference, financialReferenceAssumptions } from './financial-reference.mjs';
+import { estimateCmvRevenue } from './cmv-tax-estimate.mjs';
+import { financialReferenceAssumptions } from './financial-reference.mjs';
 
 export const CMV_GROSS_FORMULA_VERSION = 'rook-cmv-gross-1';
 const money = value => Math.round((value + Number.EPSILON) * 100) / 100;
@@ -9,34 +10,10 @@ const percent = (value, maximumFractionDigits = 2) => `${value.toLocaleString('p
 
 /** Inputs stay in the visitor's original basis, so revalidation never deducts tax twice. */
 export function calculateGrossCmv(candidate) {
-  const reference = validateFinancialReference(candidate, { required: false });
-  if (!reference.ok) return reference;
-  const errors = {};
-  if (typeof candidate.revenue !== 'number' || !Number.isFinite(candidate.revenue)
-    || money(candidate.revenue) <= 0 || candidate.revenue > 1_000_000_000) {
-    errors.revenue = 'Informe um faturamento válido em reais.';
-  }
-  if (!['amount', 'gross_percent', 'net_percent'].includes(candidate.cmvInputMode)) {
-    errors.cmvInputMode = 'Informe como você conhece o CMV: em reais ou em percentual.';
-  }
-  const field = candidate.cmvInputMode === 'amount' ? 'cmvAmount' : 'cmvPercent';
-  const limit = field === 'cmvAmount' ? 1_000_000_000 : 100;
-  if (typeof candidate[field] !== 'number' || !Number.isFinite(candidate[field])
-    || candidate[field] < 0 || candidate[field] > limit) {
-    errors[field] = field === 'cmvAmount' ? 'Informe o custo dos ingredientes consumidos em reais.' : 'Informe um percentual entre 0 e 100.';
-  }
-  if (!TAX_STATES.some(state => state.code === candidate.taxState)) errors.taxState = 'Selecione o estado usado na estimativa de impostos.';
-  if (candidate.taxModelVersion !== CMV_TAX_MODEL_VERSION) errors.taxModelVersion = 'Atualize a calculadora para usar as premissas atuais de impostos.';
-  const segment = typeof candidate.segment === 'string' ? segmentoPorSlug(candidate.segment) : null;
-  if (!segment && candidate.segment !== 'other') errors.segment = 'Confirme o segmento de comparação.';
-  if (Object.keys(errors).length) return { ok: false, errors };
-
-  const inputs = {
-    tool: 'cmv', revenueBasis: 'gross', revenue: money(candidate.revenue),
-    cmvInputMode: candidate.cmvInputMode, [field]: money(candidate[field]),
-    segment: candidate.segment, taxState: candidate.taxState, taxModelVersion: CMV_TAX_MODEL_VERSION,
-    ...reference.value,
-  };
+  const validated = validateFinancialInput(candidate);
+  if (!validated.ok) return validated;
+  const { inputs } = validated;
+  const segment = segmentoPorSlug(inputs.segment);
   // Tax, net revenue and all result fields are derived here, never trusted from the client.
   const estimate = estimateCmvRevenue(inputs.revenue, inputs.taxState);
   if (estimate.netRevenue <= 0) return { ok: false, errors: { revenue: 'Não foi possível estimar uma receita após impostos positiva.' } };

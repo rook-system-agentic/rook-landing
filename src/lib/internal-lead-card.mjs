@@ -65,7 +65,7 @@ export function buildInternalLeadCard({lead, receipt} = {}) {
       // The assumptions below carry the estimated tax/net bridge and original CMV basis.
     } else lines.push(`Receita ${input.revenueBasis === 'net' ? 'líquida' : 'bruta'}: ${money(input.revenue)} • CMV: ${input.cmvPercent}%`);
     if (calculated.tool === 'breakeven') lines.push(
-      `Custos fixos: ${money(input.fixedCosts)} • Impostos: ${input.taxPercent}% • Taxas: ${input.feesPercent}% • Outros variáveis: ${input.otherVariablePercent}%`);
+      `Custos fixos: ${money(input.fixedCosts)} • Impostos: ${input.taxInputMode === 'amount' ? `${money(input.taxAmount)} (guia informada)` : `${input.taxPercent}%`} • Taxas: ${input.feesPercent}% • Outros variáveis: ${input.otherVariablePercent}%`);
     lines.push(calculated.summary, ...calculated.assumptions,
       `Proveniência: motor determinístico Rook • Fórmula ${calculated.formulaVersion}`);
   } else if (Array.isArray(lead.diagnosticNotes) && lead.diagnosticNotes.length) {
