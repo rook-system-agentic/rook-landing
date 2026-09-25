@@ -5,6 +5,7 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)
 MANIFEST="$ROOT/k8s/production/lp.yaml"
 DOCKERFILE="$ROOT/k8s/production/Dockerfile"
 SECRET_GENERATOR="$ROOT/k8s/production/generate-secret.sh"
+SECRET_WRAPPER="$ROOT/k8s/production/rook-lp-runtime-secret-reconcile"
 CRONJOB="$ROOT/k8s/production/cron/publish-scheduled.yaml"
 WORKFLOW="$ROOT/.github/workflows/deploy-production.yml"
 VERCEL_JSON="$ROOT/vercel.json"
@@ -17,6 +18,7 @@ fail() {
 test -f "$MANIFEST" || fail "manifesto de produção ausente"
 test -f "$DOCKERFILE" || fail "Dockerfile de produção ausente"
 test -x "$SECRET_GENERATOR" || fail "gerador de Secret ausente ou não executável"
+test -x "$SECRET_WRAPPER" || fail "wrapper privilegiado ausente ou não executável"
 test -f "$CRONJOB" || fail "CronJob de publicação agendada ausente"
 test -f "$WORKFLOW" || fail "workflow de deploy de produção ausente"
 
@@ -59,7 +61,7 @@ grep -q 'secretName: rook-origin' "$MANIFEST" || fail "TLS do Ingress não usa o
 if grep -q 'configuration-snippet\|\$request_uri' "$MANIFEST"; then
   fail "anotação recusada pelo admission webhook do ingress-nginx"
 fi
-if grep -q 'a7b1a939\|source-revision' "$MANIFEST" "$SECRET_GENERATOR"; then
+if grep -q 'a7b1a939' "$MANIFEST" "$SECRET_GENERATOR"; then
   fail "revisão fixa da Vercel ainda referenciada"
 fi
 if grep -qi 'rook-homolog\|lp-homolog' "$MANIFEST"; then
@@ -77,7 +79,12 @@ grep -q 'test "$NEXT_PUBLIC_SITE_URL" = https://www.rook.com.br' "$DOCKERFILE" |
 grep -q 'supabase-production' "$SECRET_GENERATOR" || fail "Secret não aponta ao Supabase candidato"
 grep -q 'NEXT_PUBLIC_SUPABASE_URL=https://supabase.rook.com.br' "$SECRET_GENERATOR" || fail "URL pública do Supabase não é a de produção"
 grep -q 'comunicacao@rook.com.br' "$SECRET_GENERATOR" || fail "remetente da newsletter não é o real"
-grep -q '/etc/rook-production/vercel/landing.production.env' "$SECRET_GENERATOR" || fail "RESEND_API_KEY não vem do env da Vercel"
+grep -q '/etc/rook-production/runtime/landing.production.env' "$SECRET_GENERATOR" || fail "fonte root-only da Hostinger ausente"
+for name in ASAFLOW_ACQUISITION_ENABLED ASAFLOW_ACQUISITION_API_KEY ASAFLOW_ACQUISITION_PIPELINE_ID ASAFLOW_ACQUISITION_STAGE_ID; do
+  grep -Fq "from_runtime_env $name" "$SECRET_GENERATOR" || fail "$name não vem da fonte de runtime"
+  grep -Fq -- "--from-literal=$name=\"\$$name\"" "$SECRET_GENERATOR" || fail "$name não chega ao Secret"
+done
+grep -Fq 'rooksystem.com/source-revision="$SOURCE_REVISION"' "$SECRET_GENERATOR" || fail "Secret sem revisão de origem"
 grep -q 'existing CRON_SECRET' "$SECRET_GENERATOR" || fail "CRON_SECRET existente não é preservado"
 if grep -q 'já existe.*exit 0' "$SECRET_GENERATOR"; then
   fail "gerador ainda desiste quando o Secret existe"
@@ -108,6 +115,11 @@ grep -q 'vars.PROD_EXTERNAL_EFFECTS' "$WORKFLOW" || fail "portão PROD_EXTERNAL_
 grep -q 'image: rook-lp:production|image: rook-lp:prod-\${GITHUB_SHA}' "$WORKFLOW" || fail "workflow não troca o placeholder da imagem"
 grep -q 'rollout undo deploy/rook-lp' "$WORKFLOW" || fail "rollback em falha ausente"
 grep -q -- '--resolve www.rook.com.br:443:127.0.0.1 https://www.rook.com.br/' "$WORKFLOW" || fail "smoke pelo ingress local ausente"
+grep -q 'rook-lp-runtime-secret-reconcile' "$WORKFLOW" || fail "workflow não reconcilia o Secret root-only"
+grep -q 'sha256sum k8s/production/generate-secret.sh' "$WORKFLOW" || fail "workflow não valida o gerador root-owned"
+grep -q '/usr/local/lib/rook-lp/generate-secret.sh' "$SECRET_WRAPPER" || fail "wrapper não fixa o gerador root-owned"
+grep -q 'env -i' "$SECRET_WRAPPER" || fail "wrapper herda ambiente não confiável do runner"
+grep -q 'https://www.rook.com.br/api/acquisition/' "$WORKFLOW" || fail "workflow não valida a rota de aquisição"
 grep -q 'k8s/production/cron/publish-scheduled.yaml' "$WORKFLOW" || fail "workflow não aplica o CronJob"
 if grep -qi 'vercel deploy\|vercel --prod\|lp-homolog\|rook-homolog' "$WORKFLOW"; then
   fail "workflow de produção referencia Vercel deploy ou homologação"
