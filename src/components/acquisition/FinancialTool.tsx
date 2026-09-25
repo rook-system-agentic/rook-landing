@@ -1,11 +1,13 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useId, useRef, useState } from 'react';
+import { NumericFormat } from 'react-number-format';
 import { segmentsData } from '@/lib/cmv-benchmarks.mjs';
 import { CMV_TAX_MODEL_VERSION, TAX_STATES } from '@/lib/cmv-tax-estimate.mjs';
 import { buildSimulationInput } from '@/lib/acquisition.mjs';
 import { DIAGNOSTIC_CONTEXT_EVENT } from '@/lib/diagnostic-context.mjs';
 import { financialReferenceLabel } from '@/lib/financial-reference.mjs';
+import { formatPastedFinancialNumber } from '@/lib/financial-number-input.mjs';
 import {
   calculateFinancialSimulation,
   type FinancialResponse,
@@ -215,7 +217,44 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
       <label htmlFor={`${id}-${field.key}`}>{field.label}</label>
       <div className={styles.inputGroup}>
         <span aria-hidden="true">{field.unit}</span>
-        <input id={`${id}-${field.key}`} type="text" inputMode="decimal" maxLength={40} value={unknown[field.key] ? '' : answers[field.key] || ''} onChange={event => change(field.key, event.target.value)} disabled={unknown[field.key]} placeholder={unknown[field.key] ? 'Não informado' : 'Informe o valor'} aria-label={`${field.label} ${field.unit === '%' ? 'em percentual' : 'em reais'}`} aria-invalid={!!errors[field.key]} aria-describedby={`${id}-${field.key}-help${errors[field.key] ? ` ${id}-${field.key}-error` : ''}`} required={!unknown[field.key]} />
+        <NumericFormat
+          id={`${id}-${field.key}`}
+          type="text"
+          inputMode="decimal"
+          thousandSeparator="."
+          decimalSeparator=","
+          allowedDecimalSeparators={[',', '.']}
+          decimalScale={2}
+          fixedDecimalScale
+          value={unknown[field.key] ? '' : answers[field.key] || ''}
+          isAllowed={({ formattedValue }) => formattedValue.length <= 40}
+          onValueChange={({ formattedValue }, source) => {
+            // Mudanças de referência/estado não são novas entradas do visitante.
+            if (source.source === 'event') change(field.key, formattedValue);
+          }}
+          onPaste={event => {
+            const input = event.currentTarget;
+            const text = event.clipboardData.getData('text');
+            const replacesAll = !input.value || (input.selectionStart === 0 && input.selectionEnd === input.value.length);
+            // Inserções parciais de dígitos ficam com o controle de cursor da máscara.
+            if (!replacesAll && /^\d+$/.test(text)) return;
+            event.preventDefault();
+            const formatted = replacesAll ? formatPastedFinancialNumber(text) : null;
+            if (formatted === null) {
+              resetResult();
+              setErrors({ [field.key]: replacesAll ? 'Cole um número válido com até duas casas decimais.' : 'Selecione todo o valor para colar um número com separadores.' });
+              return;
+            }
+            change(field.key, formatted);
+            window.requestAnimationFrame(() => input.setSelectionRange(formatted.length, formatted.length));
+          }}
+          disabled={unknown[field.key]}
+          placeholder={unknown[field.key] ? 'Não informado' : 'Informe o valor'}
+          aria-label={`${field.label} ${field.unit === '%' ? 'em percentual' : 'em reais'}`}
+          aria-invalid={!!errors[field.key]}
+          aria-describedby={`${id}-${field.key}-help${errors[field.key] ? ` ${id}-${field.key}-error` : ''}`}
+          required={!unknown[field.key]}
+        />
       </div>
       <p id={`${id}-${field.key}-help`} className={styles.fieldHelp}>{field.help}</p>
       <label className={styles.unknown}><input type="checkbox" checked={!!unknown[field.key]} onChange={event => toggleUnknown(field.key, event.target.checked)} />Não sei informar<span className={styles.srOnly}>: {field.label}</span></label>
