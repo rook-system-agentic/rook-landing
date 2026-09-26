@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createAsaflowAcquisition,buildLeadDescription} from '../src/lib/asaflow-acquisition.mjs';
+import {createAsaflowAcquisition,buildContactProperties,buildDealProperties,buildLeadDescription} from '../src/lib/asaflow-acquisition.mjs';
 const lead={submissionId:'example-uuid',name:'Pessoa Teste',company:'Casa Teste',email:'teste@example.com',phone:'+5511999999999',city:{id:'3550308',name:'São Paulo',uf:'SP'},segment:'pizzaria',segmentOther:null,revenueBand:'up_to_100k',usesErp:false,erp:null,erpOther:null,intent:'demo',simulation:null};
 test('contrato oficial cria contato e negócio com chaves distintas e estáveis',async()=>{
  const calls=[];
@@ -11,6 +11,41 @@ test('contrato oficial cria contato e negócio com chaves distintas e estáveis'
  assert.equal(calls[2].headers['Idempotency-Key'],calls[5].headers['Idempotency-Key']);
  const payload=JSON.parse(calls[2].body);assert.equal(payload.stageId,'stage');assert.deepEqual(payload.contactIds,['contact-id']);
  assert.match(payload.description,/Não utiliza/);assert.ok(!('amount' in payload));
+});
+
+test('diagnóstico vindo da Meta grava origem, qualificação e UTMs em campos estruturados',async()=>{
+ const paid={...lead,intent:'cmv',usesErp:true,erp:'other',erpOther:'Sistema Casa',attribution:{
+  utm_source:'meta',utm_medium:'paid_social',utm_campaign:'[ES] - CMV 26/09',
+  utm_term:'gestores_restaurante',utm_content:'video-cmv-a',landing_path:'/calculadora-cmv',
+ }};
+ assert.deepEqual(buildContactProperties(paid),{
+  origem_lead:'Tráfego pago',empresa:'Casa Teste',nome_do_restaurante:'Casa Teste',
+  cidade:'São Paulo',uf:'SP',segmento:'Pizzaria',sistema_atual:'Sistema Casa',
+ });
+ assert.deepEqual(buildDealProperties(paid),{
+  origem:'Tráfego pago',empresa_cliente:'Casa Teste',landing_page:'/calculadora-cmv',
+  plataforma_de_midia:'Meta Ads',parceiro_de_aquisicao:'Escala SaaS',
+  utm_source:'meta',utm_medium:'paid_social',utm_campaign:'[ES] - CMV 26/09',
+  utm_term:'gestores_restaurante',utm_content:'video-cmv-a',
+ });
+
+ const calls=[];
+ const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
+  calls.push({url,...options});
+  return {ok:true,json:async()=>options.method==='GET'?{data:[],nextCursor:null}:{id:url.endsWith('/contacts')?'contact':'deal'}};
+ }});
+ await client.create(paid);
+ assert.deepEqual(JSON.parse(calls[1].body).properties,buildContactProperties(paid));
+ assert.deepEqual(JSON.parse(calls[2].body).properties,buildDealProperties(paid));
+});
+
+test('tráfego orgânico das calculadoras permanece Diagnóstico (site), sem inventar Meta',()=>{
+ const organic={...lead,intent:'breakeven',segment:'a_la_carte',attribution:{landing_path:'/diagnostico'}};
+ assert.equal(buildContactProperties(organic).origem_lead,'Diagnóstico (site)');
+ assert.equal(buildContactProperties(organic).segmento,'Restaurante à la carte');
+ assert.deepEqual(buildDealProperties(organic),{
+  origem:'Diagnóstico (site)',empresa_cliente:'Casa Teste',landing_page:'/diagnostico',
+ });
 });
 test('contato existente é preservado; falha no CRM não confirma sucesso',async()=>{
  const methods=[];const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
