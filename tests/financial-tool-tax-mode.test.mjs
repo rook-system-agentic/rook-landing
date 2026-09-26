@@ -10,6 +10,8 @@ import * as diagnostic from '../src/lib/diagnostic-context.mjs';
 import * as reference from '../src/lib/financial-reference.mjs';
 import * as numberInput from '../src/lib/financial-number-input.mjs';
 import * as validation from '../src/lib/financial-input.mjs';
+import * as attribution from '../src/lib/lead-attribution.mjs';
+import { TRACKING_EVENTS } from '../src/lib/tracking-events.mjs';
 import { calculateFinancialSimulation } from '../src/lib/financial-simulation.mjs';
 import { toPublicFinancialSimulation } from '../src/lib/public-financial-simulation.mjs';
 
@@ -48,23 +50,33 @@ function setup(tool = 'breakeven') {
   const NumericFormat = () => null;
   const dependencies = {
     react, 'react/jsx-runtime': { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) },
-    'react-number-format': { NumericFormat }, '@/lib/culinary-segments.mjs': segments,
+    'react-number-format': { NumericFormat, PatternFormat: () => null }, '@/lib/culinary-segments.mjs': segments,
     '@/lib/cmv-input-options.mjs': options, '@/lib/acquisition-input.mjs': acquisition,
     '@/lib/diagnostic-context.mjs': diagnostic, '@/lib/financial-reference.mjs': reference,
     '@/lib/financial-number-input.mjs': numberInput, '@/lib/financial-input.mjs': validation,
+    '@/lib/lead-attribution-client': { captureVisitAttribution: attribution.createVisitAttributionCapture() },
+    '@/lib/track': { track: () => false, TRACKING_EVENTS },
+    '@/lib/commercial-lead-challenge-client.mjs': { solveCommercialLeadChallenge: async () => 'proof' },
+    './PreviewModeWatcher': () => null,
     './financial-tool.module.css': {},
   };
   const module = { exports: {} };
   vm.runInNewContext(compiled, {
-    module, exports: module.exports, AbortSignal,
+    module, exports: module.exports, AbortSignal, URLSearchParams,
+    process: { env: { NODE_ENV: 'production', NEXT_PUBLIC_ENV: 'production' } },
+    crypto: { randomUUID: () => 'bb189bc0-1c1d-4cca-8400-44acb47fbda8' },
+    document: { referrer: '', getElementById: () => null },
+    requestAnimationFrame: fn => fn(),
     require(name) { assert.ok(name in dependencies, name); return dependencies[name]; },
-    window: { dispatchEvent(event) { events.push(event.detail); }, requestAnimationFrame(fn) { fn(); } },
+    window: { location: { href: 'https://rook.com.br/diagnostico/', search: '' },
+      dispatchEvent(event) { events.push(event.detail); }, requestAnimationFrame(fn) { fn(); } },
     CustomEvent: class { constructor(type, options) { this.type = type; this.detail = options.detail; } },
-    fetch: async (url, options) => {
-      const input = JSON.parse(options.body);
+    fetch: async (url, options = {}) => {
+      if (options.method !== 'POST') return { ok: true, json: async () => ({ token: 'challenge' }) };
+      const input = JSON.parse(options.body).simulation;
       requests.push(input);
       const result = toPublicFinancialSimulation(calculateFinancialSimulation(input));
-      return { ok: result.ok, json: async () => result };
+      return { ok: result.ok, status: 201, json: async () => ({ success: true, simulation: result }) };
     },
   });
   function render() {
@@ -85,13 +97,23 @@ function setup(tool = 'breakeven') {
     const container = find(node => node.type === 'div' && Array.isArray(node.props?.children) && node.props.children.some(child => child?.type === 'label' && child.props.htmlFor === `financial-${key}`));
     find(node => node.type === 'input' && node.props.type === 'checkbox', container).props.onChange({ target: { checked: true } }); render();
   }
-  async function calculate() { await find(node => node.type === 'form').props.onSubmit({ preventDefault() {} }); render(); }
+  async function calculate() {
+    await find(node => node.type === 'form').props.onSubmit({ preventDefault() {} }); render();
+    if (field('name')) {
+      for (const [key, value] of Object.entries({ name: 'Pessoa Teste', phone: '(11) 99999-9999', email: 'teste@example.invalid' })) select(key, value);
+      await find(node => node.type === 'form').props.onSubmit({ preventDefault() {} }); render();
+    }
+  }
+  function newAnalysis() {
+    const button = find(node => node.type === 'button' && node.props.children === 'Fazer nova análise');
+    assert.ok(button); button.props.onClick(); render();
+  }
   function fillBase() {
     select('referenceBasis', 'last_month');
     for (const [key, value] of Object.entries({ revenue: '100.000,00', cmvPercent: '40,00', fixedCosts: '10.000,00', feesPercent: '5,00', otherVariablePercent: '0,00' })) numeric(key, value);
   }
-  render();
-  return { field, select, numeric, unknown, calculate, fillBase, find, requests, events };
+  render(); render();
+  return { field, select, numeric, unknown, calculate, fillBase, newAnalysis, find, requests, events };
 }
 
 const latestScenario = app => app.events.filter(event => !event.clear).at(-1);
@@ -111,6 +133,7 @@ test('PE começa com imposto em reais e envia o valor da guia sem convertê-lo e
 
 test('trocar modo remove resultado e contexto anterior, limpa ambos os valores e desfaz desconhecido', async () => {
   const app = setup(); app.fillBase(); app.numeric('taxAmount', '5.000,00'); await app.calculate();
+  app.newAnalysis();
   app.select('taxInputMode', 'percent');
   assert.equal(app.events.at(-1).clear, true);
   assert.equal(app.field('taxAmount'), null);
@@ -119,6 +142,7 @@ test('trocar modo remove resultado e contexto anterior, limpa ambos os valores e
   app.numeric('taxPercent', '5,00'); await app.calculate();
   assert.equal(app.requests[1].taxPercent, 5);
   assert.equal(Object.hasOwn(app.requests[1], 'taxAmount'), false);
+  app.newAnalysis();
   app.unknown('taxPercent');
   app.select('taxInputMode', 'amount');
   assert.equal(app.field('taxAmount').props.disabled, undefined);

@@ -1,15 +1,18 @@
 'use client';
 
 import { FormEvent, Fragment, useCallback, useEffect, useId, useRef, useState } from 'react';
-import { NumericFormat } from 'react-number-format';
+import { NumericFormat, PatternFormat } from 'react-number-format';
 import { culinarySegments } from '@/lib/culinary-segments.mjs';
 import { CMV_TAX_MODEL_VERSION, TAX_STATES } from '@/lib/cmv-input-options.mjs';
-import { buildSimulationInput } from '@/lib/acquisition-input.mjs';
+import { buildSimulationInput, normalizePhone } from '@/lib/acquisition-input.mjs';
+import type { LeadAttribution } from '@/lib/lead-attribution.mjs';
+import { captureVisitAttribution } from '@/lib/lead-attribution-client';
+import { track, TRACKING_EVENTS } from '@/lib/track';
 import { DIAGNOSTIC_CONTEXT_EVENT } from '@/lib/diagnostic-context.mjs';
 import { financialReferenceLabel } from '@/lib/financial-reference.mjs';
 import { formatPastedFinancialNumber } from '@/lib/financial-number-input.mjs';
 import { validateFinancialInput, type FinancialTool as FinancialToolKind } from '@/lib/financial-input.mjs';
-import type { PublicFinancialResponse, PublicFinancialSuccess } from '@/lib/public-financial-simulation.mjs';
+import type { PublicFinancialSuccess } from '@/lib/public-financial-simulation.mjs';
 import styles from './financial-tool.module.css';
 
 type NumericField = { key: string; label: string; help: string; unit: 'R$' | '%' };
@@ -24,10 +27,9 @@ const currency = (value: number) => value.toLocaleString('pt-BR', { style: 'curr
 const percent = (value: number, maximumFractionDigits = 3) => `${value.toLocaleString('pt-BR', { maximumFractionDigits })}%`;
 
 /**
- * Ferramenta financeira independente da aquisição. Calcular não cadastra lead.
- * O cenário concluído fica disponível no formulário desta página, mesmo sem
- * clique no CTA. Editar ou sair da ferramenta retira o cenário anterior; os
- * dados só são enviados quando a pessoa confirma o formulário com consentimento.
+ * Primeiro valida os números, depois identifica o visitante. O clique final
+ * grava a análise no CRM e só a confirmação do servidor libera o resultado.
+ * Um retry preserva os mesmos dados e identificador para não duplicar o envio.
  */
 export default function FinancialTool({ tool, embedded = false }: { tool: FinancialToolKind; embedded?: boolean }) {
   const id = useId();
@@ -39,6 +41,16 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const [result, setResult] = useState<PublicFinancialSuccess | null>(null);
   const [incomplete, setIncomplete] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [step, setStep] = useState<'numbers' | 'identity'>('numbers');
+  const [profile, setProfile] = useState<Record<string, string>>({});
+  const [commercialContactRequested, setCommercialContactRequested] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const inFlight = useRef(false);
+  const completed = useRef(false);
+  const frozen = useRef<Record<string, unknown> | null>(null);
+  const submissionId = useRef('');
+  const attribution = useRef<LeadAttribution | null>(null);
+  const identityHeading = useRef<HTMLHeadingElement>(null);
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const errorSummary = useRef<HTMLParagraphElement>(null);
   const isCmv = tool === 'cmv';
@@ -46,6 +58,17 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const cmvInputMode = answers.cmvInputMode || 'amount';
   const taxInputMode = answers.taxInputMode || 'amount';
   const ContentHeading = embedded ? 'h3' : 'h2';
+
+  useEffect(() => {
+    submissionId.current = crypto.randomUUID();
+    attribution.current = captureVisitAttribution({ href: window.location.href, referrer: document.referrer });
+  }, []);
+
+  useEffect(() => {
+    // Esperar o commit da etapa evita focar um cabeçalho ainda não montado.
+    if (result || incomplete) resultHeading.current?.focus();
+    else if (step === 'identity') identityHeading.current?.focus();
+  }, [step, result, incomplete]);
 
   const shareWithForm = useCallback(() => {
     window.dispatchEvent(new CustomEvent(DIAGNOSTIC_CONTEXT_EVENT, {
@@ -103,11 +126,13 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   }
 
   function change(key: string, value: string) {
+    if (inFlight.current || frozen.current || completed.current) return;
     setAnswers(previous => ({ ...previous, [key]: value }));
     resetResult();
   }
 
   function changeReferenceBasis(value: string) {
+    if (inFlight.current || frozen.current || completed.current) return;
     setAnswers(previous => {
       const next: Record<string, string> = { ...previous, referenceBasis: value };
       delete next.period;
@@ -119,11 +144,13 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   }
 
   function toggleUnknown(key: string, checked: boolean) {
+    if (inFlight.current || frozen.current || completed.current) return;
     setUnknown(previous => ({ ...previous, [key]: checked }));
     resetResult();
   }
 
   function changeCmvInputMode(value: string) {
+    if (inFlight.current || frozen.current || completed.current) return;
     setAnswers(previous => {
       const next: Record<string, string> = { ...previous, cmvInputMode: value };
       delete next.cmvAmount;
@@ -140,6 +167,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   }
 
   function changeTaxInputMode(value: string) {
+    if (inFlight.current || frozen.current || completed.current) return;
     setAnswers(previous => {
       const next: Record<string, string> = { ...previous, taxInputMode: value };
       delete next.taxAmount;
@@ -175,52 +203,119 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
 
   async function calculate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
+    if (inFlight.current) return;
+    if (completed.current) { focusResult(); return; }
     setErrors({});
     setResult(null);
     setIncomplete(false);
 
     const input = buildSimulationInput(scenarioAnswers(), tool);
-    const validated = validateFinancialInput(input);
-    const nextErrors: Record<string, string> = {};
-    if (!['last_month', 'monthly_average_12m'].includes(answers.referenceBasis || '')) {
-      nextErrors.referenceBasis = 'Escolha entre o último mês e a média mensal dos últimos 12 meses.';
-    }
-    if (!validated.ok) {
-      for (const [key, message] of Object.entries(validated.errors)) {
-        if (!unknown[key]) nextErrors[key] = message;
+    if (!frozen.current) {
+      const validated = validateFinancialInput(input);
+      const nextErrors: Record<string, string> = {};
+      if (!['last_month', 'monthly_average_12m'].includes(answers.referenceBasis || '')) {
+        nextErrors.referenceBasis = 'Escolha entre o último mês e a média mensal dos últimos 12 meses.';
       }
-    }
-    if (Object.keys(nextErrors).length) {
-      showErrors(nextErrors);
-      return;
-    }
-    if (missingFields.length) {
-      setIncomplete(true);
-      focusResult();
-      return;
+      if (!validated.ok) {
+        for (const [key, message] of Object.entries(validated.errors)) {
+          if (!unknown[key]) nextErrors[key] = message;
+        }
+      }
+      if (Object.keys(nextErrors).length) {
+        setStep('numbers');
+        showErrors(nextErrors);
+        return;
+      }
+      if (missingFields.length) {
+        setIncomplete(true);
+        focusResult();
+        return;
+      }
+      if (step === 'numbers') {
+        setStep('identity');
+        window.requestAnimationFrame(() => identityHeading.current?.focus());
+        return;
+      }
+      if ((profile.name || '').trim().length < 2) nextErrors.name = 'Informe seu nome.';
+      if (!normalizePhone(profile.phone)) nextErrors.phone = 'Informe um WhatsApp válido com DDD.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((profile.email || '').trim())) nextErrors.email = 'Informe um e-mail válido.';
+      if (Object.keys(nextErrors).length) { showErrors(nextErrors); return; }
     }
 
+    // A prévia de homologação nunca cria um lead fictício nem simula entrega.
+    if (process.env.NEXT_PUBLIC_ENV === 'homolog' && new URLSearchParams(window.location.search).get('preview') === '1') {
+      showErrors({ form: 'Esta é uma prévia. O envio de dados está desativado e nenhum cadastro foi criado.' });
+      return;
+    }
+    inFlight.current = true;
     setBusy(true);
     try {
+      const challengeResponse = await fetch('/api/financial-simulations/', { cache: 'no-store', signal: AbortSignal.timeout(20_000) });
+      const challenge = await challengeResponse.json();
+      if (!challengeResponse.ok) throw new Error(challenge.error || 'Não foi possível iniciar o envio. Tente novamente.');
+      const { solveCommercialLeadChallenge } = await import('@/lib/commercial-lead-challenge-client.mjs');
+      const solution = await solveCommercialLeadChallenge(challenge);
+      if (!frozen.current) {
+        frozen.current = {
+          ...profile, commercialContactRequested, simulation: input,
+          submissionId: submissionId.current || (submissionId.current = crypto.randomUUID()),
+          attribution: attribution.current,
+        };
+      }
+      setLocked(true);
       const response = await fetch('/api/financial-simulations/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input),
+        body: JSON.stringify({ ...frozen.current, antiBot: { token: challenge.token, solution } }),
         signal: AbortSignal.timeout(20_000),
       });
-      const data = await response.json() as PublicFinancialResponse;
-      if (!response.ok || !data.ok) {
-        showErrors(!data.ok && data.errors ? data.errors : { form: 'Não foi possível calcular agora. Tente novamente.' });
+      const data = await response.json();
+      if (response.status === 422) {
+        // A validação precede qualquer gravação. É seguro liberar a edição.
+        frozen.current = null;
+        setLocked(false);
+        const nextErrors: Record<string, string> = {};
+        for (const [key, message] of Object.entries(data.fieldErrors || {})) {
+          if (typeof message !== 'string') continue;
+          const field = key.startsWith('simulation.') ? key.slice('simulation.'.length) : key;
+          nextErrors[field === 'simulation' ? 'form' : field] = message;
+          if (key.startsWith('simulation')) setStep('numbers');
+        }
+        showErrors(Object.keys(nextErrors).length ? nextErrors : { form: 'Revise os dados para continuar.' });
         return;
       }
-      setResult(data);
+      if (!response.ok || data.success !== true || data.simulation?.ok !== true || data.simulation.tool !== tool) {
+        throw new Error(data.error || 'Não foi possível confirmar o cadastro. Seus dados estão preservados; tente novamente.');
+      }
+      completed.current = true;
+      setResult(data.simulation);
       focusResult();
-    } catch {
-      showErrors({ form: 'Não foi possível calcular agora. Seus valores foram preservados; tente novamente.' });
+      // Só a confirmação do CRM conta como lead. Nenhum dado pessoal ou
+      // financeiro é enviado ao rastreamento; canal é uma constante do fluxo.
+      track(TRACKING_EVENTS.lead, { channel: tool === 'cmv' ? 'cmv' : 'diagnostico' });
+    } catch (problem) {
+      showErrors({ form: problem instanceof Error && problem.name !== 'TimeoutError'
+        ? problem.message : 'Não foi possível confirmar o cadastro agora. Seus dados estão preservados; tente novamente.' });
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
+  }
+
+  function changeProfile(key: string, value: string) {
+    if (inFlight.current || frozen.current || completed.current) return;
+    setProfile(previous => ({ ...previous, [key]: value }));
+    setErrors(previous => { const next = { ...previous }; delete next[key]; delete next.form; return next; });
+  }
+
+  function newAnalysis() {
+    if (inFlight.current || !completed.current) return;
+    completed.current = false;
+    frozen.current = null;
+    submissionId.current = crypto.randomUUID();
+    setLocked(false);
+    setStep('numbers');
+    resetResult();
   }
 
   const breakEven = result?.result.breakEvenRevenue;
@@ -292,9 +387,11 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
 
       <div className={styles.layout}>
         <form className={styles.form} onSubmit={calculate} noValidate aria-busy={busy}>
+          <p className={styles.eyebrow}>{result ? 'Etapa 3 de 3 · Resultado' : step === 'numbers' ? 'Etapa 1 de 3 · Números da operação' : 'Etapa 2 de 3 · Seus dados'}</p>
+          <div hidden={step !== 'numbers'}>
           <ContentHeading>Dados do cenário</ContentHeading>
           <p className={styles.hint}>Escolha a referência e use a mesma para todos os valores. Se não souber um número, marque “Não sei informar”.{!isCmv && ' Informe zero somente quando esse custo não existir.'}</p>
-          <fieldset disabled={busy} className={styles.fields}>
+          <fieldset disabled={busy || locked} className={styles.fields}>
             <legend className={styles.srOnly}>Valores mensais para {isCmv ? 'análise de CMV' : 'ponto de equilíbrio'}</legend>
             <div className={styles.field}>
               <label htmlFor={`${id}-referenceBasis`}>Quais números você prefere usar?</label>
@@ -352,8 +449,42 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
               {numericField(field)}
             </Fragment>)}
           </fieldset>
+          </div>
+          {step === 'identity' && <>
+            <ContentHeading ref={identityHeading} tabIndex={-1}>{result ? 'Cadastro confirmado' : 'Como podemos identificar sua análise?'}</ContentHeading>
+            <p className={styles.hint}>{result
+              ? 'Seus dados e os números da análise foram registrados. O resultado está disponível nesta página.'
+              : 'Falta só esta etapa. Informe seu nome, WhatsApp e e-mail para ver o resultado gratuito.'}</p>
+            <fieldset className={styles.fields} disabled={busy || locked}>
+              <legend className={styles.srOnly}>Identificação da análise</legend>
+              {(['name', 'phone', 'email'] as const).map(key => {
+                const label = key === 'name' ? 'Nome' : key === 'phone' ? 'WhatsApp com DDD' : 'E-mail';
+                const props = {
+                  id: `${id}-${key}`, name: key, value: profile[key] || '', maxLength: key === 'email' ? 254 : 120,
+                  required: true, onChange: (event: React.ChangeEvent<HTMLInputElement>) => changeProfile(key, event.target.value),
+                  'aria-invalid': !!errors[key], 'aria-describedby': errors[key] ? `${id}-${key}-error` : undefined,
+                };
+                return <div key={key} className={styles.field}>
+                  <label htmlFor={`${id}-${key}`}>{label}</label>
+                  {key === 'phone'
+                    ? <PatternFormat {...props} type="tel" inputMode="tel" autoComplete="tel-national" format="(##) #####-####" placeholder="(11) 99999-9999" />
+                    : <input {...props} type={key === 'email' ? 'email' : 'text'} autoComplete={key === 'email' ? 'email' : 'name'} />}
+                  {errors[key] && <p id={`${id}-${key}-error`} className={styles.fieldError}>{errors[key]}</p>}
+                </div>;
+              })}
+              <label className={styles.contactChoice}>
+                <input id={`${id}-commercialContactRequested`} type="checkbox" checked={commercialContactRequested}
+                  onChange={event => setCommercialContactRequested(event.target.checked)} />
+                <span>Quero que a equipe Rook entre em contato comigo para conversar sobre esta análise. <small>Opcional.</small></span>
+              </label>
+            </fieldset>
+            {!result && <p className={styles.privacy}>Ao clicar em “Ver {isCmv ? 'minha análise de CMV' : 'meu diagnóstico'}”, você envia seus dados e os números informados à Rook para registrar e apresentar sua análise. Consulte nossa <a href="/privacidade/" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>.</p>}
+            {!locked && <button type="button" className={styles.back} disabled={busy} onClick={() => { setStep('numbers'); setErrors({}); }}>Voltar aos números</button>}
+            {locked && !result && !busy && <p className={styles.retryNote}>Seus dados foram mantidos para repetir a mesma solicitação. Clique abaixo para tentar confirmar o envio.</p>}
+          </>}
           {hasErrors && <p className={styles.error} role="alert" tabIndex={-1} ref={errorSummary}>{errors.form || errors.taxModelVersion || 'Revise os campos indicados para continuar.'}</p>}
-          <button className={`btn-primary ${styles.calculate}`} type="submit" disabled={busy}>{busy ? 'Calculando…' : missingFields.length ? 'Continuar com os dados disponíveis' : isCmv ? 'Analisar meu CMV' : 'Calcular ponto de equilíbrio'}</button>
+          <button className={`btn-primary ${styles.calculate}`} type="submit" disabled={busy}>{busy ? 'Registrando sua análise…' : result ? 'Ver resultado registrado' : locked ? 'Tentar novamente' : step === 'numbers' ? missingFields.length ? 'Continuar com os dados disponíveis' : 'Continuar para identificação' : isCmv ? 'Ver minha análise de CMV' : 'Ver meu diagnóstico'}</button>
+          {result && <button type="button" className={styles.back} onClick={newAnalysis}>Fazer nova análise</button>}
         </form>
 
         <aside className={styles.result} aria-live="polite" aria-atomic="true">
@@ -378,7 +509,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
               <div><dt>{grossCmvResult ? 'CMV sobre a receita líquida estimada' : 'CMV informado'}</dt><dd>{percent(comparisonCmv, grossCmvResult ? 2 : 3)}</dd></div>
             </dl>}
             <p className={styles.notice}>{result.notice}</p>
-            <div className={styles.nextStep}><h3>Vamos conversar sobre esse resultado?</h3><p>O cenário será incluído no formulário abaixo. O envio acontece quando você confirmar sua solicitação.</p><a href="#cadastro" className="btn-primary" onClick={shareWithForm}>Solicitar demonstração</a></div>
+            <div className={styles.nextStep}><h3>Vamos conversar sobre esse resultado?</h3><p>Sua análise já foi registrada. {commercialContactRequested ? 'Você também autorizou o contato da equipe. ' : ''}Se quiser conhecer o Rook em uma demonstração, preencha a solicitação abaixo. Levaremos os números desta análise junto.</p><a href="#cadastro" className="btn-primary" onClick={shareWithForm}>Solicitar demonstração</a></div>
           </> : incomplete ? <>
             <p className={styles.eyebrow}>Cenário incompleto</p>
             <ContentHeading ref={resultHeading} tabIndex={-1}>Podemos começar pelo que você já sabe.</ContentHeading>
@@ -388,8 +519,8 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
           </> : <>
             <p className={styles.eyebrow}>Como usar</p>
             <ContentHeading>Um cenário para orientar a próxima decisão.</ContentHeading>
-            <ol className={styles.steps}><li>Escolha o último mês ou a média mensal dos últimos 12 meses e informe os números da operação.</li><li>Confira a análise dos seus números.</li><li>Se quiser, leve esse contexto a uma demonstração do Rook.</li></ol>
-            <p className={styles.note}>A análise é gratuita. Você pode calcular antes de informar seus dados de contato.</p>
+            <ol className={styles.steps}><li>Escolha o último mês ou a média mensal dos últimos 12 meses e informe os números da operação.</li><li>Preencha seu nome, WhatsApp e e-mail.</li><li>Clique em “Ver resultado” para registrar os dados e acessar sua análise.</li></ol>
+            <p className={styles.note}>A análise é gratuita. Pediremos seus dados de contato antes de mostrar o resultado. Você escolhe se deseja receber contato comercial.</p>
           </>}
         </aside>
       </div>

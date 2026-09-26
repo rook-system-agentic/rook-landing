@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createAsaflowAcquisition,buildContactProperties,buildDealProperties,buildLeadDescription} from '../src/lib/asaflow-acquisition.mjs';
+import {validateFinancialAcquisition} from '../src/lib/financial-acquisition.mjs';
+import {financialLead} from './helpers/financial-acquisition-route.mjs';
 const lead={submissionId:'example-uuid',name:'Pessoa Teste',company:'Casa Teste',email:'teste@example.com',phone:'+5511999999999',city:{id:'3550308',name:'São Paulo',uf:'SP'},segment:'pizzaria',segmentOther:null,revenueBand:'up_to_100k',usesErp:false,erp:null,erpOther:null,intent:'demo',simulation:null};
 test('contrato oficial cria contato e negócio com chaves distintas e estáveis',async()=>{
  const calls=[];
@@ -173,4 +175,40 @@ test('relatório fora do teto falha antes de gravar contato e não corta diagnó
  }});
  await assert.rejects(()=>client.create({...lead,diagnosticNotes:['x'.repeat(5000)]}),/asaflow_description_too_long/);
  assert.equal(calls.length,0);
+});
+
+test('captação das ferramentas omite estabelecimento, cidade e ERP desconhecidos do contato e card',()=>{
+ const captured=validateFinancialAcquisition(financialLead);
+ assert.equal(captured.ok,true);
+ assert.deepEqual(buildContactProperties(captured.value),{
+  origem_lead:'Diagnóstico (site)',uf:'SP',segmento:'Hamburgueria',
+ });
+ assert.deepEqual(buildDealProperties(captured.value),{origem:'Diagnóstico (site)'});
+ const description=buildLeadDescription(captured.value);
+ assert.match(description,/Análise solicitada: CMV/);
+ assert.match(description,/Demonstração solicitada: não/);
+ assert.match(description,/Contato comercial solicitado: não/);
+ assert.match(description,/Faturamento bruto mensal: Até R\$ 100 mil/);
+ assert.match(description,/UF informada para a estimativa: SP/);
+ assert.doesNotMatch(description,/Estabelecimento:|Cidade\/UF:|ERP\/PDV:|Não utiliza|undefined|null/);
+});
+
+test('ponto de equilíbrio conserva valores em reais sem inventar qualificação não coletada',async()=>{
+ const captured=validateFinancialAcquisition({...financialLead,simulation:{
+  tool:'breakeven',referenceBasis:'monthly_average_12m',revenueBasis:'gross',revenue:150000,
+  cmvPercent:35,fixedCosts:60000,taxInputMode:'amount',taxAmount:12000,feesPercent:2,otherVariablePercent:5,
+ }});
+ assert.equal(captured.ok,true);
+ assert.deepEqual(buildContactProperties(captured.value),{origem_lead:'Diagnóstico (site)'});
+ const calls=[];
+ const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
+  calls.push({url,...options});return {ok:true,json:async()=>options.method==='GET'?{data:[],nextCursor:null}:{id:url.endsWith('/contacts')?'contact':'deal'}};
+ }});
+ await client.create(captured.value);
+ const deal=JSON.parse(calls[2].body);
+ assert.equal(deal.name,'Ponto de equilíbrio — Pessoa Teste');
+ assert.match(deal.description,/Análise solicitada: Ponto de equilíbrio/);
+ assert.match(deal.description,/"taxAmount":12000/);
+ assert.match(deal.description,/Média mensal dos últimos 12 meses/);
+ assert.doesNotMatch(deal.description,/Segmento:|UF informada|Estabelecimento:|Cidade\/UF:|ERP\/PDV:|Não utiliza|undefined|null/);
 });
