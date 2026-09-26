@@ -65,6 +65,7 @@ function setup({ environment = 'production', href = 'https://rook.com.br/?utm_so
     'next/navigation': { usePathname: () => pathname },
     '@/lib/culinary-segments.mjs': culinarySegments, '@/lib/acquisition-input.mjs': acquisition,
     '@/lib/diagnostic-context.mjs': diagnostic, '@/lib/lead-attribution.mjs': attribution,
+    '@/lib/lead-attribution-client': { captureVisitAttribution: attribution.createVisitAttributionCapture() },
     '@/lib/financial-reference.mjs': financialReference,
     '@/lib/track': track, './CityPicker': CityPicker, './PreviewModeWatcher': () => null,
     './demo.module.css': {},

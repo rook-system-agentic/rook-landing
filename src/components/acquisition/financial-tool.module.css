@@ -24,6 +24,15 @@
 .error{margin-top:22px;padding:12px 14px;border-left:3px solid var(--color-terracota-text);background:var(--color-bg-elevated);font-size:14px;line-height:1.5}
 .calculate{display:block;width:100%;margin-top:28px;min-height:48px}
 .calculate:disabled{opacity:.65;cursor:wait}
+.back{display:block;margin-top:18px;min-height:44px;text-decoration:underline;font-size:14px;color:var(--color-text-primary)}
+.back:disabled{opacity:.65;cursor:wait}
+.privacy,.retryNote{margin-top:22px;font-size:12px;line-height:1.7;color:var(--color-text-muted)}
+.privacy a{text-decoration:underline}
+.contactChoice{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.6;cursor:pointer}
+.contactChoice input{flex-shrink:0;width:18px;height:18px;margin-top:3px;accent-color:var(--color-cta)}
+.contactChoice small{font-size:12px;color:var(--color-text-muted)}
+.form [tabindex="-1"]:focus{outline:none}
+.form [hidden]{display:none}
 .result{position:sticky;top:100px;background:var(--color-bg-elevated)}
 .result :is(h2,h3):focus{outline:none}
 .summary{font-size:15px;line-height:1.8;margin:20px 0}

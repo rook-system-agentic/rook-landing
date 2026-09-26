@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import vm from 'node:vm';
 import ts from 'typescript';
 import * as engine from '../src/lib/financial-simulation.mjs';
 import * as projection from '../src/lib/public-financial-simulation.mjs';
@@ -12,6 +11,7 @@ import { CMV_TAX_MODEL_VERSION } from '../src/lib/cmv-tax-estimate.mjs';
 import { segmentsData } from '../src/lib/cmv-benchmarks.mjs';
 import { buildSimulationInput, validateAcquisition } from '../src/lib/acquisition.mjs';
 import { readDiagnosticContext } from '../src/lib/diagnostic-context.mjs';
+import { financialRequest, loadFinancialRoute } from './helpers/financial-acquisition-route.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const gross = { tool: 'cmv', referenceBasis: 'last_month', revenueBasis: 'gross', revenue: 100000,
@@ -21,18 +21,7 @@ const pe = { tool: 'breakeven', referenceBasis: 'last_month', revenueBasis: 'gro
 const forbidden = /assumptions|formulaVersion|taxModelVersion|taxRegime|referencePercent|differencePoints|monthlyDifference|estimatedTaxPercent|defaultCmvTarget|cmvMin|cmvMax|Benchmark Rook|Sublimite|DAS federal|hipótese anual|Parâmetros internos/;
 function publicOnly(value) { assert.doesNotMatch(JSON.stringify(value), forbidden); }
 
-const compiled = ts.transpileModule(readFileSync(path.join(root, 'src/app/api/financial-simulations/route.ts'), 'utf8'), {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
-}).outputText;
-const module = { exports: {} };
-vm.runInNewContext(compiled, { module, exports: module.exports, Buffer,
-  require(name) {
-    const dependencies = { 'next/server': { NextResponse: Response }, '@/lib/financial-simulation.mjs': engine,
-      '@/lib/public-financial-simulation.mjs': projection };
-    assert.ok(name in dependencies, name);
-    return dependencies[name];
-  },
-});
+const route = loadFinancialRoute();
 const request = data => new Request('http://localhost/api/financial-simulations/', {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
 });
@@ -43,14 +32,15 @@ test('rota real expõe apenas resultado público em todos os segmentos e bases d
       { ...gross, segment }, { ...gross, segment, cmvInputMode: 'gross_percent', cmvAmount: undefined, cmvPercent: 35 },
       { tool: 'cmv', segment, revenueBasis: 'net', revenue: 91175, cmvPercent: 38, referenceBasis: 'last_month' },
     ]) {
-      const response = await module.exports.POST(request(input));
-      assert.equal(response.status, 200);
+      const response = await route.post(financialRequest({ simulation: input }));
+      assert.equal(response.status, 201);
       assert.equal(response.headers.get('cache-control'), 'no-store');
       const body = await response.json();
       publicOnly(body);
-      assert.equal(body.inputs.revenue, input.revenue);
-      assert.ok(body.result.comparisonCmvPercent > 0);
-      assert.equal(body.result.assessment === 'no_reference', segment === 'other');
+      assert.equal(body.success, true);
+      assert.equal(body.simulation.inputs.revenue, input.revenue);
+      assert.ok(body.simulation.result.comparisonCmvPercent > 0);
+      assert.equal(body.simulation.result.assessment === 'no_reference', segment === 'other');
     }
   }
 });
@@ -88,9 +78,9 @@ test('APIs públicas do chat ocultam premissas tanto no sucesso quanto na confir
 });
 
 test('erros e cenários sem margem continuam explícitos sem expor a implementação', async () => {
-  const response = await module.exports.POST(request({ ...gross, revenue: -1 }));
+  const response = await route.post(financialRequest({ simulation: { ...gross, revenue: -1 } }));
   assert.equal(response.status, 422);
-  assert.ok((await response.json()).errors.revenue);
+  assert.ok((await response.json()).fieldErrors['simulation.revenue']);
   const body = projection.toPublicFinancialSimulation(engine.calculateFinancialSimulation({ ...pe, cmvPercent: 90 }));
   publicOnly(body);
   assert.equal(body.result.status, 'non_positive_margin');
@@ -121,7 +111,7 @@ test('nenhuma entrada use client alcança motor, parâmetros ou tabelas internas
     ? files(path.join(dir, item.name)) : [path.join(dir, item.name)]); }
   const sources = files(path.join(root, 'src')).filter(file => /\.(?:[cm]?js|tsx?)$/.test(file));
   const prohibited = new Set(['financial-simulation.mjs', 'cmv-gross-simulation.mjs', 'cmv-tax-estimate.mjs',
-    'cmv-benchmarks.mjs', 'rook-tax-calculator-4b6c69ee.mjs', 'acquisition.mjs', 'public-financial-simulation.mjs']);
+    'cmv-benchmarks.mjs', 'rook-tax-calculator-4b6c69ee.mjs', 'acquisition.mjs', 'financial-acquisition.mjs', 'public-financial-simulation.mjs']);
   function dependencies(file) {
     // Transpilation removes type-only imports before walking the runtime graph.
     const code = ts.transpileModule(readFileSync(file, 'utf8'), { compilerOptions: {

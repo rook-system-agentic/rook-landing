@@ -10,7 +10,7 @@ Esta primeira entrega preserva integralmente páginas, preços, CTAs, formulári
 Foram preparados:
 
 - `/api/acquisition`: cadastro validado no servidor, proteção distribuída já existente, contato + oportunidade no AsaFlow. Desligado por padrão e sem configuração completa retorna `503` antes de ler o cadastro ou acessar serviços.
-- Motor financeiro determinístico, endpoint `/api/financial-simulations` e ferramentas HTTP de CMV/ponto de equilíbrio. Estes endpoints públicos só calculam: não consultam CRM, não gravam dados, não enviam mensagens e não estão conectados à IA do AsaFlow nesta entrega.
+- Motor financeiro determinístico e ferramentas HTTP de CMV/ponto de equilíbrio. Na entrega original, os endpoints apenas calculavam. O contrato atual de `/api/financial-simulations` passou a cadastrar o lead antes do resultado; consultar [financial-lead-gate.md](financial-lead-gate.md). As rotas de ferramentas da IA preservam seu contrato separado.
 - Normalização de cidade/UF pelo código IBGE e campos de perfil, faturamento e ERP/PDV.
 - Formatter puro do futuro aviso interno de lead. Não está conectado à rota, fila ou canal WhatsApp.
 - Testes de contratos, cálculos, limites HTTP, correções, identidade e idempotência do adapter.
