@@ -14,7 +14,7 @@ Este recorte adiciona a interface ao servidor já publicado e permite ponto deci
 - Formulário independente no final das páginas, acionado pelos CTAs de demonstração em `#cadastro`.
 - Nome, estabelecimento, WhatsApp, e-mail, cidade/UF padronizada pelo IBGE, segmento, faturamento e ERP/PDV, com opção de informar outro sistema.
 - Rook AI global, com logo negativa e paleta do site. A conversa pertence ao widget nativo do AsaFlow.
-- Calculadoras independentes de CMV e ponto de equilíbrio; o contexto só acompanha o formulário após um clique explícito do visitante.
+- CMV e ponto de equilíbrio: o fluxo atual valida números, identifica o visitante e registra a análise no clique final antes de mostrar resultado. A solicitação opcional de demonstração preserva o contexto financeiro. Ver [financial-lead-gate.md](financial-lead-gate.md).
 - Rotas existentes preservadas; `/assistente/` e `/cadastro/` incluídas no sitemap.
 
 ## Isolamento das mudanças paralelas

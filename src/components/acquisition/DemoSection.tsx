@@ -6,7 +6,8 @@ import { culinarySegments } from '@/lib/culinary-segments.mjs';
 import { ERP_SYSTEMS, REVENUE_BANDS, normalizePhone } from '@/lib/acquisition-input.mjs';
 import { DIAGNOSTIC_CONTEXT_EVENT, readDiagnosticContext, type DiagnosticContext } from '@/lib/diagnostic-context.mjs';
 import { financialReferenceLabel } from '@/lib/financial-reference.mjs';
-import { createVisitAttributionCapture, type LeadAttribution } from '@/lib/lead-attribution.mjs';
+import type { LeadAttribution } from '@/lib/lead-attribution.mjs';
+import { captureVisitAttribution } from '@/lib/lead-attribution-client';
 import { track, TRACKING_EVENTS } from '@/lib/track';
 import CityPicker from './CityPicker';
 import PreviewModeWatcher from './PreviewModeWatcher';
@@ -16,8 +17,6 @@ type Profile = Record<string, string>;
 type Errors = Record<string, string>;
 const fieldId = (key: string) => `demo-${key}`;
 const errorId = (key: string) => `demo-${key}-error`;
-// Compartilhado entre remontagens; não grava URL nem dados pessoais em storage.
-const captureVisitAttribution = createVisitAttributionCapture();
 
 function validateProfile(profile: Profile, consent: boolean): Errors {
   const errors: Errors = {};

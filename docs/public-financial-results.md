@@ -5,7 +5,7 @@
 A calculadora de CMV e o diagnóstico apresentam os números do cenário e uma orientação. Tabelas de referência, parâmetros fiscais, fórmulas e memória de cálculo pertencem ao servidor.
 
 - O navegador importa apenas seletores, parser, normalizadores e validação de entrada. Não importa `financial-simulation`, `cmv-gross-simulation`, `cmv-tax-estimate`, `cmv-benchmarks` ou o módulo fiscal em `vendor`.
-- `/api/financial-simulations/` usa a projeção explícita em `public-financial-simulation.mjs`. Novos campos internos não se tornam públicos automaticamente.
+- `/api/financial-simulations/` exige cadastro e grava o lead antes de devolver a projeção explícita em `public-financial-simulation.mjs`. Novos campos internos não se tornam públicos automaticamente. O fluxo está documentado em [financial-lead-gate.md](financial-lead-gate.md).
 - As rotas `/api/ai/tools/analisar-cmv/` e `/api/ai/tools/estimar-ponto-equilibrio/` aplicam a mesma projeção, inclusive nas entradas devolvidas para confirmação.
 - O contexto da calculadora enviado ao formulário contém entradas validadas. A captação recalcula no servidor; CRM e cards internos continuam recebendo os detalhes completos.
 
