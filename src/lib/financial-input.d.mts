@@ -12,11 +12,14 @@ export interface FinancialInput {
   taxModelVersion?: string;
   segment?: string;
   fixedCosts?: number;
+  costInputMode?: 'purchases_amount';
+  purchasesAmount?: number;
   taxInputMode?: 'amount' | 'percent';
   taxAmount?: number;
   taxPercent?: number;
   feesPercent?: number;
   otherVariablePercent?: number;
+  otherVariableAmount?: number;
 }
 
 export function validateFinancialInput(candidate: unknown): { ok: true; inputs: FinancialInput } | { ok: false; errors: Record<string, string> };

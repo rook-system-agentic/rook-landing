@@ -8,6 +8,7 @@ export function publicFinancialInputs(inputs) {
     'tool', 'revenueBasis', 'revenue', 'referenceBasis', 'period', 'segment',
     'cmvInputMode', 'cmvAmount', 'cmvPercent', 'taxState', 'fixedCosts',
     'taxInputMode', 'taxAmount', 'taxPercent', 'feesPercent', 'otherVariablePercent',
+    'costInputMode', 'purchasesAmount', 'otherVariableAmount',
   ]);
 }
 
@@ -34,12 +35,14 @@ export function toPublicFinancialSimulation(calculation) {
   } else {
     result.breakEvenRevenue = internal.breakEvenRevenue;
     summary = internal.status === 'non_positive_margin'
-      ? 'Os custos variáveis consomem toda a receita ou mais. Nessas condições, aumentar as vendas não cobre os custos fixos. Revise os percentuais com a equipe.'
+      ? 'Os custos variáveis consomem toda a receita ou mais. Nessas condições, aumentar as vendas não cobre os custos fixos. Revise os valores informados com a equipe.'
       : `Neste cenário, a receita mensal estimada para cobrir os custos é ${currency(internal.breakEvenRevenue)}. Sua receita está ${currency(Math.abs(inputs.revenue - internal.breakEvenRevenue))} ${inputs.revenue >= internal.breakEvenRevenue ? 'acima' : 'abaixo'} desse ponto. Essa diferença de receita não é o valor do lucro ou prejuízo.`;
   }
   return {
     ok: true, tool: calculation.tool, inputs, result, summary,
-    notice: 'Estimativa para orientar a análise da operação. Não representa apuração fiscal, lucro ou economia garantida.',
+    notice: inputs.costInputMode === 'purchases_amount'
+      ? 'Estimativa com base nas compras informadas, não no CMV apurado. Variações de estoque podem alterar o resultado. Não representa apuração fiscal, lucro ou economia garantida.'
+      : 'Estimativa para orientar a análise da operação. Não representa apuração fiscal, lucro ou economia garantida.',
   };
 }
 

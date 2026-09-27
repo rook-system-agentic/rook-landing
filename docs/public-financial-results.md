@@ -15,9 +15,9 @@ CMV: faturamento informado, impostos estimados em reais, receita líquida estima
 
 A referência numérica e a diferença mensal em reais não são publicadas. O valor exato da diferença, combinado com os valores informados, permitiria reconstruir a referência interna.
 
-Ponto de equilíbrio: receita mensal necessária para cobrir os custos, orientação e aviso de estimativa. Os cenários sem margem positiva continuam explícitos, sem um ponto de equilíbrio inventado.
+Ponto de equilíbrio: receita mensal necessária para cobrir os custos, orientação e aviso de estimativa. O questionário usa as compras e os demais gastos em reais do último mês, mantendo apenas taxas em percentual. Compras são uma aproximação, não CMV apurado; variações de estoque podem alterar o resultado. Os cenários sem margem positiva continuam explícitos, sem um ponto de equilíbrio inventado. O contrato e os critérios estão em [diagnostico-enxuto.md](diagnostico-enxuto.md).
 
-O visitante continua sabendo que os impostos são estimados e que a análise não comprova lucro, economia ou apuração fiscal. Nenhuma alíquota, referência ou fórmula foi alterada.
+Na calculadora de CMV, o visitante continua sabendo que os impostos são estimados. No diagnóstico, o valor da guia é informado pelo visitante e usado proporcionalmente para a projeção. Em ambos, a análise não comprova lucro, economia ou apuração fiscal.
 
 ## Contrato HTTP v2
 

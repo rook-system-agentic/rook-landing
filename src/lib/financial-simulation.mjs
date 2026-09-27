@@ -4,6 +4,7 @@ import { calculateGrossCmv } from './cmv-gross-simulation.mjs';
 import { financialReferenceAssumptions } from './financial-reference.mjs';
 
 export const FORMULA_VERSION = 'rook-consultivo-1';
+export const PURCHASES_FORMULA_VERSION = 'rook-breakeven-purchases-1';
 const money = value => Math.round((value + Number.EPSILON) * 100) / 100;
 const currency = value => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -14,6 +15,7 @@ export function calculateFinancialSimulation(candidate) {
   const validated = validateFinancialInput(candidate);
   if (!validated.ok) return validated;
   const { inputs } = validated;
+  if (inputs.tool === 'breakeven' && inputs.costInputMode === 'purchases_amount') return calculatePurchasesBreakeven(inputs);
   // Explicit gross scenarios use the versioned estimate. Legacy net and PE are unchanged.
   if (inputs.tool === 'cmv' && inputs.revenueBasis === 'gross') return calculateGrossCmv(inputs);
   const assumptions = ['Cenário mensal baseado nos valores informados. Não comprova lucro contábil, economia realizada ou fluxo de caixa.', ...financialReferenceAssumptions(inputs)];
@@ -71,5 +73,40 @@ export function calculateFinancialSimulation(candidate) {
     ok: true, tool: inputs.tool, formulaVersion: FORMULA_VERSION, inputs, assumptions,
     result: { status: 'valid', contributionPercent, breakEvenRevenue, revenueGap, operationalResult },
     summary: `Neste cenário, a receita mensal estimada para cobrir os custos é ${currency(breakEvenRevenue)}. Sua receita está ${currency(Math.abs(revenueGap))} ${revenueGap >= 0 ? 'acima' : 'abaixo'} desse ponto. Essa diferença de receita não é o valor do lucro ou prejuízo.`,
+  };
+}
+
+function calculatePurchasesBreakeven(inputs) {
+  const revenueCents = Math.round(inputs.revenue * 100);
+  const variableCents = Math.round(inputs.purchasesAmount * 100)
+    + Math.round(inputs.taxAmount * 100) + Math.round(inputs.otherVariableAmount * 100);
+  const feesBasisPoints = Math.round(inputs.feesPercent * 100);
+  // Não arredondar compras/receita, impostos/receita ou outros/receita para
+  // percentuais intermediários. Os produtos inteiros cabem na precisão segura
+  // do Number dentro dos limites de entrada; margem zero permanece exata.
+  const contributionNumerator = revenueCents * (10000 - feesBasisPoints) - variableCents * 10000;
+  const contributionRatio = contributionNumerator / (revenueCents * 10000);
+  const contributionPercent = money(contributionRatio * 100);
+  const operationalResult = money(contributionNumerator / 1_000_000 - inputs.fixedCosts);
+  const assumptions = [
+    'Cenário mensal baseado nos valores informados. Não comprova lucro contábil, economia realizada ou fluxo de caixa.',
+    ...financialReferenceAssumptions(inputs),
+    'As compras de ingredientes e bebidas são usadas como aproximação dos custos variáveis, não como CMV apurado. A formação ou redução de estoque pode distorcer esta estimativa.',
+    'A projeção mantém compras, impostos, taxas e outros custos variáveis na mesma proporção das vendas do último mês. Os valores em reais não são tratados como custos fixos.',
+    `Impostos informados: ${currency(inputs.taxAmount)} de guia ou valor declarado. A proporção sobre as vendas é uma hipótese gerencial, não uma alíquota fiscal confirmada. Não inclui guias atrasadas, multas ou tributos da folha já considerados nos custos fixos.`,
+    'Informe cada despesa uma única vez. Custos fixos ficam separados das compras, dos impostos, das taxas e dos outros custos variáveis. Não inclui dívidas, investimentos nem calendário de recebimentos.',
+  ];
+  const common = { ok: true, tool: inputs.tool, formulaVersion: PURCHASES_FORMULA_VERSION, inputs, assumptions };
+  if (contributionNumerator <= 0) return {
+    ...common,
+    result: { status: 'non_positive_margin', contributionPercent, breakEvenRevenue: null, revenueGap: null, operationalResult },
+    summary: 'As compras e os demais custos variáveis informados consomem toda a receita ou mais. Mantida essa proporção, aumentar as vendas não cobre os custos fixos. Revise os valores e a movimentação do estoque com a equipe.',
+  };
+  const breakEvenRevenue = money(inputs.fixedCosts / contributionRatio);
+  const revenueGap = money(inputs.revenue - breakEvenRevenue);
+  return {
+    ...common,
+    result: { status: 'valid', contributionPercent, breakEvenRevenue, revenueGap, operationalResult },
+    summary: `Neste cenário, a receita mensal estimada para cobrir os custos é ${currency(breakEvenRevenue)}. Sua receita está ${currency(Math.abs(revenueGap))} ${revenueGap >= 0 ? 'acima' : 'abaixo'} desse ponto. As compras são uma aproximação do consumo, e essa diferença de receita não é o valor do lucro ou prejuízo.`,
   };
 }
