@@ -18,10 +18,12 @@ em **Ver resultado** → confirmação do registro no AsaFlow → resultado.
   memória de cálculo continuam no servidor e no contexto interno do negócio.
 - O negócio identifica análise de CMV ou ponto de equilíbrio. Não presume empresa,
   cidade, ERP, solicitação de demonstração ou autorização de contato não informados.
-- O negócio grava `contato_comercial_solicitado` como booleano. A automação comercial
-  do Inbound deve usar esse campo da solicitação atual como gate: `true` pode avançar
-  para primeiro contato; `false` permanece em `Aguardando Esteira`, sem tarefa,
-  notificação ou mensagem automática.
+- O negócio grava `contato_comercial_solicitado` como booleano para consulta e
+  relatórios. No evento `deal.created`, o motor de automações não expõe essa
+  propriedade ao nó de condição; por isso o F1 usa a linha canônica gerada pelo
+  servidor na descrição: `Contato comercial solicitado: sim`. Esse valor não é
+  montado pelo visitante. `sim` pode avançar para primeiro contato; `não` permanece
+  em `Aguardando Esteira`, sem tarefa, notificação ou mensagem automática.
 - Quando a receita bruta permite derivar uma faixa, o contato recebe a mesma opção
   canônica em `faixa_faturamento` e `faturamento_informado_formulario`. A descrição do
   negócio continua sendo a fonte da memória de cálculo completa.
@@ -75,5 +77,11 @@ Sem meta de conversão inventada: comparar conclusão e falhas após publicaçã
 - Navegador local: CMV e diagnóstico avançam para identificação sem liberar o
   resultado; campos obrigatórios, máscara, retorno preservando os dados e bloqueio
   de envio em prévia conferidos. CMV conferido também em largura de 390 px.
-- Nenhum lead real foi enviado. A entrega em AsaFlow e o comportamento das
-  automações do pipeline precisam de comprovação após publicação/configuração.
+- Homologação E2E em 26/09/2026: CMV com contato comercial desmarcado retornou 201,
+  permaneceu em `Aguardando Esteira` e não criou tarefa; ponto de equilíbrio com
+  contato marcado retornou 201, foi atribuído ao Gabriel, criou tarefa de ligação e
+  moveu para `Tentativa de Contato`. O relatório do F1 registrou três execuções
+  concluídas, zero falhas; o canário positivo final percorreu sete etapas.
+- Os negócios UAT foram encerrados como perda técnica `Outro` e a tarefa UAT foi
+  concluída. Os contatos sintéticos usam dados não entregáveis e devem permanecer
+  excluídos de métricas comerciais pelo prefixo `UAT`.
