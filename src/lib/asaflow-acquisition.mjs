@@ -49,13 +49,26 @@ export function buildContactProperties(lead) {
   if(cleanProperty(lead.city?.uf || lead.taxState)) properties.uf=lead.city?.uf || lead.taxState;
   if(lead.segment) properties.segmento=ASAFLOW_SEGMENTS[lead.segment]||'Outro';
   if(lead.segment==='other' && cleanProperty(lead.segmentOther,100)) properties.segmento_outros=cleanProperty(lead.segmentOther,100);
+  const revenueBand=REVENUE_BANDS.find(item=>item.value===lead.revenueBand)?.label;
+  if(revenueBand) {
+    properties.faixa_faturamento=revenueBand;
+    properties.faturamento_informado_formulario=revenueBand;
+  }
   if(lead.usesErp) properties.sistema_atual=ERP_SYSTEMS.includes(lead.erp)?lead.erp:cleanProperty(lead.erpOther,100);
   return properties;
 }
 
 export function buildDealProperties(lead) {
   const attribution=normalizedAttribution(lead);
-  const properties={origem:acquisitionOrigin(lead)};
+  const properties={
+    origem:acquisitionOrigin(lead),
+    // A análise financeira é sempre registrada; só este campo autoriza a
+    // esteira comercial. O valor mora no negócio para representar esta
+    // solicitação, inclusive quando o contato já existia.
+    contato_comercial_solicitado:lead.captureKind==='financial_tool'
+      ? lead.commercialContactRequested===true
+      : true,
+  };
   if(cleanProperty(lead.company)) properties.empresa_cliente=lead.company;
   if(cleanProperty(attribution?.landing_path,256)) properties.landing_page=cleanProperty(attribution.landing_path,256);
   if(isMetaPaid(attribution)) properties.plataforma_de_midia='Meta Ads';

@@ -22,10 +22,13 @@ test('diagnóstico vindo da Meta grava origem, qualificação e UTMs em campos e
  }};
  assert.deepEqual(buildContactProperties(paid),{
   origem_lead:'Tráfego pago',empresa:'Casa Teste',nome_do_restaurante:'Casa Teste',
-  cidade:'São Paulo',uf:'SP',segmento:'Pizzaria',sistema_atual:'Sistema Casa',
+  cidade:'São Paulo',uf:'SP',segmento:'Pizzaria',
+  faixa_faturamento:'Até R$ 100 mil',faturamento_informado_formulario:'Até R$ 100 mil',
+  sistema_atual:'Sistema Casa',
  });
  assert.deepEqual(buildDealProperties(paid),{
-  origem:'Tráfego pago',empresa_cliente:'Casa Teste',landing_page:'/calculadora-cmv',
+  origem:'Tráfego pago',contato_comercial_solicitado:true,
+  empresa_cliente:'Casa Teste',landing_page:'/calculadora-cmv',
   plataforma_de_midia:'Meta Ads',parceiro_de_aquisicao:'Escala SaaS',
   utm_source:'meta',utm_medium:'paid_social',utm_campaign:'[ES] - CMV 26/09',
   utm_term:'gestores_restaurante',utm_content:'video-cmv-a',
@@ -46,7 +49,8 @@ test('tráfego orgânico das calculadoras permanece Diagnóstico (site), sem inv
  assert.equal(buildContactProperties(organic).origem_lead,'Diagnóstico (site)');
  assert.equal(buildContactProperties(organic).segmento,'Restaurante à la carte');
  assert.deepEqual(buildDealProperties(organic),{
-  origem:'Diagnóstico (site)',empresa_cliente:'Casa Teste',landing_page:'/diagnostico',
+  origem:'Diagnóstico (site)',contato_comercial_solicitado:true,
+  empresa_cliente:'Casa Teste',landing_page:'/diagnostico',
  });
 });
 test('contato existente é preservado; falha no CRM não confirma sucesso',async()=>{
@@ -182,8 +186,11 @@ test('captação das ferramentas omite estabelecimento, cidade e ERP desconhecid
  assert.equal(captured.ok,true);
  assert.deepEqual(buildContactProperties(captured.value),{
   origem_lead:'Diagnóstico (site)',uf:'SP',segmento:'Hamburgueria',
+  faixa_faturamento:'Até R$ 100 mil',faturamento_informado_formulario:'Até R$ 100 mil',
  });
- assert.deepEqual(buildDealProperties(captured.value),{origem:'Diagnóstico (site)'});
+ assert.deepEqual(buildDealProperties(captured.value),{
+  origem:'Diagnóstico (site)',contato_comercial_solicitado:false,
+ });
  const description=buildLeadDescription(captured.value);
  assert.match(description,/Análise solicitada: CMV/);
  assert.match(description,/Demonstração solicitada: não/);
@@ -199,7 +206,12 @@ test('ponto de equilíbrio conserva valores em reais sem inventar qualificação
   cmvPercent:35,fixedCosts:60000,taxInputMode:'amount',taxAmount:12000,feesPercent:2,otherVariablePercent:5,
  }});
  assert.equal(captured.ok,true);
- assert.deepEqual(buildContactProperties(captured.value),{origem_lead:'Diagnóstico (site)'});
+ assert.deepEqual(buildContactProperties(captured.value),{
+  origem_lead:'Diagnóstico (site)',
+  faixa_faturamento:'Acima de R$ 100 mil até R$ 200 mil',
+  faturamento_informado_formulario:'Acima de R$ 100 mil até R$ 200 mil',
+ });
+ assert.equal(buildDealProperties(captured.value).contato_comercial_solicitado,false);
  const calls=[];
  const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
   calls.push({url,...options});return {ok:true,json:async()=>options.method==='GET'?{data:[],nextCursor:null}:{id:url.endsWith('/contacts')?'contact':'deal'}};
@@ -211,4 +223,12 @@ test('ponto de equilíbrio conserva valores em reais sem inventar qualificação
  assert.match(deal.description,/"taxAmount":12000/);
  assert.match(deal.description,/Média mensal dos últimos 12 meses/);
  assert.doesNotMatch(deal.description,/Segmento:|UF informada|Estabelecimento:|Cidade\/UF:|ERP\/PDV:|Não utiliza|undefined|null/);
+});
+
+test('consentimento comercial das ferramentas pertence à solicitação atual',()=>{
+ const without=validateFinancialAcquisition(financialLead);
+ const withContact=validateFinancialAcquisition({...financialLead,commercialContactRequested:true});
+ assert.equal(without.ok,true);assert.equal(withContact.ok,true);
+ assert.equal(buildDealProperties(without.value).contato_comercial_solicitado,false);
+ assert.equal(buildDealProperties(withContact.value).contato_comercial_solicitado,true);
 });

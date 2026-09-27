@@ -18,6 +18,13 @@ em **Ver resultado** → confirmação do registro no AsaFlow → resultado.
   memória de cálculo continuam no servidor e no contexto interno do negócio.
 - O negócio identifica análise de CMV ou ponto de equilíbrio. Não presume empresa,
   cidade, ERP, solicitação de demonstração ou autorização de contato não informados.
+- O negócio grava `contato_comercial_solicitado` como booleano. A automação comercial
+  do Inbound deve usar esse campo da solicitação atual como gate: `true` pode avançar
+  para primeiro contato; `false` permanece em `Aguardando Esteira`, sem tarefa,
+  notificação ou mensagem automática.
+- Quando a receita bruta permite derivar uma faixa, o contato recebe a mesma opção
+  canônica em `faixa_faturamento` e `faturamento_informado_formulario`. A descrição do
+  negócio continua sendo a fonte da memória de cálculo completa.
 - A solicitação posterior de demonstração continua sendo uma ação comercial
   explícita, com seu formulário próprio. O cadastro da análise já foi realizado;
   não depende desse formulário. Não é feita alteração anônima em negócios existentes.
@@ -37,6 +44,14 @@ em **Ver resultado** → confirmação do registro no AsaFlow → resultado.
 8. Após sucesso, repetir o clique reapresenta o mesmo resultado sem novo envio.
 9. Dados, erro, foco, telefone e botões funcionam em desktop e celular.
 
+## Responsável e efeitos externos
+
+- O responsável pelo negócio é definido na automação do AsaFlow, não no navegador.
+- A esteira comercial pode criar tarefa e notificação interna; envio automático de
+  WhatsApp ou e-mail continua fora do escopo e fail-closed.
+- O consentimento pertence ao negócio/solicitação, não ao histórico permanente do
+  contato, evitando que uma decisão antiga autorize um cadastro novo.
+
 ## Limites desta entrega
 
 Sem mudança de fórmulas, tabelas internas, agente Rook AI, pagamento, CS ou envio de
@@ -51,7 +66,7 @@ Sem meta de conversão inventada: comparar conclusão e falhas após publicaçã
 
 ## Validação da implementação
 
-- `pnpm test:ci`: 333 testes passaram, incluindo validação do cadastro, resposta
+- `pnpm test:ci`: 334 testes passaram, incluindo validação do cadastro, resposta
   perdida após escrita, retry, clique duplo, privacidade e regressão de demonstração.
 - Build Next.js com `NEXT_PUBLIC_ENV=homolog` e captação desativada: concluído,
   incluindo checagem de tipos. Blog usou a semente local por não haver Supabase
