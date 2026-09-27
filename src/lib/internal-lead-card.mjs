@@ -63,9 +63,12 @@ export function buildInternalLeadCard({lead, receipt} = {}) {
     if(calculated.tool==='cmv' && input.revenueBasis==='gross') {
       lines.push(`Faturamento bruto informado: ${money(input.revenue)} • UF da estimativa: ${input.taxState}`);
       // The assumptions below carry the estimated tax/net bridge and original CMV basis.
+    } else if (input.costInputMode === 'purchases_amount') {
+      lines.push(`Receita bruta: ${money(input.revenue)} • Compras de ingredientes e bebidas: ${money(input.purchasesAmount)}`,
+        'Origem dos custos: compras informadas pelo visitante, não CMV apurado. Variações de estoque podem alterar a estimativa.');
     } else lines.push(`Receita ${input.revenueBasis === 'net' ? 'líquida' : 'bruta'}: ${money(input.revenue)} • CMV: ${input.cmvPercent}%`);
     if (calculated.tool === 'breakeven') lines.push(
-      `Custos fixos: ${money(input.fixedCosts)} • Impostos: ${input.taxInputMode === 'amount' ? `${money(input.taxAmount)} (guia informada)` : `${input.taxPercent}%`} • Taxas: ${input.feesPercent}% • Outros variáveis: ${input.otherVariablePercent}%`);
+      `Custos fixos: ${money(input.fixedCosts)} • Impostos: ${input.taxInputMode === 'amount' ? `${money(input.taxAmount)} (guia informada)` : `${input.taxPercent}%`} • Taxas: ${input.feesPercent}% • Outros variáveis: ${input.costInputMode === 'purchases_amount' ? money(input.otherVariableAmount) : `${input.otherVariablePercent}%`}`);
     lines.push(calculated.summary, ...calculated.assumptions,
       `Proveniência: motor determinístico Rook • Fórmula ${calculated.formulaVersion}`);
   } else if (Array.isArray(lead.diagnosticNotes) && lead.diagnosticNotes.length) {

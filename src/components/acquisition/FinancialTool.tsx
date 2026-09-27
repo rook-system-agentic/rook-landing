@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, Fragment, useCallback, useEffect, useId, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { NumericFormat, PatternFormat } from 'react-number-format';
 import { culinarySegments } from '@/lib/culinary-segments.mjs';
 import { CMV_TAX_MODEL_VERSION, TAX_STATES } from '@/lib/cmv-input-options.mjs';
@@ -20,7 +20,7 @@ type NumericField = { key: string; label: string; help: string; unit: 'R$' | '%'
 const FIXED_AND_VARIABLE_FIELDS: NumericField[] = [
   { key: 'fixedCosts', label: 'Custos fixos mensais', unit: 'R$', help: 'Folha, aluguel e pró-labore. Não repita ingredientes, impostos sobre vendas ou taxas já informados nos outros campos.' },
   { key: 'feesPercent', label: 'Taxas de cartão e delivery', unit: '%', help: 'Use o total pago em taxas de cartão e delivery como percentual de todas as vendas. A taxa do aplicativo, aplicada só ao delivery, não é esse percentual.' },
-  { key: 'otherVariablePercent', label: 'Outros custos variáveis', unit: '%', help: 'Comissões e demais custos variáveis, sobre a mesma receita bruta.' },
+  { key: 'otherVariableAmount', label: 'Outros custos variáveis no último mês', unit: 'R$', help: 'Gastos que acompanham as vendas, como embalagens, descartáveis e comissões por venda. Não repita compras, impostos ou taxas já informados.' },
 ];
 
 const currency = (value: number) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -35,7 +35,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const id = useId();
   const [answers, setAnswers] = useState<Record<string, string>>((): Record<string, string> => tool === 'cmv'
     ? { revenueBasis: 'gross', cmvInputMode: 'amount', taxState: 'SP', taxModelVersion: CMV_TAX_MODEL_VERSION }
-    : { taxInputMode: 'amount' });
+    : { referenceBasis: 'last_month', costInputMode: 'purchases_amount', taxInputMode: 'amount' });
   const [unknown, setUnknown] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [result, setResult] = useState<PublicFinancialSuccess | null>(null);
@@ -54,9 +54,8 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const errorSummary = useRef<HTMLParagraphElement>(null);
   const isCmv = tool === 'cmv';
-  const isAverage = answers.referenceBasis === 'monthly_average_12m';
+  const isAverage = isCmv && answers.referenceBasis === 'monthly_average_12m';
   const cmvInputMode = answers.cmvInputMode || 'amount';
-  const taxInputMode = answers.taxInputMode || 'amount';
   const ContentHeading = embedded ? 'h3' : 'h2';
 
   useEffect(() => {
@@ -88,18 +87,15 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     };
   }, [id, result, incomplete, shareWithForm]);
 
-  const taxField: NumericField = taxInputMode === 'amount' ? {
-    key: 'taxAmount', label: isAverage ? 'Impostos sobre as vendas, em média por mês' : 'Impostos sobre as vendas no último mês', unit: 'R$',
-    help: `${isAverage ? 'Use a média mensal dos impostos sobre as vendas dos mesmos 12 meses.' : 'Use o valor da guia dos impostos sobre as vendas do último mês.'} Deixe de fora guias atrasadas, multas e tributos da folha já incluídos nos custos fixos.`,
-  } : {
-    key: 'taxPercent', label: 'Impostos sobre o faturamento', unit: '%',
-    help: `${isAverage ? 'Use o percentual dos impostos sobre o faturamento total dos mesmos 12 meses.' : 'Use o percentual dos impostos sobre o faturamento do último mês.'} Deixe de fora guias atrasadas, multas e tributos da folha já incluídos nos custos fixos.`,
+  const taxField: NumericField = {
+    key: 'taxAmount', label: 'Qual foi o valor da sua guia de impostos do último mês?', unit: 'R$',
+    help: 'Informe o valor da guia de impostos paga no último mês. Deixe de fora guias atrasadas, multas e tributos da folha já incluídos nos custos fixos.',
   };
 
   const fields: NumericField[] = [
     {
       key: 'revenue', label: isAverage ? 'Quanto seu restaurante vendeu por mês, em média?' : 'Quanto seu restaurante vendeu no último mês?', unit: 'R$',
-      help: isCmv ? 'Informe o total das vendas antes dos impostos. Nós estimamos os impostos para fazer a comparação.' : 'Faturamento antes dos impostos. Use essa base em todos os percentuais.',
+      help: isCmv ? 'Informe o total das vendas antes dos impostos. Nós estimamos os impostos para fazer a comparação.' : 'Informe o total das vendas do último mês, antes dos impostos.',
     },
     isCmv && cmvInputMode === 'amount' ? {
       key: 'cmvAmount', label: isAverage ? 'Custo médio mensal dos ingredientes consumidos' : 'Custo dos ingredientes consumidos no último mês', unit: 'R$',
@@ -112,8 +108,8 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
         ? 'Percentual do custo dos ingredientes consumidos sobre as vendas antes dos impostos. Nós ajustamos a base para comparar.'
         : 'Use apenas se seu relatório já calcula o CMV sobre a receita após impostos. Nesta simulação, aplicaremos esse percentual à receita líquida estimada.',
     } : {
-      key: 'cmvPercent', label: 'CMV apurado', unit: '%',
-      help: 'Use o custo dos ingredientes consumidos como percentual das vendas antes dos impostos, não da receita líquida. Compras, sozinhas, não medem o consumo do estoque.',
+      key: 'purchasesAmount', label: 'Quanto você gastou com compras no último mês?', unit: 'R$',
+      help: 'Some as compras de ingredientes e bebidas. Usamos esse valor como aproximação do consumo; mudanças no estoque podem alterar a estimativa.',
     },
     ...(isCmv ? [] : [FIXED_AND_VARIABLE_FIELDS[0], taxField, ...FIXED_AND_VARIABLE_FIELDS.slice(1)]),
   ];
@@ -166,29 +162,16 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     resetResult();
   }
 
-  function changeTaxInputMode(value: string) {
-    if (inFlight.current || frozen.current || completed.current) return;
-    setAnswers(previous => {
-      const next: Record<string, string> = { ...previous, taxInputMode: value };
-      delete next.taxAmount;
-      delete next.taxPercent;
-      return next;
-    });
-    setUnknown(previous => {
-      const next = { ...previous };
-      delete next.taxAmount;
-      delete next.taxPercent;
-      return next;
-    });
-    resetResult();
-  }
-
   function scenarioAnswers() {
     const values = { ...answers };
     // Um valor marcado como desconhecido nunca vira zero nem um valor anterior.
     for (const field of fields) if (unknown[field.key]) delete values[field.key];
     if (isCmv) delete values[cmvInputMode === 'amount' ? 'cmvPercent' : 'cmvAmount'];
-    else delete values[taxInputMode === 'amount' ? 'taxPercent' : 'taxAmount'];
+    else {
+      delete values.cmvPercent;
+      delete values.taxPercent;
+      delete values.otherVariablePercent;
+    }
     return values;
   }
 
@@ -213,7 +196,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
     if (!frozen.current) {
       const validated = validateFinancialInput(input);
       const nextErrors: Record<string, string> = {};
-      if (!['last_month', 'monthly_average_12m'].includes(answers.referenceBasis || '')) {
+      if (isCmv && !['last_month', 'monthly_average_12m'].includes(answers.referenceBasis || '')) {
         nextErrors.referenceBasis = 'Escolha entre o último mês e a média mensal dos últimos 12 meses.';
       }
       if (!validated.ok) {
@@ -390,10 +373,10 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
           <p className={styles.eyebrow}>{result ? 'Etapa 3 de 3 · Resultado' : step === 'numbers' ? 'Etapa 1 de 3 · Números da operação' : 'Etapa 2 de 3 · Seus dados'}</p>
           <div hidden={step !== 'numbers'}>
           <ContentHeading>Dados do cenário</ContentHeading>
-          <p className={styles.hint}>Escolha a referência e use a mesma para todos os valores. Se não souber um número, marque “Não sei informar”.{!isCmv && ' Informe zero somente quando esse custo não existir.'}</p>
+          <p className={styles.hint}>{isCmv ? 'Escolha a referência e use a mesma para todos os valores.' : 'Use os números do último mês em todos os campos.'} Se não souber um número, marque “Não sei informar”.{!isCmv && ' Informe zero somente quando esse custo não existir.'}</p>
           <fieldset disabled={busy || locked} className={styles.fields}>
             <legend className={styles.srOnly}>Valores mensais para {isCmv ? 'análise de CMV' : 'ponto de equilíbrio'}</legend>
-            <div className={styles.field}>
+            {isCmv && <div className={styles.field}>
               <label htmlFor={`${id}-referenceBasis`}>Quais números você prefere usar?</label>
               <select id={`${id}-referenceBasis`} value={answers.referenceBasis || ''} onChange={event => changeReferenceBasis(event.target.value)} aria-invalid={!!errors.referenceBasis} aria-describedby={`${id}-referenceBasis-help${errors.referenceBasis ? ` ${id}-referenceBasis-error` : ''}`} required>
                 <option value="">Selecione a referência</option>
@@ -406,7 +389,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
                   ? 'Use vendas e custos do último mês. Não precisa informar mês e ano. Ao trocar a referência, os valores são limpos.'
                   : 'Escolha o último mês ou a média mensal dos últimos 12 meses. Depois, informe vendas e custos da mesma referência, sem precisar indicar mês e ano.'}</p>
               {errors.referenceBasis && <p id={`${id}-referenceBasis-error`} className={styles.fieldError}>{errors.referenceBasis}</p>}
-            </div>
+            </div>}
             {isCmv && <div className={styles.field}>
               <label htmlFor={`${id}-segment`}>Segmento culinário</label>
               <select id={`${id}-segment`} value={answers.segment || ''} onChange={event => change('segment', event.target.value)} aria-invalid={!!errors.segment} aria-describedby={errors.segment ? `${id}-segment-error` : undefined} required>
@@ -436,18 +419,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
                 {errors.cmvInputMode && <p id={`${id}-cmvInputMode-error`} className={styles.fieldError}>{errors.cmvInputMode}</p>}
               </div>
             </>}
-            {fields.slice(1).map(field => <Fragment key={field.key}>
-              {!isCmv && field.key === taxField.key && <div className={styles.field}>
-                <label htmlFor={`${id}-taxInputMode`}>Como você prefere informar os impostos?</label>
-                <select id={`${id}-taxInputMode`} value={taxInputMode} onChange={event => changeTaxInputMode(event.target.value)} aria-invalid={!!errors.taxInputMode} aria-describedby={`${id}-taxInputMode-help${errors.taxInputMode ? ` ${id}-taxInputMode-error` : ''}`} required>
-                  <option value="amount">Valor da guia em reais (R$)</option>
-                  <option value="percent">Percentual sobre o faturamento (%)</option>
-                </select>
-                <p id={`${id}-taxInputMode-help`} className={styles.fieldHelp}>Use a mesma referência das vendas. Ao trocar a forma de informar, o valor dos impostos é limpo.</p>
-                {errors.taxInputMode && <p id={`${id}-taxInputMode-error`} className={styles.fieldError}>{errors.taxInputMode}</p>}
-              </div>}
-              {numericField(field)}
-            </Fragment>)}
+            {fields.slice(1).map(numericField)}
           </fieldset>
           </div>
           {step === 'identity' && <>
@@ -519,7 +491,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
           </> : <>
             <p className={styles.eyebrow}>Como usar</p>
             <ContentHeading>Um cenário para orientar a próxima decisão.</ContentHeading>
-            <ol className={styles.steps}><li>Escolha o último mês ou a média mensal dos últimos 12 meses e informe os números da operação.</li><li>Preencha seu nome, WhatsApp e e-mail.</li><li>Clique em “Ver resultado” para registrar os dados e acessar sua análise.</li></ol>
+            <ol className={styles.steps}><li>{isCmv ? 'Escolha o último mês ou a média mensal dos últimos 12 meses e informe os números da operação.' : 'Informe as vendas e os gastos da operação no último mês.'}</li><li>Preencha seu nome, WhatsApp e e-mail.</li><li>Clique em “Ver resultado” para registrar os dados e acessar sua análise.</li></ol>
             <p className={styles.note}>A análise é gratuita. Pediremos seus dados de contato antes de mostrar o resultado. Você escolhe se deseja receber contato comercial.</p>
           </>}
         </aside>

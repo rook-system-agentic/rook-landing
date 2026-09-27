@@ -11,5 +11,6 @@ export interface FinancialSuccess {
 }
 export type FinancialResponse = FinancialSuccess | {ok: false; errors: Record<string,string>};
 export const FORMULA_VERSION: string;
+export const PURCHASES_FORMULA_VERSION: string;
 export function parseBrazilianNumber(value: unknown): number | null;
 export function calculateFinancialSimulation(candidate: unknown): FinancialResponse;

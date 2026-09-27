@@ -114,11 +114,13 @@ function setup({ tool = 'cmv', outcomes = [], challengeError = false, environmen
   function change(key, value) { assert.ok(field(key), key); field(key).props.onChange({ target: { value } }); render(); }
   function numeric(key, value) { field(key).props.onValueChange({ formattedValue: value }, { source: 'event' }); render(); }
   function fillScenario() {
-    change('referenceBasis', 'last_month');
-    if (tool === 'cmv') change('segment', 'pizzaria');
+    if (tool === 'cmv') {
+      change('referenceBasis', 'last_month');
+      change('segment', 'pizzaria');
+    }
     for (const [key, value] of Object.entries(tool === 'cmv'
       ? { revenue: '100.000,00', cmvAmount: '35.000,00' }
-      : { revenue: '100.000,00', cmvPercent: '40,00', fixedCosts: '10.000,00', taxAmount: '5.000,00', feesPercent: '5,00', otherVariablePercent: '0,00' })) numeric(key, value);
+      : { revenue: '100.000,00', purchasesAmount: '40.000,00', fixedCosts: '10.000,00', taxAmount: '5.000,00', feesPercent: '5,00', otherVariableAmount: '0,00' })) numeric(key, value);
   }
   function fillIdentity(values = profile) { for (const [key, value] of Object.entries(values)) change(key, value); }
   function rawSubmit() { return find(node => node.type === 'form').props.onSubmit({ preventDefault() {} }); }
