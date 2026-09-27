@@ -47,11 +47,12 @@ export function validateAcquisition(candidate,cities) {
   if(!simulation && ['cmv','breakeven'].includes(candidate.intent)) {
     const grossCmv=candidate.intent==='cmv' && candidate.revenueBasis==='gross';
     const amountCmv=grossCmv && candidate.cmvInputMode==='amount';
+    const amountPurchases=candidate.intent==='breakeven' && candidate.costInputMode==='purchases_amount';
     const amountTax=candidate.intent==='breakeven' && candidate.taxInputMode==='amount';
     const fields=candidate.intent==='cmv'
       ? ['revenue',amountCmv?'cmvAmount':'cmvPercent']
-      : ['revenue','cmvPercent','fixedCosts',amountTax?'taxAmount':'taxPercent','feesPercent','otherVariablePercent'];
-    const labels={revenue:grossCmv?'Faturamento bruto mensal (R$)':'Receita mensal (R$)',cmvAmount:'Ingredientes consumidos (R$)',cmvPercent:'CMV (%)',fixedCosts:'Custos fixos (R$)',taxPercent:'Impostos (%)',taxAmount:'Impostos sobre vendas informados (R$)',feesPercent:'Taxas (%)',otherVariablePercent:'Outros variáveis (%)'};
+      : ['revenue',amountPurchases?'purchasesAmount':'cmvPercent','fixedCosts',amountTax?'taxAmount':'taxPercent','feesPercent',amountPurchases?'otherVariableAmount':'otherVariablePercent'];
+    const labels={revenue:grossCmv?'Faturamento bruto mensal (R$)':'Receita mensal (R$)',cmvAmount:'Ingredientes consumidos (R$)',cmvPercent:'CMV (%)',purchasesAmount:'Compras de ingredientes e bebidas (R$)',fixedCosts:'Custos fixos (R$)',taxPercent:'Impostos (%)',taxAmount:'Impostos sobre vendas informados (R$)',feesPercent:'Taxas (%)',otherVariableAmount:'Outros custos variáveis (R$)',otherVariablePercent:'Outros variáveis (%)'};
     const known=[];const missing=[];
     for(const field of fields){
       const value=parseBrazilianNumber(candidate[field]);
@@ -62,6 +63,7 @@ export function validateAcquisition(candidate,cities) {
       `Base: ${candidate.intent==='cmv'&&!grossCmv?'receita líquida':'receita bruta'}. ${referenceValue.referenceBasis?`Referência: ${financialReferenceLabel(referenceValue)}`:`Mês: ${period||'não informado'}`}.`,
       `Dados informados: ${known.length ? known.join('; ') : 'nenhum valor financeiro informado'}.`,
       missing.length?`Dados ainda não informados: ${missing.join(', ')}.`:'Valores ainda precisam de confirmação e cálculo.');
+    if(amountPurchases) diagnosticNotes.push('Origem dos custos: compras de ingredientes e bebidas informadas em reais pelo visitante, não CMV apurado. Variações de estoque podem alterar a estimativa.');
     if(grossCmv) {
       diagnosticNotes.push(`CMV informado em ${amountCmv?'reais de consumo':candidate.cmvInputMode==='gross_percent'?'percentual do faturamento bruto':candidate.cmvInputMode==='net_percent'?'percentual da receita líquida estimada':'base ainda não confirmada'}. Impostos e receita líquida ainda não calculados.`);
       const state=TAX_STATES.find(item=>item.code===candidate.taxState);

@@ -93,9 +93,9 @@ function setup(tool = 'breakeven') {
   const field = key => find(node => node.props?.id === `financial-${key}`);
   function select(key, value) { field(key).props.onChange({ target: { value } }); render(); }
   function numeric(key, value) { field(key).props.onValueChange({ formattedValue: value }, { source: 'event' }); render(); }
-  function unknown(key) {
+  function unknown(key, checked = true) {
     const container = find(node => node.type === 'div' && Array.isArray(node.props?.children) && node.props.children.some(child => child?.type === 'label' && child.props.htmlFor === `financial-${key}`));
-    find(node => node.type === 'input' && node.props.type === 'checkbox', container).props.onChange({ target: { checked: true } }); render();
+    find(node => node.type === 'input' && node.props.type === 'checkbox', container).props.onChange({ target: { checked } }); render();
   }
   async function calculate() {
     await find(node => node.type === 'form').props.onSubmit({ preventDefault() {} }); render();
@@ -109,8 +109,7 @@ function setup(tool = 'breakeven') {
     assert.ok(button); button.props.onClick(); render();
   }
   function fillBase() {
-    select('referenceBasis', 'last_month');
-    for (const [key, value] of Object.entries({ revenue: '100.000,00', cmvPercent: '40,00', fixedCosts: '10.000,00', feesPercent: '5,00', otherVariablePercent: '0,00' })) numeric(key, value);
+    for (const [key, value] of Object.entries({ revenue: '100.000,00', purchasesAmount: '40.000,00', fixedCosts: '10.000,00', feesPercent: '5,00', otherVariableAmount: '0,00' })) numeric(key, value);
   }
   render(); render();
   return { field, select, numeric, unknown, calculate, fillBase, newAnalysis, find, requests, events };
@@ -118,59 +117,83 @@ function setup(tool = 'breakeven') {
 
 const latestScenario = app => app.events.filter(event => !event.clear).at(-1);
 
-test('PE começa com imposto em reais e envia o valor da guia sem convertê-lo em percentual na UI', async () => {
+test('diagnóstico usa seis valores do último mês e envia compras, guia e outros custos em reais', async () => {
   const app = setup(); app.fillBase();
-  assert.equal(app.field('taxInputMode').props.value, 'amount');
-  assert.equal(app.field('taxAmount').props['aria-label'], 'Impostos sobre as vendas no último mês em reais');
-  assert.equal(app.field('taxPercent'), null);
-  app.numeric('taxAmount', '5.000,00'); await app.calculate();
+  for (const key of ['referenceBasis', 'taxInputMode', 'cmvInputMode', 'cmvPercent', 'taxPercent', 'otherVariablePercent']) {
+    assert.equal(app.field(key), null, `O diagnóstico não deve pedir ${key}`);
+  }
+  assert.equal(app.field('taxAmount').props['aria-label'], 'Qual foi o valor da sua guia de impostos do último mês? em reais');
+  assert.equal(app.field('purchasesAmount').props['aria-label'], 'Quanto você gastou com compras no último mês? em reais');
+  assert.equal(app.field('otherVariableAmount').props['aria-label'], 'Outros custos variáveis no último mês em reais');
+  assert.equal(app.field('feesPercent').props['aria-label'], 'Taxas de cartão e delivery em percentual');
+  assert.equal(app.field('fixedCosts').props['aria-label'], 'Custos fixos mensais em reais');
+  assert.match(app.find(node => node.props?.id === 'financial-purchasesAmount-help').props.children, /aproximação do consumo; mudanças no estoque/);
+  assert.match(app.find(node => node.props?.id === 'financial-otherVariableAmount-help').props.children, /embalagens, descartáveis e comissões por venda/);
+  app.numeric('taxAmount', '5.000,00'); app.numeric('otherVariableAmount', '2.000,00'); await app.calculate();
   assert.equal(app.requests.length, 1);
-  assert.equal(app.requests[0].taxInputMode, 'amount');
-  assert.equal(app.requests[0].taxAmount, 5000);
-  assert.equal(Object.hasOwn(app.requests[0], 'taxPercent'), false);
+  const input = app.requests[0];
+  assert.equal(input.referenceBasis, 'last_month');
+  assert.equal(input.costInputMode, 'purchases_amount');
+  assert.equal(input.purchasesAmount, 40000);
+  assert.equal(input.taxInputMode, 'amount');
+  assert.equal(input.taxAmount, 5000);
+  assert.equal(input.otherVariableAmount, 2000);
+  for (const key of ['cmvPercent', 'taxPercent', 'otherVariablePercent']) assert.equal(Object.hasOwn(input, key), false);
   assert.equal(latestScenario(app).simulation.taxAmount, 5000);
+  assert.equal(latestScenario(app).simulation.purchasesAmount, 40000);
 });
 
-test('trocar modo remove resultado e contexto anterior, limpa ambos os valores e desfaz desconhecido', async () => {
+test('nova análise invalida contexto anterior e recalcula com os valores em reais editados', async () => {
   const app = setup(); app.fillBase(); app.numeric('taxAmount', '5.000,00'); await app.calculate();
   app.newAnalysis();
-  app.select('taxInputMode', 'percent');
   assert.equal(app.events.at(-1).clear, true);
-  assert.equal(app.field('taxAmount'), null);
-  assert.equal(app.field('taxPercent').props.value, '');
   assert.equal(app.field('revenue').props.value, '100.000,00');
-  app.numeric('taxPercent', '5,00'); await app.calculate();
-  assert.equal(app.requests[1].taxPercent, 5);
-  assert.equal(Object.hasOwn(app.requests[1], 'taxAmount'), false);
-  app.newAnalysis();
-  app.unknown('taxPercent');
-  app.select('taxInputMode', 'amount');
-  assert.equal(app.field('taxAmount').props.disabled, undefined);
-  assert.equal(app.field('taxAmount').props.value, '');
-  app.unknown('taxAmount');
-  app.select('taxInputMode', 'percent');
-  assert.equal(app.field('taxPercent').props.disabled, undefined);
-  assert.equal(app.field('taxPercent').props.value, '');
+  assert.equal(app.field('purchasesAmount').props.value, '40.000,00');
+  app.numeric('purchasesAmount', '35.000,00');
+  app.numeric('taxAmount', '4.000,00');
+  app.numeric('otherVariableAmount', '1.000,00');
+  await app.calculate();
+  assert.equal(app.requests.length, 2);
+  assert.equal(app.requests[1].purchasesAmount, 35000);
+  assert.equal(app.requests[1].taxAmount, 4000);
+  assert.equal(app.requests[1].otherVariableAmount, 1000);
+  assert.equal(latestScenario(app).simulation.purchasesAmount, 35000);
 });
 
-test('média de 12 meses limpa guia anterior e desconhecido do imposto ativo continua sem estimativa', async () => {
-  const app = setup(); app.fillBase(); app.numeric('taxAmount', '5.000,00');
-  app.select('referenceBasis', 'monthly_average_12m');
-  assert.equal(app.field('taxAmount').props.value, '');
-  assert.equal(app.field('revenue').props.value, '');
-  assert.match(app.find(node => node.props?.id === 'financial-taxAmount-help').props.children, /média mensal.*mesmos 12 meses/);
-  for (const [key, value] of Object.entries({ revenue: '100.000,00', cmvPercent: '40,00', fixedCosts: '10.000,00', feesPercent: '5,00', otherVariablePercent: '0,00' })) app.numeric(key, value);
-  app.unknown('taxAmount'); await app.calculate();
-  assert.equal(app.requests.length, 0);
-  assert.equal(latestScenario(app).simulation, null);
-  assert.equal(latestScenario(app).unknown.taxAmount, true);
-  assert.equal(app.field('taxAmount').props.disabled, true);
-});
+for (const key of ['purchasesAmount', 'taxAmount', 'otherVariableAmount']) {
+  test(`${key}: desconhecido mantém cenário incompleto e nunca reaproveita valor anterior`, async () => {
+    const app = setup(); app.fillBase(); app.numeric('taxAmount', '5.000,00');
+    app.unknown(key); await app.calculate();
+    assert.equal(app.requests.length, 0);
+    assert.equal(latestScenario(app).simulation, null);
+    assert.equal(latestScenario(app).unknown[key], true);
+    assert.equal(app.field(key).props.disabled, true);
+    assert.equal(app.field(key).props.value, '');
+    app.unknown(key, false); app.numeric(key, '0,00'); await app.calculate();
+    assert.equal(app.requests.length, 1);
+    assert.equal(app.requests[0][key], 0);
+  });
+}
 
-test('calculadora CMV mantém modo de consumo e não recebe seletor da guia do PE', () => {
+test('calculadora CMV mantém referência, modos de consumo e estimativa de impostos', () => {
   const app = setup('cmv');
   assert.equal(app.field('taxInputMode'), null);
+  assert.equal(app.field('purchasesAmount'), null);
+  assert.equal(app.field('otherVariableAmount'), null);
   assert.equal(app.field('cmvInputMode').props.value, 'amount');
   assert.ok(app.field('cmvAmount'));
   assert.ok(app.field('taxState'));
+  app.select('referenceBasis', 'last_month');
+  app.numeric('revenue', '100.000,00'); app.numeric('cmvAmount', '35.000,00');
+  app.select('referenceBasis', 'monthly_average_12m');
+  assert.equal(app.field('revenue').props.value, '');
+  assert.equal(app.field('cmvAmount').props.value, '');
+  assert.match(app.find(node => node.props?.id === 'financial-cmvAmount-help').props.children, /mesmos 12 meses/);
+  app.select('cmvInputMode', 'gross_percent');
+  assert.equal(app.field('cmvAmount'), null);
+  assert.ok(app.field('cmvPercent'));
+  app.numeric('cmvPercent', '35,00');
+  app.select('cmvInputMode', 'amount');
+  assert.equal(app.field('cmvPercent'), null);
+  assert.equal(app.field('cmvAmount').props.value, '');
 });

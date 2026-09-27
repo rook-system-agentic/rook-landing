@@ -10,6 +10,15 @@ export function validateFinancialInput(candidate) {
   if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
     return { ok: false, errors: { form: 'Informe os dados do cenário.' } };
   }
+  // Compras não são CMV apurado. Um modo explícito mantém essa origem em todas
+  // as camadas e impede que entradas em reais sejam ignoradas pelo contrato legado.
+  if (candidate.costInputMode !== undefined || candidate.purchasesAmount !== undefined
+    || candidate.otherVariableAmount !== undefined) {
+    if (candidate.tool !== 'breakeven' || candidate.costInputMode !== 'purchases_amount') {
+      return { ok: false, errors: { costInputMode: 'Use o modo de compras em reais no diagnóstico de ponto de equilíbrio.' } };
+    }
+    return validatePurchasesBreakevenInput(candidate);
+  }
   if (candidate.tool === 'cmv' && candidate.revenueBasis === 'gross') return validateGrossCmvInput(candidate);
   const reference = validateFinancialReference(candidate, { required: false });
   if (!reference.ok) return reference;
@@ -54,6 +63,32 @@ export function validateFinancialInput(candidate) {
   }
   if (Object.keys(errors).length) return { ok: false, errors };
   return { ok: true, inputs };
+}
+
+function validatePurchasesBreakevenInput(candidate) {
+  const errors = {};
+  if (candidate.referenceBasis !== 'last_month' || candidate.period !== undefined) {
+    errors.referenceBasis = 'Use os dados do último mês para todos os valores.';
+  }
+  if (candidate.revenueBasis !== 'gross') errors.revenueBasis = 'Informe as vendas antes dos impostos.';
+  if (candidate.taxInputMode !== 'amount') errors.taxInputMode = 'Informe o valor da guia de impostos em reais.';
+  for (const field of ['cmvPercent', 'cmvAmount', 'cmvInputMode', 'otherVariablePercent', 'taxPercent']) {
+    if (candidate[field] !== undefined) errors[field] = 'Este campo não pertence ao diagnóstico com compras em reais.';
+  }
+  const inputs = {
+    tool: 'breakeven', revenueBasis: 'gross', referenceBasis: 'last_month',
+    costInputMode: 'purchases_amount', taxInputMode: 'amount',
+  };
+  for (const field of ['revenue', 'purchasesAmount', 'fixedCosts', 'taxAmount', 'feesPercent', 'otherVariableAmount']) {
+    const value = candidate[field];
+    const limit = field === 'feesPercent' ? 100 : 1_000_000_000;
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > limit
+      || (field === 'revenue' && money(value) === 0)) {
+      errors[field] = field === 'feesPercent' ? 'Informe um percentual entre 0 e 100.'
+        : 'Informe um valor válido em reais.';
+    } else inputs[field] = money(value);
+  }
+  return Object.keys(errors).length ? { ok: false, errors } : { ok: true, inputs };
 }
 
 function validateGrossCmvInput(candidate) {

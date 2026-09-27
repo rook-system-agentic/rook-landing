@@ -36,6 +36,15 @@ export function buildSimulationInput(answers, tool) {
     cmvInputMode:answers.cmvInputMode,taxState:answers.taxState,taxModelVersion:answers.taxModelVersion,
     ...(answers.cmvInputMode==='amount' ? {cmvAmount:parseBrazilianNumber(answers.cmvAmount)} : {cmvPercent:parseBrazilianNumber(answers.cmvPercent)}),
   };
+  // Compras são uma aproximação declarada em reais, não CMV apurado. Mantemos
+  // os valores originais; somente o servidor deriva proporções para a estimativa.
+  if(tool==='breakeven' && answers.costInputMode==='purchases_amount') return {
+    tool,...reference,revenueBasis:'gross',costInputMode:answers.costInputMode,
+    revenue:parseBrazilianNumber(answers.revenue),purchasesAmount:parseBrazilianNumber(answers.purchasesAmount),
+    fixedCosts:parseBrazilianNumber(answers.fixedCosts),taxInputMode:answers.taxInputMode,
+    taxAmount:parseBrazilianNumber(answers.taxAmount),feesPercent:parseBrazilianNumber(answers.feesPercent),
+    otherVariableAmount:parseBrazilianNumber(answers.otherVariableAmount),
+  };
   const common={tool,...reference,revenueBasis:tool==='cmv'?'net':'gross',revenue:parseBrazilianNumber(answers.revenue),cmvPercent:parseBrazilianNumber(answers.cmvPercent)};
   return tool==='cmv' ? {...common,segment:answers.segment} : {...common,
     fixedCosts:parseBrazilianNumber(answers.fixedCosts),
@@ -43,4 +52,3 @@ export function buildSimulationInput(answers, tool) {
     ...(answers.taxInputMode === 'amount' ? {taxAmount:parseBrazilianNumber(answers.taxAmount)} : {taxPercent:parseBrazilianNumber(answers.taxPercent)}),
     feesPercent:parseBrazilianNumber(answers.feesPercent),otherVariablePercent:parseBrazilianNumber(answers.otherVariablePercent)};
 }
-
