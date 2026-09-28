@@ -30,6 +30,22 @@
  * O que NÃO mudou, de propósito: "Faturar não é lucrar." continua — virou a
  * assinatura de marca, acima da manchete, em vez de ser a manchete; e os
  * números do restaurante-exemplo seguem derivando de EXEMPLO_DRE.
+ *
+ * v7 (28/09/2026): "o Rook é uma plataforma, o restaurante é o primeiro
+ * segmento". O Rook vai atender contabilidade, advocacia, saúde, consultoria e
+ * outros segmentos, e a home falava só com dono de restaurante — quem chegasse
+ * de um escritório lia na primeira dobra que o produto não era para ele. Duas
+ * mudanças, com o mesmo motivo:
+ *
+ *   1. A CONEXÃO DE DADOS virou a promessa principal. É o que vale para todo
+ *      segmento — banco, nota fiscal e folha toda empresa tem — e é o maior
+ *      valor do Rook: ninguém digita o que os sistemas já sabem. O hero, o
+ *      método e o FAQ abrem por aí.
+ *   2. As demonstrações do produto CONTINUAM sendo do restaurante, e agora
+ *      dizem isso no rótulo ("Exemplo · Rook para restaurantes"). É o segmento
+ *      que existe hoje; inventar tela de clínica ou de escritório seria o
+ *      "plausível e falso" que este arquivo inteiro existe para evitar. A seção
+ *      SEGMENTOS diz o que está disponível e o que está a caminho.
  */
 
 export const CONTACT_EMAIL = "contato@rook.com.br";
@@ -48,29 +64,62 @@ export type Paragraph = readonly Segment[];
 export const HERO = {
   /** Assinatura de marca. Era a manchete até a v5; ver o cabeçalho do arquivo. */
   label: "— Faturar não é lucrar.",
-  headlinePlain: "Você sabe ",
-  headlineEmphasis: "quanto sobrou",
-  headlineTail: " no fim do mês?",
-  primaryLabel: "Fazer meu diagnóstico gratuito",
-  primaryHref: "/diagnostico/",
-  secondaryLabel: "Conhecer o Rook",
-  secondaryHref: "#cadastro",
+  headlinePlain: "Pare de digitar ",
+  headlineEmphasis: "o que seus sistemas já sabem",
+  headlineTail: ".",
+  /*
+   * v7: o primário deixou de ser o diagnóstico. O /diagnostico/ é de
+   * restaurante (pede segmento culinário e CMV) — como primeiro clique de
+   * quem chega de um escritório de advocacia, seria a porta errada. A
+   * demonstração serve a todo segmento; o diagnóstico continua, nomeado.
+   */
+  primaryLabel: "Agendar uma demonstração",
+  primaryHref: "#cadastro",
+  secondaryLabel: "Diagnóstico para restaurantes",
+  secondaryHref: "/diagnostico/",
   /** Remove o risco na mesma linha de visão do botão. */
-  micro: "Com os seus números · Sem cartão",
+  micro: "Sem trocar de sistema · Sem digitar nada",
 } as const;
 
 export const HERO_PARAGRAPH: Paragraph = [
-  { text: "O Rook conecta as vendas, as notas e o banco do seu restaurante e te diz, " },
+  { text: "O Rook se conecta ao banco, às notas fiscais, à folha e aos sistemas que a sua empresa já usa. Os dados " },
+  { text: "chegam sozinhos", strong: true },
+  { text: " — sem planilha paralela, sem lançamento à mão — e viram, " },
   { text: "todo dia", strong: true },
-  { text: ", se a casa está no lucro — e o que fazer quando não está. Direto no seu " },
-  { text: "WhatsApp, às 7h", strong: true },
-  { text: "." },
+  { text: ", o número que importa: quanto sobrou e o que fazer. Para restaurantes, contabilidade, advocacia, saúde, consultoria e o que mais vier." },
 ];
+
+/*
+ * O artefato do hero na v7: a Central de Dados, e não mais o informe do
+ * WhatsApp. O informe é de restaurante ("resumo diário do restaurante Casa
+ * exemplo" é o template real) e desceu para o briefing, onde já é rotulado
+ * como exemplo. Aqui a peça precisa mostrar o que vale para todo segmento: as
+ * fontes ligadas e nenhum dado digitado.
+ *
+ * Os números fecham com o resto da página: as contagens são as de PDV_MOCK,
+ * os 78% são o `badge` do extrato (DATA_SOURCES.statement).
+ */
+export const HERO_HUB = {
+  title: "Central de Dados",
+  period: "Julho 2026 · Empresa exemplo",
+  fontes: [
+    { fonte: "Banco", via: "Open Finance", entrega: "3 extratos conciliados" },
+    { fonte: "Notas fiscais", via: "SEFAZ", entrega: "359 notas lidas" },
+    { fonte: "Folha", via: "eSocial", entrega: "18 vínculos" },
+    { fonte: "Cartões e recebíveis", via: "Adquirentes", entrega: "2 faturas conferidas" },
+    { fonte: "Sistema de gestão", via: "ERP, PDV ou o do seu segmento", entrega: "sincronizado" },
+  ],
+  status: "Conectado",
+  digitadoLabel: "Lançamentos digitados à mão",
+  digitadoValor: "0",
+  classificadoLabel: "Classificado sozinho",
+  classificadoValor: "78%",
+} as const;
 
 /* ─── Tabuleiro · Casa exemplo (a vitrine, agora dentro do método) ─── */
 
 export const SHOWCASE = {
-  label: "Tabuleiro · Casa exemplo",
+  label: "Exemplo · Rook para restaurantes",
   live: "Ao vivo",
   vendas: "Vendas",
   cmv: "Compras · CMV",
@@ -84,22 +133,22 @@ export const METHOD = {
   headlinePlain: "O Rook faz o trabalho que ",
   headlineEmphasis: "ninguém tem tempo de fazer.",
   intro:
-    "Sem trocar de sistema, sem digitar nada e sem montar planilha. Em três passos, o dinheiro da casa fica visível.",
+    "Sem trocar de sistema, sem digitar nada e sem montar planilha. Em qualquer segmento, são os mesmos três passos — e o primeiro é o que tira o trabalho braçal da sua equipe.",
   cards: [
     {
       step: "1 · Conecta",
       title: "Com o que você já usa",
-      desc: "O PDV, o delivery, a máquina de cartão, o banco, as notas e a folha entram sozinhos no Rook. Ninguém digita nada. Ninguém troca de sistema.",
+      desc: "O banco, as notas fiscais, a folha, a máquina de cartão e o sistema de gestão da empresa entram sozinhos no Rook. O dado que já existe em um sistema não é digitado de novo em outro. Ninguém troca de sistema.",
     },
     {
       step: "2 · Enxerga",
       title: "Quanto sobrou, hoje",
-      desc: "Vendas, compras, impostos, folha e dívidas se organizam no tabuleiro da casa — e o resultado do mês aparece em reais, sem esperar o fechamento do contador.",
+      desc: "Receitas, custos, impostos, folha e dívidas se organizam numa tela só — e o resultado do mês aparece em reais, sem esperar o fechamento.",
     },
     {
       step: "3 · Decide",
       title: "O que fazer, em reais",
-      desc: "O Rook.AI — o consultor digital da casa — aponta onde a margem está escapando e o que fazer agora: renegociar, ajustar a ficha, segurar a compra. Sempre com o impacto em R$ de cada decisão.",
+      desc: "O Rook.AI — o consultor digital da empresa — aponta onde a margem está escapando e o que fazer agora: renegociar um contrato, rever um preço, segurar uma despesa. Sempre com o impacto em R$ de cada decisão.",
     },
   ],
   /**
@@ -111,18 +160,18 @@ export const METHOD = {
     { sigla: "Open Finance", o_que: "seu banco" },
     { sigla: "SEFAZ", o_que: "suas notas" },
     { sigla: "eSocial", o_que: "sua folha" },
-    { sigla: "Adquirentes e PDVs", o_que: "suas vendas" },
+    { sigla: "ERPs, PDVs e adquirentes", o_que: "suas vendas e recebimentos" },
   ],
 } as const;
 
 /* ─── De onde vêm os números ─── */
 
 export const DATA_SOURCES = {
-  label: "— De onde vêm os números",
-  headlinePlain: "Não é só o sistema da casa. É ",
+  label: "— Conexão de dados",
+  headlinePlain: "Não é só o sistema da empresa. É ",
   headlineEmphasis: "tudo que a operação já emite.",
   intro:
-    "Open Finance monta o fluxo de caixa pelo extrato. A SEFAZ entrega a nota. O eSocial, a folha. A adquirente, a taxa. O PDV continua no salão.",
+    "Open Finance monta o fluxo de caixa pelo extrato. A SEFAZ entrega a nota. O eSocial, a folha. A adquirente, a taxa. O seu sistema de gestão continua onde está. Toda empresa tem essas fontes — por isso a conexão vale para qualquer segmento. Abaixo, o exemplo de um restaurante.",
   statement: {
     title: "Central de Dados · Extratos bancários",
     doc: "Extrato Stone · 01/07 a 31/07/2026 · Casa exemplo",
@@ -253,7 +302,7 @@ export const SECTOR = {
   headlinePlain: "Se está difícil, ",
   headlineEmphasis: "não é só com você.",
   outro:
-    "Não é falta de esforço — é decidir sem ver o número. O setor inteiro joga no escuro. Quem enxerga primeiro, ganha o jogo.",
+    "Não é falta de esforço — é decidir sem ver o número. Restaurante, escritório ou clínica: quem ainda depende de planilha e de lançamento à mão joga no escuro. Quem enxerga primeiro, ganha o jogo.",
 } as const;
 
 export interface SectorStat {
@@ -262,8 +311,13 @@ export interface SectorStat {
   source: string;
 }
 
+/*
+ * v7: os números seguem sendo os que têm fonte — dois deles são de food
+ * service, e o rótulo agora diz isso em vez de chamá-lo de "o setor". Trocar
+ * por estatística de outros segmentos só com fonte citável; ver o cabeçalho.
+ */
 export const SECTOR_STATS: readonly SectorStat[] = [
-  { value: "R$ 495 bi", label: "O tamanho do setor", source: "Abrasel, 2025" },
+  { value: "R$ 495 bi", label: "O tamanho do food service, nosso primeiro segmento", source: "Abrasel, 2025" },
   { value: "60%", label: "Dos bares e restaurantes não geram lucro", source: "Abrasel, 2025" },
   { value: "39%", label: "Ainda controlam na planilha ou no caderno", source: "Conta Simples + Visa, 2024" },
   { value: "62,7%", label: "Das empresas fecham em 5 anos", source: "IBGE, 2024" },
@@ -292,7 +346,7 @@ export const EXEMPLO_DRE = {
 /* ─── A dor espelhada (era "Manifesto") ─── */
 
 export const MANIFESTO = {
-  label: "— A dor de quase todo dono",
+  label: "— A dor de quase todo gestor",
   headlinePlain: "Você trabalha demais para ",
   headlineEmphasis: "não saber quanto sobra.",
   headlineTail: "",
@@ -305,8 +359,13 @@ export const MANIFESTO_PARAGRAPHS: readonly Paragraph[] = [
     { text: ". Lucro é " },
     { text: "fato", strong: true },
     {
-      text: ". Entre um e outro, o dinheiro passa por seis paradas — venda, imposto, insumo, despesa, dívida e o que sobra. Em qualquer uma delas a margem escapa sem fazer barulho.",
+      text: ". Entre um e outro, o dinheiro passa por seis paradas — receita, imposto, custo, despesa, dívida e o que sobra. Em qualquer uma delas a margem escapa sem fazer barulho.",
     },
+  ],
+  [
+    { text: "E o número que responderia a pergunta já existe — no banco, na nota, na folha. Só está " },
+    { text: "espalhado", strong: true },
+    { text: ", e juntar à mão toma o tempo que deveria ir para a decisão." },
   ],
 ];
 
@@ -325,11 +384,15 @@ export interface Pain {
 export const PAINS: readonly Pain[] = [
   {
     title: "Vendeu bem e não sobrou?",
-    desc: "Crescer 30% em vendas e perder dinheiro acontece todo mês. Sem ver etapa por etapa — imposto, insumo, folha, despesa, dívida — ninguém sabe onde a margem se perdeu.",
+    desc: "Crescer 30% em faturamento e perder dinheiro acontece todo mês. Sem ver etapa por etapa — imposto, custo, folha, despesa, dívida — ninguém sabe onde a margem se perdeu.",
   },
   {
-    title: "Fila na porta não paga aluguel.",
-    desc: "Salão cheio e delivery bombando dão sensação de mês bom. Decidir pela sensação é o jeito mais caro de administrar uma casa.",
+    /*
+     * v7: era "Fila na porta não paga aluguel." — dor de restaurante. A dor
+     * que todo segmento tem, e que o Rook resolve na origem, é a digitação.
+     */
+    title: "O mesmo dado, digitado três vezes.",
+    desc: "O extrato vira planilha, a nota vira lançamento, a folha vira outra planilha. Cada redigitação custa horas da equipe — e abre espaço para o erro que ninguém confere.",
   },
   {
     title: "A parcela come o caixa em silêncio.",
@@ -340,7 +403,7 @@ export const PAINS: readonly Pain[] = [
 /* ─── O tabuleiro (seis etapas em abas) ─── */
 
 export const BOARD = {
-  label: "— O tabuleiro",
+  label: "— O tabuleiro · exemplo de restaurante",
   headlinePlain: "A casa inteira, na ",
   headlineEmphasis: "mesma tela.",
   intro:
@@ -446,14 +509,14 @@ export const HERO_MESSAGE: BriefingMessage = {
 };
 
 export const BRIEFING = {
-  label: "— O briefing da casa",
+  label: "— O briefing diário",
   headlinePlain: "Todo dia às 7h, o resumo no ",
   headlineEmphasis: "WhatsApp.",
   intro:
-    "Não é mais um aplicativo para abrir. É o informe da casa chegando onde você já está: quanto vendeu ontem, quanto comprou e quanto ainda pode gastar na semana. Segunda-feira chega o limite semanal de compras; dia 1, o fechamento do mês.",
+    "Não é mais um aplicativo para abrir. É o informe da empresa chegando onde você já está: quanto entrou ontem, quanto saiu e quanto ainda pode gastar na semana. Segunda-feira chega o limite semanal; dia 1, o fechamento do mês.",
   ctaLabel: "Quero o resumo no WhatsApp",
   ctaHref: "#cadastro",
-  note: "Conheça o briefing e as possibilidades de acompanhamento em uma demonstração.",
+  note: "No exemplo, o informe de um restaurante. Cada segmento recebe os indicadores que fazem sentido para ele.",
   /*
    * O CABEÇALHO DO MOCK NÃO CARREGA NÚMERO DE TELEFONE. (24/08/2026)
    *
@@ -474,9 +537,9 @@ export const BRIEFING = {
   contactName: "Rook Insights",
   contactTag: "Conta comercial",
   /*
-   * Só o informe semanal. O diário subiu para o hero na v6 (HERO_MESSAGE) e
-   * repeti-lo aqui seria mostrar o mesmo bloco de texto duas vezes na mesma
-   * página — a seção ganha ao ilustrar a mensagem que o hero não mostrou.
+   * Só o informe semanal aqui. O diário (HERO_MESSAGE) foi para o hero na v6 e
+   * voltou para esta seção na v7, quando o hero passou a mostrar a Central de
+   * Dados — LpBriefing desenha os dois, diário primeiro.
    */
   messages: [
     {
@@ -526,8 +589,8 @@ export interface ChatTurn {
 }
 
 export const INTELLIGENCE = {
-  label: "— O consultor digital da casa",
-  headlinePlain: "O filé subiu 8% e ninguém te avisou. ",
+  label: "— O consultor digital · exemplo de restaurante",
+  headlinePlain: "Um custo subiu 8% e ninguém te avisou. ",
   headlineEmphasis: "O Rook avisa",
   headlineTail: " — e diz o que fazer.",
   /** Cabeçalho do painel, como no produto. */
@@ -557,15 +620,15 @@ export const INTELLIGENCE = {
   /** O produto exibe este aviso sob o campo; a LP não pode prometer menos. */
   disclaimer: "Rook.AI pode cometer erros. Valide dados importantes.",
   productParagraph:
-    "O Rook.AI é o consultor que mora dentro da plataforma. Você pergunta em português, como perguntaria ao seu contador — e ele responde com o número, o contexto do seu segmento e a próxima decisão. Sem esperar o fechamento, sem montar planilha, a qualquer hora.",
+    "O Rook.AI é o consultor que mora dentro da plataforma. Você pergunta em português, como perguntaria ao seu contador — e ele responde com o número, o contexto do seu segmento e a próxima decisão. Ele só consegue fazer isso porque os dados já chegaram conectados: ninguém precisou alimentá-lo à mão.",
   /** Fecha o argumento em dinheiro: a economia contra a mensalidade. */
   payoff: [
     { text: "Uma decisão dessas devolve " },
     { text: "R$ 4.100 por mês", strong: true },
     { text: " para o caixa. É assim que o Rook paga a própria mensalidade — todo mês." },
   ] as Paragraph,
-  ctaLabel: "Ver o diagnóstico da minha casa",
-  ctaHref: "/diagnostico/",
+  ctaLabel: "Ver o Rook.AI numa demonstração",
+  ctaHref: "#cadastro",
 } as const;
 
 /* ─── Quem está por trás ─── */
@@ -589,7 +652,7 @@ export const AUTHORITY = {
   headlineEmphasis: "planilhas.",
   paragraphs: [
     "Por mais de vinte anos fizemos o trabalho que quase ninguém quer fazer: entrar onde a operação está apertando e olhar os números sem romantizar. Antes de existir produto, existia método.",
-    "Ao olhar para restaurantes, o padrão se repetia: casa cheia, marca forte, bom faturamento — e o dono sem saber para onde o dinheiro ia. O Rook é esse método virado plataforma: o olhar do controller na tela do dono, todo dia.",
+    "Empresa após empresa, de segmentos diferentes, o padrão se repetia: operação cheia, marca forte, bom faturamento — e o dono sem saber para onde o dinheiro ia, com a equipe gastando horas para juntar à mão números que já existiam. O Rook é esse método virado plataforma: os dados conectados na origem e o olhar do controller na tela do gestor, todo dia.",
   ],
   ctaLabel: "Conheça o Rook por dentro",
   ctaHref: "/sobre/",
@@ -644,7 +707,7 @@ export const PARTNERS_SECTION = {
   headlinePlain: "Funciona com o que você ",
   headlineEmphasis: "já usa.",
   intro:
-    "O PDV, o ERP e o delivery da casa entram no mesmo tabuleiro — sem recadastrar nada. Se o seu ainda não está na lista, peça.",
+    "O ERP, o banco, a maquininha e os sistemas do seu segmento entram no mesmo lugar — sem recadastrar nada e sem ninguém exportar planilha. Se o seu ainda não está na lista, peça.",
   ctaLabel: "Não encontrou o seu sistema? Solicite a integração →",
 } as const;
 
@@ -661,7 +724,7 @@ export const FAQ = {
   headlinePlain: "Antes de ",
   headlineEmphasis: "começar.",
   intro:
-    "As dúvidas mais comuns dos donos de restaurante que estão avaliando o Rook. Não encontrou o que precisa?",
+    "As dúvidas mais comuns de quem está avaliando o Rook. Não encontrou o que precisa?",
   ctaLabel: "Enviar e-mail →",
 } as const;
 
@@ -674,11 +737,26 @@ export const FAQ = {
 export const FAQ_ITEMS: readonly FaqItem[] = [
   {
     q: "O que o Rook faz, na prática?",
-    a: "Conecta as vendas, as compras, as notas, o banco e a folha do seu restaurante num lugar só e mostra quanto sobrou no mês — em reais, todo dia. Quando algo foge da meta, ele avisa e diz o que fazer, com o impacto em R$ de cada decisão. O resumo diário chega às 7h no seu WhatsApp.",
+    a: "Conecta o banco, as notas fiscais, a folha e os sistemas que a sua empresa já usa num lugar só e mostra quanto sobrou no mês — em reais, todo dia, sem ninguém digitar nada. Quando algo foge da meta, ele avisa e diz o que fazer, com o impacto em R$ de cada decisão. O resumo diário chega no seu WhatsApp.",
+  },
+  /*
+   * v7: as duas perguntas que a home multissegmento levanta e não respondia.
+   * "Para quais segmentos" diz com honestidade o que está disponível hoje;
+   * "vou precisar digitar" é a promessa principal da página, respondida sem
+   * exagero — o que o Rook não classifica sozinho, alguém revisa.
+   */
+  {
+    q: "Para quais segmentos o Rook serve?",
+    a: "O Rook começou em restaurantes e food service, onde já está disponível. Contabilidade, advocacia, saúde e consultoria estão a caminho: a conexão de dados é a mesma, e o que muda é a leitura de cada segmento. Se a sua empresa é de outro segmento, fale com a gente — é assim que priorizamos os próximos.",
+    cta: { label: "Contar sobre a minha empresa", href: "#cadastro" },
+  },
+  {
+    q: "Vou precisar ficar digitando dados?",
+    a: "Não. O que já existe em outro sistema — extrato, nota, folha, venda — chega pela conexão, e o Rook classifica sozinho a maior parte. A sua equipe revisa o que ficou de fora, em vez de lançar tudo. É o nosso principal compromisso: nenhum dado digitado duas vezes.",
   },
   {
     q: "Preciso trocar o sistema que já uso?",
-    a: "Não. O Rook se conecta ao PDV, ao ERP e ao delivery que você já tem — e ao que a operação já emite: notas, extrato do banco, folha. Nada muda no salão nem no caixa. Se o seu sistema ainda não está na lista, peça: a gente prioriza pelo volume de indicações.",
+    a: "Não. O Rook se conecta ao ERP, ao PDV e aos sistemas que você já tem — e ao que a operação já emite: notas, extrato do banco, folha. Nada muda na rotina da equipe. Se o seu sistema ainda não está na lista, peça: a gente prioriza pelo volume de indicações.",
     cta: {
       label: "Solicite a integração aqui.",
       href: `mailto:${CONTACT_EMAIL}?subject=Solicita%C3%A7%C3%A3o%20de%20integra%C3%A7%C3%A3o%20com%20ERP`,
@@ -686,15 +764,15 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   },
   {
     q: "Quanto custa?",
-    a: "Conte sobre seu estabelecimento para conhecer a proposta adequada à sua operação. Solicite uma demonstração pelo formulário ou pelo assistente virtual.",
+    a: "Conte sobre a sua empresa para conhecer a proposta adequada à sua operação. Solicite uma demonstração pelo formulário ou pelo assistente virtual.",
   },
   {
     q: "Funciona em qualquer cidade?",
-    a: "Sim. 26 estados + DF. O cálculo tributário considera a UF do estabelecimento pelo CNPJ.",
+    a: "Sim. 26 estados + DF. O cálculo tributário considera a UF da empresa pelo CNPJ.",
   },
   {
     q: "Como posso conhecer o Rook?",
-    a: "Você pode começar pelo diagnóstico e pela calculadora de CMV, gratuitos e sem cartão. Para conhecer a plataforma, solicite uma demonstração pelo formulário. Nossa equipe combina o melhor horário com você.",
+    a: "Solicite uma demonstração pelo formulário: nossa equipe combina o melhor horário com você. Se você tem restaurante, pode começar agora pelo diagnóstico e pela calculadora de CMV, gratuitos e sem cartão.",
     cta: { label: "Solicitar demonstração", href: "#cadastro" },
   },
   {
@@ -703,7 +781,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   },
   {
     q: "Quanto tempo por dia isso me toma?",
-    a: "O resumo das 7h se lê em 30 segundos. As decisões da semana cabem em 5 minutos. O Rook trabalha de madrugada para você decidir no cafezinho.",
+    a: "O resumo diário se lê em 30 segundos. As decisões da semana cabem em 5 minutos. O Rook trabalha de madrugada para você decidir no cafezinho.",
   },
 ];
 
@@ -718,17 +796,94 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
  * à la carte lendo que talvez a página não seja para ele. O segmento passou a
  * ser pergunta dentro do próprio diagnóstico, que é onde ele muda o resultado.
  */
+/*
+ * v7: o fecho deixou de ser "Comece pelo diagnóstico" pelo mesmo motivo do
+ * hero — o diagnóstico é de restaurante. Ele segue como botão secundário,
+ * nomeado, para quem é do segmento.
+ */
 export const CTA = {
   label: "— Pronto para ver os seus números",
-  headlinePlain: "Comece pelo ",
-  headlineEmphasis: "diagnóstico.",
-  headlineTail: " Sem cartão.",
+  headlinePlain: "Conecte seus dados. ",
+  headlineEmphasis: "Veja o que sobra.",
+  headlineTail: "",
   intro:
-    "Informe os números da sua operação para estimar o ponto de equilíbrio e entender quais dados merecem atenção.",
-  primaryLabel: "Fazer meu diagnóstico",
-  primaryHref: "/diagnostico/",
-  secondaryLabel: "Conhecer o Rook",
-  secondaryHref: "#cadastro",
+    "Numa demonstração, mostramos o Rook ligado a fontes como as da sua empresa — e o que ele passa a entregar sem ninguém digitar nada.",
+  primaryLabel: "Agendar uma demonstração",
+  primaryHref: "#cadastro",
+  secondaryLabel: "Diagnóstico para restaurantes",
+  secondaryHref: "/diagnostico/",
+} as const;
+
+/* ─── Segmentos ─── */
+
+/**
+ * Um motor de dados, vários segmentos (v7).
+ *
+ * `status` é o que separa promessa de produto: só restaurantes está
+ * "disponível". Os outros descrevem o que a mesma conexão (banco, nota,
+ * folha, sistema de gestão) entrega naquele segmento — sem tela, sem número
+ * e sem cliente, porque ainda não há. Quando um segmento lançar, trocar o
+ * status e apontar o `href` para a página dele.
+ */
+export interface SegmentCard {
+  nome: string;
+  status: "disponivel" | "em-breve";
+  conecta: string;
+  entrega: string;
+  href?: string;
+}
+
+export const SEGMENTS = {
+  label: "— Um Rook para cada negócio",
+  headlinePlain: "A mesma conexão de dados, ",
+  headlineEmphasis: "a leitura do seu segmento.",
+  intro:
+    "Banco, nota fiscal e folha toda empresa tem. O Rook liga essas fontes uma vez e cada segmento recebe os indicadores que fazem sentido para ele — sem que ninguém precise alimentar o sistema à mão.",
+  statusLabel: { disponivel: "Disponível", "em-breve": "Em breve" },
+  linkDisponivel: "Ver o Rook para restaurantes →",
+  linkContato: "Falar com a gente →",
+  conectaLabel: "Conecta",
+  entregaLabel: "Entrega",
+  cards: [
+    {
+      nome: "Restaurantes e food service",
+      status: "disponivel",
+      conecta: "PDV, delivery, maquininha, notas de compra, banco e folha.",
+      entrega: "CMV contra a meta, margem por canal e o resultado do mês em reais, todo dia.",
+      href: "/restaurantes/",
+    },
+    {
+      nome: "Contabilidade",
+      status: "em-breve",
+      conecta: "Extratos, notas e folha dos clientes chegando sozinhos.",
+      entrega: "Menos documento cobrado por e-mail e mais tempo para assessorar a carteira.",
+    },
+    {
+      nome: "Advocacia",
+      status: "em-breve",
+      conecta: "Honorários, custas, repasses e o extrato do escritório.",
+      entrega: "O caixa do escritório e a margem por cliente, sem planilha paralela.",
+    },
+    {
+      nome: "Saúde",
+      status: "em-breve",
+      conecta: "Atendimentos, convênios, repasses e recebimentos.",
+      entrega: "Glosa e atraso de convênio aparecendo antes de virar prejuízo.",
+    },
+    {
+      nome: "Consultoria",
+      status: "em-breve",
+      conecta: "Contratos, horas, notas de serviço e recebimentos.",
+      entrega: "A margem de cada projeto, não só o faturamento do mês.",
+    },
+    {
+      nome: "Outros segmentos",
+      status: "em-breve",
+      conecta: "Se a empresa emite nota, tem conta em banco e folha, já há por onde começar.",
+      entrega: "Conte o seu caso — é assim que priorizamos os próximos segmentos.",
+      href: "#cadastro",
+    },
+  ] as readonly SegmentCard[],
 } as const;
 
 /* ─── As telas do produto (seção da /restaurantes) ─── */
@@ -944,7 +1099,7 @@ export const SOBRE_CTA = {
 } as const;
 
 export const ACQUISITION_CTA = {
- title: "Entenda onde o seu restaurante pode melhorar o resultado.",
+ title: "Entenda onde a sua empresa pode melhorar o resultado.",
  description: "Conte sobre sua operação. Conheça o Rook em uma demonstração ou comece por uma conversa sobre seus números.",
  formLabel: "Solicitar demonstração", chatLabel: "Conversar sobre meus números",
 };

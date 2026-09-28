@@ -15,9 +15,9 @@ import { COMPANY_INFO } from "@/lib/company";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
-  title: "Rook System — Inteligência financeira para food service",
+  title: "Rook System — Inteligência financeira com dados conectados",
   description:
-    "Inteligência financeira para food service. O Rook lê a operação, interpreta as seis etapas — vendas, impostos, custos, despesas, dívidas e resultado — e aponta a próxima decisão em reais.",
+    "Inteligência financeira com dados conectados. O Rook se liga ao banco, às notas, à folha e aos sistemas que a empresa já usa, interpreta as seis etapas — receitas, impostos, custos, despesas, dívidas e resultado — e aponta a próxima decisão em reais.",
   keywords: [
     "sistema de inteligência financeira para restaurantes",
     "sistema de gestão para restaurante",
@@ -28,7 +28,12 @@ export const metadata: Metadata = {
     "controle de CMV",
     "food service",
     "controle de custos",
-    "margem de lucro restaurante"
+    "margem de lucro restaurante",
+    "inteligência financeira para empresas",
+    "conciliação bancária automática",
+    "integração de dados financeiros",
+    "gestão financeira para escritórios",
+    "gestão financeira para clínicas"
   ],
   /*
    * AQUI NÃO ENTRA `alternates.canonical`. (ROO-1125, 21/08/2026)
@@ -66,7 +71,7 @@ export const metadata: Metadata = {
    * pelo mesmo motivo que causou o problema.
    */
   openGraph: {
-    title: "Rook System — Inteligência financeira para food service",
+    title: "Rook System — Inteligência financeira com dados conectados",
     description: "Faturar não é lucrar. O Rook lê a operação, interpreta as seis etapas e aponta, em reais, a próxima decisão.",
     url: siteUrl(),
     siteName: "Rook System",
@@ -76,7 +81,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: TWITTER_CARD,
-    title: "Rook System — Inteligência financeira para food service",
+    title: "Rook System — Inteligência financeira com dados conectados",
     description: "Faturar não é lucrar. O Rook lê a operação, interpreta as seis etapas e aponta, em reais, a próxima decisão.",
     images: [OG_IMAGE_PATH],
   },
@@ -91,7 +96,7 @@ const jsonLd = {
       "url": siteUrl(),
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web, iOS, Android",
-      "description": "Sistema de inteligência financeira e gestão para restaurantes. Controle CMV, DRE gerencial automático, score de saúde financeira e recomendações com impacto em R$."
+      "description": "Sistema de inteligência financeira com conexão de dados para empresas de vários segmentos — restaurantes, contabilidade, advocacia, saúde e consultoria. DRE gerencial automático, sem digitação, e recomendações com impacto em R$."
     },
     {
         /*

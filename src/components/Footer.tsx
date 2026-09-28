@@ -28,7 +28,7 @@ export default function Footer() {
             <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={144} height={47} className="h-10 w-auto" />
           </Link>
           <p className="text-sm leading-relaxed">
-            O lucro do seu restaurante, visível todo dia — com a próxima decisão em reais. Faturar não é lucrar.
+            Os dados da sua empresa conectados, o lucro visível todo dia — com a próxima decisão em reais. Faturar não é lucrar.
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export default function Footer() {
         <div>
           <h2 className="font-semibold text-sm mb-4">Conteúdo</h2>
           <ul className="space-y-2.5 text-sm">
-            <li><Link href="/restaurantes/">Restaurantes</Link></li>
+            <li><Link href="/#segmentos">Segmentos</Link></li>
             <li><Link href="/restaurantes/">Restaurantes</Link></li>
             <li><Link href="/blog/">Blog</Link></li>
             <li><a href="mailto:contato@rook.com.br">contato@rook.com.br</a></li>

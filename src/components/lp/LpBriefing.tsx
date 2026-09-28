@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BRIEFING } from "@/lib/lp-content";
+import { BRIEFING, HERO_MESSAGE } from "@/lib/lp-content";
 import Reveal from "./LpReveal";
 import { WhatsMessage, WhatsPanel } from "./LpWhatsMessage";
 
@@ -43,7 +43,8 @@ export default function LpBriefing() {
 
         <Reveal className="lg:col-span-6">
           <WhatsPanel contactName={BRIEFING.contactName} contactTag={BRIEFING.contactTag}>
-            {BRIEFING.messages.map((m) => (
+            {/* v7: o diário voltou do hero para cá; ver BRIEFING.messages. */}
+            {[HERO_MESSAGE, ...BRIEFING.messages].map((m) => (
               <WhatsMessage key={m.time} message={m} remetente={BRIEFING.contactName} />
             ))}
           </WhatsPanel>

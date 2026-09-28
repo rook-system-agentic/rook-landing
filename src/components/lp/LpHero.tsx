@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { HERO, HERO_PARAGRAPH, HERO_MESSAGE, BRIEFING } from "@/lib/lp-content";
+import { HERO, HERO_PARAGRAPH } from "@/lib/lp-content";
 import Rich from "./LpRich";
 import Reveal from "./LpReveal";
-import { WhatsMessage, WhatsPanel } from "./LpWhatsMessage";
+import LpDataHub from "./LpDataHub";
 
 /**
  * Hero da home (v6): a pergunta que o dono se faz à esquerda, o informe das 7h
@@ -19,6 +19,11 @@ import { WhatsMessage, WhatsPanel } from "./LpWhatsMessage";
  *   para o método (LpMethod), onde o passo "Enxerga" dá contexto para lê-la.
  *   No lugar entrou a mensagem de WhatsApp: o mesmo produto, no artefato que o
  *   dono já sabe ler.
+ *
+ * v7: o artefato trocou de novo — do informe do WhatsApp para a Central de
+ * Dados (LpDataHub). O informe é de restaurante; o hero agora fala com todo
+ * segmento, e a conexão de dados é o que vale para todos. O informe foi para
+ * o briefing. Ver o cabeçalho de `lp-content`.
  *
  * A microcopy sob os botões (2 minutos · sem cartão · na hora) fica na mesma
  * linha de visão do clique: é ali que o risco é avaliado, não no rodapé.
@@ -59,9 +64,7 @@ export default function LpHero() {
         </div>
 
         <Reveal className="lg:col-span-6">
-          <WhatsPanel contactName={BRIEFING.contactName} contactTag={BRIEFING.contactTag}>
-            <WhatsMessage message={HERO_MESSAGE} remetente={BRIEFING.contactName} />
-          </WhatsPanel>
+          <LpDataHub />
         </Reveal>
       </div>
     </section>

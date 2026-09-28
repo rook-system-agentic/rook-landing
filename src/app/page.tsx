@@ -14,6 +14,7 @@ import LpPartners from "@/components/lp/LpPartners";
 import LpPricing from "@/components/lp/LpPricing";
 import LpFaq from "@/components/lp/LpFaq";
 import LpCta from "@/components/lp/LpCta";
+import LpSegments from "@/components/lp/LpSegments";
 
 /**
  * Home — v6 (24/08/2026), "o Rook na língua do dono".
@@ -48,6 +49,12 @@ import LpCta from "@/components/lp/LpCta";
  *     CTA de solicitar integração. Uma lista só, no lugar onde a dúvida "vai
  *     funcionar com o meu sistema?" de fato aparece: logo depois da promessa.
  *
+ * v7 (28/09/2026): entra SEGMENTOS logo depois do método. O método explica a
+ * conexão de dados, que vale para qualquer negócio; a seção seguinte diz para
+ * quais negócios, e a partir dela as demonstrações (Rook.AI, fontes,
+ * tabuleiro, briefing) são rotuladas como exemplo de restaurante — o segmento
+ * que existe hoje.
+ *
  * O atributo `data-lp-home` é o que aplica a paleta desta página. Ele é lido
  * por `body:has([data-lp-home])` no `globals.css`, e é assim que o Header e o
  * Footer — que vivem no layout, fora daqui — adotam a paleta nova sem que
@@ -70,10 +77,13 @@ import LpCta from "@/components/lp/LpCta";
  * onde "saiba todo dia se o seu restaurante deu lucro" seria mentira de
  * catálogo. Aqui a promessa é a mesma da manchete, que é o que o dono digita
  * no Google e o que ele vê quando alguém manda o link no WhatsApp.
+ *
+ * v7: título e descrição deixam de ser de restaurante, pelo mesmo motivo da
+ * manchete — a home agora é da plataforma, e o restaurante tem página própria.
  */
-const TITULO = "Rook — Saiba todo dia se o seu restaurante deu lucro";
+const TITULO = "Rook — Seus dados conectados, o lucro visível todo dia";
 const DESCRICAO =
-  "O Rook conecta vendas, notas e banco do seu restaurante e mostra, em reais, quanto sobrou — com resumo diário no WhatsApp e diagnóstico gratuito em 2 minutos.";
+  "O Rook conecta banco, notas fiscais, folha e os sistemas que a sua empresa já usa e mostra, em reais, quanto sobrou — sem digitar nada. Para restaurantes, contabilidade, advocacia, saúde e consultoria.";
 
 export const metadata: Metadata = {
   title: TITULO,
@@ -112,6 +122,7 @@ export default function HomePage() {
       <LpPartners />
       <LpManifesto />
       <LpMethod />
+      <LpSegments />
       <LpIntelligence />
       <LpSources />
       <LpBoard />

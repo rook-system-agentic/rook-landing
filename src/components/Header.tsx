@@ -5,6 +5,9 @@ import Image from "next/image";
 
 const navLinks = [
   { href: "/sobre/", label: "Sobre" },
+  // v7: a home passou a ser da plataforma; "Segmentos" leva à seção que
+  // lista os negócios atendidos, e dela se chega à /restaurantes.
+  { href: "/#segmentos", label: "Segmentos" },
   { href: "/restaurantes/", label: "Restaurantes" },
   { href: "/diagnostico/", label: "Diagnóstico" },
   // "CMV" sozinho era a última sigla crua da navegação e não
