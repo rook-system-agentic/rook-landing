@@ -78,8 +78,10 @@ export function buildDealProperties(lead) {
   return properties;
 }
 
-export function buildLeadDescription(lead) {
+export function buildLeadDescription(lead,{environment}={}) {
   const financialTool=lead.captureKind==='financial_tool';
+  // O ambiente vem do servidor; dados do visitante não escolhem o host interno.
+  const adminOrigin=environment==='homolog'?'https://adm-homolog.rooksystem.com.br':'https://adm.rook.com.br';
   const lines=[
     financialTool ? 'Solicitação de análise financeira pelo site Rook. Dados autodeclarados.' : 'Cadastro comercial pelo site Rook. Dados autodeclarados.',
     ...(lead.company ? [`Estabelecimento: ${lead.company}`] : []),`Responsável: ${lead.name}`,
@@ -93,7 +95,7 @@ export function buildLeadDescription(lead) {
     `Contato comercial solicitado: ${!financialTool || lead.commercialContactRequested ? 'sim' : 'não'}`,
     `Referência da solicitação: ${lead.submissionId}`,
     ...(['none','partial','complete'].includes(lead.analysisState) ? [`Estado da análise: ${{none:'sem cálculo registrado',partial:'dados parciais, sem resultado',complete:'cálculo registrado'}[lead.analysisState]}`] : []),
-    ...(UUID.test(lead.analysisId||'') ? [`Histórico interno (acesso restrito): https://adm.rook.com.br/onboarding-diagnosticos?analysis=${lead.analysisId}`] : []),
+    ...(UUID.test(lead.analysisId||'') ? [`Histórico interno (acesso restrito): ${adminOrigin}/onboarding-diagnosticos?analysis=${lead.analysisId}`] : []),
   ].map(line=>line.replace(/[\r\n\u0085\u2028\u2029]+/g,' '));
   if(lead.simulation) {
     lines.push('', `Cenário financeiro informado pelo visitante — ${lead.referenceBasis?financialReferenceLabel({referenceBasis:lead.referenceBasis}):`mês ${lead.period}`}:`,lead.simulation.summary,
@@ -109,7 +111,7 @@ export function buildLeadDescription(lead) {
 }
 
 /** Contrato público OpenAPI v1; nenhuma chamada ao banco privado do fornecedor. */
-export function createAsaflowAcquisition({apiKey,pipelineId,stageId,fetchImpl=fetch}) {
+export function createAsaflowAcquisition({apiKey,pipelineId,stageId,environment,fetchImpl=fetch}) {
   if(!apiKey || !pipelineId || !stageId) throw new Error('asaflow_not_configured');
   async function request(path,method='GET',body,idem) {
     const response=await fetchImpl(`${BASE}${path}`,{method,
@@ -120,7 +122,7 @@ export function createAsaflowAcquisition({apiKey,pipelineId,stageId,fetchImpl=fe
   }
   async function create(lead,{contactId=null,dealId=null,verificationOnly=false,checkpoint=async()=>{}}={}) {
     if(verificationOnly && (!UUID.test(contactId||'') || !UUID.test(dealId||''))) throw new Error('asaflow_invalid_verification_receipt');
-    const description=buildLeadDescription(lead);
+    const description=buildLeadDescription(lead,{environment});
     let contact;
     if(contactId) {
       if(!UUID.test(contactId)) throw new Error('asaflow_invalid_contact');

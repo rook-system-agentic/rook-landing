@@ -64,6 +64,26 @@ test('configuração ausente não grava e card inclui localização canônica',(
  assert.throws(()=>createAsaflowAcquisition({}),/not_configured/);
  assert.match(buildLeadDescription(lead),/IBGE 3550308/);
 });
+test('link do histórico aponta ao ADM do ambiente e não aceita host informado pelo visitante',async()=>{
+ const analysisId='6a433339-7c62-4edf-a6ef-f22791875ae3';
+ for(const [environment,origin] of [
+  ['homolog','https://adm-homolog.rooksystem.com.br'],
+  ['production','https://adm.rook.com.br'],
+  [undefined,'https://adm.rook.com.br'],
+ ]){
+  let created;
+  const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',environment,fetchImpl:async(url,options)=>{
+   if(url.includes('/deals/')) return verified();
+   if(options.method==='GET') return {ok:true,json:async()=>({data:[{id:CONTACT_ID,email:lead.email,phone:lead.phone}],nextCursor:null})};
+   created=JSON.parse(options.body);
+   return {ok:true,json:async()=>({id:DEAL_ID})};
+  }});
+  await client.create({...lead,analysisId,environment:'https://untrusted.invalid',adminOrigin:'https://untrusted.invalid'});
+  const expected=`Histórico interno (acesso restrito): ${origin}/onboarding-diagnosticos?analysis=${analysisId}`;
+  assert.ok(created.description.split('\n').includes(expected));
+  assert.doesNotMatch(created.description,/untrusted/);
+ }
+});
 test('reenvio após resposta perdida reutiliza a solicitação sem criar outro negócio',async()=>{
  let count=0,lost=true;const deals=new Map();
  const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{

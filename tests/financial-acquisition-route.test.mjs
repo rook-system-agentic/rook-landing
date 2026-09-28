@@ -6,6 +6,15 @@ import { financialInput, financialLead, financialRequest, loadFinancialRoute } f
 import { CONTACT_ID, DEAL_ID, RECEIPT } from './helpers/acquisition-ledger.mjs';
 const noInternal = body => assert.doesNotMatch(JSON.stringify(body), /private-|contactId|dealId|pipelineId|stageId|assumptions|formulaVersion|taxModelVersion|referencePercent|monthlyDifference|Parâmetros internos/);
 
+test('cadastro financeiro usa o ambiente do servidor no link ADM, sem aceitar override público', async () => {
+  const route = loadFinancialRoute({ env: { NEXT_PUBLIC_ENV: 'homolog' } });
+  const response = await route.post(financialRequest({ environment: 'production', adminOrigin: 'https://untrusted.invalid' }));
+  assert.equal(response.status, 201);
+  assert.equal(route.calls.clients[0].environment, 'homolog');
+  assert.equal(route.calls.crm[0].environment, undefined);
+  assert.equal(route.calls.crm[0].adminOrigin, undefined);
+});
+
 test('GET emite desafio e depende da mesma configuração distribuída da captação', async () => {
   const request = new Request('http://localhost/api/financial-simulations/');
   const { get, calls } = loadFinancialRoute();

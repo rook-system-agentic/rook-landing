@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.ASAFLOW_ACQUISITION_API_KEY!,
       pipelineId: process.env.ASAFLOW_ACQUISITION_PIPELINE_ID!,
       stageId: process.env.ASAFLOW_ACQUISITION_STAGE_ID!,
+      environment: process.env.NEXT_PUBLIC_ENV,
     });
     const saved = await createAcquisitionLedger({ adminRequest: supabaseAdminRequest, crm: client }).persist(lead, {
       capturePath: candidate.capturePath, recordKind: process.env.NEXT_PUBLIC_ENV === 'homolog' ? 'test' : 'live',
