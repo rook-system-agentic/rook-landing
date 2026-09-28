@@ -3,15 +3,17 @@ import assert from 'node:assert/strict';
 import {createAsaflowAcquisition,buildContactProperties,buildDealProperties,buildLeadDescription} from '../src/lib/asaflow-acquisition.mjs';
 import {validateFinancialAcquisition} from '../src/lib/financial-acquisition.mjs';
 import {financialLead} from './helpers/financial-acquisition-route.mjs';
+import { CONTACT_ID, DEAL_ID } from './helpers/acquisition-ledger.mjs';
+const verified=()=>({ok:true,json:async()=>({id:DEAL_ID,contactIds:[CONTACT_ID]})});
 const lead={submissionId:'example-uuid',name:'Pessoa Teste',company:'Casa Teste',email:'teste@example.com',phone:'+5511999999999',city:{id:'3550308',name:'São Paulo',uf:'SP'},segment:'pizzaria',segmentOther:null,revenueBand:'up_to_100k',usesErp:false,erp:null,erpOther:null,intent:'demo',simulation:null};
 test('contrato oficial cria contato e negócio com chaves distintas e estáveis',async()=>{
  const calls=[];
- const fetchImpl=async(url,options)=>{calls.push({url,...options});return {ok:true,json:async()=>options.method==='GET'?{data:[],nextCursor:null}:{id:url.endsWith('/contacts')?'contact-id':'deal-id'}};};
+ const fetchImpl=async(url,options)=>{calls.push({url,...options});if(url.includes('/deals/'))return verified();return {ok:true,json:async()=>options.method==='GET'?{data:[],nextCursor:null}:{id:url.endsWith('/contacts')?CONTACT_ID:DEAL_ID}};};
  const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'pipeline',stageId:'stage',fetchImpl});
  await client.create(lead);await client.create(lead);
- assert.equal(calls[1].headers['Idempotency-Key'],calls[4].headers['Idempotency-Key']);
- assert.equal(calls[2].headers['Idempotency-Key'],calls[5].headers['Idempotency-Key']);
- const payload=JSON.parse(calls[2].body);assert.equal(payload.stageId,'stage');assert.deepEqual(payload.contactIds,['contact-id']);
+ assert.equal(calls[1].headers['Idempotency-Key'],calls[5].headers['Idempotency-Key']);
+ assert.equal(calls[2].headers['Idempotency-Key'],calls[6].headers['Idempotency-Key']);
+ const payload=JSON.parse(calls[2].body);assert.equal(payload.stageId,'stage');assert.deepEqual(payload.contactIds,[CONTACT_ID]);
  assert.match(payload.description,/Não utiliza/);assert.ok(!('amount' in payload));
 });
 
@@ -36,8 +38,8 @@ test('diagnóstico vindo da Meta grava origem, qualificação e UTMs em campos e
 
  const calls=[];
  const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
-  calls.push({url,...options});
-  return {ok:true,json:async()=>options.method==='GET'?{data:[],nextCursor:null}:{id:url.endsWith('/contacts')?'contact':'deal'}};
+  calls.push({url,...options});if(url.includes('/deals/'))return verified();
+  return {ok:true,json:async()=>options.method==='GET'?{data:[],nextCursor:null}:{id:url.endsWith('/contacts')?CONTACT_ID:DEAL_ID}};
  }});
  await client.create(paid);
  assert.deepEqual(JSON.parse(calls[1].body).properties,buildContactProperties(paid));
@@ -55,7 +57,7 @@ test('tráfego orgânico das calculadoras permanece Diagnóstico (site), sem inv
 });
 test('contato existente é preservado; falha no CRM não confirma sucesso',async()=>{
  const methods=[];const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
-  methods.push(options.method);return options.method==='GET'?{ok:true,json:async()=>({data:[{id:'existing',email:lead.email,phone:lead.phone}],nextCursor:null})}:{ok:false,status:503};
+  methods.push(options.method);return options.method==='GET'?{ok:true,json:async()=>({data:[{id:CONTACT_ID,email:lead.email,phone:lead.phone}],nextCursor:null})}:{ok:false,status:503};
  }});await assert.rejects(()=>client.create(lead),/503/);assert.deepEqual(methods,['GET','POST']);
 });
 test('configuração ausente não grava e card inclui localização canônica',()=>{
@@ -65,15 +67,16 @@ test('configuração ausente não grava e card inclui localização canônica',(
 test('reenvio após resposta perdida reutiliza a solicitação sem criar outro negócio',async()=>{
  let count=0,lost=true;const deals=new Map();
  const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
-  if(options.method==='GET')return {ok:true,json:async()=>({data:[{id:'existing',email:lead.email,phone:lead.phone}],nextCursor:null})};
+  if(url.includes('/deals/'))return verified();
+  if(options.method==='GET')return {ok:true,json:async()=>({data:[{id:CONTACT_ID,email:lead.email,phone:lead.phone}],nextCursor:null})};
   const key=options.headers['Idempotency-Key'];
-  if(!deals.has(key)){count++;deals.set(key,{id:'deal-one',body:options.body});}
+  if(!deals.has(key)){count++;deals.set(key,{id:DEAL_ID,body:options.body});}
   assert.equal(options.body,deals.get(key).body);
   if(lost){lost=false;throw new Error('resposta perdida depois de persistir');}
   return {ok:true,json:async()=>({id:deals.get(key).id})};
  }});
  await assert.rejects(()=>client.create(lead));
- assert.equal((await client.create(lead)).dealId,'deal-one');
+ assert.equal((await client.create(lead)).dealId,DEAL_ID);
  assert.equal(count,1);
 });
 test('resultado financeiro e premissas seguem no card',()=>{
@@ -85,8 +88,8 @@ test('resultado financeiro e premissas seguem no card',()=>{
 test('resposta incompleta ou malformada na busca não cria contato nem negócio',async()=>{
  const invalidResponses=[null,{}, {data:[]}, {data:{},nextCursor:null}, {data:[null],nextCursor:null},
   {data:[{id:'',email:lead.email,phone:lead.phone}],nextCursor:null},
-  {data:[{id:'contact',email:12,phone:lead.phone}],nextCursor:null},
-  {data:[{id:'contact',email:lead.email,phone:12}],nextCursor:null},
+  {data:[{id:CONTACT_ID,email:12,phone:lead.phone}],nextCursor:null},
+  {data:[{id:CONTACT_ID,email:lead.email,phone:12}],nextCursor:null},
   {data:[],nextCursor:42}, {data:[],nextCursor:''}];
  for(const response of invalidResponses){
   const methods=[];
@@ -118,16 +121,16 @@ test('busca respeita 200 caracteres e preserva a comparação exata de e-mail lo
  const longEmail=`${'a'.repeat(64)}@${'b'.repeat(63)}.${'c'.repeat(63)}.${'d'.repeat(50)}.com`;
  const calls=[];
  const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
-  calls.push({url,...options});
+  calls.push({url,...options});if(url.includes('/deals/'))return verified();
   return {ok:true,json:async()=>options.method==='GET' ? {data:[
    {id:'prefix-only',email:longEmail.slice(0,200),phone:lead.phone},
-   {id:'exact',email:longEmail.toUpperCase(),phone:lead.phone},
-  ],nextCursor:null} : {id:'deal'}};
+   {id:CONTACT_ID,email:longEmail.toUpperCase(),phone:lead.phone},
+  ],nextCursor:null} : {id:DEAL_ID}};
  }});
  await client.create({...lead,email:longEmail});
  assert.equal(new URL(calls[0].url).searchParams.get('search'),longEmail.slice(0,200));
- assert.deepEqual(calls.map(c=>c.method),['GET','POST']);
- assert.deepEqual(JSON.parse(calls[1].body).contactIds,['exact']);
+ assert.deepEqual(calls.map(c=>c.method),['GET','POST','GET']);
+ assert.deepEqual(JSON.parse(calls[1].body).contactIds,[CONTACT_ID]);
 });
 
 test('criação de contato sem identificador válido interrompe antes do negócio',async()=>{
@@ -146,16 +149,16 @@ test('contato existente com telefone brasileiro local e e-mail espaçado é reut
  for(const phone of ['(11) 99999-9999','11999999999','+55 (11) 99999-9999']){
   const calls=[];
   const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
-   calls.push({url,...options});
+   calls.push({url,...options});if(url.includes('/deals/'))return verified();
    return {ok:true,json:async()=>options.method==='GET'
-    ? {data:[{id:'existing-local',email:` ${lead.email.toUpperCase()} `,phone}],nextCursor:null}
-    : {id:url.endsWith('/contacts')?'unexpected-contact':'deal'}};
+    ? {data:[{id:CONTACT_ID,email:` ${lead.email.toUpperCase()} `,phone}],nextCursor:null}
+    : {id:url.endsWith('/contacts')?'unexpected-contact':DEAL_ID}};
   }});
   const receipt=await client.create(lead);
-  assert.equal(receipt.contactId,'existing-local');
-  assert.deepEqual(calls.map(call=>call.method),['GET','POST']);
+  assert.equal(receipt.contactId,CONTACT_ID);
+  assert.deepEqual(calls.map(call=>call.method),['GET','POST','GET']);
   assert.ok(calls[1].url.endsWith('/deals'));
-  assert.deepEqual(JSON.parse(calls[1].body).contactIds,['existing-local']);
+  assert.deepEqual(JSON.parse(calls[1].body).contactIds,[CONTACT_ID]);
  }
 });
 
@@ -214,7 +217,7 @@ test('ponto de equilíbrio conserva valores em reais sem inventar qualificação
  assert.equal(buildDealProperties(captured.value).contato_comercial_solicitado,false);
  const calls=[];
  const client=createAsaflowAcquisition({apiKey:'test-only',pipelineId:'p',stageId:'s',fetchImpl:async(url,options)=>{
-  calls.push({url,...options});return {ok:true,json:async()=>options.method==='GET'?{data:[],nextCursor:null}:{id:url.endsWith('/contacts')?'contact':'deal'}};
+  calls.push({url,...options});if(url.includes('/deals/'))return verified();return {ok:true,json:async()=>options.method==='GET'?{data:[],nextCursor:null}:{id:url.endsWith('/contacts')?CONTACT_ID:DEAL_ID}};
  }});
  await client.create(captured.value);
  const deal=JSON.parse(calls[2].body);

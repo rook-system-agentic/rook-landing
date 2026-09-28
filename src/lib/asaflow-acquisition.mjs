@@ -5,6 +5,7 @@ import {appendLeadAttribution,LEAD_DESCRIPTION_MAX_LENGTH,normalizeLeadAttributi
 import {financialReferenceLabel} from './financial-reference.mjs';
 
 const BASE='https://app.asaflow.com.br/api/v1';
+const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const hash=value=>createHash('sha256').update(value).digest('hex');
 const UTM_FIELDS=['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
 const ASAFLOW_SEGMENTS={
@@ -91,6 +92,8 @@ export function buildLeadDescription(lead) {
     ...(financialTool ? [`Análise solicitada: ${lead.intent==='cmv'?'CMV':'Ponto de equilíbrio'}`, 'Demonstração solicitada: não'] : []),
     `Contato comercial solicitado: ${!financialTool || lead.commercialContactRequested ? 'sim' : 'não'}`,
     `Referência da solicitação: ${lead.submissionId}`,
+    ...(['none','partial','complete'].includes(lead.analysisState) ? [`Estado da análise: ${{none:'sem cálculo registrado',partial:'dados parciais, sem resultado',complete:'cálculo registrado'}[lead.analysisState]}`] : []),
+    ...(UUID.test(lead.analysisId||'') ? [`Histórico interno (acesso restrito): https://adm.rook.com.br/onboarding-diagnosticos?analysis=${lead.analysisId}`] : []),
   ].map(line=>line.replace(/[\r\n\u0085\u2028\u2029]+/g,' '));
   if(lead.simulation) {
     lines.push('', `Cenário financeiro informado pelo visitante — ${lead.referenceBasis?financialReferenceLabel({referenceBasis:lead.referenceBasis}):`mês ${lead.period}`}:`,lead.simulation.summary,
@@ -115,8 +118,17 @@ export function createAsaflowAcquisition({apiKey,pipelineId,stageId,fetchImpl=fe
     if(!response.ok) throw new Error(`asaflow_${response.status}`);
     return response.json();
   }
-  async function create(lead) {
+  async function create(lead,{contactId=null,dealId=null,verificationOnly=false,checkpoint=async()=>{}}={}) {
+    if(verificationOnly && (!UUID.test(contactId||'') || !UUID.test(dealId||''))) throw new Error('asaflow_invalid_verification_receipt');
     const description=buildLeadDescription(lead);
+    let contact;
+    if(contactId) {
+      if(!UUID.test(contactId)) throw new Error('asaflow_invalid_contact');
+      contact=await request(`/contacts/${encodeURIComponent(contactId)}`);
+      // O ID confirmado no ledger é estável. Uma edição legítima posterior do
+      // telefone/e-mail no CRM não altera a identidade do snapshot já aceito.
+      if(contact?.id!==contactId) throw new Error('asaflow_contact_identity_mismatch');
+    } else {
     // A busca aceita até 200 caracteres; a comparação abaixo continua exata.
     const contacts=await request(`/contacts?limit=100&search=${encodeURIComponent(lead.email.slice(0,200))}`);
     if(!contacts || !Array.isArray(contacts.data) ||
@@ -134,19 +146,32 @@ export function createAsaflowAcquisition({apiKey,pipelineId,stageId,fetchImpl=fe
       normalizePhone(c.phone)===lead.phone);
     if(new Set(matches.map(c=>c.id)).size>1) throw new Error('asaflow_contact_ambiguous');
     const existing=matches[0];
-    const contact=existing || await request('/contacts','POST',{
+    if(!existing) await checkpoint('contact_requested',{});
+    contact=existing || await request('/contacts','POST',{
       name:lead.name,email:lead.email,phone:lead.phone,properties:buildContactProperties(lead),
     },`rook-contact-${hash(`${lead.email}:${lead.phone}`)}`);
-    if(!contact || typeof contact.id!=='string' || !contact.id.trim()) throw new Error('asaflow_invalid_contact');
+    }
+    if(!contact || !UUID.test(contact.id||'')) throw new Error('asaflow_invalid_contact');
+    if(!contactId) await checkpoint('contact_resolved',{contact_id:contact.id});
     // A mesma solicitação conserva a chave; a API documenta reenvio em até 24h.
     // A identidade compartilhada com o chat ainda depende da integração nativa.
     // Não alterar contatos preexistentes sem autenticação.
-    const deal=await request('/deals','POST',{
+    if(!dealId) {
+      await checkpoint('deal_requested',{});
+      const deal=await request('/deals','POST',{
       name:(lead.captureKind==='financial_tool' ? `${lead.intent==='cmv'?'CMV':'Ponto de equilíbrio'} — ${lead.name}` : lead.company).slice(0,200),pipelineId,stageId,
       contactIds:[contact.id],description,properties:buildDealProperties(lead),
     },`rook-acquisition-${lead.submissionId}`);
-    if(!deal || typeof deal.id!=='string' || !deal.id.trim()) throw new Error('asaflow_invalid_deal');
-    return {contactId:contact.id,dealId:deal.id};
+      if(!deal || !UUID.test(deal.id||'')) throw new Error('asaflow_invalid_deal');
+      dealId=deal.id;
+      // Guardar o ID antes de verificar o vínculo: uma falha daqui em diante
+      // deve repetir somente a leitura, nunca criar outro negócio.
+      await checkpoint('deal_created',{deal_id:dealId});
+    }
+    if(!UUID.test(dealId)) throw new Error('asaflow_invalid_deal');
+    const confirmed=await request(`/deals/${encodeURIComponent(dealId)}`);
+    if(confirmed?.id!==dealId || !Array.isArray(confirmed.contactIds) || confirmed.contactIds.some(id=>!UUID.test(id)) || !confirmed.contactIds.includes(contact.id)) throw new Error('asaflow_contact_link_mismatch');
+    return {contactId:contact.id,dealId,contactIds:confirmed.contactIds};
   }
   return {create};
 }

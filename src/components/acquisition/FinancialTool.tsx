@@ -13,6 +13,8 @@ import { financialReferenceLabel } from '@/lib/financial-reference.mjs';
 import { formatPastedFinancialNumber } from '@/lib/financial-number-input.mjs';
 import { validateFinancialInput, type FinancialTool as FinancialToolKind } from '@/lib/financial-input.mjs';
 import type { PublicFinancialSuccess } from '@/lib/public-financial-simulation.mjs';
+import { FINANCIAL_NUMBER_FIELDS } from '@/lib/financial-draft.mjs';
+import { browserSubmissionStorage, readSubmissionRecovery, saveSubmissionRecovery, clearSubmissionRecovery } from '@/lib/submission-recovery.mjs';
 import styles from './financial-tool.module.css';
 
 type NumericField = { key: string; label: string; help: string; unit: 'R$' | '%' };
@@ -47,6 +49,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const [locked, setLocked] = useState(false);
   const inFlight = useRef(false);
   const completed = useRef(false);
+  const conversionRecorded = useRef(false);
   const frozen = useRef<Record<string, unknown> | null>(null);
   const submissionId = useRef('');
   const attribution = useRef<LeadAttribution | null>(null);
@@ -59,7 +62,17 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   const ContentHeading = embedded ? 'h3' : 'h2';
 
   useEffect(() => {
-    submissionId.current = crypto.randomUUID();
+    const recovered = readSubmissionRecovery(`financial-${tool}`, browserSubmissionStorage());
+    if (recovered && recovered.payload.simulation && (recovered.payload.simulation as {tool?:string}).tool === tool) {
+      frozen.current = recovered.payload;
+      submissionId.current = recovered.payload.submissionId as string;
+      setAnswers(recovered.form.answers as Record<string,string>);
+      setProfile(recovered.form.profile as Record<string,string>);
+      setCommercialContactRequested(recovered.payload.commercialContactRequested === true);
+      conversionRecorded.current = recovered.form.conversionRecorded === true;
+      setLocked(true);
+      setStep('identity');
+    } else submissionId.current = crypto.randomUUID();
     attribution.current = captureVisitAttribution({ href: window.location.href, referrer: document.referrer });
   }, []);
 
@@ -76,7 +89,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   }, [id, tool, answers, unknown, result]);
 
   useEffect(() => {
-    if (!result && !incomplete) return;
+    if (!result && !incomplete && !FINANCIAL_NUMBER_FIELDS.some(field => Boolean(answers[field]?.trim())) && !Object.values(unknown).some(Boolean)) return;
     shareWithForm();
     // O formulário vive no layout e permanece entre rotas. O contexto pertence
     // à ferramenta que o produziu: edição, novo cálculo ou saída o invalidam.
@@ -85,7 +98,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
         detail: { sourceId: id, clear: true },
       }));
     };
-  }, [id, result, incomplete, shareWithForm]);
+  }, [id, result, incomplete, shareWithForm, answers, unknown]);
 
   const taxField: NumericField = {
     key: 'taxAmount', label: 'Qual foi o valor da sua guia de impostos do último mês?', unit: 'R$',
@@ -243,9 +256,11 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
           ...profile, commercialContactRequested, simulation: input,
           submissionId: submissionId.current || (submissionId.current = crypto.randomUUID()),
           attribution: attribution.current,
+          capturePath: window.location.pathname,
         };
       }
       setLocked(true);
+      if (!saveSubmissionRecovery(`financial-${tool}`, {payload:frozen.current,form:{answers,profile,conversionRecorded:conversionRecorded.current}}, browserSubmissionStorage())) throw new Error('Não foi possível preservar esta solicitação nesta aba. Verifique o armazenamento do navegador e tente novamente.');
       const response = await fetch('/api/financial-simulations/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -256,6 +271,7 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
       if (response.status === 422) {
         // A validação precede qualquer gravação. É seguro liberar a edição.
         frozen.current = null;
+        clearSubmissionRecovery(`financial-${tool}`, browserSubmissionStorage());
         setLocked(false);
         const nextErrors: Record<string, string> = {};
         for (const [key, message] of Object.entries(data.fieldErrors || {})) {
@@ -275,7 +291,11 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
       focusResult();
       // Só a confirmação do CRM conta como lead. Nenhum dado pessoal ou
       // financeiro é enviado ao rastreamento; canal é uma constante do fluxo.
-      track(TRACKING_EVENTS.lead, { channel: tool === 'cmv' ? 'cmv' : 'diagnostico' });
+      if (!conversionRecorded.current) {
+        track(TRACKING_EVENTS.lead, { channel: tool === 'cmv' ? 'cmv' : 'diagnostico' });
+        conversionRecorded.current = true;
+        saveSubmissionRecovery(`financial-${tool}`, {payload:frozen.current!,form:{answers,profile,conversionRecorded:true}}, browserSubmissionStorage());
+      }
     } catch (problem) {
       showErrors({ form: problem instanceof Error && problem.name !== 'TimeoutError'
         ? problem.message : 'Não foi possível confirmar o cadastro agora. Seus dados estão preservados; tente novamente.' });
@@ -294,7 +314,9 @@ export default function FinancialTool({ tool, embedded = false }: { tool: Financ
   function newAnalysis() {
     if (inFlight.current || !completed.current) return;
     completed.current = false;
+    conversionRecorded.current = false;
     frozen.current = null;
+    clearSubmissionRecovery(`financial-${tool}`, browserSubmissionStorage());
     submissionId.current = crypto.randomUUID();
     setLocked(false);
     setStep('numbers');

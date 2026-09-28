@@ -32,7 +32,7 @@ test('rota real expõe apenas resultado público em todos os segmentos e bases d
       { ...gross, segment }, { ...gross, segment, cmvInputMode: 'gross_percent', cmvAmount: undefined, cmvPercent: 35 },
       { tool: 'cmv', segment, revenueBasis: 'net', revenue: 91175, cmvPercent: 38, referenceBasis: 'last_month' },
     ]) {
-      const response = await route.post(financialRequest({ simulation: input }));
+      const response = await route.post(financialRequest({ submissionId: crypto.randomUUID(), simulation: input }));
       assert.equal(response.status, 201);
       assert.equal(response.headers.get('cache-control'), 'no-store');
       const body = await response.json();

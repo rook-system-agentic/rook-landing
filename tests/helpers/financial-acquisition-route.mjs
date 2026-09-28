@@ -6,6 +6,8 @@ import { createAsaflowAcquisition } from '../../src/lib/asaflow-acquisition.mjs'
 import { toPublicFinancialSimulation } from '../../src/lib/public-financial-simulation.mjs';
 import { CommercialLeadAbuseProtectionError } from '../../src/lib/commercial-lead-abuse-protection.mjs';
 import { CMV_TAX_MODEL_VERSION } from '../../src/lib/cmv-input-options.mjs';
+import * as ledger from '../../src/lib/acquisition-ledger.mjs';
+import { memoryLedger, checkpointReceipt, RECEIPT } from './acquisition-ledger.mjs';
 
 const compiled = ts.transpileModule(readFileSync(new URL('../../src/app/api/financial-simulations/route.ts', import.meta.url), 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
@@ -29,23 +31,27 @@ export const financialRequest = (extra = {}) => new Request('http://localhost/ap
 // Executa a rota TypeScript real; apenas transporte e configuração são injetados.
 export function loadFinancialRoute({
   gate = async () => ({ allowed: true, reason: 'allowed', retryAfterSeconds: 0 }),
-  create = async () => ({ contactId: 'private-contact', dealId: 'private-deal' }),
+  create = async () => RECEIPT,
   fetchImpl,
   enabled = true,
   abuseConfigured = true,
   challenge = () => ({ token: 'challenge-token', difficulty: 8, expiresAt: 123456 }),
   env = {},
+  store = memoryLedger(),
+  storageConfigured = true,
 } = {}) {
   const calls = { gate: [], clients: [], crm: [], challenge: [], network: 0 };
   const dependencies = {
     'next/server': { NextResponse: Response },
     '@/lib/financial-acquisition.mjs': { validateFinancialAcquisition },
     '@/lib/public-financial-simulation.mjs': { toPublicFinancialSimulation },
+    '@/lib/acquisition-ledger.mjs': ledger,
+    '@/lib/supabase-admin': {isSupabaseAdminConfigured:()=>storageConfigured,supabaseAdminRequest:store.request},
     '@/lib/asaflow-acquisition.mjs': {
       createAsaflowAcquisition: options => {
         calls.clients.push(options);
         const implementation = fetchImpl ? createAsaflowAcquisition({ ...options, fetchImpl }).create : create;
-        return { create: async value => { calls.crm.push(value); return implementation(value); } };
+        return { create: async (value,options) => { calls.crm.push(value); const receipt=await implementation(value,options); return fetchImpl ? receipt : checkpointReceipt(options,receipt || RECEIPT); } };
       },
     },
     '@/lib/commercial-lead-abuse': {
@@ -71,5 +77,5 @@ export function loadFinancialRoute({
       return dependencies[name];
     },
   }, { filename: 'api/financial-simulations/route.cjs' });
-  return { post: module.exports.POST, get: module.exports.GET, calls };
+  return { post: module.exports.POST, get: module.exports.GET, calls, store };
 }

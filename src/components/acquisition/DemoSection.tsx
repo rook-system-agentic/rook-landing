@@ -12,6 +12,7 @@ import { track, TRACKING_EVENTS } from '@/lib/track';
 import CityPicker from './CityPicker';
 import PreviewModeWatcher from './PreviewModeWatcher';
 import styles from './demo.module.css';
+import { browserSubmissionStorage, readSubmissionRecovery, saveSubmissionRecovery, clearSubmissionRecovery } from '@/lib/submission-recovery.mjs';
 
 type Profile = Record<string, string>;
 type Errors = Record<string, string>;
@@ -49,6 +50,7 @@ export default function DemoSection() {
   const [receiptPreview, setReceiptPreview] = useState(false);
   const inFlight = useRef(false);
   const completed = useRef(false);
+  const conversionRecorded = useRef(false);
   const frozen = useRef<Record<string, unknown> | null>(null);
   const attribution = useRef<LeadAttribution | null>(null);
   const segmentEdited = useRef(false);
@@ -56,7 +58,16 @@ export default function DemoSection() {
   const receipt = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    setSubmissionId(crypto.randomUUID());
+    const recovered = readSubmissionRecovery('commercial', browserSubmissionStorage());
+    if (recovered) {
+      frozen.current = recovered.payload;
+      setSubmissionId(recovered.payload.submissionId as string);
+      setProfile(recovered.form.profile as Profile);
+      setConsent(recovered.payload.consent === true);
+      conversionRecorded.current = recovered.form.conversionRecorded === true;
+      const previousContext = recovered.form.context as DiagnosticContext | null;
+      setContext(previousContext ? readDiagnosticContext({...previousContext,simulation:previousContext.result?.inputs || null}) : null);
+    } else setSubmissionId(crypto.randomUUID());
     attribution.current = captureVisitAttribution({ href: window.location.href, referrer: document.referrer });
 
     function receiveContext(event: Event) {
@@ -173,8 +184,10 @@ export default function DemoSection() {
           submissionId,
           simulation: context?.result?.inputs || null,
           attribution: attribution.current,
+          capturePath: window.location.pathname,
         };
       }
+      if (!saveSubmissionRecovery('commercial', {payload:frozen.current,form:{profile,context,conversionRecorded:conversionRecorded.current}}, browserSubmissionStorage())) throw new Error('Não foi possível preservar esta solicitação nesta aba. Verifique o armazenamento do navegador e tente novamente.');
       const response = await fetch('/api/acquisition/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -186,6 +199,7 @@ export default function DemoSection() {
         // A validação ocorre antes de qualquer gravação: os campos podem ser
         // corrigidos com segurança, mantendo o identificador desta solicitação.
         frozen.current = null;
+        clearSubmissionRecovery('commercial', browserSubmissionStorage());
         const fieldErrors: Errors = {};
         for (const [key, value] of Object.entries(data.fieldErrors || {})) {
           if (typeof value === 'string') fieldErrors[key] = value;
@@ -200,7 +214,11 @@ export default function DemoSection() {
       // A resposta do CRM foi confirmada. O evento não leva perfil, UTMs nem
       // diagnóstico; track mantém o gate de ambiente e o Consent Mode/GTM
       // existente continua responsável pelo consentimento publicitário.
-      track(TRACKING_EVENTS.lead);
+      if (!conversionRecorded.current) {
+        track(TRACKING_EVENTS.lead);
+        conversionRecorded.current = true;
+        saveSubmissionRecovery('commercial', {payload:frozen.current!,form:{profile,context,conversionRecorded:true}}, browserSubmissionStorage());
+      }
     } catch (problem) {
       setMessage(problem instanceof Error && problem.name !== 'TimeoutError'
         ? problem.message
@@ -266,7 +284,7 @@ export default function DemoSection() {
                   </div>
                   <p>{context.result?.summary || 'Os valores informados serão incluídos para a equipe continuar a análise com você.'}</p>
                   {context.result?.tool === 'cmv' && <small>Segmento usado no cálculo: {culinarySegments.find(segment => segment.slug === context.result?.inputs.segment)?.name || 'Outro segmento'}</small>}
-                  <small>Referência informada: {financialReferenceLabel(context.answers)}</small>
+                  <small>Referência informada: {financialReferenceLabel(context.answers) || 'Ainda não informada'}</small>
                 </div>
               )}
 

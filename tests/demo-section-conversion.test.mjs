@@ -1,4 +1,6 @@
 import test from 'node:test';
+import * as draft from '../src/lib/financial-draft.mjs';
+import { recoveryDependencies, memorySubmissionStorage } from './helpers/submission-storage.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -26,14 +28,14 @@ const plain = value => JSON.parse(JSON.stringify(value));
 // Executa o componente e sua porta track reais. Somente transporte, hooks e
 // elementos visuais são substituídos; nenhum CRM ou provedor externo é chamado.
 function setup({ environment = 'production', href = 'https://rook.com.br/?utm_source=meta',
-  outcomes = [{ ok: true, status: 201, body: { success: true } }], challengeError = false } = {}) {
+  outcomes = [{ ok: true, status: 201, body: { success: true } }], challengeError = false, storage = memorySubmissionStorage() } = {}) {
   const state = [], refs = [], effects = [];
   let stateCursor = 0, refCursor = 0, effectCursor = 0, tree;
   let pathname = new URL(href).pathname;
   const pendingEffects = [], calls = [];
   const listeners = new Map();
   const target = { dataLayer: [], consent: defaultConsentState() };
-  const location = { href, search: new URL(href).search };
+  const location = { href, pathname: new URL(href).pathname, search: new URL(href).search };
   const react = {
     useState(initial) {
       const index = stateCursor++;
@@ -61,6 +63,8 @@ function setup({ environment = 'production', href = 'https://rook.com.br/?utm_so
   } });
   const CityPicker = () => null;
   const dependencies = {
+    '@/lib/financial-draft.mjs': draft,
+    '@/lib/submission-recovery.mjs': recoveryDependencies(storage),
     react, 'react/jsx-runtime': { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) },
     'next/navigation': { usePathname: () => pathname },
     '@/lib/culinary-segments.mjs': culinarySegments, '@/lib/acquisition-input.mjs': acquisition,
@@ -217,4 +221,17 @@ test('clique durante envio não duplica e retry confirmado mede somente uma vez'
   assert.deepEqual(posts[0].attribution, posts[1].attribution);
   assert.equal(posts[0].submissionId, posts[1].submissionId);
   assert.deepEqual(app.target.dataLayer, [{ event: 'generate_lead' }]);
+});
+
+test('demonstração recebe números ainda não calculados e conserva a solicitação após reload',async()=>{
+  const storage=memorySubmissionStorage();
+  const first=setup({storage,outcomes:[new DOMException('resposta perdida','TimeoutError')]});
+  first.fill();first.receiveDiagnostic({sourceId:'pe',intent:'breakeven',answers:{referenceBasis:'last_month',costInputMode:'purchases_amount',revenue:'120000',fixedCosts:'0'},simulation:null});
+  await first.submit();
+  const original=JSON.parse(first.calls.find(call=>call.method==='POST').body);
+  assert.equal(original.intent,'breakeven');assert.equal(original.simulation,null);assert.equal(original.revenue,'120000');
+  const reloaded=setup({storage});assert.equal(reloaded.calls.length,0);
+  await reloaded.submit();
+  const resumed=JSON.parse(reloaded.calls.find(call=>call.method==='POST').body);
+  assert.deepEqual(resumed,original);
 });
