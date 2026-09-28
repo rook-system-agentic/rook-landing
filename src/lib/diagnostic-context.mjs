@@ -15,14 +15,14 @@ export function readDiagnosticContext(detail) {
     || !Object.hasOwn(fields, detail.intent)) return null;
   // Reject invalid or competing reference fields before string filtering can
   // hide them. A numeric/null period must not silently disappear beside a basis.
-  if (!validateFinancialReference(detail.answers).ok) return null;
+  if (!validateFinancialReference(detail.answers, {required:Boolean(detail.simulation)}).ok) return null;
   const answers = {};
   for (const key of fields[detail.intent]) {
     if (!detail.unknown?.[key] && typeof detail.answers?.[key] === 'string') {
       answers[key] = detail.answers[key].slice(0, 40);
     }
   }
-  const reference = validateFinancialReference(answers);
+  const reference = validateFinancialReference(answers, {required:Boolean(detail.simulation)});
   if (!reference.ok) return null;
   const validated = detail.simulation ? validateFinancialInput(detail.simulation) : null;
   if (detail.simulation && (!validated?.ok || validated.inputs.tool !== detail.intent

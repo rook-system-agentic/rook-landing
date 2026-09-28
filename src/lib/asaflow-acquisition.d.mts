@@ -3,6 +3,7 @@ import type {FinancialAcquisitionLead} from './financial-acquisition.mjs';
 type Lead = AcquisitionLead | FinancialAcquisitionLead;
 export function acquisitionOrigin(lead:Lead):string;
 export function buildContactProperties(lead:Lead):Record<string,string|null>;
-export function buildDealProperties(lead:Lead):Record<string,string>;
+export function buildDealProperties(lead:Lead):Record<string,string|boolean>;
 export function buildLeadDescription(lead:Lead):string;
-export function createAsaflowAcquisition(options:{apiKey:string;pipelineId:string;stageId:string;fetchImpl?:typeof fetch}):{create(lead:Lead):Promise<{contactId:string;dealId:string}>};
+export interface AcquisitionReceipt {contactId:string;dealId:string;contactIds:string[]}
+export function createAsaflowAcquisition(options:{apiKey:string;pipelineId:string;stageId:string;fetchImpl?:typeof fetch}):{create(lead:Lead,options?:{contactId?:string|null;dealId?:string|null;verificationOnly?:boolean;checkpoint?:(transition:string,receipt:Record<string,unknown>)=>Promise<unknown>}):Promise<AcquisitionReceipt>};

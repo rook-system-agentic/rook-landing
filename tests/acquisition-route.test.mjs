@@ -5,6 +5,8 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import { validateAcquisition } from '../src/lib/acquisition.mjs';
 import { CommercialLeadAbuseProtectionError } from '../src/lib/commercial-lead-abuse-protection.mjs';
+import * as ledger from '../src/lib/acquisition-ledger.mjs';
+import { memoryLedger, checkpointReceipt, RECEIPT } from './helpers/acquisition-ledger.mjs';
 
 // Execute the actual route with only transport dependencies replaced. This
 // exercises the HTTP status/headers and verifies denied gates never reach CRM.
@@ -24,14 +26,17 @@ const request = (token, extra = {}) => new Request('http://localhost/api/acquisi
 });
 function loadRoute({ gate, create = async () => {} }) {
   const calls = { gate: [], clients: 0, crm: [], network: 0 };
+  const store=memoryLedger();
   const dependencies = {
     'next/server': { NextResponse: Response },
     '@/data/municipalities.json': cities,
     '@/lib/acquisition.mjs': { validateAcquisition },
+    '@/lib/acquisition-ledger.mjs':ledger,
+    '@/lib/supabase-admin':{isSupabaseAdminConfigured:()=>true,supabaseAdminRequest:store.request},
     '@/lib/asaflow-acquisition.mjs': {
       createAsaflowAcquisition: () => {
         calls.clients++;
-        return { create: async value => { calls.crm.push(value); return create(value); } };
+        return { create: async (value,options) => { calls.crm.push(value); await create(value); return checkpointReceipt(options,RECEIPT); } };
       },
     },
     '@/lib/commercial-lead-abuse': {

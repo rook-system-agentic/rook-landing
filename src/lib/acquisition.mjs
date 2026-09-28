@@ -6,6 +6,7 @@ export { ERP_SYSTEMS, REVENUE_BANDS, normalizeSearch, normalizePhone, searchMuni
 import { normalizeLeadAttribution } from './lead-attribution.mjs';
 import { CMV_TAX_MODEL_VERSION, TAX_STATES } from './cmv-tax-estimate.mjs';
 import { validateFinancialReference, financialReferenceLabel } from './financial-reference.mjs';
+import { readFinancialDraft } from './financial-draft.mjs';
 
 export function validateAcquisition(candidate,cities) {
   if(!candidate || typeof candidate!=='object' || Array.isArray(candidate)) return {ok:false,errors:{form:'Dados inválidos.'}};
@@ -75,5 +76,6 @@ export function validateAcquisition(candidate,cities) {
     revenueBand,usesErp:usesErp==='yes',erp:usesErp==='yes'?erp:null,erpOther:usesErp==='yes'&&erp==='other'?erpOther:null,
     intent:['cmv','breakeven','demo'].includes(candidate.intent)?candidate.intent:'demo',consent:true,period:period||null,
     ...(referenceValue.referenceBasis?{referenceBasis:referenceValue.referenceBasis}:{}),simulation,diagnosticNotes,
+    ...(!simulation && ['cmv','breakeven'].includes(candidate.intent) ? readFinancialDraft(candidate,candidate.intent) : {inputs:null,missingFields:[]}),
     attribution:normalizeLeadAttribution(candidate.attribution)}};
 }
