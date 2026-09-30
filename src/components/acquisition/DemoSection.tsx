@@ -175,19 +175,20 @@ export default function DemoSection() {
 
       // Depois da primeira tentativa de gravação, preservar o mesmo cadastro
       // e identificador permite repetir a entrega sem criar outro lead.
-      if (!frozen.current) {
-        frozen.current = {
-          ...context?.answers,
-          ...profile,
-          intent: context?.intent || 'demo',
-          consent,
-          submissionId,
-          simulation: context?.result?.inputs || null,
-          attribution: attribution.current,
-          capturePath: window.location.pathname,
-        };
-      }
-      if (!saveSubmissionRecovery('commercial', {payload:frozen.current,form:{profile,context,conversionRecorded:conversionRecorded.current}}, browserSubmissionStorage())) throw new Error('Não foi possível preservar esta solicitação nesta aba. Verifique o armazenamento do navegador e tente novamente.');
+      const payload = frozen.current || {
+        ...context?.answers,
+        ...profile,
+        intent: context?.intent || 'demo',
+        consent,
+        submissionId,
+        simulation: context?.result?.inputs || null,
+        attribution: attribution.current,
+        capturePath: window.location.pathname,
+      };
+      if (!saveSubmissionRecovery('commercial', {payload,form:{profile,context,conversionRecorded:conversionRecorded.current}}, browserSubmissionStorage())) throw new Error('Não foi possível preservar esta solicitação nesta aba. Verifique o armazenamento do navegador e tente novamente.');
+      // Antes do primeiro POST, falhar ao salvar não deve bloquear a edição.
+      // Uma tentativa anterior permanece congelada até confirmar sua entrega.
+      frozen.current = payload;
       const response = await fetch('/api/acquisition/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
