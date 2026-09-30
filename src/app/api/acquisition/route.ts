@@ -31,7 +31,7 @@ export async function POST(request:NextRequest){
     const gate=await consumeCommercialLeadAbuseGate(request.headers,{name:parsed.value.name,company:parsed.value.company,email:parsed.value.email,phone:parsed.value.phone,cnpj:parsed.value.phone,interest:'general'},challenge);
     if(gate.reason==='nonce_replayed') return NextResponse.json({error:'Esta verificação já foi utilizada. Tente enviar novamente.'},{status:400,headers});
     if(!gate.allowed) return NextResponse.json({error:'Aguarde alguns minutos e tente novamente.'},{status:429,headers:{...headers,'Retry-After':String(Math.max(1,gate.retryAfterSeconds))}});
-    const client=createAsaflowAcquisition({apiKey:process.env.ASAFLOW_ACQUISITION_API_KEY!,pipelineId:process.env.ASAFLOW_ACQUISITION_PIPELINE_ID!,stageId:process.env.ASAFLOW_ACQUISITION_STAGE_ID!});
+    const client=createAsaflowAcquisition({apiKey:process.env.ASAFLOW_ACQUISITION_API_KEY!,pipelineId:process.env.ASAFLOW_ACQUISITION_PIPELINE_ID!,stageId:process.env.ASAFLOW_ACQUISITION_STAGE_ID!,environment:process.env.NEXT_PUBLIC_ENV});
     await createAcquisitionLedger({adminRequest:supabaseAdminRequest,crm:client}).persist(parsed.value,{capturePath:candidate.capturePath,recordKind:process.env.NEXT_PUBLIC_ENV==='homolog'?'test':'live'});
     return NextResponse.json({success:true},{status:201,headers});
   }catch(error){

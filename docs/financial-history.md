@@ -43,6 +43,9 @@ rook-system, na mesma entrega ROO-1207.
 5. Persistir `deal_requested` antes de criar negócio e `deal_created` assim que
    houver ID. O negócio inclui o resumo, o estado da análise e um link para o
    histórico no ADM, que continua exigindo autenticação.
+   O ambiente do servidor (`NEXT_PUBLIC_ENV=homolog`) escolhe
+   `adm-homolog.rooksystem.com.br`; produção mantém `adm.rook.com.br`.
+   O visitante não pode substituir esse host. Negócios anteriores não são editados.
 6. Ler `/deals/{id}` e comprovar que `contactIds` inclui o contato solicitado.
    Somente a confirmação dessa prova no ledger libera sucesso/resultado.
 
