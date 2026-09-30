@@ -1,4 +1,6 @@
 import test from 'node:test';
+import * as draft from '../src/lib/financial-draft.mjs';
+import { recoveryDependencies, memorySubmissionStorage } from './helpers/submission-storage.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -29,7 +31,7 @@ const textOf = node => !node ? '' : typeof node === 'string' || typeof node === 
 
 // Os handlers e a porta de analytics são reais. Só hooks, elementos e transporte
 // são substituídos; este teste não faz conexão de rede nem cria contato no CRM.
-function setup({ tool = 'cmv', outcomes = [], challengeError = false, environment = 'production',
+function setup({ tool = 'cmv', outcomes = [], challengeError = false, environment = 'production', storage = memorySubmissionStorage(),
   href = 'https://rook.com.br/calculadora-cmv/?utm_source=meta' } = {}) {
   const states = [], refs = [], effects = [], callbacks = [], pending = [], calls = [], events = [];
   const target = { dataLayer: [], consent: defaultConsentState() };
@@ -69,6 +71,8 @@ function setup({ tool = 'cmv', outcomes = [], challengeError = false, environmen
   } });
   const NumericFormat = () => null;
   const dependencies = {
+    '@/lib/financial-draft.mjs': draft,
+    '@/lib/submission-recovery.mjs': recoveryDependencies(storage),
     react, 'react/jsx-runtime': { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) },
     'react-number-format': { NumericFormat, PatternFormat: () => null }, '@/lib/acquisition-input.mjs': acquisition,
     '@/lib/culinary-segments.mjs': segments, '@/lib/cmv-input-options.mjs': options,
@@ -79,7 +83,7 @@ function setup({ tool = 'cmv', outcomes = [], challengeError = false, environmen
     './PreviewModeWatcher': () => null,
     '@/lib/commercial-lead-challenge-client.mjs': { solveCommercialLeadChallenge: async () => 'proof' },
   };
-  const location = { href, search: new URL(href).search };
+  const location = { href, pathname: new URL(href).pathname, search: new URL(href).search };
   const Component = evaluate(code, dependencies, {
     AbortSignal, URLSearchParams,
     crypto: { randomUUID: () => `bb189bc0-1c1d-4cca-8400-${String(++uuid).padStart(12, '0')}` },
@@ -233,7 +237,7 @@ test('nova análise exige ação explícita, invalida contexto anterior e usa ou
   const app = setup(); app.fillScenario(); await app.submit(); app.fillIdentity(); await app.submit();
   const first = app.posts()[0]; assert.equal(app.locked('name'), true);
   app.find(node => node.type === 'button' && textOf(node) === 'Fazer nova análise').props.onClick(); app.render();
-  assert.equal(app.hasResult(), false); assert.equal(app.events.at(-1).clear, true);
+  assert.equal(app.hasResult(), false); assert.ok(app.events.some(event=>event.clear)); assert.equal(app.events.at(-1).simulation, null);
   app.numeric('revenue', '200.000,00'); await app.submit();
   assert.equal(app.posts().length, 1); await app.submit();
   const next = app.posts()[1]; assert.notEqual(first.submissionId, next.submissionId);
@@ -272,4 +276,74 @@ test('422 financeiro retorna aos números para correção mantendo identidade e 
   assert.equal(app.field('name').props.value, profile.name); await app.submit();
   assert.equal(app.posts()[0].submissionId, app.posts()[1].submissionId);
   assert.equal(app.posts()[1].simulation.revenue, 120000); assert.equal(app.hasResult(), true);
+});
+
+test('recarregar a aba após timeout restaura os dados e repete a mesma solicitação sem liberar resultado antes da confirmação',async()=>{
+  const storage=memorySubmissionStorage();
+  const first=setup({storage,outcomes:[new DOMException('resposta perdida','TimeoutError')]});
+  first.fillScenario();await first.submit();first.fillIdentity();await first.submit();
+  const original=first.posts()[0];assert.equal(first.hasResult(),false);
+  const reloaded=setup({storage});
+  assert.equal(reloaded.calls.length,0);assert.equal(reloaded.hasResult(),false);
+  assert.equal(reloaded.field('name').props.value,profile.name);assert.equal(reloaded.locked('email'),true);
+  const context=reloaded.events.filter(event=>!event.clear).at(-1);
+  assert.equal(context.simulation,null);
+  assert.equal(diagnostic.readDiagnosticContext(context).result,null);
+  await reloaded.submit();
+  const resumed=reloaded.posts()[0];delete resumed.antiBot;delete original.antiBot;
+  assert.deepEqual(resumed,original);assert.equal(reloaded.hasResult(),true);
+});
+
+test('editar números compartilha um parcial com o formulário sem criar lead nem evento de conversão',()=>{
+  const app=setup({tool:'breakeven'});
+  app.numeric('revenue','120.000,00');
+  const context=app.events.filter(event=>!event.clear).at(-1);
+  assert.equal(context.intent,'breakeven');assert.equal(context.answers.revenue,'120.000,00');
+  assert.equal(context.simulation,null);assert.equal(app.calls.length,0);assert.deepEqual(app.target.dataLayer,[]);
+});
+
+test('reload confirmado mantém contexto completo para demonstração, sem liberar resultado nem repetir conversão',async()=>{
+  const storage=memorySubmissionStorage();
+  const first=setup({storage});first.fillScenario();await first.submit();first.fillIdentity();await first.submit();
+  assert.equal(first.target.dataLayer.filter(event=>event.event==='generate_lead').length,1);
+  const reloaded=setup({storage});
+  const context=reloaded.events.filter(event=>!event.clear).at(-1);
+  assert.deepEqual(context.simulation,first.posts()[0].simulation);
+  assert.equal(diagnostic.readDiagnosticContext(context).result.tool,'cmv');
+  assert.equal(reloaded.hasResult(),false);assert.equal(reloaded.calls.length,0);
+  assert.deepEqual(reloaded.target.dataLayer,[]);
+  await reloaded.submit();
+  assert.equal(reloaded.hasResult(),true);assert.deepEqual(reloaded.target.dataLayer,[]);
+  reloaded.find(node=>node.type==='button' && textOf(node)==='Fazer nova análise').props.onClick();reloaded.render();
+  assert.equal(reloaded.events.filter(event=>!event.clear).at(-1).simulation,null);
+});
+
+test('falha de armazenamento antes do primeiro POST mantém identificação e números editáveis',async()=>{
+  for(const tool of ['cmv','breakeven']) for(const name of ['QuotaExceededError','SecurityError']) {
+    const storage=memorySubmissionStorage();const save=storage.setItem;
+    storage.setItem=()=>{throw new DOMException('armazenamento indisponível',name);};
+    const app=setup({tool,storage});app.fillScenario();await app.submit();app.fillIdentity();await app.submit();
+    assert.equal(app.posts().length,0);assert.equal(app.hasResult(),false);assert.equal(app.locked('name'),false);
+    app.change('name','Pessoa Corrigida');assert.equal(app.field('name').props.value,'Pessoa Corrigida');
+    app.find(node=>node.type==='button' && textOf(node)==='Voltar aos números').props.onClick();app.render();
+    assert.equal(app.locked('revenue'),false);app.numeric('revenue','120.000,00');
+    await app.submit();storage.setItem=save;await app.submit();
+    assert.equal(app.posts().length,1);assert.equal(app.posts()[0].name,'Pessoa Corrigida');
+    assert.equal(app.posts()[0].simulation.revenue,120000);assert.equal(app.hasResult(),true);
+  }
+});
+
+test('falha de armazenamento em retry preserva payload congelado após envio ambíguo',async()=>{
+  const storage=memorySubmissionStorage();const save=storage.setItem;
+  const app=setup({storage,outcomes:[new DOMException('resposta perdida','TimeoutError')]});
+  app.fillScenario();await app.submit();app.fillIdentity();await app.submit();
+  const original=app.posts()[0];assert.equal(app.locked('email'),true);
+  storage.setItem=()=>{throw new DOMException('sem espaço','QuotaExceededError');};
+  await app.submit();assert.equal(app.posts().length,1);assert.equal(app.hasResult(),false);
+  assert.equal(app.locked('email'),true);app.change('name','Não alterar tentativa');
+  assert.equal(app.field('name').props.value,profile.name);
+  assert.equal(app.find(node=>node.type==='button' && textOf(node)==='Voltar aos números'),null);
+  storage.setItem=save;await app.submit();
+  const resumed=app.posts()[1];delete resumed.antiBot;delete original.antiBot;
+  assert.deepEqual(resumed,original);assert.equal(app.hasResult(),true);
 });

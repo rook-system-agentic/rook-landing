@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateFinancialAcquisition } from '@/lib/financial-acquisition.mjs';
-import { toPublicFinancialSimulation } from '@/lib/public-financial-simulation.mjs';
 import { createAsaflowAcquisition } from '@/lib/asaflow-acquisition.mjs';
+import { AcquisitionPersistenceError, createAcquisitionLedger } from '@/lib/acquisition-ledger.mjs';
+import { isSupabaseAdminConfigured, supabaseAdminRequest } from '@/lib/supabase-admin';
 import {
   CommercialLeadAbuseProtectionError, consumeCommercialLeadAbuseGate,
   isCommercialLeadAbuseProtectionConfigured, issueCommercialLeadChallenge,
@@ -17,7 +18,7 @@ function configured() {
     && !!process.env.ASAFLOW_ACQUISITION_API_KEY
     && !!process.env.ASAFLOW_ACQUISITION_PIPELINE_ID
     && !!process.env.ASAFLOW_ACQUISITION_STAGE_ID
-    && isCommercialLeadAbuseProtectionConfigured();
+    && isCommercialLeadAbuseProtectionConfigured() && isSupabaseAdminConfigured();
 }
 
 export async function GET(request: NextRequest) {
@@ -53,10 +54,17 @@ export async function POST(request: NextRequest) {
       apiKey: process.env.ASAFLOW_ACQUISITION_API_KEY!,
       pipelineId: process.env.ASAFLOW_ACQUISITION_PIPELINE_ID!,
       stageId: process.env.ASAFLOW_ACQUISITION_STAGE_ID!,
+      environment: process.env.NEXT_PUBLIC_ENV,
     });
-    await client.create(lead);
-    return NextResponse.json({success:true,simulation:toPublicFinancialSimulation(lead.simulation)}, {status:201,headers});
+    const saved = await createAcquisitionLedger({ adminRequest: supabaseAdminRequest, crm: client }).persist(lead, {
+      capturePath: candidate.capturePath, recordKind: process.env.NEXT_PUBLIC_ENV === 'homolog' ? 'test' : 'live',
+    });
+    if (!saved.publicSimulation?.ok || saved.publicSimulation.tool !== lead.intent) throw new Error('invalid_persisted_simulation');
+    return NextResponse.json({success:true,simulation:saved.publicSimulation}, {status:201,headers});
   } catch (error) {
+    if (error instanceof AcquisitionPersistenceError && error.code === 'conflict') return NextResponse.json({error:'Esta solicitação já foi registrada com outros dados. Retome os dados originais para tentar novamente.'}, {status:409,headers});
+    if (error instanceof AcquisitionPersistenceError && error.code === 'busy') return NextResponse.json({error:'Sua solicitação ainda está sendo confirmada. Aguarde um momento e tente novamente.'}, {status:503,headers:{...headers,'Retry-After':String(error.retryAfterSeconds)}});
+    if (error instanceof AcquisitionPersistenceError && error.code === 'needs_reconciliation') return NextResponse.json({error:'Seus dados foram registrados, mas a confirmação precisa ser conferida pela equipe. O resultado ainda não está disponível.'}, {status:503,headers});
     if (error instanceof CommercialLeadAbuseProtectionError && error.code === 'invalid_challenge') {
       return NextResponse.json({error:'A verificação expirou. Tente novamente.'}, {status:400,headers});
     }

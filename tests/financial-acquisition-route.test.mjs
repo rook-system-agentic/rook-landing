@@ -3,7 +3,17 @@ import assert from 'node:assert/strict';
 import { CommercialLeadAbuseProtectionError } from '../src/lib/commercial-lead-abuse-protection.mjs';
 import { financialInput, financialLead, financialRequest, loadFinancialRoute } from './helpers/financial-acquisition-route.mjs';
 
+import { CONTACT_ID, DEAL_ID, RECEIPT } from './helpers/acquisition-ledger.mjs';
 const noInternal = body => assert.doesNotMatch(JSON.stringify(body), /private-|contactId|dealId|pipelineId|stageId|assumptions|formulaVersion|taxModelVersion|referencePercent|monthlyDifference|Parâmetros internos/);
+
+test('cadastro financeiro usa o ambiente do servidor no link ADM, sem aceitar override público', async () => {
+  const route = loadFinancialRoute({ env: { NEXT_PUBLIC_ENV: 'homolog' } });
+  const response = await route.post(financialRequest({ environment: 'production', adminOrigin: 'https://untrusted.invalid' }));
+  assert.equal(response.status, 201);
+  assert.equal(route.calls.clients[0].environment, 'homolog');
+  assert.equal(route.calls.crm[0].environment, undefined);
+  assert.equal(route.calls.crm[0].adminOrigin, undefined);
+});
 
 test('GET emite desafio e depende da mesma configuração distribuída da captação', async () => {
   const request = new Request('http://localhost/api/financial-simulations/');
@@ -55,7 +65,7 @@ test('resultado público aguarda confirmação no CRM e a intenção comercial p
   const route = loadFinancialRoute({ create: async () => {
     entered();
     await new Promise(resolve => { confirm = resolve; });
-    return { contactId: 'private-contact', dealId: 'private-deal' };
+    return RECEIPT;
   } });
   let responded = false;
   const pending = route.post(financialRequest()).then(response => { responded = true; return response; });
@@ -130,10 +140,12 @@ test('reenvio após escrita parcial ou resposta perdida não duplica contato nem
     let lost = true;
     const route = loadFinancialRoute({ fetchImpl: async (url, options) => {
       requests.push({ url, ...options });
+      if(url.includes('/deals/')) return {ok:true,json:async()=>({id:DEAL_ID,contactIds:[CONTACT_ID]})};
+      if(url.includes('/contacts/')) return {ok:true,json:async()=>({id:CONTACT_ID,email:financialLead.email,phone:'+5511999999999'})};
       if (options.method === 'GET') return { ok: true, json: async () => ({ data: [], nextCursor: null }) };
       const kind = url.endsWith('/contacts') ? 'contact' : 'deal';
       const key = options.headers['Idempotency-Key'];
-      if (!persisted.has(key)) persisted.set(key, { id: `private-${kind}`, body: options.body });
+      if (!persisted.has(key)) persisted.set(key, { id: kind==='contact'?CONTACT_ID:DEAL_ID, body: options.body });
       assert.equal(persisted.get(key).body, options.body);
       if (lost && kind === failAt) { lost = false; throw new Error('Resposta perdida após persistir'); }
       return { ok: true, json: async () => ({ id: persisted.get(key).id }) };
@@ -154,9 +166,11 @@ test('atribuição é normalizada, contato existente é preservado e projeção 
   const requests = [];
   const route = loadFinancialRoute({ fetchImpl: async (url, options) => {
     requests.push({ url, ...options });
+      if(url.includes('/deals/')) return {ok:true,json:async()=>({id:DEAL_ID,contactIds:[CONTACT_ID]})};
+      if(url.includes('/contacts/')) return {ok:true,json:async()=>({id:CONTACT_ID,email:financialLead.email,phone:'+5511999999999'})};
     return { ok: true, json: async () => options.method === 'GET' ? {
-      data: [{ id: 'private-existing', email: ' TESTE@EXAMPLE.INVALID ', phone: '(11) 99999-9999' }], nextCursor: null,
-    } : { id: 'private-deal' } };
+      data: [{ id: CONTACT_ID, email: ' TESTE@EXAMPLE.INVALID ', phone: '(11) 99999-9999' }], nextCursor: null,
+    } : { id: DEAL_ID } };
   } });
   const response = await route.post(financialRequest({ commercialContactRequested: true, attribution: {
     source: 'meta_native_form', utm_source: 'facebookads', utm_medium: 'paid_social',
@@ -165,11 +179,11 @@ test('atribuição é normalizada, contato existente é preservado e projeção 
   } }));
   assert.equal(response.status, 201);
   noInternal(await response.json());
-  assert.deepEqual(requests.map(call => call.method), ['GET', 'POST']);
+  assert.deepEqual(requests.map(call => call.method), ['GET', 'POST', 'GET']);
   assert.ok(requests[1].url.endsWith('/deals'));
   const deal = JSON.parse(requests[1].body);
   assert.equal(deal.name, 'CMV — Pessoa Teste');
-  assert.deepEqual(deal.contactIds, ['private-existing']);
+  assert.deepEqual(deal.contactIds, [CONTACT_ID]);
   assert.equal(deal.properties.origem, 'Tráfego pago');
   assert.equal(deal.properties.utm_campaign, '[ES] - CMV');
   assert.equal(deal.properties.landing_page, '/calculadora-cmv');
@@ -196,13 +210,15 @@ test('timeout e confirmação inválida do provedor retornam 503 sem resultado p
     const requests = [];
     const route = loadFinancialRoute({ fetchImpl: async (url, options) => {
       requests.push({ url, ...options });
+      if(url.includes('/deals/')) return {ok:true,json:async()=>({id:DEAL_ID,contactIds:[CONTACT_ID]})};
+      if(url.includes('/contacts/')) return {ok:true,json:async()=>({id:CONTACT_ID,email:financialLead.email,phone:'+5511999999999'})};
       assert.ok(options.signal instanceof AbortSignal);
       if (options.method === 'GET') return { ok: true, json: async () => ({ data: [], nextCursor: null }) };
       if (failure === 'timeout') throw new DOMException('private-provider-timeout', 'TimeoutError');
       if (failure === 'http-error') return { ok: false, status: 503 };
       return { ok: true, json: async () => ({ id:
         (failure === 'invalid-contact' && url.endsWith('/contacts')) || (failure === 'invalid-deal' && url.endsWith('/deals'))
-          ? '' : 'private-confirmed',
+          ? '' : CONTACT_ID,
       }) };
     } });
     const response = await route.post(financialRequest());
@@ -218,15 +234,17 @@ test('coincidência isolada de e-mail ou telefone não reutiliza contato de outr
   const requests = [];
   const route = loadFinancialRoute({ fetchImpl: async (url, options) => {
     requests.push({ url, ...options });
+      if(url.includes('/deals/')) return {ok:true,json:async()=>({id:DEAL_ID,contactIds:[CONTACT_ID]})};
+      if(url.includes('/contacts/')) return {ok:true,json:async()=>({id:CONTACT_ID,email:financialLead.email,phone:'+5511999999999'})};
     return { ok: true, json: async () => options.method === 'GET' ? { data: [
       { id: 'private-email-only', email: financialLead.email, phone: '+5521999999999' },
       { id: 'private-phone-only', email: 'outra@example.invalid', phone: '+5511999999999' },
-    ], nextCursor: null } : { id: url.endsWith('/contacts') ? 'private-new-contact' : 'private-deal' } };
+    ], nextCursor: null } : { id: url.endsWith('/contacts') ? CONTACT_ID : DEAL_ID } };
   } });
   const response = await route.post(financialRequest());
   assert.equal(response.status, 201);
-  assert.deepEqual(requests.map(call => call.method), ['GET', 'POST', 'POST']);
+  assert.deepEqual(requests.map(call => call.method), ['GET', 'POST', 'POST', 'GET']);
   assert.ok(requests[1].url.endsWith('/contacts'));
-  assert.deepEqual(JSON.parse(requests[2].body).contactIds, ['private-new-contact']);
+  assert.deepEqual(JSON.parse(requests[2].body).contactIds, [CONTACT_ID]);
   noInternal(await response.json());
 });

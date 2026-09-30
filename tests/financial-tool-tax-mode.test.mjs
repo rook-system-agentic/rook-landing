@@ -1,4 +1,6 @@
 import test from 'node:test';
+import * as draft from '../src/lib/financial-draft.mjs';
+import { recoveryDependencies, memorySubmissionStorage } from './helpers/submission-storage.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -49,6 +51,8 @@ function setup(tool = 'breakeven') {
   };
   const NumericFormat = () => null;
   const dependencies = {
+    '@/lib/financial-draft.mjs': draft,
+    '@/lib/submission-recovery.mjs': recoveryDependencies(),
     react, 'react/jsx-runtime': { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) },
     'react-number-format': { NumericFormat, PatternFormat: () => null }, '@/lib/culinary-segments.mjs': segments,
     '@/lib/cmv-input-options.mjs': options, '@/lib/acquisition-input.mjs': acquisition,
@@ -146,7 +150,7 @@ test('diagnóstico usa seis valores do último mês e envia compras, guia e outr
 test('nova análise invalida contexto anterior e recalcula com os valores em reais editados', async () => {
   const app = setup(); app.fillBase(); app.numeric('taxAmount', '5.000,00'); await app.calculate();
   app.newAnalysis();
-  assert.equal(app.events.at(-1).clear, true);
+  assert.ok(app.events.some(event=>event.clear)); assert.equal(app.events.at(-1).simulation, null);
   assert.equal(app.field('revenue').props.value, '100.000,00');
   assert.equal(app.field('purchasesAmount').props.value, '40.000,00');
   app.numeric('purchasesAmount', '35.000,00');

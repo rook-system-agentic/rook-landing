@@ -5,6 +5,8 @@ import vm from 'node:vm';
 import ts from 'typescript';
 import { validateAcquisition } from '../src/lib/acquisition.mjs';
 import { CommercialLeadAbuseProtectionError } from '../src/lib/commercial-lead-abuse-protection.mjs';
+import * as ledger from '../src/lib/acquisition-ledger.mjs';
+import { memoryLedger, checkpointReceipt, RECEIPT } from './helpers/acquisition-ledger.mjs';
 
 // Execute the actual route with only transport dependencies replaced. This
 // exercises the HTTP status/headers and verifies denied gates never reach CRM.
@@ -22,16 +24,20 @@ const request = (token, extra = {}) => new Request('http://localhost/api/acquisi
   method: 'POST', headers: { 'content-type': 'application/json' },
   body: JSON.stringify({ ...lead, ...extra, antiBot: { token, solution: '0' } }),
 });
-function loadRoute({ gate, create = async () => {} }) {
-  const calls = { gate: [], clients: 0, crm: [], network: 0 };
+function loadRoute({ gate, create = async () => {}, env = {} }) {
+  const calls = { gate: [], clients: 0, clientOptions: [], crm: [], network: 0 };
+  const store=memoryLedger();
   const dependencies = {
     'next/server': { NextResponse: Response },
     '@/data/municipalities.json': cities,
     '@/lib/acquisition.mjs': { validateAcquisition },
+    '@/lib/acquisition-ledger.mjs':ledger,
+    '@/lib/supabase-admin':{isSupabaseAdminConfigured:()=>true,supabaseAdminRequest:store.request},
     '@/lib/asaflow-acquisition.mjs': {
-      createAsaflowAcquisition: () => {
+      createAsaflowAcquisition: options => {
         calls.clients++;
-        return { create: async value => { calls.crm.push(value); return create(value); } };
+        calls.clientOptions.push(options);
+        return { create: async (value,options) => { calls.crm.push(value); await create(value); return checkpointReceipt(options,RECEIPT); } };
       },
     },
     '@/lib/commercial-lead-abuse': {
@@ -51,6 +57,7 @@ function loadRoute({ gate, create = async () => {} }) {
     process: { env: {
       ASAFLOW_ACQUISITION_ENABLED: 'true', ASAFLOW_ACQUISITION_API_KEY: 'test-only',
       ASAFLOW_ACQUISITION_PIPELINE_ID: 'test-pipeline', ASAFLOW_ACQUISITION_STAGE_ID: 'test-stage',
+      ...env,
     } },
     fetch: () => { calls.network++; throw new Error('External requests forbidden'); },
     require: name => {
@@ -60,6 +67,17 @@ function loadRoute({ gate, create = async () => {} }) {
   }, { filename: 'api/acquisition/route.cjs' });
   return { post: module.exports.POST, calls };
 }
+
+test('cadastro comercial usa o ambiente do servidor no link ADM, sem aceitar override público', async () => {
+  const { post, calls } = loadRoute({
+    gate: async () => ({ allowed: true }), env: { NEXT_PUBLIC_ENV: 'homolog' },
+  });
+  const response = await post(request('fresh-proof', { environment: 'production', adminOrigin: 'https://untrusted.invalid' }));
+  assert.equal(response.status, 201);
+  assert.equal(calls.clientOptions[0].environment, 'homolog');
+  assert.equal(calls.crm[0].environment, undefined);
+  assert.equal(calls.crm[0].adminOrigin, undefined);
+});
 
 test('servidor transmite apenas atribuição normalizada e mantém sucesso com atribuição inválida', async () => {
   for (const input of [

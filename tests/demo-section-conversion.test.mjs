@@ -1,4 +1,6 @@
 import test from 'node:test';
+import * as draft from '../src/lib/financial-draft.mjs';
+import { recoveryDependencies, memorySubmissionStorage } from './helpers/submission-storage.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -26,14 +28,14 @@ const plain = value => JSON.parse(JSON.stringify(value));
 // Executa o componente e sua porta track reais. Somente transporte, hooks e
 // elementos visuais são substituídos; nenhum CRM ou provedor externo é chamado.
 function setup({ environment = 'production', href = 'https://rook.com.br/?utm_source=meta',
-  outcomes = [{ ok: true, status: 201, body: { success: true } }], challengeError = false } = {}) {
+  outcomes = [{ ok: true, status: 201, body: { success: true } }], challengeError = false, storage = memorySubmissionStorage() } = {}) {
   const state = [], refs = [], effects = [];
   let stateCursor = 0, refCursor = 0, effectCursor = 0, tree;
   let pathname = new URL(href).pathname;
   const pendingEffects = [], calls = [];
   const listeners = new Map();
   const target = { dataLayer: [], consent: defaultConsentState() };
-  const location = { href, search: new URL(href).search };
+  const location = { href, pathname: new URL(href).pathname, search: new URL(href).search };
   const react = {
     useState(initial) {
       const index = stateCursor++;
@@ -61,6 +63,8 @@ function setup({ environment = 'production', href = 'https://rook.com.br/?utm_so
   } });
   const CityPicker = () => null;
   const dependencies = {
+    '@/lib/financial-draft.mjs': draft,
+    '@/lib/submission-recovery.mjs': recoveryDependencies(storage),
     react, 'react/jsx-runtime': { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }) },
     'next/navigation': { usePathname: () => pathname },
     '@/lib/culinary-segments.mjs': culinarySegments, '@/lib/acquisition-input.mjs': acquisition,
@@ -217,4 +221,56 @@ test('clique durante envio não duplica e retry confirmado mede somente uma vez'
   assert.deepEqual(posts[0].attribution, posts[1].attribution);
   assert.equal(posts[0].submissionId, posts[1].submissionId);
   assert.deepEqual(app.target.dataLayer, [{ event: 'generate_lead' }]);
+});
+
+test('demonstração recebe números ainda não calculados e conserva a solicitação após reload',async()=>{
+  const storage=memorySubmissionStorage();
+  const first=setup({storage,outcomes:[new DOMException('resposta perdida','TimeoutError')]});
+  first.fill();first.receiveDiagnostic({sourceId:'pe',intent:'breakeven',answers:{referenceBasis:'last_month',costInputMode:'purchases_amount',revenue:'120000',fixedCosts:'0'},simulation:null});
+  await first.submit();
+  const original=JSON.parse(first.calls.find(call=>call.method==='POST').body);
+  assert.equal(original.intent,'breakeven');assert.equal(original.simulation,null);assert.equal(original.revenue,'120000');
+  const reloaded=setup({storage});assert.equal(reloaded.calls.length,0);
+  await reloaded.submit();
+  const resumed=JSON.parse(reloaded.calls.find(call=>call.method==='POST').body);
+  assert.deepEqual(resumed,original);
+});
+
+test('falha do armazenamento antes do POST permite corrigir o cadastro e tentar novamente', async () => {
+  const backing = memorySubmissionStorage();
+  let blocked = true;
+  const storage = { ...backing, setItem(key, value) {
+    if (blocked) throw new DOMException('Quota cheia', 'QuotaExceededError');
+    backing.setItem(key, value);
+  } };
+  const app = setup({ storage }); app.fill(); await app.submit(); app.render();
+  assert.equal(app.calls.filter(call => call.method === 'POST').length, 0);
+  assert.equal(app.find(node => node.type === 'fieldset').props.disabled, false);
+  app.find(node => node.props?.id === 'demo-company').props.onChange({ target: { value: 'Casa Corrigida' } }); app.render();
+  blocked = false;
+  await app.submit(); app.render();
+  const posts = app.calls.filter(call => call.method === 'POST');
+  assert.equal(posts.length, 1);
+  assert.equal(JSON.parse(posts[0].body).company, 'Casa Corrigida');
+  assert.ok(app.find(node => node.props?.role === 'status'));
+});
+
+test('armazenamento indisponível durante retry não libera uma tentativa com entrega incerta', async () => {
+  const backing = memorySubmissionStorage();
+  let blocked = false;
+  const storage = { ...backing, setItem(key, value) {
+    if (blocked) throw new DOMException('Sem acesso', 'SecurityError');
+    backing.setItem(key, value);
+  } };
+  const app = setup({ storage, outcomes: [new Error('Resposta perdida'), { ok: true, status: 201, body: { success: true } }] });
+  app.fill(); await app.submit(); app.render();
+  blocked = true;
+  await app.submit(); app.render();
+  assert.equal(app.calls.filter(call => call.method === 'POST').length, 1);
+  assert.equal(app.find(node => node.type === 'fieldset').props.disabled, true);
+  blocked = false;
+  await app.submit();
+  const posts = app.calls.filter(call => call.method === 'POST').map(call => JSON.parse(call.body));
+  assert.equal(posts.length, 2);
+  assert.deepEqual(posts[1], posts[0]);
 });
