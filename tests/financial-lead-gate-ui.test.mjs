@@ -286,6 +286,9 @@ test('recarregar a aba após timeout restaura os dados e repete a mesma solicita
   const reloaded=setup({storage});
   assert.equal(reloaded.calls.length,0);assert.equal(reloaded.hasResult(),false);
   assert.equal(reloaded.field('name').props.value,profile.name);assert.equal(reloaded.locked('email'),true);
+  const context=reloaded.events.filter(event=>!event.clear).at(-1);
+  assert.equal(context.simulation,null);
+  assert.equal(diagnostic.readDiagnosticContext(context).result,null);
   await reloaded.submit();
   const resumed=reloaded.posts()[0];delete resumed.antiBot;delete original.antiBot;
   assert.deepEqual(resumed,original);assert.equal(reloaded.hasResult(),true);
@@ -299,10 +302,48 @@ test('editar números compartilha um parcial com o formulário sem criar lead ne
   assert.equal(context.simulation,null);assert.equal(app.calls.length,0);assert.deepEqual(app.target.dataLayer,[]);
 });
 
-test('reabrir resultado já confirmado na mesma aba não mede outra conversão',async()=>{
+test('reload confirmado mantém contexto completo para demonstração, sem liberar resultado nem repetir conversão',async()=>{
   const storage=memorySubmissionStorage();
   const first=setup({storage});first.fillScenario();await first.submit();first.fillIdentity();await first.submit();
   assert.equal(first.target.dataLayer.filter(event=>event.event==='generate_lead').length,1);
-  const reloaded=setup({storage});await reloaded.submit();
+  const reloaded=setup({storage});
+  const context=reloaded.events.filter(event=>!event.clear).at(-1);
+  assert.deepEqual(context.simulation,first.posts()[0].simulation);
+  assert.equal(diagnostic.readDiagnosticContext(context).result.tool,'cmv');
+  assert.equal(reloaded.hasResult(),false);assert.equal(reloaded.calls.length,0);
+  assert.deepEqual(reloaded.target.dataLayer,[]);
+  await reloaded.submit();
   assert.equal(reloaded.hasResult(),true);assert.deepEqual(reloaded.target.dataLayer,[]);
+  reloaded.find(node=>node.type==='button' && textOf(node)==='Fazer nova análise').props.onClick();reloaded.render();
+  assert.equal(reloaded.events.filter(event=>!event.clear).at(-1).simulation,null);
+});
+
+test('falha de armazenamento antes do primeiro POST mantém identificação e números editáveis',async()=>{
+  for(const tool of ['cmv','breakeven']) for(const name of ['QuotaExceededError','SecurityError']) {
+    const storage=memorySubmissionStorage();const save=storage.setItem;
+    storage.setItem=()=>{throw new DOMException('armazenamento indisponível',name);};
+    const app=setup({tool,storage});app.fillScenario();await app.submit();app.fillIdentity();await app.submit();
+    assert.equal(app.posts().length,0);assert.equal(app.hasResult(),false);assert.equal(app.locked('name'),false);
+    app.change('name','Pessoa Corrigida');assert.equal(app.field('name').props.value,'Pessoa Corrigida');
+    app.find(node=>node.type==='button' && textOf(node)==='Voltar aos números').props.onClick();app.render();
+    assert.equal(app.locked('revenue'),false);app.numeric('revenue','120.000,00');
+    await app.submit();storage.setItem=save;await app.submit();
+    assert.equal(app.posts().length,1);assert.equal(app.posts()[0].name,'Pessoa Corrigida');
+    assert.equal(app.posts()[0].simulation.revenue,120000);assert.equal(app.hasResult(),true);
+  }
+});
+
+test('falha de armazenamento em retry preserva payload congelado após envio ambíguo',async()=>{
+  const storage=memorySubmissionStorage();const save=storage.setItem;
+  const app=setup({storage,outcomes:[new DOMException('resposta perdida','TimeoutError')]});
+  app.fillScenario();await app.submit();app.fillIdentity();await app.submit();
+  const original=app.posts()[0];assert.equal(app.locked('email'),true);
+  storage.setItem=()=>{throw new DOMException('sem espaço','QuotaExceededError');};
+  await app.submit();assert.equal(app.posts().length,1);assert.equal(app.hasResult(),false);
+  assert.equal(app.locked('email'),true);app.change('name','Não alterar tentativa');
+  assert.equal(app.field('name').props.value,profile.name);
+  assert.equal(app.find(node=>node.type==='button' && textOf(node)==='Voltar aos números'),null);
+  storage.setItem=save;await app.submit();
+  const resumed=app.posts()[1];delete resumed.antiBot;delete original.antiBot;
+  assert.deepEqual(resumed,original);assert.equal(app.hasResult(),true);
 });

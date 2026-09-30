@@ -235,3 +235,42 @@ test('demonstração recebe números ainda não calculados e conserva a solicita
   const resumed=JSON.parse(reloaded.calls.find(call=>call.method==='POST').body);
   assert.deepEqual(resumed,original);
 });
+
+test('falha do armazenamento antes do POST permite corrigir o cadastro e tentar novamente', async () => {
+  const backing = memorySubmissionStorage();
+  let blocked = true;
+  const storage = { ...backing, setItem(key, value) {
+    if (blocked) throw new DOMException('Quota cheia', 'QuotaExceededError');
+    backing.setItem(key, value);
+  } };
+  const app = setup({ storage }); app.fill(); await app.submit(); app.render();
+  assert.equal(app.calls.filter(call => call.method === 'POST').length, 0);
+  assert.equal(app.find(node => node.type === 'fieldset').props.disabled, false);
+  app.find(node => node.props?.id === 'demo-company').props.onChange({ target: { value: 'Casa Corrigida' } }); app.render();
+  blocked = false;
+  await app.submit(); app.render();
+  const posts = app.calls.filter(call => call.method === 'POST');
+  assert.equal(posts.length, 1);
+  assert.equal(JSON.parse(posts[0].body).company, 'Casa Corrigida');
+  assert.ok(app.find(node => node.props?.role === 'status'));
+});
+
+test('armazenamento indisponível durante retry não libera uma tentativa com entrega incerta', async () => {
+  const backing = memorySubmissionStorage();
+  let blocked = false;
+  const storage = { ...backing, setItem(key, value) {
+    if (blocked) throw new DOMException('Sem acesso', 'SecurityError');
+    backing.setItem(key, value);
+  } };
+  const app = setup({ storage, outcomes: [new Error('Resposta perdida'), { ok: true, status: 201, body: { success: true } }] });
+  app.fill(); await app.submit(); app.render();
+  blocked = true;
+  await app.submit(); app.render();
+  assert.equal(app.calls.filter(call => call.method === 'POST').length, 1);
+  assert.equal(app.find(node => node.type === 'fieldset').props.disabled, true);
+  blocked = false;
+  await app.submit();
+  const posts = app.calls.filter(call => call.method === 'POST').map(call => JSON.parse(call.body));
+  assert.equal(posts.length, 2);
+  assert.deepEqual(posts[1], posts[0]);
+});
