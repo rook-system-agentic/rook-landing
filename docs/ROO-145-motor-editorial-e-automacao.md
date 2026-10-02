@@ -1,5 +1,9 @@
 # ROO-145 — Motor editorial e automação de publicação
 
+> **Nota (02/10/2026):** desde 22/09/2026 a produção roda no k3s da Hostinger.
+> Vercel e Fly.io estão desativados, e o Supabase gerenciado do rook-system
+> está congelado. As menções a essa infra neste documento descrevem o estado da época.
+
 Documento complementar à ROO-117 e à ROO-138.
 
 Este documento define como o Rook deve gerar, revisar, aprovar e publicar conteúdo para blog, LinkedIn e Instagram sem virar uma fábrica genérica de texto. A ROO-145 deve ser entendida como a camada de publicação automática após aprovação; o motor editorial é a camada anterior, responsável por escolher pauta, gerar pacote de conteúdo e garantir qualidade.

@@ -1,5 +1,9 @@
 # ROO-1207 — Experimento `lp_asaflow_v1`: contratação direta × atendimento assistido
 
+> **Nota (02/10/2026):** desde 22/09/2026 a produção roda no k3s da Hostinger.
+> Vercel e Fly.io estão desativados, e o Supabase gerenciado do rook-system
+> está congelado. As menções a essa infra neste documento descrevem o estado da época.
+
 Fonte da verdade da hipótese, da janela e da decisão do experimento. A
 configuração do chatbot e do formulário fica no AsaFlow; o código fica em
 `src/lib/lp-experiment.mjs`, `src/middleware.ts` e
