@@ -1,5 +1,9 @@
 # ROO-138 — Blog Editorial + CMS Minimo
 
+> **Nota (02/10/2026):** desde 22/09/2026 a produção roda no k3s da Hostinger.
+> Vercel e Fly.io estão desativados, e o Supabase gerenciado do rook-system
+> está congelado. As menções a essa infra neste documento descrevem o estado da época.
+
 Esta implementacao transforma `/blog` em um produto editorial dinamico para a fase 1 da ROO-117.
 
 ## O que foi implementado

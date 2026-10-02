@@ -3,14 +3,14 @@
 `lp-homolog.rooksystem.com.br` — a LP pública rodando na VPS com k3s, ao lado
 do app (`homolog.`), do ADM (`adm-homolog.`) e do Marketing OS (`site-homolog.`).
 
-Produção continua na Vercel, a partir da `main`. Este ambiente nunca a toca.
+Produção roda no mesmo k3s, no namespace `rook-production` (`k8s/production/`), publicada por `deploy-production.yml` a partir da `main`. Este ambiente nunca a toca.
 
 ## Fluxo
 
 ```
 branch de trabalho  →  homolog  →  main
                         │            │
-                        │            └─ Vercel publica rook.com.br
+                        │            └─ deploy-production.yml publica www.rook.com.br
                         └─ este workflow publica lp-homolog.rooksystem.com.br
 ```
 
@@ -74,5 +74,5 @@ competir com o site real na busca.
 ## O que este ambiente não cobre
 
 - Otimização de imagem (`images.unoptimized`), igual à produção
-- Os crons da Vercel (`vercel.json`) — aqui não há CronJob
+- O cron de publicação agendada (`cron-lp-publish-scheduled`, só em produção) — aqui não há CronJob
 - Envio real de e-mail, se a chave do Resend não for provisionada

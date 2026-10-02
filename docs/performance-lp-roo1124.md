@@ -1,5 +1,9 @@
 # Performance da LP no celular — diagnóstico e correções (ROO-1124)
 
+> **Nota (02/10/2026):** desde 22/09/2026 a produção roda no k3s da Hostinger.
+> Vercel e Fly.io estão desativados, e o Supabase gerenciado do rook-system
+> está congelado. As menções a essa infra neste documento descrevem o estado da época.
+
 > Medições feitas em 17/08/2026 contra **produção** (`www.rook.com.br`), com
 > Chrome headless em viewport de 390×844, DPR 3 e User-Agent de Android.
 > Todo número neste documento foi medido; nenhum foi estimado.
