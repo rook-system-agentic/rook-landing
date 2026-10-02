@@ -1,5 +1,9 @@
 # Inventário da landing candidata a produção
 
+> **Nota (02/10/2026):** desde 22/09/2026 a produção roda no k3s da Hostinger.
+> Vercel e Fly.io estão desativados, e o Supabase gerenciado do rook-system
+> está congelado. As menções a essa infra neste documento descrevem o estado da época.
+
 - Repositório: `rook-system-agentic/rook-landing`.
 - Fonte publicada na Vercel: commit `a7b1a939e39a4afd7a05cf15f0733fad74bf1651`.
 - Imagem candidata: `rook-lp:prod-a7b1a939`, digest OCI

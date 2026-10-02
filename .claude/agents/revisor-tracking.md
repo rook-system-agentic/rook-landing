@@ -47,7 +47,7 @@ Estado atual da allowlist — qualquer coisa além disto é achado até prova em
 - [ ] O payload passado ao `track()` é um objeto literal com chaves fixas. `track(evento, { ...formData })` ou `{ ...dadosDoLead }` é achado GRAVE: o spread esconde de quem lê o diff quais campos vão, e passa a vazar sozinho quando alguém adiciona um campo ao formulário.
 
 ### Portão de ambiente
-- [ ] `isTrackingEnabled()` continua sendo `NEXT_PUBLIC_ENV !== "homolog"` — ligado por padrão. Se o diff inverteu para exigir variável para ligar, é achado: esquecer a variável na Vercel faria a produção **parar de medir em silêncio**.
+- [ ] `isTrackingEnabled()` continua sendo `NEXT_PUBLIC_ENV !== "homolog"` — ligado por padrão. Se o diff inverteu para exigir variável para ligar, é achado: esquecer a variável no deploy (`k8s/production/lp.yaml`/Secret) faria a produção **parar de medir em silêncio**.
 - [ ] Os IDs do GA e do Clarity são fixos no código, sem variável de ambiente — não aceite "basta deixar a env vazia em homologação" como mitigação, porque nada lê essa variável.
 - [ ] Lembre-se de que a imagem de homologação roda com `NODE_ENV=production`. Guarda por `NODE_ENV` não separa nada aqui.
 

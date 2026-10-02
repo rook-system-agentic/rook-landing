@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Landing page / marketing site for Rook System (rooksystem.com.br) — Next.js 14 App Router, TypeScript, Tailwind, pnpm. Everything is written in pt-BR: copy, comments, commit messages, test names. Long "POR QUE ISTO EXISTE" comments explaining decisions are a deliberate repo idiom — keep them, and read them before "fixing" something that looks wrong.
+Landing page / marketing site for Rook System (canonical `https://www.rook.com.br`; `rook.com.br` and `*.rooksystem.com.br` redirect to it) — Next.js 14 App Router, TypeScript, Tailwind, pnpm. Everything is written in pt-BR: copy, comments, commit messages, test names. Long "POR QUE ISTO EXISTE" comments explaining decisions are a deliberate repo idiom — keep them, and read them before "fixing" something that looks wrong.
 
 ## Commands
 
@@ -20,7 +20,7 @@ Landing page / marketing site for Rook System (rooksystem.com.br) — Next.js 14
 
 `work branch → homolog → main`. Open PRs with `--base homolog`. The `guard-main-source.yml` workflow rejects PRs to `main` unless they come from `homolog`, `hotfix/*`, or `revert-*`.
 
-- **Production** = Vercel, auto-publishes `main`.
+- **Production** = k3s on the Hostinger VPS (namespace `rook-production`, pod `rook-lp`, `www.rook.com.br`), deployed by `deploy-production.yml` on push to `main` (build on the VPS runner, import into containerd, rollout with rollback, smoke). Since the 22/09/2026 cutover, Vercel is out: the project is paused and `vercel.json` sets `git.deploymentEnabled.main=false`. Manifests and secrets live in `k8s/production/` (see its README).
 - **Homolog** = k3s on a VPS, deployed by `deploy-homolog.yml` on push to `homolog`. The homolog image is **not promotable** to production: `NEXT_PUBLIC_*` values are baked into the browser bundle at build time and `NEXT_PUBLIC_ENV=homolog` disables tracking (`src/lib/tracking.ts`) and emits an `X-Robots-Tag: noindex` header (`next.config.mjs`). Code is promoted via branch, never via image.
 
 ## Architecture
@@ -50,7 +50,7 @@ External data sources never fail silently — they return a `source`/state field
 
 ### Content automation
 
-`/api/content/*` routes (handoff, publish, hourly cron in `vercel.json`) are authenticated by `CONTENT_AUTOMATION_SECRET` via `src/lib/content-api-auth.ts` (timing-safe compare). Schema lives in `supabase/migrations/`. Docs: `docs/ROO-138-blog-cms.md`, `docs/ROO-145-motor-editorial-e-automacao.md`.
+`/api/content/*` routes (handoff, publish, hourly cron: CronJob `cron-lp-publish-scheduled` in `k8s/production/cron/publish-scheduled.yaml`; the `vercel.json` entry is a leftover) are authenticated by `CONTENT_AUTOMATION_SECRET` via `src/lib/content-api-auth.ts` (timing-safe compare). Schema lives in `supabase/migrations/`. Docs: `docs/ROO-138-blog-cms.md`, `docs/ROO-145-motor-editorial-e-automacao.md`.
 
 ### Home page (LP)
 
