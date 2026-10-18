@@ -196,5 +196,7 @@ fi
 
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(1 if d.get("git",{}).get("deploymentEnabled",{}).get("main") is False else 0)' "$VERCEL_JSON" \
   || fail "vercel.json ainda desliga o deploy automático da main (a produção é a Vercel desde o corte ROO-1436)"
+python3 -c 'import json,sys; sys.exit(0 if json.load(open(sys.argv[1])).get("regions") == ["gru1"] else 1)' "$VERCEL_JSON" \
+  || fail "vercel.json sem regions [\"gru1\"] (as funções da produção ficam em São Paulo, perto do banco)"
 
 printf 'Contrato da landing de produção validado.\n'
