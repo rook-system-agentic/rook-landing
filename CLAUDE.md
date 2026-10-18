@@ -20,7 +20,7 @@ Landing page / marketing site for Rook System (canonical `https://www.rook.com.b
 
 `work branch → homolog → main`. Open PRs with `--base homolog`. The `guard-main-source.yml` workflow rejects PRs to `main` unless they come from `homolog`, `hotfix/*`, or `revert-*`.
 
-- **Production** = k3s on the Hostinger VPS (namespace `rook-production`, pod `rook-lp`, `www.rook.com.br`), deployed by `deploy-production.yml` on push to `main` (build on the VPS runner, import into containerd, rollout with rollback, smoke). Since the 22/09/2026 cutover, Vercel is out: the project is paused and `vercel.json` sets `git.deploymentEnabled.main=false`. Manifests and secrets live in `k8s/production/` (see its README).
+- **Production** = Vercel project `rook-landing` (gru1, `www.rook.com.br`), deployed by the Vercel Git integration on push to `main`, since the ROO-1436 cutover of the production to São Paulo (this change is merged on its T-1d). Server env vars live in the Vercel project (set by `ops/roo-1436/p3-vercel.sh landing` in rook-system). The k3s path (namespace `rook-production`, pod `rook-lp`, manifests in `k8s/production/`) stays only for the return to k3s until T+14d: `deploy-production.yml` runs by `workflow_dispatch` only.
 - **Homolog** = k3s on a VPS, deployed by `deploy-homolog.yml` on push to `homolog`. The homolog image is **not promotable** to production: `NEXT_PUBLIC_*` values are baked into the browser bundle at build time and `NEXT_PUBLIC_ENV=homolog` disables tracking (`src/lib/tracking.ts`) and emits an `X-Robots-Tag: noindex` header (`next.config.mjs`). Code is promoted via branch, never via image.
 
 ## Architecture

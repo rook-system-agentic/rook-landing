@@ -7,7 +7,16 @@ name: Deploy — Produção (k3s Hostinger)
 # `rook-production`, ao lado das apps do rook-system. Este workflow é o ÚNICO
 # caminho de publicação lá e espelha o deploy-homolog.yml: build no runner
 # self-hosted da própria VPS, import no containerd, rollout com rollback e smoke
-# pelo ingress local. `vercel.json` desliga o deploy automático da Vercel na main.
+# pelo ingress local.
+#
+# ROO-1436 (produção gerenciada em São Paulo, 18/10/2026): a landing VOLTA para
+# a Vercel (projeto `rook-landing`, gru1) no corte da produção. Daqui em diante
+# a main publica pela integração Git da Vercel (`vercel.json` não desliga mais a
+# main) e este workflow sai do push: fica só por `workflow_dispatch`, para o
+# retorno ao k3s dentro de 14 dias do corte (runbook
+# docs/operations/production-cutover-sao-paulo.md do rook-system, P5 e T+14d).
+# Este PR é juntado no T-1d do corte, não antes: até lá a main ainda publica no
+# k3s, que é o que os clientes veem.
 #
 # ⚠️ A IMAGEM EMBUTE OS NEXT_PUBLIC_* DE PRODUÇÃO no bundle do browser: URL
 # canônica www.rook.com.br, Supabase de produção (supabase.rook.com.br) e a anon
@@ -15,8 +24,6 @@ name: Deploy — Produção (k3s Hostinger)
 # promove é código, pela branch `main`.
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

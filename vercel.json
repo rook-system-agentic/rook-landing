@@ -1,9 +1,5 @@
 {
-  "git": {
-    "deploymentEnabled": {
-      "main": false
-    }
-  },
+  "regions": ["gru1"],
   "crons": [
     {
       "path": "/api/content/cron/publish-scheduled",
