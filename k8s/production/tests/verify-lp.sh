@@ -111,7 +111,14 @@ grep -q -- '--fail-with-body' "$CRONJOB" || fail "cron sem --fail-with-body: o c
 if grep -q -- '--retry' "$CRONJOB"; then fail "cron com --retry: repetiria em 5xx/timeout e publicaria em dobro"; fi
 if grep -q '\$(CRON_SECRET)' "$CRONJOB"; then fail "CRON_SECRET via \$(...) no script do sh"; fi
 
-grep -q 'branches: \[main\]' "$WORKFLOW" || fail "workflow não publica a main"
+# ROO-1436: a main publica pela Vercel; o workflow do k3s fica só por dispatch
+# (retorno ao k3s até o T+14d do corte).
+python3 - "$WORKFLOW" <<'PY' || fail "workflow do k3s ainda publica a main (deve ser só workflow_dispatch)"
+import sys, yaml
+wf = yaml.safe_load(open(sys.argv[1]))
+on = wf.get("on", wf.get(True)) or {}
+sys.exit(0 if set(on) == {"workflow_dispatch"} else 1)
+PY
 grep -q 'group: deploy-production-lp' "$WORKFLOW" || fail "concorrência do deploy ausente"
 grep -q 'cancel-in-progress: false' "$WORKFLOW" || fail "deploy pode ser cancelado pela metade"
 grep -q 'secrets.PROD_SUPABASE_ANON_KEY' "$WORKFLOW" || fail "anon key de produção não é exigida"
@@ -187,7 +194,7 @@ if grep -qi 'vercel deploy\|vercel --prod\|lp-homolog\|rook-homolog' "$WORKFLOW"
   fail "workflow de produção referencia Vercel deploy ou homologação"
 fi
 
-python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if d.get("git",{}).get("deploymentEnabled",{}).get("main") is False else 1)' "$VERCEL_JSON" \
-  || fail "vercel.json não desliga o deploy automático da main"
+python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(1 if d.get("git",{}).get("deploymentEnabled",{}).get("main") is False else 0)' "$VERCEL_JSON" \
+  || fail "vercel.json ainda desliga o deploy automático da main (a produção é a Vercel desde o corte ROO-1436)"
 
 printf 'Contrato da landing de produção validado.\n'
