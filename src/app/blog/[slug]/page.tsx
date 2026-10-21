@@ -7,6 +7,7 @@ import DataSources from "@/components/blog/DataSources";
 import FaqSection from "@/components/blog/FaqSection";
 import MarkdownContent from "@/components/blog/MarkdownContent";
 import type { BlogPost } from "@/lib/blog-types";
+import { normalizeInternalCanonical } from "@/lib/indexability-policy.mjs";
 import {
   findPostBySlug,
   getAllPublishedPosts,
@@ -45,7 +46,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     return {};
   }
 
-  const canonical = post.canonicalUrl || postUrl(post);
+  const canonical = normalizeInternalCanonical(post.canonicalUrl, postUrl(post));
   const title = post.seoTitle || post.title;
   const description = post.seoDescription || post.excerpt;
   const image = post.coverImageUrl?.startsWith("http") ? post.coverImageUrl : `${siteUrl}${post.coverImageUrl || "/og-image-default.png"}`;
@@ -107,7 +108,7 @@ function ArtigoIndisponivel() {
 
 function jsonLd(post: BlogPost | null) {
   if (!post) return [];
-  const url = post.canonicalUrl || postUrl(post);
+  const url = normalizeInternalCanonical(post.canonicalUrl, postUrl(post));
   const image = post.coverImageUrl?.startsWith("http") ? post.coverImageUrl : `${siteUrl}${post.coverImageUrl || "/og-image-default.png"}`;
 
   const article = {
