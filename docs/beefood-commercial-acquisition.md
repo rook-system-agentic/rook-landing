@@ -71,8 +71,23 @@ no commit `a2522499c9411340db4bb2b19fcbd2862bbd778f`.
 A promoção isolada usa `hotfix/beefood-commercial-form`, baseada na `main`,
 com somente os dois commits de CORS já integrados em homologação e esta nota
 de estado. O `Base Guard` permite `hotfix/*`; esta seleção evita levar as
-mudanças pendentes de SEO da ROO-1557. A promoção aguarda comprovação de
-GET/OPTIONS em homologação para as origens nativa, parceira e não autorizada.
+mudanças pendentes de SEO da ROO-1557.
+
+A comprovação real de GET/OPTIONS em homologação foi concluída em
+23/10/2026, após o deploy do commit `a2522499c9411340db4bb2b19fcbd2862bbd778f`
+às 16:41 UTC, sem enviar POST nem criar cadastros:
+
+- GET com origem parceira: `200`, desafio e `Access-Control-Allow-Origin`
+  exatamente igual à origem da LP.
+- GET com origem nativa `https://lp-homolog.rooksystem.com.br`: `200`, desafio
+  e `Access-Control-Allow-Origin` exatamente igual à origem nativa.
+- GET com origem inválida: `403`, sem `Access-Control-Allow-Origin`.
+- OPTIONS da parceira para POST e Content-Type: `204`, origem exata e sem
+  `Access-Control-Allow-Credentials`.
+- OPTIONS com origem inválida ou header Authorization: `403`.
+
+Essa comprovação confirma CORS e emissão do desafio; não é evidência de
+recebimento de um cadastro real no CRM.
 
 O merge para `homolog` dispara sua publicação; a `main` publica a produção
 pela Vercel. Testes locais e um PR de promoção em rascunho não provam publicação
