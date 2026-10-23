@@ -3,11 +3,13 @@ const PARTNER_ORIGINS = new Set([
   'https://rook-beefood-parceria-20261023.gabriel-abdala.chatgpt.site',
 ]);
 
-export function acquisitionCorsPolicy(origin, requestOrigin) {
+export function acquisitionCorsPolicy(origin, requestOrigin, siteOrigin) {
   const headers = { 'Cache-Control': 'no-store', Vary: 'Origin' };
   // Chamadas sem Origin continuam sujeitas à proteção pública já existente.
   if (origin === null) return { allowed: true, headers };
-  if (origin !== requestOrigin && !PARTNER_ORIGINS.has(origin)) return { allowed: false, headers };
+  // No k3s, a URL do request pode usar HTTP/host interno. A origem pública
+  // vem da configuração existente do site, nunca de headers encaminhados.
+  if (origin !== requestOrigin && origin !== siteOrigin && !PARTNER_ORIGINS.has(origin)) return { allowed: false, headers };
   return { allowed: true, headers: {
     ...headers,
     'Access-Control-Allow-Origin': origin,
@@ -15,8 +17,8 @@ export function acquisitionCorsPolicy(origin, requestOrigin) {
   } };
 }
 
-export function acquisitionPreflightPolicy(origin, requestOrigin, method, requestedHeaders) {
-  const policy = acquisitionCorsPolicy(origin, requestOrigin);
+export function acquisitionPreflightPolicy(origin, requestOrigin, siteOrigin, method, requestedHeaders) {
+  const policy = acquisitionCorsPolicy(origin, requestOrigin, siteOrigin);
   const names = requestedHeaders ? requestedHeaders.split(',').map(name => name.trim().toLowerCase()) : [];
   if (origin === null || !policy.allowed || !['GET', 'POST'].includes(method)
     || names.some(name => name !== 'content-type')) {

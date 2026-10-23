@@ -26,7 +26,7 @@ const request = (token, extra = {}) => new Request('http://localhost/api/acquisi
   method: 'POST', headers: { 'content-type': 'application/json' },
   body: JSON.stringify({ ...lead, ...extra, antiBot: { token, solution: '0' } }),
 });
-function loadRoute({ gate = async () => ({ allowed: true }), create = async () => {}, env = {}, issueChallenge = () => ({ token: 'test-only', difficulty: 3, expiresInSeconds: 600 }) } = {}) {
+function loadRoute({ gate = async () => ({ allowed: true }), create = async () => {}, env = {}, siteOrigin = 'https://www.rook.com.br', issueChallenge = () => ({ token: 'test-only', difficulty: 3, expiresInSeconds: 600 }) } = {}) {
   const calls = { challenge: [], gate: [], clients: 0, clientOptions: [], crm: [], network: 0 };
   const store=memoryLedger();
   const dependencies = {
@@ -34,6 +34,7 @@ function loadRoute({ gate = async () => ({ allowed: true }), create = async () =
     '@/data/municipalities.json': cities,
     '@/lib/acquisition.mjs': { validateAcquisition },
     '@/lib/acquisition-cors.mjs': cors,
+    '@/lib/site-origin': { SITE_ORIGIN: siteOrigin },
     '@/lib/acquisition-ledger.mjs':ledger,
     '@/lib/supabase-admin':{isSupabaseAdminConfigured:()=>true,supabaseAdminRequest:store.request},
     '@/lib/asaflow-acquisition.mjs': {
@@ -270,6 +271,34 @@ test('origem própria e chamadas sem Origin continuam usando a proteção existe
     assert.equal(calls.gate.length, 1);
     assert.equal(calls.crm.length, 1);
   }
+});
+
+test('origem pública configurada permanece nativa quando o proxy usa URL interna HTTP', async () => {
+  for (const siteOrigin of ['https://www.rook.com.br', 'https://lp-homolog.rooksystem.com.br']) {
+    const route = loadRoute({ siteOrigin });
+    const internalUrl = 'http://rook-lp:3000/api/acquisition/';
+    const response = await route.get(new Request(internalUrl, { headers: { origin: siteOrigin } }));
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('access-control-allow-origin'), siteOrigin);
+    const preflight = await route.options(new Request(internalUrl, { method: 'OPTIONS', headers: {
+      origin: siteOrigin, 'access-control-request-method': 'POST', 'access-control-request-headers': 'Content-Type',
+    } }));
+    assert.equal(preflight.status, 204);
+    assert.equal(preflight.headers.get('access-control-allow-origin'), siteOrigin);
+    assert.equal(route.calls.challenge.length, 1);
+    assert.equal(route.calls.gate.length, 0);
+    assert.equal(route.calls.crm.length, 0);
+  }
+});
+
+test('headers encaminhados não autorizam outra origem quando a URL usa host interno', async () => {
+  const route = loadRoute({ siteOrigin: 'https://lp-homolog.rooksystem.com.br' });
+  const response = await route.get(new Request('http://rook-lp:3000/api/acquisition/', { headers: {
+    origin: 'https://untrusted.invalid', 'x-forwarded-host': 'untrusted.invalid', 'x-forwarded-proto': 'https',
+  } }));
+  assert.equal(response.status, 403);
+  assert.equal(response.headers.get('access-control-allow-origin'), null);
+  assertNoEffects(route.calls);
 });
 
 test('sucesso do cadastro parceiro depende do ledger e CRM e preserva atribuição BeeFood', async () => {
