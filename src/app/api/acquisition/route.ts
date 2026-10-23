@@ -1,6 +1,7 @@
 import {NextRequest,NextResponse} from 'next/server';
 import cities from '@/data/municipalities.json';
 import {validateAcquisition} from '@/lib/acquisition.mjs';
+import {acquisitionCorsPolicy,acquisitionPreflightPolicy} from '@/lib/acquisition-cors.mjs';
 import {createAsaflowAcquisition} from '@/lib/asaflow-acquisition.mjs';
 import {AcquisitionPersistenceError,createAcquisitionLedger} from '@/lib/acquisition-ledger.mjs';
 import {isSupabaseAdminConfigured,supabaseAdminRequest} from '@/lib/supabase-admin';
@@ -8,15 +9,23 @@ import {CommercialLeadAbuseProtectionError,consumeCommercialLeadAbuseGate,isComm
 
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
-const headers={'Cache-Control':'no-store'};
-const unavailable=()=>NextResponse.json({error:'O cadastro está temporariamente indisponível. Seus dados continuam nesta página; tente novamente mais tarde.'},{status:503,headers});
+const unavailable=(headers:Record<string,string>)=>NextResponse.json({error:'O cadastro está temporariamente indisponível. Seus dados continuam nesta página; tente novamente mais tarde.'},{status:503,headers});
+const forbidden=(headers:Record<string,string>)=>NextResponse.json({error:'Origem ou pré-verificação não permitida.'},{status:403,headers});
 function configured(){return process.env.ASAFLOW_ACQUISITION_ENABLED==='true' && !!process.env.ASAFLOW_ACQUISITION_API_KEY && !!process.env.ASAFLOW_ACQUISITION_PIPELINE_ID && !!process.env.ASAFLOW_ACQUISITION_STAGE_ID && isCommercialLeadAbuseProtectionConfigured() && isSupabaseAdminConfigured();}
+export async function OPTIONS(request:NextRequest){
+  const policy=acquisitionPreflightPolicy(request.headers.get('origin'),new URL(request.url).origin,request.headers.get('access-control-request-method'),request.headers.get('access-control-request-headers'));
+  return policy.allowed ? new NextResponse(null,{status:204,headers:policy.headers}) : forbidden(policy.headers);
+}
 export async function GET(request:NextRequest){
-  if(!configured()) return unavailable();
-  try{return NextResponse.json(issueCommercialLeadChallenge(request.headers),{headers});}catch{return unavailable();}
+  const {allowed,headers}=acquisitionCorsPolicy(request.headers.get('origin'),new URL(request.url).origin);
+  if(!allowed) return forbidden(headers);
+  if(!configured()) return unavailable(headers);
+  try{return NextResponse.json(issueCommercialLeadChallenge(request.headers),{headers});}catch{return unavailable(headers);}
 }
 export async function POST(request:NextRequest){
-  if(!configured()) return unavailable();
+  const {allowed,headers}=acquisitionCorsPolicy(request.headers.get('origin'),new URL(request.url).origin);
+  if(!allowed) return forbidden(headers);
+  if(!configured()) return unavailable(headers);
   if(Number(request.headers.get('content-length'))>16384) return NextResponse.json({error:'Dados excedem o limite.'},{status:413,headers});
   const raw=await request.text();
   if(Buffer.byteLength(raw)>16384) return NextResponse.json({error:'Dados excedem o limite.'},{status:413,headers});
@@ -40,6 +49,6 @@ export async function POST(request:NextRequest){
     if(error instanceof AcquisitionPersistenceError && error.code==='needs_reconciliation') return NextResponse.json({error:'Seus dados foram registrados, mas a confirmação precisa ser conferida pela equipe.'},{status:503,headers});
     if(error instanceof CommercialLeadAbuseProtectionError && error.code==='invalid_challenge') return NextResponse.json({error:'A verificação expirou. Tente novamente.'},{status:400,headers});
     console.error('[acquisition] Integração indisponível.');
-    return unavailable();
+    return unavailable(headers);
   }
 }

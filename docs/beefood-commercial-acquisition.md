@@ -1,0 +1,69 @@
+# Cadastro comercial da parceria BeeFood
+
+A LP externa pode usar seu próprio formulário e chamar diretamente o cadastro
+comercial do site Rook. O CORS de `/api/acquisition/` autoriza somente a origem
+`https://rook-beefood-parceria-20261023.gabriel-abdala.chatgpt.site`, além da
+própria origem do endpoint. Não há liberação global nem uso de cookies ou
+credenciais de CRM no navegador. Chamadas sem `Origin` continuam seguindo o
+contrato público anterior; CORS não é autenticação.
+
+## Contrato do navegador
+
+1. Conservar um `submissionId` UUID v4 e os mesmos dados durante uma tentativa.
+2. Fazer `GET https://www.rook.com.br/api/acquisition/` com `credentials: 'omit'`
+   e `cache: 'no-store'` para obter `token`, `difficulty` e `expiresInSeconds`.
+3. Resolver a prova no navegador com `solveCommercialLeadChallenge`, usando o
+   mesmo algoritmo de `src/lib/commercial-lead-challenge-client.mjs`.
+4. Fazer `POST` JSON para a mesma URL, com `credentials: 'omit'`, os campos
+   validados pelo cadastro e `antiBot: {token, solution}`. Não usar um proxy:
+   o desafio continua vinculado ao IP observado no GET e no POST.
+5. Mostrar confirmação somente para HTTP `201` e `{success: true}`. Após uma
+   falha, buscar outra prova e repetir o mesmo UUID e dados; não criar outra
+   solicitação automaticamente.
+
+Campos obrigatórios: `name`, `company`, `email`, `phone`, `cityId` (IBGE da lista
+oficial), `segment`, `revenueBand`, `usesErp` (`yes` ou `no`), `consent: true` e
+`submissionId`. `segment: 'other'` exige `segmentOther`; `usesErp: 'yes'` exige
+`erp`, e `erp: 'other'` exige `erpOther`. Para BeeFood, pode-se usar
+`erp: 'other', erpOther: 'BeeFood'` quando o visitante confirmar esse sistema.
+Uma solicitação comercial usa `intent: 'demo'`, sem campos de simulação.
+
+As fontes de seleção são `culinary-segments.mjs`, `acquisition-input.mjs` e
+`src/data/municipalities.json`. O consentimento é “Quero receber contato da
+equipe sobre o Rook, conforme a Política de Privacidade.”, com link para
+`https://www.rook.com.br/privacidade/`.
+
+A atribuição aceita `utm_source: 'beefood'`, `utm_medium: 'parceria'` e
+`utm_campaign: 'rook-beefood'`; usar `capturePath: '/'` e
+`attribution.landing_path: '/'` para a raiz da LP. A atribuição é autodeclarada
+e normalizada pelo servidor; não é prova de identidade da parceria.
+
+## Respostas e limites preservados
+
+- `400`: JSON, prova inválida/expirada ou nonce já consumido; renovar a prova.
+- `403`: origem ou pré-verificação não permitida.
+- `409`: UUID já registrado com outros dados; retomar os dados originais.
+- `413`: corpo acima de 16 KiB.
+- `422`: campos inválidos, com `fieldErrors`.
+- `429`: limite de IP/identidade, respeitando `Retry-After` exposto ao navegador.
+- `503`: configuração, fornecedor, espera de confirmação ou reconciliação;
+  não equivale a sucesso. `Retry-After` pode estar presente.
+
+O limite distribuído continua em 20 por IP e 5 por identidade a cada 15 minutos.
+A prova tem dificuldade 3, duração de 10 minutos e consumo único. O ledger,
+deduplicação de contato, idempotência e confirmação de vínculo no Asaflow não
+foram alterados. Uma origem com outro domínio, subdomínio, protocolo ou porta
+não herda a permissão; um novo endereço da LP exige revisão da allowlist.
+
+## Verificação e publicação
+
+Os testes executam a rota real com transportes substituídos: pré-verificação e
+origens negadas não criam desafio nem alcançam CRM; erros preservam CORS; uma
+prova real rejeita outro IP e replay. Não há criação de leads na rede.
+
+Executar `pnpm exec tsc --noEmit`, `pnpm test:ci` e
+`bash k8s/production/tests/verify-lp.sh`. Entregar por branch de trabalho →
+`homolog` → `main`, conforme `CLAUDE.md`. O merge para `homolog` dispara sua
+publicação; a `main` publica a produção pela Vercel. O PR em rascunho, os testes
+locais e o CORS preparado não provam publicação nem recebimento de um cadastro
+real no CRM. Não promover outras mudanças pendentes junto com esta correção.
