@@ -63,8 +63,18 @@ origens negadas não criam desafio nem alcançam CRM; erros preservam CORS; uma
 prova real rejeita outro IP e replay. Não há criação de leads na rede.
 
 Executar `pnpm exec tsc --noEmit`, `pnpm test:ci` e
-`bash k8s/production/tests/verify-lp.sh`. Entregar por branch de trabalho →
-`homolog` → `main`, conforme `CLAUDE.md`. O merge para `homolog` dispara sua
-publicação; a `main` publica a produção pela Vercel. O PR em rascunho, os testes
-locais e o CORS preparado não provam publicação nem recebimento de um cadastro
-real no CRM. Não promover outras mudanças pendentes junto com esta correção.
+`bash k8s/production/tests/verify-lp.sh`. O fluxo normal é branch de trabalho →
+`homolog` → `main`, conforme `CLAUDE.md`. O código deste contrato foi integrado
+em `homolog` pelo [PR #176](https://github.com/rook-system-agentic/rook-landing/pull/176),
+no commit `a2522499c9411340db4bb2b19fcbd2862bbd778f`.
+
+A promoção isolada usa `hotfix/beefood-commercial-form`, baseada na `main`,
+com somente os dois commits de CORS já integrados em homologação e esta nota
+de estado. O `Base Guard` permite `hotfix/*`; esta seleção evita levar as
+mudanças pendentes de SEO da ROO-1557. A promoção aguarda comprovação de
+GET/OPTIONS em homologação para as origens nativa, parceira e não autorizada.
+
+O merge para `homolog` dispara sua publicação; a `main` publica a produção
+pela Vercel. Testes locais e um PR de promoção em rascunho não provam publicação
+nem recebimento de um cadastro real no CRM. Não promover outras mudanças,
+credenciais ou flags junto com esta correção.
