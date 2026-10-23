@@ -1,6 +1,7 @@
 /** CORS somente do cadastro público. Não substitui desafio, limites ou ledger. */
 const PARTNER_ORIGINS = new Set([
   'https://rook-beefood-parceria-20261023.gabriel-abdala.chatgpt.site',
+  'https://beefood.rook.com.br',
 ]);
 
 export function acquisitionCorsPolicy(origin, requestOrigin, siteOrigin) {
