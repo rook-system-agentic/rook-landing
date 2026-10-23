@@ -3,7 +3,8 @@
 A LP externa pode usar seu próprio formulário e chamar diretamente o cadastro
 comercial do site Rook. O CORS de `/api/acquisition/` autoriza somente a origem
 `https://rook-beefood-parceria-20261023.gabriel-abdala.chatgpt.site`, além da
-própria origem do endpoint. Não há liberação global nem uso de cookies ou
+própria origem do endpoint e da origem pública em `SITE_ORIGIN` (para proxies
+com HTTP/host interno). Não há liberação global nem uso de cookies ou
 credenciais de CRM no navegador. Chamadas sem `Origin` continuam seguindo o
 contrato público anterior; CORS não é autenticação.
 

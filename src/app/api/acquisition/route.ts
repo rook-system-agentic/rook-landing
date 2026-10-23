@@ -2,6 +2,7 @@ import {NextRequest,NextResponse} from 'next/server';
 import cities from '@/data/municipalities.json';
 import {validateAcquisition} from '@/lib/acquisition.mjs';
 import {acquisitionCorsPolicy,acquisitionPreflightPolicy} from '@/lib/acquisition-cors.mjs';
+import {SITE_ORIGIN} from '@/lib/site-origin';
 import {createAsaflowAcquisition} from '@/lib/asaflow-acquisition.mjs';
 import {AcquisitionPersistenceError,createAcquisitionLedger} from '@/lib/acquisition-ledger.mjs';
 import {isSupabaseAdminConfigured,supabaseAdminRequest} from '@/lib/supabase-admin';
@@ -13,17 +14,17 @@ const unavailable=(headers:Record<string,string>)=>NextResponse.json({error:'O c
 const forbidden=(headers:Record<string,string>)=>NextResponse.json({error:'Origem ou pré-verificação não permitida.'},{status:403,headers});
 function configured(){return process.env.ASAFLOW_ACQUISITION_ENABLED==='true' && !!process.env.ASAFLOW_ACQUISITION_API_KEY && !!process.env.ASAFLOW_ACQUISITION_PIPELINE_ID && !!process.env.ASAFLOW_ACQUISITION_STAGE_ID && isCommercialLeadAbuseProtectionConfigured() && isSupabaseAdminConfigured();}
 export async function OPTIONS(request:NextRequest){
-  const policy=acquisitionPreflightPolicy(request.headers.get('origin'),new URL(request.url).origin,request.headers.get('access-control-request-method'),request.headers.get('access-control-request-headers'));
+  const policy=acquisitionPreflightPolicy(request.headers.get('origin'),new URL(request.url).origin,SITE_ORIGIN,request.headers.get('access-control-request-method'),request.headers.get('access-control-request-headers'));
   return policy.allowed ? new NextResponse(null,{status:204,headers:policy.headers}) : forbidden(policy.headers);
 }
 export async function GET(request:NextRequest){
-  const {allowed,headers}=acquisitionCorsPolicy(request.headers.get('origin'),new URL(request.url).origin);
+  const {allowed,headers}=acquisitionCorsPolicy(request.headers.get('origin'),new URL(request.url).origin,SITE_ORIGIN);
   if(!allowed) return forbidden(headers);
   if(!configured()) return unavailable(headers);
   try{return NextResponse.json(issueCommercialLeadChallenge(request.headers),{headers});}catch{return unavailable(headers);}
 }
 export async function POST(request:NextRequest){
-  const {allowed,headers}=acquisitionCorsPolicy(request.headers.get('origin'),new URL(request.url).origin);
+  const {allowed,headers}=acquisitionCorsPolicy(request.headers.get('origin'),new URL(request.url).origin,SITE_ORIGIN);
   if(!allowed) return forbidden(headers);
   if(!configured()) return unavailable(headers);
   if(Number(request.headers.get('content-length'))>16384) return NextResponse.json({error:'Dados excedem o limite.'},{status:413,headers});
