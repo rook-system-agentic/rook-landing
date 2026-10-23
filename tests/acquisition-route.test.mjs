@@ -166,6 +166,7 @@ test('desafio expirado ou inválido segue 400 e não cria cliente CRM', async ()
 });
 
 const PARTNER_ORIGIN = 'https://rook-beefood-parceria-20261023.gabriel-abdala.chatgpt.site';
+const CUSTOM_PARTNER_ORIGIN = 'https://beefood.rook.com.br';
 const API_URL = 'https://www.rook.com.br/api/acquisition/';
 function browserRequest(method, { origin = PARTNER_ORIGIN, headers = {}, body } = {}) {
   return new Request(API_URL, { method,
@@ -177,8 +178,8 @@ function browserPost(extra = {}, options = {}) {
   return browserRequest('POST', { headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ ...lead, ...extra, antiBot: { token: 'fresh-proof', solution: '0' } }), ...options });
 }
-function assertCors(response) {
-  assert.equal(response.headers.get('access-control-allow-origin'), PARTNER_ORIGIN);
+function assertCors(response, origin = PARTNER_ORIGIN) {
+  assert.equal(response.headers.get('access-control-allow-origin'), origin);
   assert.equal(response.headers.get('access-control-expose-headers'), 'Retry-After');
   assert.equal(response.headers.get('access-control-allow-credentials'), null);
   assert.equal(response.headers.get('cache-control'), 'no-store');
@@ -214,7 +215,10 @@ test('pré-verificação aprova somente os métodos e headers do cadastro, sem d
 test('origem não autorizada falha antes de desafio, validação e CRM em GET, POST e OPTIONS', async () => {
   for (const origin of ['null', 'https://untrusted.invalid', `${PARTNER_ORIGIN}/`,
     `${PARTNER_ORIGIN}.untrusted.invalid`, PARTNER_ORIGIN.replace('https:', 'http:'),
-    'https://other.gabriel-abdala.chatgpt.site', `${PARTNER_ORIGIN}, https://untrusted.invalid`]) {
+    'https://other.gabriel-abdala.chatgpt.site', `${PARTNER_ORIGIN}, https://untrusted.invalid`,
+    `${CUSTOM_PARTNER_ORIGIN}/`, `${CUSTOM_PARTNER_ORIGIN}.untrusted.invalid`,
+    CUSTOM_PARTNER_ORIGIN.replace('https:', 'http:'), `${CUSTOM_PARTNER_ORIGIN}:8443`,
+    'https://other.rook.com.br', `https://www.beefood.rook.com.br`]) {
     for (const handler of ['get', 'post', 'options']) {
       const route = loadRoute();
       const response = await route[handler](browserRequest(handler.toUpperCase(), { origin,
@@ -228,6 +232,38 @@ test('origem não autorizada falha antes de desafio, validação e CRM em GET, P
       assertNoEffects(route.calls);
     }
   }
+});
+
+test('domínio próprio da parceria recebe CORS exato sem dispensar as proteções do cadastro', async () => {
+  for (const method of ['GET', 'POST']) {
+    const { options, calls } = loadRoute({ env: { ASAFLOW_ACQUISITION_ENABLED: 'false' } });
+    const response = await options(browserRequest('OPTIONS', { origin: CUSTOM_PARTNER_ORIGIN, headers: {
+      'access-control-request-method': method, 'access-control-request-headers': 'Content-Type',
+    } }));
+    assert.equal(response.status, 204);
+    assert.equal(await response.text(), '');
+    assertCors(response, CUSTOM_PARTNER_ORIGIN);
+    assert.equal(response.headers.get('access-control-allow-methods'), 'GET, POST, OPTIONS');
+    assert.equal(response.headers.get('access-control-allow-headers'), 'Content-Type');
+    assertNoEffects(calls);
+  }
+
+  const challenge = { token: 'test-proof', difficulty: 3, expiresInSeconds: 600 };
+  const { get, post, calls } = loadRoute({ issueChallenge: () => challenge });
+  const response = await get(browserRequest('GET', { origin: CUSTOM_PARTNER_ORIGIN }));
+  assert.equal(response.status, 200);
+  assertCors(response, CUSTOM_PARTNER_ORIGIN);
+  assert.deepEqual(await response.json(), challenge);
+  assert.equal(calls.challenge.length, 1);
+
+  const invalid = await post(browserRequest('POST', { origin: CUSTOM_PARTNER_ORIGIN,
+    headers: { 'content-type': 'application/json' }, body: 'invalid-json' }));
+  assert.equal(invalid.status, 400);
+  assertCors(invalid, CUSTOM_PARTNER_ORIGIN);
+  assert.equal(calls.gate.length, 0);
+  assert.equal(calls.clients, 0);
+  assert.equal(calls.crm.length, 0);
+  assert.equal(calls.network, 0);
 });
 
 test('pré-verificação recusa métodos, headers extras e origem ausente sem efeitos', async () => {
