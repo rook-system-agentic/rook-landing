@@ -38,6 +38,17 @@ domínio `lp-homolog.rooksystem.com.br` está ligado à branch `homolog`
 desejado: o cron do `vercel.json` (`publish-scheduled`) só roda em deploy de
 produção, e por isso não roda aqui. A homologação não publica nada sozinha.
 
+**Sem a tela de login da Vercel (decisão do João, 24/10/2026).** A proteção
+padrão (*Standard Protection*, `all_except_custom_domains`) só libera domínio
+próprio de deploy de produção; num deploy de preview, até o
+`lp-homolog.rooksystem.com.br` caía na tela de login da Vercel. Por isso a
+*Vercel Authentication* está desligada neste projeto. Não expõe nada novo: o
+conteúdo é o mesmo do site público, sem dado de cliente, e o k3s também
+servia a homologação aberta. Quem precisa conferir uma mudança (ou um parceiro,
+como a BeeFood) abre o link sem conta na Vercel; o `noindex` continua tirando o
+endereço das buscas. Religar a proteção exige antes mudar a branch de produção
+do projeto para `homolog` (e desligar o Cron Jobs no painel).
+
 **Variáveis (Production e Preview, mesmo valor):**
 
 | Variável | Valor | Por quê |
