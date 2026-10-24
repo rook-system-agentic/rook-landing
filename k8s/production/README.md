@@ -1,8 +1,8 @@
 # Landing de produção na Hostinger
 
 Este diretório descreve o site `rook-landing` servido em `https://www.rook.com.br`
-pelo k3s da Hostinger, no namespace `rook-production`. A homologação em
-`rook-homolog` permanece separada.
+pelo k3s da Hostinger, no namespace `rook-production`. A homologação saiu do
+k3s em 24/10/2026 e roda na Vercel (`docs/homologacao-vercel.md`).
 
 ## Fase de corte (21/09/2026)
 
