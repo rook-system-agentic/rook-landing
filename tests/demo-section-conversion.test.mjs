@@ -22,7 +22,7 @@ const demoCode = compile('../src/components/acquisition/DemoSection.tsx');
 const trackCode = compile('../src/lib/track.ts');
 const trackingCode = compile('../src/lib/tracking.ts');
 const profile = { name: 'Pessoa Teste', company: 'Casa Teste', phone: '11999999999',
-  email: 'teste@example.invalid', segment: 'pizzaria', revenueBand: 'up_to_100k' };
+  email: 'teste@example.invalid', segment: 'pizzaria', revenueBand: '50k_to_100k' };
 const plain = value => JSON.parse(JSON.stringify(value));
 
 // Executa o componente e sua porta track reais. Somente transporte, hooks e

@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto';
-import {ERP_SYSTEMS,REVENUE_BANDS,normalizePhone} from './acquisition.mjs';
+import {ERP_SYSTEMS,REVENUE_BAND_PLAN_LABELS,normalizePhone,revenueBandInfo} from './acquisition.mjs';
 import {segmentoPorSlug} from './cmv-benchmarks.mjs';
 import {appendLeadAttribution,LEAD_DESCRIPTION_MAX_LENGTH,normalizeLeadAttribution} from './lead-attribution.mjs';
 import {financialReferenceLabel} from './financial-reference.mjs';
@@ -50,10 +50,13 @@ export function buildContactProperties(lead) {
   if(cleanProperty(lead.city?.uf || lead.taxState)) properties.uf=lead.city?.uf || lead.taxState;
   if(lead.segment) properties.segmento=ASAFLOW_SEGMENTS[lead.segment]||'Outro';
   if(lead.segment==='other' && cleanProperty(lead.segmentOther,100)) properties.segmento_outros=cleanProperty(lead.segmentOther,100);
-  const revenueBand=REVENUE_BANDS.find(item=>item.value===lead.revenueBand)?.label;
+  const revenueBand=revenueBandInfo(lead.revenueBand);
   if(revenueBand) {
-    properties.faixa_faturamento=revenueBand;
-    properties.faturamento_informado_formulario=revenueBand;
+    properties.faixa_faturamento=revenueBand.label;
+    properties.faturamento_informado_formulario=revenueBand.label;
+    // Propriedades só vão para contato novo (o existente não é alterado), então
+    // a indicação pela faixa não sobrescreve um plano marcado pelo comercial.
+    if(revenueBand.plan) properties.plano_sugerido=REVENUE_BAND_PLAN_LABELS[revenueBand.plan];
   }
   if(lead.usesErp) properties.sistema_atual=ERP_SYSTEMS.includes(lead.erp)?lead.erp:cleanProperty(lead.erpOther,100);
   return properties;
@@ -88,7 +91,8 @@ export function buildLeadDescription(lead,{environment}={}) {
     `WhatsApp: ${lead.phone}`,`E-mail: ${lead.email}`,
     ...(lead.city ? [`Cidade/UF: ${lead.city.name}/${lead.city.uf} (IBGE ${lead.city.id})`] : lead.taxState ? [`UF informada para a estimativa: ${lead.taxState}`] : []),
     ...(lead.segment ? [`Segmento: ${segmentoPorSlug(lead.segment)?.name || lead.segmentOther || 'Outro'}`] : []),
-    ...(lead.revenueBand ? [`Faturamento bruto mensal: ${REVENUE_BANDS.find(b=>b.value===lead.revenueBand)?.label}`] : []),
+    ...(lead.revenueBand ? [`Faturamento bruto mensal: ${revenueBandInfo(lead.revenueBand)?.label}`] : []),
+    ...(revenueBandInfo(lead.revenueBand)?.plan ? [`Plano indicado pela faixa: ${REVENUE_BAND_PLAN_LABELS[revenueBandInfo(lead.revenueBand).plan]}`] : []),
     ...(typeof lead.usesErp==='boolean' ? [`ERP/PDV: ${lead.usesErp ? (ERP_SYSTEMS.includes(lead.erp)?lead.erp:lead.erpOther) : 'Não utiliza'}`] : []),
     `Intenção: ${lead.intent}`,
     ...(financialTool ? [`Análise solicitada: ${lead.intent==='cmv'?'CMV':'Ponto de equilíbrio'}`, 'Demonstração solicitada: não'] : []),

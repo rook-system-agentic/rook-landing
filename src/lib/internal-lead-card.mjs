@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto';
-import {ERP_SYSTEMS, REVENUE_BANDS} from './acquisition.mjs';
+import {ERP_SYSTEMS, REVENUE_BAND_PLAN_LABELS, revenueBandInfo} from './acquisition.mjs';
 import {segmentoPorSlug} from './cmv-benchmarks.mjs';
 import {calculateFinancialSimulation} from './financial-simulation.mjs';
 import {validateFinancialReference, financialReferenceLabel} from './financial-reference.mjs';
@@ -25,7 +25,8 @@ export function buildInternalLeadCard({lead, receipt} = {}) {
     throw new Error('invalid_lead_receipt');
   }
   const segment = segmentoPorSlug(lead.segment)?.name || (lead.segment === 'other' ? line(lead.segmentOther, 100) : '');
-  const revenueBand = REVENUE_BANDS.find(b => b.value === lead.revenueBand)?.label;
+  const band = revenueBandInfo(lead.revenueBand);
+  const revenueBand = band?.label;
   const erp = lead.usesErp === false ? 'Não utiliza'
     : lead.usesErp === true ? (ERP_SYSTEMS.includes(lead.erp) ? lead.erp : lead.erp === 'other' ? line(lead.erpOther, 100) : '') : '';
   if (![lead.name, lead.company, lead.email, lead.phone, lead.city?.name, lead.city?.uf].every(v => line(v)) ||
@@ -42,6 +43,7 @@ export function buildInternalLeadCard({lead, receipt} = {}) {
     `Cidade/UF: ${line(lead.city.name, 120)}/${lead.city.uf} • IBGE ${lead.city.id}`,
     `Segmento: ${line(segment, 100)}`,
     `Faturamento bruto mensal: ${revenueBand}`,
+    ...(band.plan ? [`Plano indicado pela faixa: ${REVENUE_BAND_PLAN_LABELS[band.plan]}`] : []),
     `ERP/PDV: ${erp}`,
     `Intenção: ${intents[lead.intent]}`,
     'Contato comercial solicitado: sim',
