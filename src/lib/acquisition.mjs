@@ -1,8 +1,8 @@
 import { segmentsData } from './cmv-benchmarks.mjs';
 import { calculateFinancialSimulation } from './financial-simulation.mjs';
 import { parseBrazilianNumber } from './financial-number.mjs';
-import { ERP_SYSTEMS, REVENUE_BANDS, normalizePhone } from './acquisition-input.mjs';
-export { ERP_SYSTEMS, REVENUE_BANDS, normalizeSearch, normalizePhone, searchMunicipalities, deriveRevenueBand, buildSimulationInput } from './acquisition-input.mjs';
+import { ERP_SYSTEMS, normalizePhone, revenueBandInfo } from './acquisition-input.mjs';
+export { ERP_SYSTEMS, REVENUE_BANDS, LEGACY_REVENUE_BANDS, REVENUE_BAND_PLAN_LABELS, revenueBandInfo, normalizeSearch, normalizePhone, searchMunicipalities, deriveRevenueBand, buildSimulationInput } from './acquisition-input.mjs';
 import { normalizeLeadAttribution } from './lead-attribution.mjs';
 import { CMV_TAX_MODEL_VERSION, TAX_STATES } from './cmv-tax-estimate.mjs';
 import { validateFinancialReference, financialReferenceLabel } from './financial-reference.mjs';
@@ -23,7 +23,8 @@ export function validateAcquisition(candidate,cities) {
   if(!segmentsData.some(s=>s.slug===segment) && segment!=='other') errors.segment='Selecione o segmento.';
   if(segment==='other' && segmentOther.length<2) errors.segmentOther='Informe o segmento.';
   const revenueBand=text('revenueBand',40);
-  if(!REVENUE_BANDS.some(b=>b.value===revenueBand)) errors.revenueBand='Selecione a faixa de faturamento bruto.';
+  // Aceita também os valores anteriores (LEGACY_REVENUE_BANDS); o formulário só exibe os atuais.
+  if(!revenueBandInfo(revenueBand)) errors.revenueBand='Selecione a faixa de faturamento bruto.';
   const usesErp=text('usesErp',3),erp=text('erp',60),erpOther=text('erpOther',100);
   if(!['yes','no'].includes(usesErp)) errors.usesErp='Informe se utiliza ERP ou PDV.';
   if(usesErp==='yes' && !ERP_SYSTEMS.includes(erp) && erp!=='other') errors.erp='Selecione o sistema.';
