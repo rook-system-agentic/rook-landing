@@ -22,7 +22,7 @@ test('captação canônica usa apenas cadastro, números recalculados e qualific
   assert.equal(lead.commercialContactRequested, false);
   assert.equal(lead.segment, 'hamburgueria');
   assert.equal(lead.taxState, 'SP');
-  assert.equal(lead.revenueBand, 'up_to_100k');
+  assert.equal(lead.revenueBand, '50k_to_100k');
   assert.equal(lead.simulation.result.estimatedTaxAmount, 8825);
   assert.notEqual(lead.simulation.summary, 'Lucro garantido');
   for (const field of ['company', 'city', 'usesErp', 'erp', 'erpOther', 'consent', 'antiBot']) assert.equal(Object.hasOwn(lead, field), false, field);
@@ -74,7 +74,7 @@ test('ponto de equilíbrio não inventa segmento/UF e CMV líquido não inventa 
     cmvPercent: 35, fixedCosts: 60000, taxInputMode: 'amount', taxAmount: 12000, feesPercent: 2, otherVariablePercent: 5 };
   const pe = validateFinancialAcquisition({ ...financialLead, simulation });
   assert.equal(pe.ok, true);
-  assert.equal(pe.value.revenueBand, '100k_to_200k');
+  assert.equal(pe.value.revenueBand, '100k_to_250k');
   assert.equal(pe.value.simulation.result.breakEvenRevenue, 120000);
   assert.equal(Object.hasOwn(pe.value, 'segment'), false);
   assert.equal(Object.hasOwn(pe.value, 'taxState'), false);

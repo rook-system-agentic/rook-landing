@@ -28,6 +28,13 @@ oficial), `segment`, `revenueBand`, `usesErp` (`yes` ou `no`), `consent: true` e
 `erp`, e `erp: 'other'` exige `erpOther`. Para BeeFood, pode-se usar
 `erp: 'other', erpOther: 'BeeFood'` quando o visitante confirmar esse sistema.
 Uma solicitação comercial usa `intent: 'demo'`, sem campos de simulação.
+`revenueBand` aceita `up_to_50k`, `50k_to_100k`, `100k_to_250k`, `250k_to_500k`
+e `above_500k` (faturamento bruto mensal; R$ 250 mil é o limite do plano Knight,
+inclusive). Os valores anteriores a 24/10/2026 (`up_to_100k`, `100k_to_200k`,
+`200k_to_300k`, `above_300k`) continuam aceitos para não quebrar a integração,
+mas a LP parceira deve migrar: `200k_to_300k` atravessa o limite do Knight e não
+indica plano. Fonte: `REVENUE_BANDS` e `LEGACY_REVENUE_BANDS` em
+`src/lib/acquisition-input.mjs`.
 
 As fontes de seleção são `culinary-segments.mjs`, `acquisition-input.mjs` e
 `src/data/municipalities.json`. O consentimento é “Quero receber contato da
