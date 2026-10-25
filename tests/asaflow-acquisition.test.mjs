@@ -26,7 +26,7 @@ test('diagnóstico vindo da Meta grava origem, qualificação e UTMs em campos e
   origem_lead:'Tráfego pago',empresa:'Casa Teste',nome_do_restaurante:'Casa Teste',
   cidade:'São Paulo',uf:'SP',segmento:'Pizzaria',
   faixa_faturamento:'Até R$ 100 mil',faturamento_informado_formulario:'Até R$ 100 mil',
-  sistema_atual:'Sistema Casa',
+  plano_sugerido:'Knight',sistema_atual:'Sistema Casa',
  });
  assert.deepEqual(buildDealProperties(paid),{
   origem:'Tráfego pago',contato_comercial_solicitado:true,
@@ -209,7 +209,8 @@ test('captação das ferramentas omite estabelecimento, cidade e ERP desconhecid
  assert.equal(captured.ok,true);
  assert.deepEqual(buildContactProperties(captured.value),{
   origem_lead:'Diagnóstico (site)',uf:'SP',segmento:'Hamburgueria',
-  faixa_faturamento:'Até R$ 100 mil',faturamento_informado_formulario:'Até R$ 100 mil',
+  faixa_faturamento:'Acima de R$ 50 mil até R$ 100 mil',faturamento_informado_formulario:'Acima de R$ 50 mil até R$ 100 mil',
+  plano_sugerido:'Knight',
  });
  assert.deepEqual(buildDealProperties(captured.value),{
   origem:'Diagnóstico (site)',contato_comercial_solicitado:false,
@@ -218,7 +219,8 @@ test('captação das ferramentas omite estabelecimento, cidade e ERP desconhecid
  assert.match(description,/Análise solicitada: CMV/);
  assert.match(description,/Demonstração solicitada: não/);
  assert.match(description,/Contato comercial solicitado: não/);
- assert.match(description,/Faturamento bruto mensal: Até R\$ 100 mil/);
+ assert.match(description,/Faturamento bruto mensal: Acima de R\$ 50 mil até R\$ 100 mil/);
+ assert.match(description,/Plano indicado pela faixa: Knight/);
  assert.match(description,/UF informada para a estimativa: SP/);
  assert.doesNotMatch(description,/Estabelecimento:|Cidade\/UF:|ERP\/PDV:|Não utiliza|undefined|null/);
 });
@@ -231,8 +233,9 @@ test('ponto de equilíbrio conserva valores em reais sem inventar qualificação
  assert.equal(captured.ok,true);
  assert.deepEqual(buildContactProperties(captured.value),{
   origem_lead:'Diagnóstico (site)',
-  faixa_faturamento:'Acima de R$ 100 mil até R$ 200 mil',
-  faturamento_informado_formulario:'Acima de R$ 100 mil até R$ 200 mil',
+  faixa_faturamento:'Acima de R$ 100 mil até R$ 250 mil',
+  faturamento_informado_formulario:'Acima de R$ 100 mil até R$ 250 mil',
+  plano_sugerido:'Knight',
  });
  assert.equal(buildDealProperties(captured.value).contato_comercial_solicitado,false);
  const calls=[];

@@ -26,7 +26,7 @@ test('cadastro não aceita benchmark de um segmento diferente do estabelecimento
 });
 test('consentimento, e-mail, telefone e segmento são validados',()=>{
  for(const patch of [{consent:false},{email:'a'},{phone:'00000000000'},{segment:'other',segmentOther:''}]) assert.equal(validateAcquisition({...lead,...patch},cities).ok,false);
- assert.equal(normalizePhone('(11) 99999-9999'),'+5511999999999'); assert.equal(deriveRevenueBand('100.000,01'),'100k_to_200k');
+ assert.equal(normalizePhone('(11) 99999-9999'),'+5511999999999'); assert.equal(deriveRevenueBand('100.000,01'),'100k_to_250k');
 });
 
 test('caminho não sei preserva números conhecidos sem completar os ausentes com zero',()=>{
