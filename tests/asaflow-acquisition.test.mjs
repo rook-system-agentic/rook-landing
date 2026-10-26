@@ -67,7 +67,7 @@ test('configuração ausente não grava e card inclui localização canônica',(
 test('link do histórico aponta ao ADM do ambiente e não aceita host informado pelo visitante',async()=>{
  const analysisId='6a433339-7c62-4edf-a6ef-f22791875ae3';
  for(const [environment,origin] of [
-  ['homolog','https://adm-homolog.rooksystem.com.br'],
+  ['homolog','https://adm.homolog.rook.com.br'],
   ['production','https://adm.rook.com.br'],
   [undefined,'https://adm.rook.com.br'],
  ]){
