@@ -1,0 +1,61 @@
+name: CMV — entrega transacional de materiais
+
+# ROO-1642: não envia diretamente nem processa newsletter/blog.
+# Sem vars explícitas iguais a 'true', inclusive dispatch manual, os jobs pulam.
+# Agendamentos só existem no branch default: HML inicialmente é testado por
+# acionamento autenticado do backend. Ativar cada ambiente é gate de rollout.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Ambiente autorizado para recuperar a fila educativa
+        type: choice
+        required: true
+        default: homolog
+        options: [homolog, production]
+
+permissions:
+  contents: read
+
+jobs:
+  homolog:
+    if: ${{ vars.CMV_GUIDE_HML_DISPATCH_ENABLED == 'true' && (github.event_name == 'schedule' || inputs.environment == 'homolog') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    concurrency:
+      group: cmv-guide-delivery-homolog
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: homolog
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Recuperar somente a fila educativa de homologação
+        env:
+          CMV_GUIDE_DISPATCH_ENV: homolog
+          CMV_GUIDE_DISPATCH_SECRET: ${{ secrets.CMV_GUIDE_HML_DISPATCH_SECRET }}
+        run: node scripts/dispatch-cmv-guide.mjs
+
+  production:
+    if: ${{ vars.CMV_GUIDE_PROD_DISPATCH_ENABLED == 'true' && (github.event_name == 'schedule' || inputs.environment == 'production') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    concurrency:
+      group: cmv-guide-delivery-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Recuperar somente a fila educativa de produção
+        env:
+          CMV_GUIDE_DISPATCH_ENV: production
+          CMV_GUIDE_DISPATCH_SECRET: ${{ secrets.CMV_GUIDE_PROD_DISPATCH_SECRET }}
+        run: node scripts/dispatch-cmv-guide.mjs

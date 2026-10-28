@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DemoSection from "@/components/acquisition/DemoSection";
 import SiteChat from "@/components/acquisition/SiteChat";
+import RouteScopedAcquisition from "@/components/RouteScopedAcquisition";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import AppHandoffTracker from "@/components/AppHandoffTracker";
 import CookieConsent from "@/components/CookieConsent";
@@ -166,10 +167,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GoogleTagManager />
         <AppHandoffTracker />
         <Header />
-        <main className="pt-[72px]">{children}<DemoSection /></main>
+        <main className="pt-[72px]">{children}<RouteScopedAcquisition><DemoSection /></RouteScopedAcquisition></main>
         <CookieConsent />
         <Footer />
-        <SiteChat />
+        <RouteScopedAcquisition><SiteChat /></RouteScopedAcquisition>
         <Analytics />
       </body>
     </html>
