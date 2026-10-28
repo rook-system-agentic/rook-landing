@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
   { href: "/sobre/", label: "Sobre" },
@@ -74,6 +75,10 @@ function ThemeToggle() {
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const isCmvGuide = pathname === "/guia-cmv" || pathname === "/guia-cmv/";
+  const headerCtaHref = isCmvGuide ? "#cmv-guide-form" : "#cadastro";
+  const headerCtaLabel = isCmvGuide ? "Receber guia" : "Agendar demonstração";
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md" style={{ backgroundColor: "var(--color-header-bg)", borderBottom: "1px solid var(--color-border)" }}>
@@ -100,7 +105,7 @@ export default function Header() {
         <div className="hidden lg:flex items-center gap-3">
           <ThemeToggle />
           <a href="https://app.rook.com.br/login" className="btn-ghost text-sm">Entrar</a>
-          <Link href="#cadastro" className="btn-primary text-sm">Agendar demonstração</Link>
+          <Link href={headerCtaHref} className="btn-primary text-sm">{headerCtaLabel}</Link>
         </div>
 
         {/* Mobile toggle */}
@@ -127,7 +132,7 @@ export default function Header() {
         ))}
         <div className="flex flex-col gap-2 pt-3" style={{ borderTop: "1px solid var(--color-border)" }}>
           <a href="https://app.rook.com.br/login" className="btn-ghost text-sm text-center">Entrar</a>
-          <Link href="#cadastro" onClick={() => setOpen(false)} className="btn-primary text-sm text-center">Agendar demonstração</Link>
+          <Link href={headerCtaHref} onClick={() => setOpen(false)} className="btn-primary text-sm text-center">{headerCtaLabel}</Link>
         </div>
       </nav>
     </header>
