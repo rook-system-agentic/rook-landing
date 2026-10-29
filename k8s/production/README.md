@@ -1,5 +1,11 @@
 # Landing de produção na Hostinger
 
+> **Histórico (29/10/2026, ROO-1659):** a produção do site é a Vercel desde o
+> corte da ROO-1436, e o k3s de produção foi apagado em 26 e 27/10/2026. O
+> workflow `deploy-production.yml` (runner self-hosted da VPS) foi removido;
+> nada neste diretório publica mais o site e não há caminho de volta ao k3s.
+> O texto abaixo descreve o estado da época.
+
 Este diretório descreve o site `rook-landing` servido em `https://www.rook.com.br`
 pelo k3s da Hostinger, no namespace `rook-production`. A homologação saiu do
 k3s em 24/10/2026 e roda na Vercel (`docs/homologacao-vercel.md`).

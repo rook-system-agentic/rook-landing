@@ -41,7 +41,7 @@ O núcleo financeiro e suas rotas são determinísticos e não gravam contatos. 
 4. Concluir a configuração de aviso interno e comprovar entrega/deduplicação de forma separada.
 5. Revisar a experiência visual e publicar somente com a configuração correspondente validada.
 
-O merge em `main` publica a landing automaticamente (desde 22/09/2026 pelo `deploy-production.yml` no k3s; antes, pela Vercel). O canal/fluxo do AsaFlow e a aquisição devem estar configurados antes desse merge. A contratação direta no chat e a passagem de uma compra ao CS não são implementadas por este recorte.
+O merge em `main` publica a landing automaticamente pela integração Git da Vercel (projeto `rook-landing`, desde o corte da ROO-1436). Entre 22/09/2026 e esse corte a publicação era pelo `deploy-production.yml` no k3s, removido na ROO-1659 depois que o k3s de produção foi apagado (26 e 27/10/2026). O canal/fluxo do AsaFlow e a aquisição devem estar configurados antes desse merge. A contratação direta no chat e a passagem de uma compra ao CS não são implementadas por este recorte.
 
 ## Verificação local em 18/09/2026
 
