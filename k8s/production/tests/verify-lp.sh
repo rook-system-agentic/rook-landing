@@ -7,7 +7,6 @@ DOCKERFILE="$ROOT/k8s/production/Dockerfile"
 SECRET_GENERATOR="$ROOT/k8s/production/generate-secret.sh"
 SECRET_WRAPPER="$ROOT/k8s/production/rook-lp-runtime-secret-reconcile"
 CRONJOB="$ROOT/k8s/production/cron/publish-scheduled.yaml"
-WORKFLOW="$ROOT/.github/workflows/deploy-production.yml"
 VERCEL_JSON="$ROOT/vercel.json"
 
 fail() {
@@ -20,7 +19,6 @@ test -f "$DOCKERFILE" || fail "Dockerfile de produção ausente"
 test -x "$SECRET_GENERATOR" || fail "gerador de Secret ausente ou não executável"
 test -x "$SECRET_WRAPPER" || fail "wrapper privilegiado ausente ou não executável"
 test -f "$CRONJOB" || fail "CronJob de publicação agendada ausente"
-test -f "$WORKFLOW" || fail "workflow de deploy de produção ausente"
 
 grep -q '^ARG NEXT_PUBLIC_SUPABASE_URL$' "$DOCKERFILE" || fail "URL pública do destino não é parâmetro do build"
 grep -q '^ARG NEXT_PUBLIC_SUPABASE_ANON_KEY$' "$DOCKERFILE" || fail "chave pública do destino não é parâmetro do build"
@@ -31,10 +29,7 @@ grep -q '^ARG SUPABASE_ANON_KEY$' "$DOCKERFILE" || fail "chave privada de build 
 for name in NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED NEXT_PUBLIC_ASAFLOW_CHAT_TENANT NEXT_PUBLIC_ASAFLOW_CHAT_FLOW; do
   grep -q "^ARG ${name}\\(=.*\\)\\?$" "$DOCKERFILE" || fail "$name não é argumento do build"
   grep -Fq "$name=\$$name" "$DOCKERFILE" || fail "$name não chega ao ambiente do Next build"
-  grep -Fq -- "--build-arg $name=\"\$$name\"" "$WORKFLOW" || fail "$name não é passado pelo deploy"
-  grep -q "^  ${name}: " "$WORKFLOW" || fail "$name não está configurado no deploy"
 done
-grep -Fq "aria-label=\"Abrir chat Rook AI\"" "$WORKFLOW" || fail "smoke não confere a presença do chat"
 
 grep -q '^  namespace: rook-production$' "$MANIFEST" || fail "namespace incorreto"
 grep -q '^  name: rook-lp$' "$MANIFEST" || fail "Deployment/Service rook-lp ausente"
@@ -111,23 +106,14 @@ grep -q -- '--fail-with-body' "$CRONJOB" || fail "cron sem --fail-with-body: o c
 if grep -q -- '--retry' "$CRONJOB"; then fail "cron com --retry: repetiria em 5xx/timeout e publicaria em dobro"; fi
 if grep -q '\$(CRON_SECRET)' "$CRONJOB"; then fail "CRON_SECRET via \$(...) no script do sh"; fi
 
-# ROO-1436: a main publica pela Vercel; o workflow do k3s fica só por dispatch
-# (retorno ao k3s até o T+14d do corte).
-python3 - "$WORKFLOW" <<'PY' || fail "workflow do k3s ainda publica a main (deve ser só workflow_dispatch)"
-import sys, yaml
-wf = yaml.safe_load(open(sys.argv[1]))
-on = wf.get("on", wf.get(True)) or {}
-sys.exit(0 if set(on) == {"workflow_dispatch"} else 1)
-PY
-grep -q 'group: deploy-production-lp' "$WORKFLOW" || fail "concorrência do deploy ausente"
-grep -q 'cancel-in-progress: false' "$WORKFLOW" || fail "deploy pode ser cancelado pela metade"
-grep -q 'secrets.PROD_SUPABASE_ANON_KEY' "$WORKFLOW" || fail "anon key de produção não é exigida"
-grep -q 'vars.PROD_EXTERNAL_EFFECTS' "$WORKFLOW" || fail "portão PROD_EXTERNAL_EFFECTS ausente"
-grep -q 'image: rook-lp:production|image: rook-lp:prod-\${GITHUB_SHA}' "$WORKFLOW" || fail "workflow não troca o placeholder da imagem"
-grep -q 'rollout undo deploy/rook-lp' "$WORKFLOW" || fail "rollback em falha ausente"
-grep -q -- '--resolve www.rook.com.br:443:127.0.0.1 https://www.rook.com.br/' "$WORKFLOW" || fail "smoke pelo ingress local ausente"
-grep -q 'rook-lp-runtime-secret-reconcile' "$WORKFLOW" || fail "workflow não reconcilia o Secret root-only"
-grep -q 'sha256sum k8s/production/generate-secret.sh' "$WORKFLOW" || fail "workflow não valida o gerador root-owned"
+# ROO-1659 (29/10/2026): o deploy-production.yml, que publicava no k3s pelo
+# runner self-hosted da VPS, foi removido. A produção do site é a Vercel desde
+# o corte da ROO-1436 e o k3s de produção foi apagado em 26 e 27/10/2026, então
+# não há mais caminho de volta. As checagens que liam o workflow saíram com ele;
+# o que segue confere só os arquivos que continuam neste diretório.
+if grep -rqs 'self-hosted' "$ROOT/.github/workflows"; then
+  fail "workflow com runner self-hosted em repositório público"
+fi
 grep -q '/usr/local/lib/rook-lp/generate-secret.sh' "$SECRET_WRAPPER" || fail "wrapper não fixa o gerador root-owned"
 grep -q 'env -i' "$SECRET_WRAPPER" || fail "wrapper herda ambiente não confiável do runner"
 
@@ -187,12 +173,6 @@ printf 'gerador-ficticio-ok\\n'
 
 print('Wrapper validado: cache absoluto, ambiente isolado e validação preservada.')
 PY
-
-grep -q 'https://www.rook.com.br/api/acquisition/' "$WORKFLOW" || fail "workflow não valida a rota de aquisição"
-grep -q 'k8s/production/cron/publish-scheduled.yaml' "$WORKFLOW" || fail "workflow não aplica o CronJob"
-if grep -qi 'vercel deploy\|vercel --prod\|lp-homolog\|rook-homolog' "$WORKFLOW"; then
-  fail "workflow de produção referencia Vercel deploy ou homologação"
-fi
 
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(1 if d.get("git",{}).get("deploymentEnabled",{}).get("main") is False else 0)' "$VERCEL_JSON" \
   || fail "vercel.json ainda desliga o deploy automático da main (a produção é a Vercel desde o corte ROO-1436)"
