@@ -1,3 +1,5 @@
+import { normalizeLeadAttribution } from "./lead-attribution.mjs";
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CONTROL_OR_HEADER = /[\u0000-\u001f\u007f]/;
@@ -65,6 +67,10 @@ export function validateCmvGuideInput(candidate) {
       phone: normalizeCmvGuidePhone(phoneInput),
       restaurant,
       commercialContactRequested,
+      // Atribuição autodeclarada da visita (ROO-1642), no mesmo contrato v1 de
+      // /planos e /diagnostico. Campo inválido é omitido, nunca recusa o pedido;
+      // ausência vira null e o pedido segue pela RPC v1.
+      attribution: Object.hasOwn(candidate, "attribution") ? normalizeLeadAttribution(candidate.attribution) : null,
     }),
   };
 }

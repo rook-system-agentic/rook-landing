@@ -33,6 +33,14 @@ test("guia CMV chama a API pública com desafio renovado e snapshot de submissã
   assert.doesNotMatch(FORM, /localStorage/);
 });
 
+test("guia CMV captura a atribuição da visita e emite um evento sem campos (ROO-1642)", () => {
+  assert.match(FORM, /captureVisitAttribution\(\{ href: window\.location\.href, referrer: document\.referrer \}\)/);
+  assert.match(FORM, /attribution: attribution\.current/);
+  assert.equal(occurrences(FORM, "track(TRACKING_EVENTS.cmvGuideRequest)"), 1);
+  assert.doesNotMatch(FORM, /track\(TRACKING_EVENTS\.cmvGuideRequest, /);
+  assert.ok(FORM.indexOf("completed.current = true") < FORM.indexOf("track(TRACKING_EVENTS.cmvGuideRequest)"));
+});
+
 test("guia CMV não promete download público nem entrega incondicional", () => {
   assert.match(PAGE, /data-cmv-guide/);
   assert.match(`${FORM}${CONTENT}`, /não há link público/i);
