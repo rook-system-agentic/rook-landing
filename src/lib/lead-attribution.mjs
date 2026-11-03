@@ -10,6 +10,8 @@ const UTM_FIELDS = ATTRIBUTION_FIELDS.slice(0, 5);
 const SAFE_PATHS = new Set([
   '/', '/funcionalidades', '/cadastro', '/termos', '/calculadora-cmv', '/planos',
   '/privacidade', '/diagnostico', '/restaurantes', '/sobre', '/assistente', '/blog',
+  // ROO-1642: a LP do guia de CMV também é porta de entrada rastreável.
+  '/guia-cmv',
 ]);
 const CONTROL = /[\p{Cc}\p{Cf}]/u;
 

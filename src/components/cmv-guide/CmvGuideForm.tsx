@@ -4,6 +4,9 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { normalizePhone } from "@/lib/acquisition-input.mjs";
 import { CMV_GUIDE_CONTENT } from "@/lib/cmv-guide-content";
+import type { LeadAttribution } from "@/lib/lead-attribution.mjs";
+import { captureVisitAttribution } from "@/lib/lead-attribution-client";
+import { track, TRACKING_EVENTS } from "@/lib/track";
 import styles from "./cmv-guide.module.css";
 
 type GuideValues = {
@@ -34,6 +37,10 @@ type GuideResponse = {
 type GuideSnapshot = GuideValues & {
   submissionId: string;
   commercialContactRequested: boolean;
+  // Atribuição autodeclarada da visita (ROO-1642): UTMs permitidas, caminho
+  // público e host do referrer, capturados na primeira entrada da SPA. Nunca
+  // a URL completa nem os dados do formulário; o servidor normaliza de novo.
+  attribution: LeadAttribution | null;
 };
 
 type Challenge = {
@@ -168,6 +175,7 @@ export default function CmvGuideForm() {
   const [receiptState, setReceiptState] = useState<GuideState | null>(null);
   const [ready, setReady] = useState(false);
   const submissionId = useRef("");
+  const attribution = useRef<LeadAttribution | null>(null);
   const snapshot = useRef<GuideSnapshot | null>(null);
   const inFlight = useRef(false);
   const completed = useRef(false);
@@ -175,6 +183,7 @@ export default function CmvGuideForm() {
 
   useEffect(() => {
     submissionId.current = crypto.randomUUID();
+    attribution.current = captureVisitAttribution({ href: window.location.href, referrer: document.referrer });
     setReady(true);
   }, []);
 
@@ -234,6 +243,7 @@ export default function CmvGuideForm() {
       phone: normalizePhone(values.phone) as string,
       restaurant: values.restaurant.trim(),
       commercialContactRequested,
+      attribution: attribution.current,
     };
 
     if (!existingSnapshot) {
@@ -293,6 +303,9 @@ export default function CmvGuideForm() {
 
       completed.current = true;
       setReceiptState(responseData.state);
+      // Pedido gravado no servidor: um evento, sem campos. O gate de ambiente e
+      // a allowlist anti-PII ficam em track()/tracking-events.mjs.
+      track(TRACKING_EVENTS.cmvGuideRequest);
     } catch (problem) {
       setMessage(
         problem instanceof Error && problem.name !== "AbortError"

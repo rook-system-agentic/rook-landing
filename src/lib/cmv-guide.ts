@@ -44,13 +44,17 @@ export async function cmvGuideAdminRequest(path: string, options: RequestInit = 
   const timer = setTimeout(() => controller.abort(), 4_000);
   try {
     const response = await fetch(endpoint, { ...options, headers, cache: "no-store", signal: controller.signal });
-    if (!response.ok) throw new CmvGuideBackendError("database_unavailable");
+    // 404 do PostgREST (função/relação inexistente, PGRST202) é distinguível para
+    // que a persistência caia da RPC v2 para a v1 quando a migration ainda não
+    // chegou ao ambiente. Qualquer outra falha continua opaca: indisponível.
+    if (!response.ok) throw new CmvGuideBackendError(response.status === 404 ? "rpc_not_found" : "database_unavailable");
     try {
       return await response.json();
     } catch {
       throw new CmvGuideBackendError("database_unavailable");
     }
-  } catch {
+  } catch (error) {
+    if (error instanceof CmvGuideBackendError) throw error;
     throw new CmvGuideBackendError("database_unavailable");
   } finally {
     clearTimeout(timer);

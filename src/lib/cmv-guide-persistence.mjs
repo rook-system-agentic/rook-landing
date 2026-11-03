@@ -1,3 +1,5 @@
+import { normalizeLeadAttribution } from "./lead-attribution.mjs";
+
 const REQUEST_STATES = new Set([
   "queued", "processing", "retry", "provider_accepted", "delivered",
   "failed", "needs_reconciliation", "bounced",
@@ -33,6 +35,10 @@ function sanitizeErrorCode(value, fallback = "persistence_unavailable") {
   return typeof value === "string" && ERROR_CODE.test(value) ? value : fallback;
 }
 
+function isMissingRpc(error) {
+  return Boolean(error) && typeof error === "object" && error.code === "rpc_not_found";
+}
+
 function providerId(value) {
   return typeof value === "string" && PROVIDER_ID.test(value) ? value : null;
 }
@@ -51,7 +57,7 @@ export function createCmvGuidePersistence({ adminRequest } = {}) {
   });
 
   async function enqueue(request, recordKind) {
-    const row = firstRow(await rpc("enqueue_cmv_guide_request_v1", {
+    const payload = {
       p_submission_id: request.submissionId,
       p_request: {
         name: request.name,
@@ -61,7 +67,25 @@ export function createCmvGuidePersistence({ adminRequest } = {}) {
         commercialContactRequested: request.commercialContactRequested,
       },
       p_record_kind: recordKind,
-    }));
+    };
+    // ROO-1642: com atribuição, a RPC v2 grava o contrato v1 junto do pedido.
+    // Sem atribuição, a v1 continua sendo o caminho — nada muda para quem já
+    // está em produção. Se a landing for publicada antes da migration v2, o
+    // pedido vale mais que o metadado: o 404 do PostgREST cai para a v1.
+    const attribution = normalizeLeadAttribution(request.attribution);
+    let row = null;
+    let attributionRecorded = false;
+    if (attribution) {
+      try {
+        row = firstRow(await rpc("enqueue_cmv_guide_request_v2", { ...payload, p_attribution: attribution }));
+        attributionRecorded = row?.attribution_recorded === true;
+      } catch (error) {
+        if (!isMissingRpc(error)) throw error;
+        row = firstRow(await rpc("enqueue_cmv_guide_request_v1", payload));
+      }
+    } else {
+      row = firstRow(await rpc("enqueue_cmv_guide_request_v1", payload));
+    }
     if (!row || !["created", "existing", "conflict"].includes(row.result)
       || !validUuid(row.request_id) || !validState(row.delivery_status)) {
       throw new CmvGuidePersistenceError("invalid_enqueue_receipt");
@@ -71,6 +95,7 @@ export function createCmvGuidePersistence({ adminRequest } = {}) {
       result: row.result,
       requestId: row.request_id,
       state: publicDeliveryState(row.delivery_status),
+      attributionRecorded,
     };
   }
 

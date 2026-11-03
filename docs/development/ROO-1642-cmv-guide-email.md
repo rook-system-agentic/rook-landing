@@ -41,6 +41,16 @@ A migration exige executor e owners das RPCs com `rolsuper` ou `rolbypassrls`, p
 
 Variáveis Preview de homologação e Production do site não são intercambiáveis. Alterações exigem novo deployment pelo fluxo oficial da landing; não promover o build HML para produção, pois `NEXT_PUBLIC_ENV` está embutido no bundle.
 
+## Atribuição da visita no pedido (incremento de 03/11/2026)
+
+O pedido do guia passa a carregar a mesma **atribuição autodeclarada v1** que `/planos` e `/diagnostico` já carregam (`src/lib/lead-attribution.mjs`: cinco UTMs filtradas, `landing_path` da allowlist — agora com `/guia-cmv` — e `referrer_host`). O formulário captura na primeira entrada da SPA (`captureVisitAttribution`), envia `attribution` no POST e o servidor normaliza de novo (`validateCmvGuideInput`); campo inválido é omitido em `omitted_fields`, nunca recusa o pedido. A URL completa, a query string e os dados do formulário não entram.
+
+Persistência: com atribuição, o adapter chama `enqueue_cmv_guide_request_v2(p_submission_id, p_request, p_record_kind, p_attribution)` (migration `20270103160000_roo1642_cmv_guide_request_attribution.sql` do rook-system: coluna `attribution jsonb` write-once, validador `cmv_guide_attribution_is_valid` no CHECK e na RPC). Sem atribuição, continua a v1. Se a v2 ainda não existir no ambiente (404 do PostgREST, `rpc_not_found`), o adapter cai para a v1 e o pedido é gravado sem atribuição — a landing pode ser publicada antes da migration sem quebrar o cadastro, e o `attributionRecorded=false` do retorno diz o que aconteceu.
+
+Evento: após o 2xx, o formulário emite **uma vez** `cmv_guide_request` pela allowlist (`tracking-events.mjs`, sem campos). O que o evento vira no GA4/Meta é configuração do GTM (ROO-1117), fora deste repositório; em homolog o gate de ambiente mantém o tracking desligado.
+
+O que não muda: nenhum envio ao AsaFlow (mesmo com `commercialContactRequested=true`, que segue P2), nenhuma deduplicação por pessoa, nenhum relatório. Sequência de rollout: migration pelo trilho do rook-system (homolog → HML) antes da landing, ou landing primeiro com o fallback acima; em produção, aplicar v1 e v2 na mesma janela do readiness da campanha.
+
 ## Brindes privados
 
 Criar, em operação autorizada, bucket **privado** `cmv-guide-private` no mesmo projeto do ambiente. Nenhuma policy pública de leitura ou URL permanente. Upload de duas cópias imutáveis:
