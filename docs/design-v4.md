@@ -185,6 +185,6 @@ Nenhuma é sobre esta base de código, mas todas apareceram trabalhando nela.
 
 ## Onde está o resto
 
-- Ambiente de homologação e o fluxo de branches: `k8s/homolog/README.md`
+- Ambiente de homologação e o fluxo de branches: `docs/homologacao-vercel.md`
 - Por que o rastreamento é desligado em homologação: `src/lib/tracking.ts`
 - Fallback do blog e sua lacuna de observabilidade: ROO-1116
