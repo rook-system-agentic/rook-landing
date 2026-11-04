@@ -15,7 +15,7 @@ function occurrences(source, value) {
 }
 
 test("guia CMV mantém somente os quatro campos educativos obrigatórios", () => {
-  for (const label of ["Nome", "E-mail", "Telefone com DDD", "Nome do restaurante"]) {
+  for (const label of ["Seu nome", "Seu melhor e-mail", "Telefone com DDD", "Nome do restaurante"]) {
     assert.match(FORM, new RegExp(label));
   }
   assert.match(FORM, /required/);
