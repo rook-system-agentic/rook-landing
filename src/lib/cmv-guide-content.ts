@@ -1,35 +1,99 @@
 export const CMV_GUIDE_CONTENT = {
+  // LP viva (04/11/2026): hero e introdução passam a mostrar a conta, não só
+  // descrevê-la. Todos os números vêm do exemplo ilustrativo do guia e da
+  // planilha (abas Insumos, CMV Mensal, Impacto 1 Ponto e Orçamento Semanal).
   hero: {
-    eyebrow: "MATERIAL GRATUITO · PARA RESTAURANTES",
-    title: "Entenda o CMV. Comece com os seus números.",
+    eyebrow: "GUIA PRÁTICO DE CMV · PDF + EXCEL GRÁTIS",
+    title: {
+      before: "A muçarela subiu R$ 6 o quilo. ",
+      highlight: "Quanto saiu da sua margem?",
+    },
     lead:
-      "Receba o Guia Prático de CMV e a planilha de apoio da Rook. Aprenda a organizar estoque, compras e vendas para fazer o primeiro cálculo do seu restaurante.",
+      "O guia mostra a conta completa do CMV. A planilha faz essa conta por você: o CMV do mês, o impacto de cada insumo e quanto ainda dá para comprar na semana, com os números do seu restaurante.",
+    cta: "Quero o guia e a planilha",
+    secondary: "Ver a conta completa",
+    chips: ["Guia de 10 páginas", "Planilha com 6 abas", "Grátis, por e-mail"],
+    visual: {
+      label: "A conta da muçarela",
+      tag: "Exemplo do guia",
+      bars: [
+        { label: "3 meses atrás", value: "R$ 30/kg", amount: 30 },
+        { label: "Hoje", value: "R$ 36/kg", amount: 36 },
+      ],
+      delta: "+20%",
+      rows: [
+        ["Ficha técnica (300 g por pizza)", "R$ 9,00"],
+        ["Custo real hoje", "R$ 10,80"],
+      ],
+      total: { label: "Em 1.000 pizzas por mês", value: "+ R$ 1.800" },
+      note: "Se o preço da pizza não mudou, essa diferença sai da margem.",
+      cmvChip: { label: "CMV do mês", value: "34,0%", detail: "meta 32%" },
+      budgetChip: { label: "Teto de compras da semana", value: "R$ 28.574" },
+      caption: "Valores ilustrativos do guia e da planilha",
+    },
   },
   introduction: {
     eyebrow: "ANTES DA PLANILHA",
-    title: "CMV não é só um percentual.",
-    paragraphs: [
-      "É uma leitura do caminho entre o estoque, as compras e o que foi vendido. Um número sem período, inventário ou rotina de conferência pode parecer preciso e ainda assim orientar a decisão errada.",
-      "O material da Rook organiza o primeiro cálculo e mostra o que observar depois dele — sem transformar um exemplo em benchmark para todos os restaurantes.",
-    ],
+    title: {
+      before: "CMV não é só um percentual. ",
+      highlight: "É onde a margem escapa.",
+    },
+    lead:
+      "No exemplo da planilha, a conta completa dá 34,0% contra uma meta de 32%. Parecem só 2 pontos. Em um restaurante que fatura R$ 400 mil por mês, cada ponto vale R$ 4.000.",
+    formula: {
+      label: "A conta completa · exemplo da planilha",
+      terms: [
+        { op: "", label: "Estoque inicial", value: "R$ 30.000" },
+        { op: "+", label: "Compras do mês", value: "R$ 118.760" },
+        { op: "−", label: "Estoque final", value: "R$ 25.000" },
+        { op: "=", label: "CMV do mês", value: "R$ 123.760" },
+      ],
+      gauge: {
+        scaleMax: 40,
+        real: 34,
+        meta: 32,
+        realLabel: "34,0% da receita líquida",
+        metaLabel: "Meta 32%",
+        base: "Receita líquida de R$ 364.000: R$ 400 mil de faturamento menos 9% de impostos.",
+      },
+    },
+    impact: {
+      label: "Quanto vale 1 ponto de CMV em R$ 400 mil de faturamento",
+      items: [
+        { value: "R$ 4.000", label: "1 ponto, por mês" },
+        { value: "R$ 8.000", label: "2 pontos, por mês" },
+        { value: "R$ 96.000", label: "2 pontos, em 12 meses" },
+      ],
+      note: "Valores ilustrativos, não são benchmark. A planilha refaz a conta com o faturamento e os insumos do seu restaurante.",
+    },
   },
-  principles: [
-    {
-      number: "01",
-      title: "Comece pelo período",
-      text: "Compare estoque inicial, compras e estoque final do mesmo intervalo. Misturar datas é a forma mais rápida de perder a leitura.",
-    },
-    {
-      number: "02",
-      title: "Use a fórmula inteira",
-      text: "CMV = estoque inicial + compras − estoque final. O resultado só explica a operação quando as três partes estão disponíveis.",
-    },
-    {
-      number: "03",
-      title: "Leia junto da venda",
-      text: "O percentual ajuda a comparar períodos, mas a decisão depende também da receita, do mix, dos preços e da margem que o restaurante precisa preservar.",
-    },
-  ],
+  principles: {
+    title: "3 erros que escondem a fuga",
+    items: [
+      {
+        number: "01",
+        icon: "calendar",
+        title: "Datas misturadas",
+        mistake: "Compras de um mês comparadas com o estoque de outro.",
+        fix: "O guia fecha estoque inicial, compras e estoque final no mesmo período.",
+      },
+      {
+        number: "02",
+        icon: "formula",
+        title: "Compras no lugar do CMV",
+        mistake: "Sem os estoques, o número sobe e desce sem explicar a operação.",
+        fix: "A planilha usa a fórmula inteira e mostra o CMV real do mês.",
+      },
+      {
+        number: "03",
+        icon: "chart",
+        title: "Percentual sem a venda",
+        mistake: "Comparar o percentual sem olhar receita, mix e preço do cardápio.",
+        fix: "A leitura sai sobre a receita líquida e contra a meta do seu restaurante.",
+      },
+    ],
+    cta: "Fazer essa conta com os meus números",
+  },
   form: {
     // ROO-1642 v3 (aprovada em 04/11/2026): a seção vende o resultado e mostra
     // o material antes de pedir os dados. Números e seções vêm do próprio guia
@@ -46,7 +110,7 @@ export const CMV_GUIDE_CONTENT = {
       sheetTitle: "Planilha de apoio",
       sheetTabs: "6 abas",
       rows: [
-        ["CMV Mensal", "32,0%"],
+        ["CMV Mensal", "34,0%"],
         ["Insumos · Muçarela", "+R$ 1,80"],
         ["Impacto 1 ponto", "R$ 4.000"],
         ["Orçamento semanal", "R$ 28.574"],
