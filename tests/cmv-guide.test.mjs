@@ -7,6 +7,8 @@ import {
 import { readCmvGuideConfig } from "../src/lib/cmv-guide-config.mjs";
 import {
   CMV_GUIDE_MANIFEST,
+  CMV_GUIDE_PREHEADER,
+  CMV_GUIDE_SUBJECT,
   buildCmvGuideEmail,
   verifyCmvGuideMaterial,
 } from "../src/lib/cmv-guide-envelope.mjs";
@@ -130,13 +132,59 @@ test("envelope é escapado e determinístico, sem pixel ou link de tracking", ()
     { filename: CMV_GUIDE_MANIFEST[0].filename, content: "cGRm" },
     { filename: CMV_GUIDE_MANIFEST[1].filename, content: "eGxzeA==" },
   ];
-  const first = buildCmvGuideEmail({ request: { ...BASE, name: "<Ana> Silva" }, recordKind: "test", requestId: BASE.submissionId, from: "Rook <materiais@rook.com.br>", attachments });
-  const second = buildCmvGuideEmail({ request: { ...BASE, name: "<Ana> Silva" }, recordKind: "test", requestId: BASE.submissionId, from: "Rook <materiais@rook.com.br>", attachments });
+  const first = buildCmvGuideEmail({ request: { ...BASE, name: "<Ana> Silva" }, recordKind: "test", requestId: BASE.submissionId, from: "Rook <materiais@rook.com.br>", attachments, siteOrigin: "https://lp.homolog.rook.com.br" });
+  const second = buildCmvGuideEmail({ request: { ...BASE, name: "<Ana> Silva" }, recordKind: "test", requestId: BASE.submissionId, from: "Rook <materiais@rook.com.br>", attachments, siteOrigin: "https://lp.homolog.rook.com.br" });
   assert.equal(first.envelopeHash, second.envelopeHash);
   assert.equal(first.idempotencyKey, `cmv-guide-v2/test/${BASE.submissionId}`);
   assert.match(first.payload.html, /&lt;Ana&gt;/);
   assert.doesNotMatch(`${first.payload.html}${first.payload.text}`, /pixel|unsubscribe|utm_|tracking/i);
   assert.match(first.payload.text, /estoque inicial \+ compras − estoque final/);
+});
+const EMAIL_V3 = {
+  recordKind: "live",
+  requestId: "0190a6f0-0000-7000-8000-000000000001",
+  from: "Rook <materiais@rook.com.br>",
+  attachments: [{ filename: "Guia_Pratico_CMV_Rook.pdf", content: "cGRm" }],
+  company: { legalName: "ROOK SYSTEM INTELIGÊNCIA FINANCEIRA LTDA", cnpj: "67.537.706/0001-68" },
+};
+test("email v3 tem assunto, preheader e primeiro nome, e cabe com folga no corte do Gmail", () => {
+  const { payload } = buildCmvGuideEmail({ ...EMAIL_V3, request: { ...BASE, name: "Gabriel Abdala", restaurant: "Cantina <do> Bairro" }, siteOrigin: "https://www.rook.com.br" });
+  assert.equal(payload.subject, CMV_GUIDE_SUBJECT);
+  assert.match(payload.subject, /Guia de CMV/);
+  assert.ok(payload.html.includes(CMV_GUIDE_PREHEADER));
+  assert.match(payload.html, /Gabriel, agora você tem o mapa do seu CMV\./);
+  assert.doesNotMatch(payload.html, /Abdala/);
+  assert.match(payload.html, /Cantina &lt;do&gt; Bairro/);
+  assert.match(payload.html, /Exemplo ilustrativo/);
+  assert.match(payload.text, /Nenhum desses números é benchmark/);
+  assert.match(payload.html, /CNPJ 67\.537\.706\/0001-68/);
+  assert.ok(Buffer.byteLength(payload.html) < 60_000, "HTML deve ficar bem abaixo de ~102 KB");
+});
+test("links e imagens do email saem só da origem do ambiente, sem UTM nem redirecionamento", () => {
+  const { payload } = buildCmvGuideEmail({ ...EMAIL_V3, request: BASE, siteOrigin: "https://lp.homolog.rook.com.br" });
+  const urls = [...payload.html.matchAll(/(?:href|src)="([^"]+)"/g)].map((match) => match[1]);
+  assert.ok(urls.length >= 4);
+  for (const url of urls) {
+    assert.ok(url.startsWith("https://lp.homolog.rook.com.br/"), url);
+    assert.equal(new URL(url).search, "", url);
+  }
+  assert.ok(urls.includes("https://lp.homolog.rook.com.br/brand/cmv-guide/guia-cmv-capa-email-v1.png"));
+  assert.match(payload.text, /Conhecer o Rook: https:\/\/lp\.homolog\.rook\.com\.br\/$/m);
+  assert.match(payload.text, /em lp\.homolog\.rook\.com\.br\./);
+  assert.doesNotMatch(`${payload.html}${payload.text}`, /pixel|unsubscribe|utm_|tracking/i);
+});
+test("convite para responder só aparece quando há reply_to configurado", () => {
+  const without = buildCmvGuideEmail({ ...EMAIL_V3, request: BASE, siteOrigin: "https://www.rook.com.br" });
+  const withReply = buildCmvGuideEmail({ ...EMAIL_V3, request: BASE, siteOrigin: "https://www.rook.com.br", replyTo: "contato@rook.com.br" });
+  assert.doesNotMatch(`${without.payload.html}${without.payload.text}`, /Responda este email/);
+  assert.equal(Object.hasOwn(without.payload, "reply_to"), false);
+  assert.match(withReply.payload.html, /Responda este email/);
+  assert.equal(withReply.payload.reply_to, "contato@rook.com.br");
+});
+test("envelope recusa origem ausente, sem https ou com caminho", () => {
+  for (const siteOrigin of [undefined, "", "http://www.rook.com.br", "https://www.rook.com.br/guia-cmv/", "https://www.rook.com.br?x=1", "javascript:alert(1)"]) {
+    assert.throws(() => buildCmvGuideEmail({ ...EMAIL_V3, request: BASE, siteOrigin }), /invalid_cmv_guide_envelope_input/, String(siteOrigin));
+  }
 });
 
 test("adapter chama RPCs fixas, rejeita receipt inválido e não salva CNPJ/CRM", async () => {

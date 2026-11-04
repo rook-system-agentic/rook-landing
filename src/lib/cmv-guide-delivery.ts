@@ -10,6 +10,8 @@ import { buildCmvGuideEmail } from "@/lib/cmv-guide-envelope.mjs";
 import { createCmvGuidePersistence } from "@/lib/cmv-guide-persistence.mjs";
 import { readCmvGuideMaterials } from "@/lib/cmv-guide-storage.mjs";
 import { cmvGuideAdminRequest } from "@/lib/cmv-guide";
+import { COMPANY_INFO } from "@/lib/company";
+import { SITE_ORIGIN } from "@/lib/site-origin";
 
 function safeEqual(value: string, expected: string) {
   const left = Buffer.from(value);
@@ -137,6 +139,9 @@ export async function dispatchCmvGuide() {
       from: config.from!,
       replyTo: config.replyTo,
       attachments,
+      // Links e imagens do email seguem a origem do ambiente (fonte única).
+      siteOrigin: SITE_ORIGIN,
+      company: { legalName: COMPANY_INFO.razaoSocial, cnpj: COMPANY_INFO.cnpj },
     }),
     sendEmail: (envelope) => sendResendEmail(config, envelope),
     listReceipts: persistence.listReceipts,

@@ -51,6 +51,15 @@ Evento: após o 2xx, o formulário emite **uma vez** `cmv_guide_request` pela al
 
 O que não muda: nenhum envio ao AsaFlow (mesmo com `commercialContactRequested=true`, que segue P2), nenhuma deduplicação por pessoa, nenhum relatório. Sequência de rollout: migration pelo trilho do rook-system (homolog → HML) antes da landing, ou landing primeiro com o fallback acima; em produção, aplicar v1 e v2 na mesma janela do readiness da campanha.
 
+## Template do email v3 e copy do cadastro (ROO-1777, 04/11/2026)
+
+- Versão do template: `cmv-guide-email-v3` (`CMV_GUIDE_EMAIL_TEMPLATE_VERSION`). Assunto e preheader são constantes exportadas do envelope; a copy da LP fica em `src/lib/cmv-guide-content.ts`.
+- Estrutura: identidade da Rook, primeiro nome no título, os dois anexos descritos, três passos para a primeira leitura, a conta do guia marcada como **exemplo ilustrativo**, e ponte passiva "Conhecer o Rook". HTML em tabelas com estilos inline e largura máxima de 600 px. O orçamento é de menos de 60 KB, abaixo do corte de ~102 KB do Gmail, e é verificado em teste.
+- Links e imagens saem só de `siteOrigin`, que é obrigatório: `https`, sem caminho, query ou fragmento. O dispatcher passa `SITE_ORIGIN`, então o HML aponta para o próprio HML. Não há UTM, pixel nem redirecionamento, e o rastreamento de abertura e clique do domínio no Resend está desligado. A UTM na ponte é decisão P1 separada, porque exige revisar este guard.
+- A linha "Responda este email" só aparece quando `CMV_GUIDE_REPLY_TO` está configurado.
+- Imagens públicas: só a capa do guia em `public/brand/cmv-guide/` (versionada no nome do arquivo). PDF e Excel continuam privados no bucket.
+- Mudar o template muda o `envelopeHash`. Por isso, só se publica com zero pedidos em `processing` ou `provider_accepted`. Caso contrário, o retry de um pedido preparado na versão anterior vai para reconciliação, sem reenvio.
+
 ## Brindes privados
 
 Criar, em operação autorizada, bucket **privado** `cmv-guide-private` no mesmo projeto do ambiente. Nenhuma policy pública de leitura ou URL permanente. Upload de duas cópias imutáveis:
