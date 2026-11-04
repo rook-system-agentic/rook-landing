@@ -65,6 +65,8 @@ test('normalização aplica limites e descarta campos extras, dados pessoais apa
 });
 
 test('rejeita caminhos não conhecidos e referrers com credenciais, IP ou dados adicionais', () => {
+  assert.deepEqual(normalizeLeadAttribution({ landing_path: '/guia-cmv/' }),
+    { version: 1, source: 'site_form', landing_path: '/guia-cmv' }, 'a LP do guia de CMV (ROO-1642) é caminho público rastreável');
   for (const landing_path of ['/pessoa@example.invalid', '/blog/nome-de-pessoa', '/?email=x', '/#cadastro',
     '//evil.invalid', '/diagnostico/extra', '/diagnostico\n', 'https://rook.com.br/']) {
     assert.deepEqual(normalizeLeadAttribution({ landing_path }),

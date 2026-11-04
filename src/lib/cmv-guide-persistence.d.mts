@@ -24,7 +24,7 @@ export interface CmvGuideClaim {
 
 export function publicDeliveryState(value: string): CmvGuideDeliveryState;
 export function createCmvGuidePersistence(options: { adminRequest: (path: string, options?: RequestInit) => Promise<unknown> }): {
-  enqueue(request: CmvGuideRequest, recordKind: CmvGuideRecordKind): Promise<{ result: "created" | "existing"; requestId: string; state: CmvGuideDeliveryState }>;
+  enqueue(request: CmvGuideRequest, recordKind: CmvGuideRecordKind): Promise<{ result: "created" | "existing"; requestId: string; state: CmvGuideDeliveryState; attributionRecorded: boolean }>;
   claim(limit: number, recordKind: CmvGuideRecordKind): Promise<CmvGuideClaim[]>;
   prepare(requestId: string, leaseToken: string, envelopeHash: string): Promise<boolean>;
   finish(requestId: string, leaseToken: string, outcome: CmvGuideFinishOutcome, providerMessageId?: string | null, errorCode?: string | null): Promise<boolean>;

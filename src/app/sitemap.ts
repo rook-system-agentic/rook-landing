@@ -1,8 +1,19 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 import { getAllPublishedPosts, postUrl } from "@/lib/blog";
+import { indexabilityDecision } from "@/lib/indexability-policy.mjs";
 import { siteUrl } from "@/lib/site-origin";
 
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const decision = indexabilityDecision({
+    environment: process.env.NEXT_PUBLIC_ENV,
+    deploymentEnvironment: process.env.VERCEL_ENV,
+    host: headers().get("host"),
+  });
+  if (!decision.indexable) return [];
+
   const now = new Date().toISOString();
   const posts = await getAllPublishedPosts();
 

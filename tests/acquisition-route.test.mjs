@@ -310,7 +310,7 @@ test('origem própria e chamadas sem Origin continuam usando a proteção existe
 });
 
 test('origem pública configurada permanece nativa quando o proxy usa URL interna HTTP', async () => {
-  for (const siteOrigin of ['https://www.rook.com.br', 'https://lp-homolog.rooksystem.com.br']) {
+  for (const siteOrigin of ['https://www.rook.com.br', 'https://lp.homolog.rook.com.br']) {
     const route = loadRoute({ siteOrigin });
     const internalUrl = 'http://rook-lp:3000/api/acquisition/';
     const response = await route.get(new Request(internalUrl, { headers: { origin: siteOrigin } }));
@@ -328,7 +328,7 @@ test('origem pública configurada permanece nativa quando o proxy usa URL intern
 });
 
 test('headers encaminhados não autorizam outra origem quando a URL usa host interno', async () => {
-  const route = loadRoute({ siteOrigin: 'https://lp-homolog.rooksystem.com.br' });
+  const route = loadRoute({ siteOrigin: 'https://lp.homolog.rook.com.br' });
   const response = await route.get(new Request('http://rook-lp:3000/api/acquisition/', { headers: {
     origin: 'https://untrusted.invalid', 'x-forwarded-host': 'untrusted.invalid', 'x-forwarded-proto': 'https',
   } }));

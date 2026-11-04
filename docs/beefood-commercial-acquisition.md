@@ -75,10 +75,12 @@ Executar `pnpm exec tsc --noEmit`, `pnpm test:ci` e
 em `homolog` pelo [PR #176](https://github.com/rook-system-agentic/rook-landing/pull/176),
 no commit `a2522499c9411340db4bb2b19fcbd2862bbd778f`.
 
-A promoção isolada usa `hotfix/beefood-commercial-form`, baseada na `main`,
-com somente os dois commits de CORS já integrados em homologação e esta nota
-de estado. O `Base Guard` permite `hotfix/*`; esta seleção evita levar as
-mudanças pendentes de SEO da ROO-1557.
+A promoção isolada usou `hotfix/beefood-commercial-form`, baseada na `main`,
+com somente os dois commits de CORS já integrados em homologação e as notas
+de estado. O `Base Guard` permite `hotfix/*`; essa seleção preservou as
+mudanças de SEO da ROO-1557 somente em homologação. O
+[PR #177](https://github.com/rook-system-agentic/rook-landing/pull/177) integrou
+a promoção na `main`, no commit `5bd7e9a1af0a53a4262ece7422ad9f7afd6d71a3`.
 
 A comprovação real de GET/OPTIONS em homologação foi concluída em
 23/10/2026, após o deploy do commit `a2522499c9411340db4bb2b19fcbd2862bbd778f`
@@ -97,6 +99,14 @@ Essa comprovação confirma CORS e emissão do desafio; não é evidência de
 recebimento de um cadastro real no CRM.
 
 O merge para `homolog` dispara sua publicação; a `main` publica a produção
-pela Vercel. Testes locais e um PR de promoção em rascunho não provam publicação
-nem recebimento de um cadastro real no CRM. Não promover outras mudanças,
-credenciais ou flags junto com esta correção.
+pela Vercel. Em 23/10/2026, o deployment de produção
+`dpl_EmHDBdn76PzimPy8cmNobdFEiECi` publicou o commit
+`5bd7e9a1af0a53a4262ece7422ad9f7afd6d71a3` e atingiu `READY`.
+
+Os seis checks GET/OPTIONS também passaram em produção: origens parceira e
+nativa com desafio e origem exata; origem inválida recusada; pré-verificação
+POST/Content-Type autorizada sem credentials; origem inválida e Authorization
+recusados. A evidência `cors-producao.json` registra a verificação sem POST.
+Isso confirma o contrato CORS da API publicada, não recebimento de um
+cadastro real no Asaflow. Não promover outras mudanças, credenciais ou flags
+junto com esta correção.

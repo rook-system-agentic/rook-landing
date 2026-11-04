@@ -23,10 +23,12 @@
  * URL absoluta chama `siteUrl(path)`. O guard de contrato reprova reincidência.
  *
  * Sobre `NEXT_PUBLIC_SITE_URL`: continua sendo respeitado para que homologação
- * publique as próprias URLs, mas a normalização é aplicada de qualquer forma —
- * um valor sem www em produção reintroduziria o defeito por variável de
- * ambiente, sem passar por revisão de código.
+ * publique as próprias URLs, mas aliases institucionais antigos são sempre
+ * promovidos ao www. Em produção a origem é fixa, mesmo que a variável esteja
+ * errada — um valor de ambiente não pode reintroduzir o defeito.
  */
+
+import { normalizeOrigin } from "./indexability-policy.mjs";
 
 /** Origem canônica de produção. Com www, porque é para onde o 308 aponta. */
 export const CANONICAL_ORIGIN = "https://www.rook.com.br";
@@ -42,16 +44,22 @@ function normalizar(origem: string): string {
   const limpa = origem.replace(/\/+$/, "");
   // `rook.com.br` sem www redireciona: promove para a forma canônica.
   if (limpa === "https://rook.com.br") return CANONICAL_ORIGIN;
-  return limpa;
+  if (limpa === "https://rooksystem.com.br") return CANONICAL_ORIGIN;
+  if (limpa === "https://www.rooksystem.com.br") return CANONICAL_ORIGIN;
+  return normalizeOrigin(limpa, CANONICAL_ORIGIN);
 }
 
 /**
  * Origem efetiva do ambiente. Em produção é sempre a canônica; em homologação
- * ou preview, o que `NEXT_PUBLIC_SITE_URL` declarar.
+ * ou preview, o que `NEXT_PUBLIC_SITE_URL` declarar, com aliases antigos
+ * normalizados. Sem uma marca explícita de produção, o build não pode produzir
+ * URLs de produção por acidente.
  */
-export const SITE_ORIGIN = normalizar(
+const origemConfigurada = normalizar(
   process.env.NEXT_PUBLIC_SITE_URL || CANONICAL_ORIGIN,
 );
+export const SITE_ORIGIN =
+  process.env.NEXT_PUBLIC_ENV === "production" ? CANONICAL_ORIGIN : origemConfigurada;
 
 /**
  * URL absoluta para um caminho do site.

@@ -59,6 +59,34 @@ test("POST confirmado só responde depois do enqueue RPC e não expõe PII", asy
   assert.equal(route.calls.gate.length, 1);
 });
 
+test("POST leva a atribuição normalizada ao enqueue e descarta o que não é do contrato v1", async () => {
+  const route = loadCmvGuideRoute();
+  const attributed = await route.post(guideRequest({
+    attribution: {
+      utm_source: "youtube", utm_medium: "organic_video", utm_campaign: "guia_cmv",
+      utm_content: "120212345678901234", landing_path: "/guia-cmv/", referrer_host: "WWW.YOUTUBE.COM",
+      email: "pessoa@example.invalid", href: "https://www.rook.com.br/guia-cmv/?utm_source=youtube",
+    },
+  }));
+  assert.equal(attributed.status, 201);
+  assert.deepEqual(route.calls.enqueue[0].attribution, {
+    version: 1, source: "site_form", utm_source: "youtube", utm_medium: "organic_video", utm_campaign: "guia_cmv",
+    landing_path: "/guia-cmv", referrer_host: "www.youtube.com", omitted_fields: ["utm_content"],
+  });
+  assert.equal(JSON.stringify(route.calls.enqueue[0]).includes("href"), false);
+
+  const garbage = loadCmvGuideRoute();
+  for (const attribution of ["texto", ["lista"], 42, null]) {
+    const response = await garbage.post(guideRequest({ attribution }));
+    assert.equal(response.status, 201, `atribuição inválida (${JSON.stringify(attribution)}) não pode recusar o pedido`);
+  }
+  assert.ok(garbage.calls.enqueue.every((value) => value.attribution === null));
+
+  const absent = loadCmvGuideRoute();
+  assert.equal((await absent.post(guideRequest())).status, 201);
+  assert.equal(absent.calls.enqueue[0].attribution, null);
+});
+
 test("duplo clique/replay de UUID retorna estado existente; conflito retorna 409", async () => {
   const existing = loadCmvGuideRoute({ enqueue: async () => ({ result: "existing", state: "provider_accepted" }) });
   const response = await existing.post(guideRequest());

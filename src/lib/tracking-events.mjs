@@ -28,6 +28,9 @@ export const TRACKING_EVENTS = Object.freeze({
   chatOpen: "chat_open",
   formView: "form_view",
   integrationError: "integration_error",
+  // Pedido do guia de CMV (ROO-1642): só o fato, sem campos. O formulário
+  // coleta nome, e-mail, telefone e restaurante; nada disso segue para o GA4.
+  cmvGuideRequest: "cmv_guide_request",
 });
 
 /**
@@ -52,6 +55,7 @@ const ALLOWED_FIELDS = Object.freeze({
   [TRACKING_EVENTS.chatOpen]: ["page_type", ...EXPERIMENT_FIELDS],
   [TRACKING_EVENTS.formView]: ["page_type", ...EXPERIMENT_FIELDS],
   [TRACKING_EVENTS.integrationError]: ["component", "error_code", ...EXPERIMENT_FIELDS],
+  [TRACKING_EVENTS.cmvGuideRequest]: [],
 });
 
 export function buildTrackingEvent(name, payload = {}) {

@@ -39,6 +39,17 @@ test("recusa dado pessoal mesmo quando e o unico campo", () => {
   }
 });
 
+test("pedido do guia de CMV é um evento sem campos (ROO-1642)", () => {
+  assert.deepEqual(buildTrackingEvent(TRACKING_EVENTS.cmvGuideRequest), { event: "cmv_guide_request" });
+  for (const campo of ["email", "phone", "restaurant", "utm_source", "name"]) {
+    assert.throws(
+      () => buildTrackingEvent(TRACKING_EVENTS.cmvGuideRequest, { [campo]: "x" }),
+      new RegExp(campo),
+      `${campo} deveria ser recusado no evento do guia`,
+    );
+  }
+});
+
 test("recusa evento desconhecido", () => {
   assert.throws(() => buildTrackingEvent("purchase", {}), /purchase/);
 });

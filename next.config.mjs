@@ -1,3 +1,5 @@
+import { isIndexableBuild } from "./src/lib/indexability-policy.mjs";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   trailingSlash: true,
@@ -38,8 +40,10 @@ const nextConfig = {
    * por padrão nas versões recentes. Aqui é melhor lugar de qualquer forma:
    * viaja com o código, é versionado, e não depende de permissão do cluster.
    *
-   * Em produção `NEXT_PUBLIC_ENV` não é definido, então o bloco de noindex não
-   * é emitido e nada muda.
+   * O build de produção é marcado explicitamente com `NEXT_PUBLIC_ENV=production`.
+   * Qualquer outro valor, inclusive ausência da variável em preview/local, é
+   * tratado como não indexável. Mesmo no build de produção, só o host oficial
+   * passa pela exceção; o host efetivo é avaliado pela condição `missing` abaixo.
    */
   /*
    * /setores/ → /restaurantes/ (redirect permanente, 24/08/2026)
@@ -79,10 +83,21 @@ const nextConfig = {
       { source: "/:og(og-image-.*\\.png|twitter-card.png|banner-.*\\.png|avatar-.*\\.png)", headers: cacheEstatico },
     ];
 
-    if (process.env.NEXT_PUBLIC_ENV === "homolog") {
+    const noindex = [{ key: "X-Robots-Tag", value: "noindex, nofollow, nosnippet" }];
+
+    if (!isIndexableBuild(process.env.NEXT_PUBLIC_ENV, process.env.VERCEL_ENV)) {
       headers.push({
         source: "/:path*",
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+        headers: noindex,
+      });
+    } else {
+      // `missing` com `type: host` é o fail-closed: só o www exato fica fora
+      // desta regra. A camada de edge continua responsável pelos redirects dos
+      // aliases; se um alias chegar ao Next, ele não pode ser indexado.
+      headers.push({
+        source: "/:path*",
+        missing: [{ type: "host", value: "www\\.rook\\.com\\.br" }],
+        headers: noindex,
       });
     }
 

@@ -45,7 +45,23 @@ test("validação normaliza telefone BR e mantém somente os quatro dados mais c
   assert.equal(normalizeCmvGuidePhone("+55 (11) 99999-9999"), "+5511999999999");
   const parsed = validateCmvGuideInput({ ...BASE, phone: "+55 (11) 99999-9999", ignored: "não persiste" });
   assert.equal(parsed.ok, true);
-  assert.deepEqual(parsed.value, { ...BASE, phone: "+5511999999999" });
+  assert.deepEqual(parsed.value, { ...BASE, phone: "+5511999999999", attribution: null });
+});
+
+test("validação normaliza a atribuição v1 e descarta o que não pertence ao contrato, sem recusar o pedido", () => {
+  const parsed = validateCmvGuideInput({ ...BASE, attribution: {
+    utm_source: "youtube", utm_content: "120212345678901234", landing_path: "/guia-cmv/", referrer_host: "WWW.YOUTUBE.COM",
+    email: "pessoa@example.invalid", href: "https://www.rook.com.br/guia-cmv/?utm_source=youtube",
+  } });
+  assert.equal(parsed.ok, true);
+  assert.deepEqual(parsed.value.attribution, {
+    version: 1, source: "site_form", utm_source: "youtube", landing_path: "/guia-cmv", referrer_host: "www.youtube.com", omitted_fields: ["utm_content"],
+  });
+  for (const attribution of ["texto", ["lista"], 42, null, undefined]) {
+    const result = validateCmvGuideInput({ ...BASE, attribution });
+    assert.equal(result.ok, true, JSON.stringify(attribution));
+    assert.equal(result.value.attribution, null);
+  }
 });
 
 test("validação rejeita UUID, campos, booleano e header injection inválidos", () => {
@@ -136,9 +152,49 @@ test("adapter chama RPCs fixas, rejeita receipt inválido e não salva CNPJ/CRM"
   } });
   const saved = await persistence.enqueue({ ...BASE, phone: "+5511999999999" }, "test");
   assert.equal(saved.result, "created");
+  assert.equal(saved.attributionRecorded, false);
+  assert.equal(calls[0].path, "rpc/enqueue_cmv_guide_request_v1");
+  assert.equal(Object.hasOwn(calls[0].body, "p_attribution"), false);
   assert.deepEqual(Object.keys(calls[0].body.p_request).sort(), ["commercialContactRequested", "email", "name", "phone", "restaurant"]);
   assert.equal(Object.hasOwn(calls[0].body.p_request, "cnpj"), false);
   await assert.rejects(() => persistence.finish(BASE.submissionId, BASE.submissionId, "accepted"), (error) => error instanceof CmvGuidePersistenceError && error.code === "invalid_provider_receipt");
+});
+
+test("adapter usa a RPC v2 quando há atribuição e cai para a v1 só quando a v2 não existe no ambiente", async () => {
+  const attribution = { version: 1, source: "site_form", utm_source: "youtube", utm_campaign: "guia_cmv", landing_path: "/guia-cmv" };
+  const calls = [];
+  const withV2 = createCmvGuidePersistence({ adminRequest: async (path, options) => {
+    calls.push({ path, body: JSON.parse(options.body) });
+    return [{ result: "created", request_id: BASE.submissionId, delivery_status: "queued", attribution_recorded: true, attribution_rejected: false }];
+  } });
+  const saved = await withV2.enqueue({ ...BASE, phone: "+5511999999999", attribution }, "test");
+  assert.equal(saved.attributionRecorded, true);
+  assert.equal(calls[0].path, "rpc/enqueue_cmv_guide_request_v2");
+  assert.deepEqual(calls[0].body.p_attribution, attribution);
+  assert.deepEqual(Object.keys(calls[0].body.p_request).sort(), ["commercialContactRequested", "email", "name", "phone", "restaurant"]);
+
+  // Atribuição que não passa no contrato v1 nunca chega à RPC: o adapter normaliza de novo.
+  calls.length = 0;
+  await withV2.enqueue({ ...BASE, phone: "+5511999999999", attribution: { utm_source: "+55 11 99999-9999", email: "x@y.z" } }, "test");
+  assert.equal(calls[0].path, "rpc/enqueue_cmv_guide_request_v2");
+  assert.deepEqual(calls[0].body.p_attribution, { version: 1, source: "site_form", omitted_fields: ["utm_source"] });
+
+  // Migration v2 ausente (404 do PostgREST): o pedido é gravado pela v1 e a atribuição é perdida, não o cadastro.
+  calls.length = 0;
+  const fallback = createCmvGuidePersistence({ adminRequest: async (path, options) => {
+    calls.push({ path, body: JSON.parse(options.body) });
+    if (path.endsWith("_v2")) throw Object.assign(new Error("rpc_not_found"), { code: "rpc_not_found" });
+    return [{ result: "created", request_id: BASE.submissionId, delivery_status: "queued" }];
+  } });
+  const degraded = await fallback.enqueue({ ...BASE, phone: "+5511999999999", attribution }, "test");
+  assert.equal(degraded.result, "created");
+  assert.equal(degraded.attributionRecorded, false);
+  assert.deepEqual(calls.map((call) => call.path), ["rpc/enqueue_cmv_guide_request_v2", "rpc/enqueue_cmv_guide_request_v1"]);
+  assert.equal(Object.hasOwn(calls[1].body, "p_attribution"), false);
+
+  // Qualquer outra falha da v2 continua opaca e interrompe, sem segunda tentativa.
+  const opaque = createCmvGuidePersistence({ adminRequest: async () => { throw Object.assign(new Error("database_unavailable"), { code: "database_unavailable" }); } });
+  await assert.rejects(() => opaque.enqueue({ ...BASE, phone: "+5511999999999", attribution }, "test"), (error) => error.code === "database_unavailable");
 });
 
 test("storage falha fechado em checksum incorreto e não expõe bytes públicos", async () => {

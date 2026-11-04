@@ -84,7 +84,7 @@ export function buildDealProperties(lead) {
 export function buildLeadDescription(lead,{environment}={}) {
   const financialTool=lead.captureKind==='financial_tool';
   // O ambiente vem do servidor; dados do visitante não escolhem o host interno.
-  const adminOrigin=environment==='homolog'?'https://adm-homolog.rooksystem.com.br':'https://adm.rook.com.br';
+  const adminOrigin=environment==='homolog'?'https://adm.homolog.rook.com.br':'https://adm.rook.com.br';
   const lines=[
     financialTool ? 'Solicitação de análise financeira pelo site Rook. Dados autodeclarados.' : 'Cadastro comercial pelo site Rook. Dados autodeclarados.',
     ...(lead.company ? [`Estabelecimento: ${lead.company}`] : []),`Responsável: ${lead.name}`,
