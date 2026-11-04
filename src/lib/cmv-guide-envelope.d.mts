@@ -1,7 +1,9 @@
 import type { CmvGuideRequest } from "./cmv-guide-validation.mjs";
 
 export const CMV_GUIDE_MATERIAL_VERSION: "cmv-guide-v2";
+export const CMV_GUIDE_EMAIL_TEMPLATE_VERSION: "cmv-guide-email-v3";
 export const CMV_GUIDE_SUBJECT: string;
+export const CMV_GUIDE_PREHEADER: string;
 export const CMV_GUIDE_IDEMPOTENCY_PREFIX: "cmv-guide-v2";
 export const CMV_GUIDE_MANIFEST: ReadonlyArray<{ objectPath: string; filename: string; sha256: string; bytes: number }>;
 export function sha256Hex(bytes: Uint8Array | ArrayBuffer): string;
@@ -13,6 +15,10 @@ export function buildCmvGuideEmail(options: {
   from: string;
   replyTo?: string | null;
   attachments: Array<{ filename: string; content: string }>;
+  /** Origem https sem caminho; vem de SITE_ORIGIN (site-origin.ts). */
+  siteOrigin: string;
+  /** Dados cadastrais do rodapé; vêm de COMPANY_INFO (company.ts). */
+  company?: { legalName: string; cnpj: string } | null;
 }): {
   payload: { from: string; to: string[]; subject: string; html: string; text: string; attachments: Array<{ filename: string; content: string }>; reply_to?: string };
   idempotencyKey: string;

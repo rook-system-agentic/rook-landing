@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { normalizePhone } from "@/lib/acquisition-input.mjs";
 import { CMV_GUIDE_CONTENT } from "@/lib/cmv-guide-content";
@@ -97,34 +98,26 @@ function errorId(field: GuideField) {
   return `${fieldId(field)}-error`;
 }
 
-function statusCopy(state: GuideState) {
-  switch (state) {
-    case "queued":
-      return {
-        title: "Solicitação registrada",
-        body: "Seu cadastro foi registrado. O guia e a planilha entraram na fila de envio por e-mail e ainda estão pendentes de processamento.",
-      };
-    case "provider_accepted":
-      return {
-        title: "Solicitação registrada",
-        body: "Seu cadastro foi registrado e o envio foi aceito para processamento. Isso ainda não é uma confirmação de entrega do e-mail.",
-      };
-    case "delivered":
-      return {
-        title: "Solicitação registrada",
-        body: "Seu cadastro foi registrado e o processamento do envio foi confirmado pelo sistema. O material segue destinado ao e-mail informado.",
-      };
-    case "failed":
-      return {
-        title: "Cadastro registrado, envio pendente",
-        body: "Seu cadastro foi preservado, mas o envio do material não pôde ser concluído. A equipe precisa reprocessar esta solicitação.",
-      };
-    case "needs_reconciliation":
-      return {
-        title: "Cadastro registrado, confirmação pendente",
-        body: "Seu cadastro foi preservado, mas a confirmação do envio precisa ser conferida pela equipe. Não há link público para baixar o material.",
-      };
+// Estados em que o pedido segue o caminho normal até o e-mail. A copy não
+// promete entrega: diz para onde o material segue e o que fazer enquanto isso.
+const ON_ITS_WAY: readonly GuideState[] = ["queued", "provider_accepted", "delivered"];
+
+function firstName(value: string) {
+  return value.trim().split(/\s+/)[0] || "";
+}
+
+function statusTitle(state: GuideState, name: string) {
+  if (ON_ITS_WAY.includes(state)) {
+    return name ? `Pronto, ${name}! O material está a caminho.` : "Pronto! O material está a caminho.";
   }
+  return state === "failed" ? "Cadastro salvo, envio pendente" : "Cadastro salvo, confirmação pendente";
+}
+
+function statusFallbackBody(state: GuideState) {
+  if (state === "failed") {
+    return "Seu cadastro está salvo, mas o envio do material não pôde ser concluído agora. A equipe Rook precisa reprocessar esta solicitação; você não precisa preencher de novo.";
+  }
+  return "Seu cadastro está salvo, mas a confirmação do envio precisa ser conferida pela equipe Rook. Não há link público para baixar o material; você não precisa preencher de novo.";
 }
 
 function messageFromResponse(data: GuideResponse, status: number) {
@@ -173,6 +166,7 @@ export default function CmvGuideForm() {
   const [busy, setBusy] = useState(false);
   const [hasSnapshot, setHasSnapshot] = useState(false);
   const [receiptState, setReceiptState] = useState<GuideState | null>(null);
+  const [receiptContact, setReceiptContact] = useState<{ name: string; email: string } | null>(null);
   const [ready, setReady] = useState(false);
   const submissionId = useRef("");
   const attribution = useRef<LeadAttribution | null>(null);
@@ -302,6 +296,7 @@ export default function CmvGuideForm() {
       }
 
       completed.current = true;
+      setReceiptContact({ name: firstName(nextSnapshot.name), email: nextSnapshot.email });
       setReceiptState(responseData.state);
       // Pedido gravado no servidor: um evento, sem campos. O gate de ambiente e
       // a allowlist anti-PII ficam em track()/tracking-events.mjs.
@@ -328,43 +323,108 @@ export default function CmvGuideForm() {
   });
   const fieldError = (field: GuideField) =>
     errors[field] ? <p className={styles.fieldError} id={errorId(field)}>{errors[field]}</p> : null;
+  const copy = CMV_GUIDE_CONTENT.form;
 
   return (
     <section className={styles.formSection} id="cmv-guide-form" aria-labelledby="cmv-guide-form-title">
       <div className={styles.formGrid}>
         <div className={styles.formIntro}>
-          <p className={styles.sectionEyebrow}>{CMV_GUIDE_CONTENT.form.eyebrow}</p>
-          <h2 id="cmv-guide-form-title">{CMV_GUIDE_CONTENT.form.title}</h2>
-          <p>{CMV_GUIDE_CONTENT.form.description}</p>
-          <p className={styles.formAside}>
-            <strong>O que você recebe:</strong> um guia prático e uma planilha editável para começar o cálculo com seus dados. Pedir o material não obriga você a contratar o Rook nem a receber contato comercial.
-          </p>
+          <p className={styles.formEyebrow}>{copy.eyebrow}</p>
+          <h2 id="cmv-guide-form-title">
+            {copy.title.before}
+            <em>{copy.title.highlight}</em>
+            {copy.title.after}
+          </h2>
+          <p>{copy.description}</p>
+        </div>
+
+        <div className={styles.pack} aria-hidden="true">
+          <Image
+            className={styles.packCover}
+            src="/brand/cmv-guide/guia-cmv-capa-v1.webp"
+            alt=""
+            width={360}
+            height={509}
+          />
+          <div className={styles.packSheet}>
+            <div className={styles.packSheetHead}>
+              <span>{copy.preview.sheetTitle}</span>
+              <span>{copy.preview.sheetTabs}</span>
+            </div>
+            <table>
+              <tbody>
+                {copy.preview.rows.map(([label, value]) => (
+                  <tr key={label}>
+                    <td>{label}</td>
+                    <td>{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <span className={styles.packBadge}>{copy.preview.badge}</span>
+          <small className={styles.packCaption}>{copy.preview.caption}</small>
+        </div>
+
+        <div className={styles.inside}>
+          <h3>{copy.insideTitle}</h3>
+          <ul>
+            {copy.inside.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <ol className={styles.steps} aria-label="Como funciona">
+            {copy.steps.map((step) => (
+              <li key={step.number}>
+                <span>{step.number}</span>
+                {step.text}
+              </li>
+            ))}
+          </ol>
         </div>
 
         <div className={styles.formCard}>
           {receiptState ? (
             <div className={styles.status} role="status" aria-live="polite">
               <span className={styles.statusMark} aria-hidden="true">✓</span>
-              <h3 ref={receiptHeading} tabIndex={-1}>{statusCopy(receiptState).title}</h3>
-              <p>{statusCopy(receiptState).body}</p>
+              <h3 ref={receiptHeading} tabIndex={-1}>{statusTitle(receiptState, receiptContact?.name || "")}</h3>
+              {ON_ITS_WAY.includes(receiptState) ? (
+                <>
+                  <p>
+                    O guia e a planilha seguem para <strong className={styles.statusEmail}>{receiptContact?.email}</strong> e devem chegar em alguns minutos, enviados por <strong>{copy.card.sender}</strong>. Se não aparecer na caixa de entrada, confira Promoções ou Spam.
+                  </p>
+                  <div className={styles.prep}>
+                    <p className={styles.prepTitle}>{copy.success.prepTitle}</p>
+                    <ul>
+                      {copy.success.prepItems.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                    <p className={styles.prepNote}>{copy.success.prepNote}</p>
+                  </div>
+                  <Link className={styles.statusLink} href="/calculadora-cmv/">{copy.success.calculatorLabel}</Link>
+                </>
+              ) : (
+                <p>{statusFallbackBody(receiptState)}</p>
+              )}
             </div>
           ) : (
             <form onSubmit={submit} noValidate aria-busy={busy}>
               <div className={styles.formHeading}>
-                <h3>Seus dados para o envio</h3>
-                <p>Os quatro campos abaixo são necessários para registrar a solicitação.</p>
+                <h3>{copy.card.title}</h3>
+                <p>{copy.card.description}</p>
               </div>
 
               <fieldset className={styles.fields} disabled={readOnly}>
                 <legend className="sr-only">Dados para receber o guia CMV</legend>
                 <div className={styles.field}>
-                  <label htmlFor={fieldId("name")}>Nome</label>
-                  <input {...fieldProps("name")} autoComplete="name" maxLength={120} required />
+                  <label htmlFor={fieldId("name")}>Seu nome</label>
+                  <input {...fieldProps("name")} autoComplete="name" placeholder="Como podemos te chamar" maxLength={120} required />
                   {fieldError("name")}
                 </div>
                 <div className={styles.field}>
-                  <label htmlFor={fieldId("email")}>E-mail</label>
-                  <input {...fieldProps("email")} type="email" autoComplete="email" maxLength={254} required />
+                  <label htmlFor={fieldId("email")}>Seu melhor e-mail</label>
+                  <input {...fieldProps("email")} type="email" autoComplete="email" placeholder="voce@restaurante.com.br" maxLength={254} required />
                   {fieldError("email")}
                 </div>
                 <div className={styles.field}>
@@ -380,9 +440,9 @@ export default function CmvGuideForm() {
                   />
                   {fieldError("phone")}
                 </div>
-                <div className={`${styles.field} ${styles.full}`}>
+                <div className={styles.field}>
                   <label htmlFor={fieldId("restaurant")}>Nome do restaurante</label>
-                  <input {...fieldProps("restaurant")} autoComplete="organization" maxLength={120} required />
+                  <input {...fieldProps("restaurant")} autoComplete="organization" placeholder="Ex.: Cantina do Bairro" maxLength={120} required />
                   {fieldError("restaurant")}
                 </div>
               </fieldset>
@@ -395,7 +455,7 @@ export default function CmvGuideForm() {
                   disabled={readOnly}
                   onChange={(event) => setCommercialContactRequested(event.target.checked)}
                 />
-                <span>Também quero receber contato comercial sobre o Rook.</span>
+                <span>Quero que a Rook entre em contato para conversar sobre a gestão do meu restaurante. <strong>(opcional)</strong></span>
               </label>
 
               <p className={styles.privacy}>
@@ -409,9 +469,15 @@ export default function CmvGuideForm() {
                 </p>
               )}
               <button className={styles.submit} type="submit" disabled={busy || !ready}>
-                <span>{busy ? "Registrando solicitação…" : hasSnapshot ? "Tentar enviar novamente" : "Receber guia e planilha por email"}</span>
+                <span>{busy ? "Registrando seu pedido…" : hasSnapshot ? "Tentar enviar novamente" : copy.card.submit}</span>
                 <span aria-hidden="true">↗</span>
               </button>
+              {!hasSnapshot && (
+                <>
+                  <p className={styles.trust}>{copy.card.trust}</p>
+                  <p className={styles.sender}>Enviado por <strong>{copy.card.sender}</strong> em alguns minutos.</p>
+                </>
+              )}
               {hasSnapshot && !busy && (
                 <button className={styles.editButton} type="button" onClick={resetSnapshotForEditing}>
                   Editar dados e iniciar outra solicitação
