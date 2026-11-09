@@ -3,7 +3,7 @@
  *
  * POR QUE UM MÓDULO SÓ PARA ISSO
  *
- * A página inteira existe para um clique: entrar na comunidade do Rook no
+ * A página inteira existe para um clique: entrar na comunidade da Rook no
  * WhatsApp. O link aparece no hero, no CTA final e no cabeçalho; repetido em
  * três lugares, um convite trocado (o WhatsApp permite redefinir o link) fica
  * certo em dois e quebrado no terceiro. Aqui é o único lugar.

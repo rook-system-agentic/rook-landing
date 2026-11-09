@@ -5,7 +5,7 @@
  *
  * REGRAS DESTA PÁGINA
  *
- * - Um CTA só: entrar na comunidade do Rook no WhatsApp. O link e a data vêm de
+ * - Um CTA só: entrar na comunidade da Rook no WhatsApp. O link e a data vêm de
  *   `bf1-community.mjs`; nenhum texto aqui cita link.
  * - Desconto e mentoria são PROMESSA DE CAMPANHA, sem regra inventada: nada de
  *   percentual, número de vagas ou critério de seleção. Essas condições são
@@ -30,10 +30,10 @@
  */
 export const BF1_CONTENT = {
   meta: {
-    title: "Black Friday do Rook e mentoria Planejamento Financeiro 2027 | Rook System",
+    title: "Black Friday da Rook e mentoria Planejamento Financeiro 2027 | Rook System",
     description:
-      "Entre na comunidade do Rook no WhatsApp: pré-lançamento da Black Friday, desconto e a oportunidade de uma mentoria personalizada de Planejamento Financeiro 2027.",
-    ogTitle: "Black Friday do Rook + mentoria de Planejamento Financeiro 2027",
+      "Entre na comunidade da Rook no WhatsApp: pré-lançamento da Black Friday, desconto e a oportunidade de uma mentoria personalizada de Planejamento Financeiro 2027.",
+    ogTitle: "Black Friday da Rook + mentoria de Planejamento Financeiro 2027",
     ogDescription:
       "Na comunidade do WhatsApp: pré-lançamento, desconto e a oportunidade de uma mentoria personalizada para o seu restaurante lucrar em 2027.",
     ogAlt: "Black Friday Rook — comunidade no WhatsApp com pré-lançamento, desconto e mentoria de Planejamento Financeiro 2027.",
@@ -47,11 +47,11 @@ export const BF1_CONTENT = {
   hero: {
     eyebrow: "Black Friday Rook · Pré-lançamento",
     liveTag: "Comunidade no WhatsApp",
-    headlinePlain: "A Black Friday do Rook começa antes.",
+    headlinePlain: "A Black Friday da Rook começa antes.",
     headlineEmphasis: "E começa na comunidade.",
     lead: {
       before:
-        "Entre na comunidade do Rook no WhatsApp. É lá que acontece o pré-lançamento: você conhece as condições antes de todo mundo, garante o desconto e ainda tem a oportunidade de uma mentoria personalizada de ",
+        "Entre na comunidade da Rook no WhatsApp. É lá que acontece o pré-lançamento: você conhece as condições antes de todo mundo, garante o desconto e ainda tem a oportunidade de uma mentoria personalizada de ",
       strong: "Planejamento Financeiro 2027",
       after: ".",
     },
@@ -96,7 +96,7 @@ export const BF1_CONTENT = {
         n: "02",
         icon: "tag",
         title: "Desconto de Black Friday",
-        text: "A condição especial do Rook para restaurantes, liberada primeiro para quem está na comunidade.",
+        text: "A condição especial da Rook para restaurantes, liberada primeiro para quem está na comunidade.",
       },
       {
         n: "03",
@@ -125,7 +125,7 @@ export const BF1_CONTENT = {
         n: "02",
         icon: "system",
         title: "O sistema",
-        text: "O Rook conecta vendas, notas e banco e mostra, em reais, quanto sobrou — para você acompanhar o plano todo mês.",
+        text: "A Rook conecta vendas, notas e banco e mostra, em reais, quanto sobrou — para você acompanhar o plano todo mês.",
       },
     ],
     proof: "Conduzida pelo time que gerenciou R$ 925 milhões de faturamento anual em consultoria em 2025.",
@@ -152,7 +152,7 @@ export const BF1_CONTENT = {
     stat: { value: "R$ 925 milhões", caption: "de faturamento anual gerenciado pela nossa consultoria em 2025." },
     paragraphs: [
       "Em 2025, gerenciamos em consultoria R$ 925 milhões de faturamento anual. Entramos onde a operação apertava, reestruturamos o que precisava ser reestruturado e ajudamos as empresas a voltar a ter resultado — de fato, não só no papel.",
-      "Todo esse conhecimento hoje roda de forma automatizada no Rook. O sistema conecta vendas, notas e banco do restaurante e mostra, em reais, quanto sobrou e qual é a próxima decisão.",
+      "Todo esse conhecimento hoje roda de forma automatizada na Rook. O sistema conecta vendas, notas e banco do restaurante e mostra, em reais, quanto sobrou e qual é a próxima decisão.",
     ],
     timeline: [
       { kicker: "20 anos", title: "Consultoria", text: "Controladoria, finanças corporativas e reestruturação de empresas." },
@@ -175,7 +175,7 @@ export const BF1_CONTENT = {
     label: "— Pré-lançamento",
     headlinePlain: "Entre antes e ",
     headlineEmphasis: "planeje 2027 com a gente.",
-    text: "A comunidade do Rook abre antes da Black Friday. O pré-lançamento, o desconto e a mentoria de Planejamento Financeiro 2027 começam lá.",
+    text: "A comunidade da Rook abre antes da Black Friday. O pré-lançamento, o desconto e a mentoria de Planejamento Financeiro 2027 começam lá.",
   },
 } as const;
 

@@ -11,7 +11,7 @@ import { siteUrl } from "@/lib/site-origin";
 /*
  * LP de Black Friday `/bl1/` (ROO-1825).
  *
- * Uma página, um clique: entrar na comunidade do Rook no WhatsApp. Por isso a
+ * Uma página, um clique: entrar na comunidade da Rook no WhatsApp. Por isso a
  * seção de demonstração do rodapé não aparece aqui (RouteScopedAcquisition) e
  * o CTA do cabeçalho aponta para o fim da página.
  *
