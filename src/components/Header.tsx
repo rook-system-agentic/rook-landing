@@ -18,9 +18,19 @@ function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // ROO-1828: com cookies/dados de sites bloqueados (Chrome, Safari, alguns
+  // webviews e iframes), ler ou gravar `localStorage` lança SecurityError.
+  // Aqui, num efeito, isso derrubava a página inteira em "Application error".
+  // Sem armazenamento, o tema fica no padrão (claro) e o botão alterna só na
+  // sessão. A trava é `tests/storage-guard.test.mjs`.
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem("rook-theme");
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem("rook-theme");
+    } catch {
+      stored = null;
+    }
     if (stored === "dark") {
       setIsDark(true);
       document.documentElement.classList.add("dark");
@@ -33,12 +43,11 @@ function ThemeToggle() {
   const toggle = () => {
     const next = !isDark;
     setIsDark(next);
-    if (next) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("rook-theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("rook-theme", "light");
+    document.documentElement.classList.toggle("dark", next);
+    try {
+      localStorage.setItem("rook-theme", next ? "dark" : "light");
+    } catch {
+      // Sem persistência: o tema vale até recarregar a página.
     }
   };
 
