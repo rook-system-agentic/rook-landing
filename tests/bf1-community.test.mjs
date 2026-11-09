@@ -80,3 +80,12 @@ test("a /bl1 fica fora do sitemap e pede noindex", async () => {
   const pagina = await readFile(path.join(RAIZ, "src/app/bl1/page.tsx"), "utf8");
   assert.match(pagina, /robots:\s*\{\s*index:\s*false,\s*follow:\s*true\s*\}/);
 });
+test("a mentoria tem tema definido e nenhuma regra inventada", async () => {
+  const conteudo = await readFile(path.join(RAIZ, "src/lib/bf1-content.ts"), "utf8");
+  // Tema definido pelo CEO em 09/11/2026: Planejamento Financeiro 2027.
+  assert.match(conteudo, /Planejamento Financeiro 2027/);
+  assert.match(conteudo, /a estratégia e o sistema/i);
+  // Vagas, percentual de desconto e datas da mentoria são anunciados na comunidade, nunca na página.
+  const textos = [...conteudo.matchAll(/"([^"\\]*)"/g)].map((m) => m[1]).join("\n");
+  assert.doesNotMatch(textos, /\bvagas?\b|\d+\s?%|\bgr[aá]tis para os \d+/i);
+});

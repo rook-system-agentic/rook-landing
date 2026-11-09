@@ -18,18 +18,25 @@
  *   reestruturação" é a mesma origem descrita em `/sobre/` (lp-content.ts).
  * - "Conecta vendas, notas e banco e mostra, em reais, quanto sobrou" é a
  *   promessa já publicada na home (page.tsx).
+ * - O tema da mentoria — "Planejamento Financeiro 2027: a estratégia e o
+ *   sistema que farão o seu restaurante lucrar no ano que está por vir" — foi
+ *   definido por Gabriel Abdala (CEO) em 09/11/2026. Os dois pilares (estratégia
+ *   e sistema) desdobram essa frase; formato, vagas e datas NÃO são citados:
+ *   "como participar" é anunciado na comunidade.
+ * - O "Plano 2027" da seção da mentoria é ilustrativo (sem valores em reais) e
+ *   está marcado como tal.
  * - A conversa da comunidade no hero é prévia ilustrativa, sem telefone
  *   (ver tests/mock-whatsapp-sem-telefone.test.mjs) e marcada como tal.
  */
 export const BF1_CONTENT = {
   meta: {
-    title: "Black Friday do Rook: entre na comunidade | Rook System",
+    title: "Black Friday do Rook e mentoria Planejamento Financeiro 2027 | Rook System",
     description:
-      "Entre na comunidade do Rook no WhatsApp e participe do pré-lançamento da Black Friday: desconto e a oportunidade de uma mentoria personalizada.",
-    ogTitle: "A Black Friday do Rook começa antes — na comunidade",
+      "Entre na comunidade do Rook no WhatsApp: pré-lançamento da Black Friday, desconto e a oportunidade de uma mentoria personalizada de Planejamento Financeiro 2027.",
+    ogTitle: "Black Friday do Rook + mentoria de Planejamento Financeiro 2027",
     ogDescription:
-      "Pré-lançamento no WhatsApp: desconto de Black Friday e a oportunidade de uma mentoria personalizada com o time do Rook.",
-    ogAlt: "Black Friday Rook — a comunidade no WhatsApp com pré-lançamento, desconto e mentoria personalizada.",
+      "Na comunidade do WhatsApp: pré-lançamento, desconto e a oportunidade de uma mentoria personalizada para o seu restaurante lucrar em 2027.",
+    ogAlt: "Black Friday Rook — comunidade no WhatsApp com pré-lançamento, desconto e mentoria de Planejamento Financeiro 2027.",
   },
   cta: {
     label: "Quero entrar na comunidade",
@@ -42,8 +49,13 @@ export const BF1_CONTENT = {
     liveTag: "Comunidade no WhatsApp",
     headlinePlain: "A Black Friday do Rook começa antes.",
     headlineEmphasis: "E começa na comunidade.",
-    lead: "Entre na comunidade do Rook no WhatsApp. É lá que acontece o pré-lançamento: você conhece as condições antes de todo mundo, garante o desconto e ainda tem a oportunidade de uma mentoria personalizada com o nosso time.",
-    secondaryLabel: "Conhecer a nossa história",
+    lead: {
+      before:
+        "Entre na comunidade do Rook no WhatsApp. É lá que acontece o pré-lançamento: você conhece as condições antes de todo mundo, garante o desconto e ainda tem a oportunidade de uma mentoria personalizada de ",
+      strong: "Planejamento Financeiro 2027",
+      after: ".",
+    },
+    secondaryLabel: "Conhecer a mentoria 2027",
     dateLabel: "Black Friday · sexta, 27 de novembro",
     countdownLabels: { days: "dias", hours: "horas", minutes: "min", seconds: "seg" },
     countdownAria: "Tempo até a Black Friday",
@@ -64,8 +76,8 @@ export const BF1_CONTENT = {
         text: "Condição de Black Friday liberada para a comunidade antes da abertura ao público.",
       },
       {
-        tag: "Mentoria",
-        text: "Quem está aqui tem a oportunidade de uma mentoria personalizada com o time do Rook.",
+        tag: "Mentoria 2027",
+        text: "Planejamento Financeiro 2027: a estratégia e o sistema para o seu restaurante lucrar no ano que vem. A oportunidade é de quem está aqui.",
       },
     ],
   },
@@ -89,10 +101,48 @@ export const BF1_CONTENT = {
       {
         n: "03",
         icon: "mentor",
-        title: "Mentoria personalizada",
-        text: "Além do desconto, a oportunidade de uma mentoria com o nosso time, olhando para os números e a operação da sua casa.",
+        title: "Mentoria Planejamento Financeiro 2027",
+        text: "Além do desconto, a oportunidade de uma mentoria personalizada com o nosso time: a estratégia e o sistema para o seu restaurante lucrar em 2027.",
       },
     ],
+  },
+  mentorship: {
+    id: "mentoria",
+    label: "— Mentoria exclusiva da comunidade",
+    headlinePlain: "Planejamento Financeiro ",
+    headlineEmphasis: "2027.",
+    lead: "A estratégia e o sistema que farão o seu restaurante lucrar no ano que está por vir.",
+    intro:
+      "Uma mentoria personalizada com o nosso time, olhando para os números da sua casa. A oportunidade é de quem está na comunidade.",
+    pillars: [
+      {
+        n: "01",
+        icon: "strategy",
+        title: "A estratégia",
+        text: "O ano de 2027 em números: quanto vender, quanto pode custar e quanto precisa sobrar, mês a mês.",
+      },
+      {
+        n: "02",
+        icon: "system",
+        title: "O sistema",
+        text: "O Rook conecta vendas, notas e banco e mostra, em reais, quanto sobrou — para você acompanhar o plano todo mês.",
+      },
+    ],
+    proof: "Conduzida pelo time que gerenciou R$ 925 milhões de faturamento anual em consultoria em 2025.",
+    howTo: "Como participar é anunciado primeiro na comunidade",
+    plan: {
+      title: "Plano 2027",
+      subtitle: "Seu restaurante",
+      tag: "Ilustrativo",
+      chartLabel: "Ilustração de um plano mensal de 2027, com as vendas de cada mês e uma linha de meta.",
+      targetLabel: "Meta",
+      months: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
+      rows: [
+        { label: "Meta de vendas", value: "mês a mês" },
+        { label: "Teto de custos", value: "CMV e fixos" },
+        { label: "Lucro planejado", value: "em reais" },
+      ],
+    },
   },
   history: {
     id: "historia",
@@ -116,17 +166,18 @@ export const BF1_CONTENT = {
     headlineEmphasis: "Black Friday.",
     items: [
       { n: "1", title: "Entre na comunidade", text: "Pelo botão desta página. É gratuito, e você sai quando quiser." },
-      { n: "2", title: "Acompanhe o pré-lançamento", text: "As condições, as datas e a mentoria são anunciadas lá primeiro." },
-      { n: "3", title: "Aproveite antes de todo mundo", text: "Garanta o desconto de Black Friday e a oportunidade de uma mentoria personalizada." },
+      { n: "2", title: "Acompanhe o pré-lançamento", text: "As condições, as datas e como participar da mentoria são anunciados lá primeiro." },
+      { n: "3", title: "Aproveite antes de todo mundo", text: "Garanta o desconto de Black Friday e a oportunidade da mentoria de Planejamento Financeiro 2027." },
     ],
   },
   final: {
     id: "comunidade",
     label: "— Pré-lançamento",
-    headlinePlain: "Quem entra antes, ",
-    headlineEmphasis: "aproveita primeiro.",
-    text: "A comunidade do Rook abre antes da Black Friday. O pré-lançamento, o desconto e a mentoria começam lá.",
+    headlinePlain: "Entre antes e ",
+    headlineEmphasis: "planeje 2027 com a gente.",
+    text: "A comunidade do Rook abre antes da Black Friday. O pré-lançamento, o desconto e a mentoria de Planejamento Financeiro 2027 começam lá.",
   },
 } as const;
 
 export type Bf1IconName = (typeof BF1_CONTENT.benefits.items)[number]["icon"];
+export type Bf1PillarIconName = (typeof BF1_CONTENT.mentorship.pillars)[number]["icon"];

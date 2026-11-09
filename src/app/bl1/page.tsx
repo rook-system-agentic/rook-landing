@@ -4,7 +4,7 @@ import Bf1Countdown from "@/components/bf1/Bf1Countdown";
 import styles from "@/components/bf1/bf1.module.css";
 import LpCountUp from "@/components/lp/LpCountUp";
 import Reveal from "@/components/lp/LpReveal";
-import { BF1_CONTENT, type Bf1IconName } from "@/lib/bf1-content";
+import { BF1_CONTENT, type Bf1IconName, type Bf1PillarIconName } from "@/lib/bf1-content";
 import { TWITTER_CARD } from "@/lib/og-image";
 import { siteUrl } from "@/lib/site-origin";
 
@@ -95,6 +95,36 @@ function BenefitIcon({ name }: { name: Bf1IconName }) {
   );
 }
 
+function PillarIcon({ name }: { name: Bf1PillarIconName }) {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+    focusable: false,
+  };
+  if (name === "strategy") {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="8.5" />
+        <circle cx="12" cy="12" r="4.5" />
+        <path d="M12 12l6.5-6.5M15.5 5.5h3v3" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <path d="M3.5 19.5h17" />
+      <path d="M6 16.5V12M10.5 16.5V9M15 16.5v-5M19.5 16.5V6" />
+    </svg>
+  );
+}
+
 function Headline({ plain, emphasis }: { plain: string; emphasis: string }) {
   return (
     <>
@@ -115,7 +145,7 @@ function TrustLine() {
 }
 
 export default function BlackFridayCommunityPage() {
-  const { hero, preview, benefits, history, steps, final } = BF1_CONTENT;
+  const { hero, preview, benefits, mentorship, history, steps, final } = BF1_CONTENT;
 
   return (
     <div className={styles.page} data-bf1>
@@ -138,10 +168,14 @@ export default function BlackFridayCommunityPage() {
             <h1 id="bf1-title" className={styles.title}>
               {hero.headlinePlain} <em>{hero.headlineEmphasis}</em>
             </h1>
-            <p className={styles.lead}>{hero.lead}</p>
+            <p className={styles.lead}>
+              {hero.lead.before}
+              <strong>{hero.lead.strong}</strong>
+              {hero.lead.after}
+            </p>
             <div className={styles.ctaRow}>
               <Bf1CommunityCta />
-              <a href={`#${history.id}`} className={styles.secondary}>
+              <a href={`#${mentorship.id}`} className={styles.secondary}>
                 {hero.secondaryLabel}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                   <path d="M12 5v14M6 13l6 6 6-6" />
@@ -210,6 +244,73 @@ export default function BlackFridayCommunityPage() {
               </Reveal>
             ))}
           </ul>
+        </div>
+      </section>
+
+      <section id={mentorship.id} className={styles.mentorSection} aria-labelledby="bf1-mentorship-title">
+        <span className={styles.mentorGlow} aria-hidden="true" />
+        <span className={styles.mentorWatermark} aria-hidden="true">
+          2027
+        </span>
+        <div className={`${styles.container} ${styles.mentorGrid}`}>
+          <div>
+            <p className={styles.sectionLabel}>{mentorship.label}</p>
+            <h2 id="bf1-mentorship-title" className={styles.sectionTitle}>
+              <Headline plain={mentorship.headlinePlain} emphasis={mentorship.headlineEmphasis} />
+            </h2>
+            <p className={styles.mentorLead}>{mentorship.lead}</p>
+            <p className={styles.mentorIntro}>{mentorship.intro}</p>
+            <ul className={styles.pillars}>
+              {mentorship.pillars.map((pillar, index) => (
+                <Reveal as="li" key={pillar.n} delay={index * 120} className={styles.pillar}>
+                  <div className={styles.pillarTop}>
+                    <span className={styles.pillarIcon}>
+                      <PillarIcon name={pillar.icon} />
+                    </span>
+                    <span className={styles.pillarNumber}>{pillar.n}</span>
+                  </div>
+                  <h3 className={styles.pillarTitle}>{pillar.title}</h3>
+                  <p className={styles.pillarText}>{pillar.text}</p>
+                </Reveal>
+              ))}
+            </ul>
+            <p className={styles.mentorProof}>{mentorship.proof}</p>
+            <div className={styles.mentorCta}>
+              <Bf1CommunityCta />
+              <p className={styles.mentorHowTo}>{mentorship.howTo}</p>
+            </div>
+          </div>
+
+          <Reveal className={styles.plan}>
+            <div className={styles.planHeader}>
+              <div>
+                <p className={styles.planTitle}>{mentorship.plan.title}</p>
+                <p className={styles.planSubtitle}>{mentorship.plan.subtitle}</p>
+              </div>
+              <span className={styles.planTag}>{mentorship.plan.tag}</span>
+            </div>
+            <div className={styles.planChart} role="img" aria-label={mentorship.plan.chartLabel}>
+              <span className={styles.planTarget} aria-hidden="true">
+                <span className={styles.planTargetLabel}>{mentorship.plan.targetLabel}</span>
+              </span>
+              {mentorship.plan.months.map((month) => (
+                <span key={month} className={styles.planBar} aria-hidden="true" />
+              ))}
+            </div>
+            <ul className={styles.planMonths} aria-hidden="true">
+              {mentorship.plan.months.map((month) => (
+                <li key={month}>{month.slice(0, 1)}</li>
+              ))}
+            </ul>
+            <ul className={styles.planRows}>
+              {mentorship.plan.rows.map((row) => (
+                <li key={row.label} className={styles.planRow}>
+                  <span>{row.label}</span>
+                  <span className={styles.planRowValue}>{row.value}</span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
         </div>
       </section>
 
