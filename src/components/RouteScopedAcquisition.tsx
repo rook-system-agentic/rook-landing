@@ -7,6 +7,9 @@ type RouteScopedAcquisitionProps = {
 };
 
 const GUIDE_PATHS = new Set(["/guia-cmv", "/guia-cmv/"]);
+// ROO-1825: a LP de Black Friday também é de conversão única (entrar na
+// comunidade); demonstração e chat do rodapé competiriam com esse CTA.
+const CAMPAIGN_PATHS = new Set(["/bl1", "/bl1/"]);
 
 /**
  * A rota do guia é uma LP educativa de quatro campos, não uma entrada do funil
@@ -14,5 +17,6 @@ const GUIDE_PATHS = new Set(["/guia-cmv", "/guia-cmv/"]);
  * evita que o layout injete um segundo formulário ou um chat depois do guia.
  */
 export default function RouteScopedAcquisition({ children }: RouteScopedAcquisitionProps) {
-  return GUIDE_PATHS.has(usePathname()) ? null : children;
+  const pathname = usePathname();
+  return GUIDE_PATHS.has(pathname) || CAMPAIGN_PATHS.has(pathname) ? null : children;
 }

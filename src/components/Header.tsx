@@ -18,9 +18,19 @@ function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // ROO-1828: com cookies/dados de sites bloqueados (Chrome, Safari, alguns
+  // webviews e iframes), ler ou gravar `localStorage` lança SecurityError.
+  // Aqui, num efeito, isso derrubava a página inteira em "Application error".
+  // Sem armazenamento, o tema fica no padrão (claro) e o botão alterna só na
+  // sessão. A trava é `tests/storage-guard.test.mjs`.
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem("rook-theme");
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem("rook-theme");
+    } catch {
+      stored = null;
+    }
     if (stored === "dark") {
       setIsDark(true);
       document.documentElement.classList.add("dark");
@@ -33,12 +43,11 @@ function ThemeToggle() {
   const toggle = () => {
     const next = !isDark;
     setIsDark(next);
-    if (next) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("rook-theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("rook-theme", "light");
+    document.documentElement.classList.toggle("dark", next);
+    try {
+      localStorage.setItem("rook-theme", next ? "dark" : "light");
+    } catch {
+      // Sem persistência: o tema vale até recarregar a página.
     }
   };
 
@@ -77,8 +86,11 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const isCmvGuide = pathname === "/guia-cmv" || pathname === "/guia-cmv/";
-  const headerCtaHref = isCmvGuide ? "#cmv-guide-form" : "#cadastro";
-  const headerCtaLabel = isCmvGuide ? "Receber guia" : "Agendar demonstração";
+  // ROO-1825: na LP de Black Friday o único destino é a comunidade; o CTA
+  // leva ao bloco final da página, onde está o convite.
+  const isBf1 = pathname === "/bl1" || pathname === "/bl1/";
+  const headerCtaHref = isCmvGuide ? "#cmv-guide-form" : isBf1 ? "#comunidade" : "#cadastro";
+  const headerCtaLabel = isCmvGuide ? "Receber guia" : isBf1 ? "Entrar na comunidade" : "Agendar demonstração";
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md" style={{ backgroundColor: "var(--color-header-bg)", borderBottom: "1px solid var(--color-border)" }}>
