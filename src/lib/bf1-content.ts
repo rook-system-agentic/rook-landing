@@ -33,7 +33,14 @@
  *   está marcado como tal.
  * - A conversa da comunidade no hero é prévia ilustrativa, sem telefone
  *   (ver tests/mock-whatsapp-sem-telefone.test.mjs) e marcada como tal.
+ * - Cadastro antes do grupo (ROO-1848, decisão do Gabriel em 11/11/2026): o CTA
+ *   pede nome, WhatsApp, e-mail e restaurante e só então abre o grupo Black
+ *   Rook 2026. O aviso (`access.notice`) diz a finalidade; contato comercial só
+ *   com a caixa marcada (desmarcada por padrão). Mudou o aviso, sobe
+ *   BF1_ACCESS_NOTICE_VERSION em bf1-access-validation.mjs.
  */
+import { BF1_ACCESS_NOTICE_VERSION } from "./bf1-access-validation.mjs";
+
 export const BF1_CONTENT = {
   meta: {
     title: "Black Friday da Rook e mentoria Planejamento Financeiro 2027 | Rook System",
@@ -49,6 +56,33 @@ export const BF1_CONTENT = {
     pendingLabel: "Link da comunidade em breve",
     headerLabel: "Entrar na comunidade",
     trust: ["Gratuito", "No WhatsApp", "Conteúdo exclusivo toda semana"],
+  },
+  access: {
+    title: "Falta só um passo",
+    lead: "Preencha para entrar no grupo Black Rook 2026, dentro da comunidade da Rook no WhatsApp.",
+    fields: {
+      name: { label: "Nome", placeholder: "Como podemos te chamar" },
+      phone: { label: "WhatsApp com DDD", placeholder: "(11) 99999-9999" },
+      email: { label: "E-mail", placeholder: "voce@restaurante.com.br" },
+      restaurant: { label: "Nome do restaurante", placeholder: "Ex.: Cantina da Praça" },
+    },
+    commercialOptIn: "Quero receber contato comercial da Rook sobre o sistema.",
+    notice: {
+      before:
+        "Usamos estes dados para liberar sua entrada no grupo Black Rook 2026 e para falar com você sobre a Black Friday da Rook. Contato comercial sobre o sistema, só se você marcar a opção acima. Mais detalhes na ",
+      linkLabel: "Política de Privacidade",
+      after: ".",
+    },
+    noticeVersion: BF1_ACCESS_NOTICE_VERSION,
+    submit: "Liberar meu acesso",
+    busy: "Liberando acesso…",
+    close: "Fechar",
+    successTitle: "Acesso liberado",
+    successBody: "Abrindo o grupo Black Rook 2026 no WhatsApp…",
+    successCta: "Entrar no grupo Black Rook 2026",
+    fallbackBody:
+      "Não conseguimos registrar seu cadastro agora. Para você não ficar de fora, pode entrar direto no grupo.",
+    fallbackCta: "Entrar no grupo mesmo assim",
   },
   hero: {
     eyebrow: "Black Friday Rook · Pré-lançamento",
