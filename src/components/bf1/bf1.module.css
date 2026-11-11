@@ -301,6 +301,16 @@ a.cta:hover .ctaArrow {
   color: var(--bf-ink);
 }
 
+.countdownSecondary {
+  /* alinhada ao texto da data: ponto (8px) + gap da linha (0.6rem) */
+  margin: 0.5rem 0 0;
+  padding-left: calc(8px + 0.6rem);
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bf-muted, rgba(255, 255, 255, 0.62));
+}
 .countdownDate .liveDot {
   background: var(--bf-accent);
 }
@@ -555,6 +565,9 @@ a.cta:hover .ctaArrow {
   list-style: none;
 }
 
+.cardsFour {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
 .card {
   position: relative;
   overflow: hidden;

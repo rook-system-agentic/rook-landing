@@ -4,7 +4,7 @@ import Bf1Countdown from "@/components/bf1/Bf1Countdown";
 import styles from "@/components/bf1/bf1.module.css";
 import LpCountUp from "@/components/lp/LpCountUp";
 import Reveal from "@/components/lp/LpReveal";
-import { BF1_CONTENT, type Bf1IconName, type Bf1PillarIconName } from "@/lib/bf1-content";
+import { BF1_CONTENT, type Bf1CommunityIconName, type Bf1IconName, type Bf1PillarIconName } from "@/lib/bf1-content";
 import { TWITTER_CARD } from "@/lib/og-image";
 import { siteUrl } from "@/lib/site-origin";
 
@@ -95,6 +95,51 @@ function BenefitIcon({ name }: { name: Bf1IconName }) {
   );
 }
 
+function CommunityIcon({ name }: { name: Bf1CommunityIconName }) {
+  const common = {
+    width: 22,
+    height: 22,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+    focusable: false,
+  };
+  if (name === "metric") {
+    return (
+      <svg {...common}>
+        <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" />
+        <path d="M7.5 15.5l3-3.5 2.5 2 3.5-4.5" />
+      </svg>
+    );
+  }
+  if (name === "tool") {
+    return (
+      <svg {...common}>
+        <path d="M6.5 3.5h8l3 3v14h-11z" />
+        <path d="M14.5 3.5v3h3M9 11.5h6M9 15h6" />
+      </svg>
+    );
+  }
+  if (name === "trend") {
+    return (
+      <svg {...common}>
+        <path d="M3.5 17.5l5.5-5.5 3.5 3.5 8-8" />
+        <path d="M15 7.5h5.5V13" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <path d="M4 5.5h11a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5H9l-4 3v-3H4A1.5 1.5 0 0 1 2.5 13V7A1.5 1.5 0 0 1 4 5.5z" />
+      <path d="M18.5 9.5h1.5A1.5 1.5 0 0 1 21.5 11v5a1.5 1.5 0 0 1-1.5 1.5h-.5v2.5l-3.2-2.5H12" />
+    </svg>
+  );
+}
+
 function PillarIcon({ name }: { name: Bf1PillarIconName }) {
   const common = {
     width: 22,
@@ -145,7 +190,7 @@ function TrustLine() {
 }
 
 export default function BlackFridayCommunityPage() {
-  const { hero, preview, benefits, mentorship, history, steps, final } = BF1_CONTENT;
+  const { hero, preview, community, benefits, mentorship, history, steps, final } = BF1_CONTENT;
 
   return (
     <div className={styles.page} data-bf1>
@@ -220,6 +265,30 @@ export default function BlackFridayCommunityPage() {
             </div>
             <p className={styles.previewNote}>{preview.note}</p>
           </div>
+        </div>
+      </section>
+
+      <section className={styles.section} aria-labelledby="bf1-community-title">
+        <div className={styles.container}>
+          <p className={styles.sectionLabel}>{community.label}</p>
+          <h2 id="bf1-community-title" className={styles.sectionTitle}>
+            <Headline plain={community.headlinePlain} emphasis={community.headlineEmphasis} />
+          </h2>
+          <ul className={`${styles.cards} ${styles.cardsFour}`}>
+            {community.items.map((item, index) => (
+              <Reveal as="li" key={item.n} delay={index * 110} className={styles.card}>
+                <span className={styles.cardAccent} aria-hidden="true" />
+                <div className={styles.cardTop}>
+                  <span className={styles.cardIcon}>
+                    <CommunityIcon name={item.icon} />
+                  </span>
+                  <span className={styles.cardNumber}>{item.n}</span>
+                </div>
+                <h3 className={styles.cardTitle}>{item.title}</h3>
+                <p className={styles.cardText}>{item.text}</p>
+              </Reveal>
+            ))}
+          </ul>
         </div>
       </section>
 
