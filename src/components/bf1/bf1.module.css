@@ -1513,3 +1513,221 @@ a.cta:hover .ctaArrow {
     }
   }
 }
+
+/* ───────────────── Cadastro antes do grupo (ROO-1848) ─────────────────
+ * <dialog> nativo: foco preso, Esc fecha e o fundo fica inerte sem JS extra.
+ * Escuro nos dois temas, como o hero: é a mesma "black" do CTA que o abriu.
+ */
+
+button.cta {
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button.cta:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+button.cta:focus-visible {
+  outline: 2px solid var(--bf-accent);
+  outline-offset: 3px;
+}
+
+button.cta:disabled {
+  cursor: progress;
+  filter: saturate(0.7);
+}
+
+.accessDialog {
+  width: min(32rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  border: 1px solid rgba(255, 131, 69, 0.28);
+  border-radius: 18px;
+  background: var(--bf-night, #0b0f14);
+  color: var(--bf-ink, #eef3f8);
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  overflow: auto;
+}
+
+.accessDialog::backdrop {
+  background: rgba(5, 8, 12, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.accessPanel {
+  position: relative;
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+}
+
+.accessClose {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--bf-ink, #eef3f8);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.accessClose:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.accessClose:focus-visible,
+.accessInput:focus-visible,
+.accessCheck input:focus-visible,
+.accessNotice a:focus-visible {
+  outline: 2px solid var(--bf-accent, #ff8345);
+  outline-offset: 2px;
+}
+
+.accessEyebrow {
+  margin: 0;
+  font-family: var(--font-mono, "JetBrains Mono", monospace);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bf-accent, #ff8345);
+}
+
+.accessTitle {
+  margin: 0.6rem 0 0;
+  padding-right: 2.5rem;
+  font-family: Manrope, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.5rem, 3.5vw, 1.9rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--bf-ink, #eef3f8);
+}
+
+.accessTitle:focus {
+  outline: none;
+}
+
+.accessLead {
+  margin: 0.75rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--bf-muted, #a7b4c2);
+}
+
+.accessForm {
+  display: grid;
+  gap: 0.95rem;
+  margin-top: 1.5rem;
+}
+
+.accessField {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.accessLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--bf-ink, #eef3f8);
+}
+
+.accessInput {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--bf-ink, #eef3f8);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.accessInput::placeholder {
+  color: rgba(167, 180, 194, 0.6);
+}
+
+.accessInput[aria-invalid="true"] {
+  border-color: #ff6b5b;
+}
+
+.accessInput:read-only {
+  opacity: 0.75;
+}
+
+.accessError {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #ff9b8f;
+}
+
+.accessCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--bf-ink, #eef3f8);
+  cursor: pointer;
+}
+
+.accessCheck input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.2rem;
+  flex: none;
+  accent-color: var(--bf-accent, #ff8345);
+}
+
+.accessNotice {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--bf-muted, #a7b4c2);
+}
+
+.accessNotice a {
+  color: var(--bf-ink, #eef3f8);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.accessSubmit {
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+.accessResult {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.accessResult .accessSubmit {
+  margin-top: 1.25rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .accessDialog[open] {
+    animation: bf1AccessIn 0.22s ease-out;
+  }
+
+  @keyframes bf1AccessIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
