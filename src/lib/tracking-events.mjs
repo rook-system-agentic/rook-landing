@@ -31,6 +31,9 @@ export const TRACKING_EVENTS = Object.freeze({
   // Pedido do guia de CMV (ROO-1642): só o fato, sem campos. O formulário
   // coleta nome, e-mail, telefone e restaurante; nada disso segue para o GA4.
   cmvGuideRequest: "cmv_guide_request",
+  // Cadastro da /bl1 antes do grupo Black Rook 2026 (ROO-1848): só o fato,
+  // sem campos. É o evento de conversão da campanha paga (GTM → GA4/Pixel).
+  bf1AccessRequest: "bf1_access_request",
 });
 
 /**
@@ -56,6 +59,7 @@ const ALLOWED_FIELDS = Object.freeze({
   [TRACKING_EVENTS.formView]: ["page_type", ...EXPERIMENT_FIELDS],
   [TRACKING_EVENTS.integrationError]: ["component", "error_code", ...EXPERIMENT_FIELDS],
   [TRACKING_EVENTS.cmvGuideRequest]: [],
+  [TRACKING_EVENTS.bf1AccessRequest]: [],
 });
 
 export function buildTrackingEvent(name, payload = {}) {
