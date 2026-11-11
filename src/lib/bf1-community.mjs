@@ -27,7 +27,7 @@
  */
 
 /** Convite real da comunidade: `https://chat.whatsapp.com/<código>`. */
-export const BF1_COMMUNITY_URL = null;
+export const BF1_COMMUNITY_URL = "https://chat.whatsapp.com/Go9Hy6nnyoGKDg6y8bbEtO";
 
 /** Abertura da Black Friday 2026 para o público, horário de Brasília. */
 export const BF1_BLACK_FRIDAY_START = "2026-11-27T00:00:00-03:00";
