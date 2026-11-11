@@ -12,6 +12,8 @@ const SAFE_PATHS = new Set([
   '/privacidade', '/diagnostico', '/restaurantes', '/sobre', '/assistente', '/blog',
   // ROO-1642: a LP do guia de CMV também é porta de entrada rastreável.
   '/guia-cmv',
+  // ROO-1848: LP da Black Friday (cadastro antes do grupo Black Rook 2026).
+  '/bl1',
 ]);
 const CONTROL = /[\p{Cc}\p{Cf}]/u;
 
