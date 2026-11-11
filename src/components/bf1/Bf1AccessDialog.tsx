@@ -31,7 +31,7 @@ const REDIRECT_DELAY_MS = 1_500;
 type Field = "name" | "phone" | "email" | "restaurant";
 type Values = Record<Field, string>;
 type Errors = Partial<Record<Field | "commercialContactRequested" | "form", string>>;
-type Phase = "form" | "success" | "fallback";
+type Phase = "form" | "success" | "fallback" | "direct";
 type Snapshot = Values & { submissionId: string; commercialContactRequested: boolean; attribution: LeadAttribution | null };
 
 const FIELDS: readonly Field[] = ["name", "phone", "email", "restaurant"];
@@ -59,12 +59,36 @@ function firstName(value: string) {
 
 class RetryableError extends Error {}
 
+type Proof = { token: string; solution: string; at: number };
+type ProofResult = Proof | "unavailable";
+// O token do desafio vale 10 min no servidor; margem para não enviar vencido.
+const PROOF_TTL_MS = 8 * 60_000;
+
+/*
+ * Busca e resolve o desafio antiabuso. Roda ao abrir o modal, enquanto a
+ * pessoa digita, para o envio ficar quase instantâneo. 503 = cadastro
+ * desligado/indisponível (BF1_ACCESS_ENABLED ausente, por exemplo): a pessoa
+ * segue direto para o grupo, como antes do formulário.
+ */
+async function obtainProof(): Promise<ProofResult> {
+  const response = await fetchWithTimeout(ENDPOINT);
+  if (response.status === 503) return "unavailable";
+  const challenge = asRecord(await response.json().catch(() => null));
+  if (!response.ok || typeof challenge.token !== "string" || typeof challenge.difficulty !== "number") {
+    throw new RetryableError("challenge_unavailable");
+  }
+  const { solveCommercialLeadChallenge } = await import("@/lib/commercial-lead-challenge-client.mjs");
+  const solution = await solveCommercialLeadChallenge({ token: challenge.token, difficulty: challenge.difficulty });
+  return { token: challenge.token, solution, at: Date.now() };
+}
+
 export default function Bf1AccessDialog({ href, onClose }: { href: string; onClose: () => void }) {
   const copy = BF1_CONTENT.access;
   const dialog = useRef<HTMLDialogElement>(null);
   const submissionId = useRef("");
   const attribution = useRef<LeadAttribution | null>(null);
   const snapshot = useRef<Snapshot | null>(null);
+  const proof = useRef<Promise<ProofResult> | null>(null);
   const inFlight = useRef(false);
   const redirectTimer = useRef<number | null>(null);
   const resultHeading = useRef<HTMLHeadingElement>(null);
@@ -76,15 +100,34 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
   const [phase, setPhase] = useState<Phase>("form");
   const [name, setName] = useState("");
 
+  function prewarm() {
+    const pending = obtainProof();
+    pending.catch(() => undefined);
+    proof.current = pending;
+    return pending;
+  }
+
+  function goDirect() {
+    // Cadastro indisponível: não segura a pessoa num formulário que não grava.
+    setPhase("direct");
+    window.location.assign(href);
+  }
+
   useEffect(() => {
     submissionId.current = crypto.randomUUID();
     attribution.current = captureVisitAttribution({ href: window.location.href, referrer: document.referrer });
     const element = dialog.current;
     if (element && !element.open) element.showModal();
+    prewarm()
+      .then((result) => {
+        if (result === "unavailable" && !inFlight.current) goDirect();
+      })
+      .catch(() => undefined);
     return () => {
       if (redirectTimer.current) window.clearTimeout(redirectTimer.current);
       if (element?.open) element.close();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- roda uma vez por abertura
   }, []);
 
   useEffect(() => {
@@ -137,17 +180,18 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
     inFlight.current = true;
     setBusy(true);
     try {
-      const challengeResponse = await fetchWithTimeout(ENDPOINT);
-      const challenge = asRecord(await challengeResponse.json().catch(() => null));
-      if (!challengeResponse.ok || typeof challenge.token !== "string" || typeof challenge.difficulty !== "number") {
-        throw new RetryableError("challenge_unavailable");
+      let current: ProofResult | null = proof.current ? await proof.current.catch(() => null) : null;
+      if (current !== "unavailable" && (!current || Date.now() - current.at > PROOF_TTL_MS)) current = await prewarm();
+      if (current === "unavailable") {
+        goDirect();
+        return;
       }
-      const { solveCommercialLeadChallenge } = await import("@/lib/commercial-lead-challenge-client.mjs");
-      const solution = await solveCommercialLeadChallenge({ token: challenge.token, difficulty: challenge.difficulty });
+      // Cada prova vale um envio: o servidor recusa nonce repetido.
+      proof.current = null;
       const response = await fetchWithTimeout(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...frozen, antiBot: { token: challenge.token, solution } }),
+        body: JSON.stringify({ ...frozen, antiBot: { token: current.token, solution: current.solution } }),
       });
       const data = asRecord(await response.json().catch(() => null));
 
@@ -159,11 +203,13 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
         snapshot.current = null;
         setMessage(typeof data.error === "string" ? data.error : "Revise os campos destacados.");
         showFieldErrors(fieldErrors);
+        prewarm();
         return;
       }
       if (response.status === 400) {
         // Desafio expirado/reutilizado: novo envio com os mesmos dados resolve.
         setMessage(typeof data.error === "string" ? data.error : "A verificação expirou. Tente novamente.");
+        prewarm();
         return;
       }
       if (!response.ok || data.success !== true) throw new RetryableError(`status_${response.status}`);
@@ -267,6 +313,15 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
             <p className={styles.accessLead}>{copy.fallbackBody}</p>
             <a href={href} target="_blank" rel="noopener noreferrer" className={`${styles.cta} ${styles.accessSubmit}`}>
               <span>{copy.fallbackCta}</span>
+            </a>
+          </div>
+        ) : null}
+
+        {phase === "direct" ? (
+          <div className={styles.accessResult} role="status" aria-live="polite">
+            <h2 id="bf1-access-title" ref={resultHeading} tabIndex={-1} className={styles.accessTitle}>{copy.successBody}</h2>
+            <a href={href} target="_blank" rel="noopener noreferrer" className={`${styles.cta} ${styles.accessSubmit}`}>
+              <span>{copy.successCta}</span>
             </a>
           </div>
         ) : null}

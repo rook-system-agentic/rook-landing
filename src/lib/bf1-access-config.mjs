@@ -11,8 +11,11 @@
  * se a URL dedicada existir, chave e segredo também vêm do conjunto dedicado.
  * Misturar URL de um banco com chave de outro não passa.
  *
- * Desligar sem deploy: BF1_ACCESS_DISABLED=true. Com o cadastro indisponível,
- * a /bl1 oferece o convite do grupo direto (decisão F2: não perder quem clicou).
+ * Ativação explícita: BF1_ACCESS_ENABLED=true. Sem ela (ou sem banco/chave),
+ * a rota responde 503 e o CTA da /bl1 leva direto ao grupo, como antes do
+ * formulário. Isso desacopla o deploy da landing da migration do banco:
+ * liga-se a variável só depois de a RPC existir no ambiente. Desligar = tirar
+ * a variável (ou trocar para outro valor) e redeployar.
  */
 
 // Mesmos hosts aceitos por cmv-guide-config.mjs. O teste
@@ -67,10 +70,10 @@ export function readBf1AccessConfig(env = {}) {
     ? env.BF1_ACCESS_SUPABASE_SERVICE_ROLE_KEY || ""
     : env.CMV_GUIDE_SUPABASE_SERVICE_ROLE_KEY || "";
   const abuseSecret = dedicated ? env.BF1_ACCESS_ABUSE_SECRET || "" : env.CMV_GUIDE_ABUSE_SECRET || "";
-  const disabled = env.BF1_ACCESS_DISABLED === "true";
+  const enabled = env.BF1_ACCESS_ENABLED === "true";
 
   const errors = [];
-  if (disabled) errors.push("disabled");
+  if (!enabled) errors.push("disabled");
   if (!aligned) errors.push("environment_mismatch");
   if (!validDatabaseUrl(databaseUrl, environment)) errors.push("database_url_invalid");
   if (!validSecret(serviceRoleKey, 32)) errors.push("database_key_missing");

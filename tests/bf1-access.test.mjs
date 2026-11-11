@@ -25,6 +25,7 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf
 const KEY = "k".repeat(40);
 const SECRET = "s".repeat(40);
 const PROD_ENV = {
+  BF1_ACCESS_ENABLED: "true",
   NEXT_PUBLIC_ENV: "production",
   CMV_GUIDE_ENV: "production",
   CMV_GUIDE_SUPABASE_URL: "https://fzvhgucgfmhnisaqellu.supabase.co",
@@ -58,10 +59,14 @@ test("config: desalinhamento de ambiente, host estranho, chave curta e kill swit
   assert.equal(readBf1AccessConfig({ ...PROD_ENV, CMV_GUIDE_SUPABASE_URL: "https://evil.supabase.co" }).ready, false);
   assert.equal(readBf1AccessConfig({ ...PROD_ENV, CMV_GUIDE_SUPABASE_SERVICE_ROLE_KEY: "curta" }).ready, false);
   assert.equal(readBf1AccessConfig({ ...PROD_ENV, CMV_GUIDE_ABUSE_SECRET: "" }).ready, false);
-  const off = readBf1AccessConfig({ ...PROD_ENV, BF1_ACCESS_DISABLED: "true" });
-  assert.equal(off.ready, false);
-  assert.ok(off.errors.includes("disabled"));
-  assert.equal(off.serviceRoleKey, null, "segredo não sai da config quando não está pronta");
+  // Ativação explícita: sem BF1_ACCESS_ENABLED=true o cadastro fica desligado
+  // e o CTA leva direto ao grupo (deploy da landing antes da migration é seguro).
+  for (const value of [undefined, "", "false", "1", "TRUE"]) {
+    const off = readBf1AccessConfig({ ...PROD_ENV, BF1_ACCESS_ENABLED: value });
+    assert.equal(off.ready, false, `BF1_ACCESS_ENABLED=${value}`);
+    assert.ok(off.errors.includes("disabled"));
+    assert.equal(off.serviceRoleKey, null, "segredo não sai da config quando não está pronta");
+  }
 });
 
 test("config: conjunto dedicado é tudo ou nada (não mistura URL de um banco com chave de outro)", () => {
@@ -254,8 +259,14 @@ test("UI: o CTA abre o cadastro antes do grupo e o modal só abre o grupo depois
   assert.match(dialog, /useState\(false\)/, "opt-in comercial desmarcado por padrão");
   const success = dialog.indexOf("rememberBf1Access();");
   assert.ok(success > dialog.indexOf("data.success !== true"), "só lembra/abre o grupo depois da confirmação do servidor");
-  assert.ok(dialog.indexOf("window.location.assign(href)") > success);
+  assert.ok(
+    dialog.indexOf("window.setTimeout(() => window.location.assign(href), REDIRECT_DELAY_MS)") > success,
+    "redirecionamento do sucesso só depois de lembrar o cadastro confirmado",
+  );
   assert.match(dialog, /track\(TRACKING_EVENTS\.bf1AccessRequest\)/, "evento sem campos");
+  assert.match(dialog, /response\.status === 503\) return "unavailable"/, "cadastro desligado → direto ao grupo");
+  assert.match(dialog, /if \(result === "unavailable" && !inFlight\.current\) goDirect\(\)/);
+  assert.match(dialog, /proof\.current = null;/, "prova do desafio é de uso único");
   assert.doesNotMatch(dialog, /track\([^)]*values|track\([^)]*email|console\./, "nada do formulário vai para analytics ou console");
 });
 
