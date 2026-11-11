@@ -40,6 +40,13 @@ test("o link configurado é nulo ou um convite válido", () => {
   assert.equal(communityLink(BF1_COMMUNITY_URL).ready, true, `BF1_COMMUNITY_URL inválido: ${BF1_COMMUNITY_URL}`);
 });
 
+test("o destino é o grupo Black Rook 2026, não o convite da comunidade nem o grupo antigo (decisão de 11/11 17:43)", () => {
+  // Go9Hy… = convite da comunidade Rook Insights (abre a comunidade inteira).
+  // CMO7… = grupo solto anterior, fora da comunidade.
+  assert.equal(BF1_COMMUNITY_URL, "https://chat.whatsapp.com/DBVioSBnT9O4cPDpIlfXCP");
+  assert.doesNotMatch(BF1_COMMUNITY_URL, /Go9Hy6nnyoGKDg6y8bbEtO|CMO7hCGFdz27jMd7eOu4o0/);
+});
+
 test("a Black Friday 2026 começa na sexta, 27/11, horário de Brasília", () => {
   const inicio = new Date(BF1_BLACK_FRIDAY_START);
   assert.equal(inicio.toISOString(), "2026-11-27T03:00:00.000Z");
@@ -121,4 +128,10 @@ test("a comunidade tem valor próprio além da Black Friday e a data destaca o a
   assert.match(textos, /A comunidade fica\./);
   assert.match(textos, /Acesso antecipado · quinta, 26\/11/);
   assert.match(textos, /Abertura para o público: sexta, 27\/11/);
+});
+
+test("os grupos são fechados: a página não promete conversa entre membros (decisão de 11/11 17:24)", async () => {
+  const textos = await textosDaPagina();
+  assert.doesNotMatch(textos, /você conversa|converse com|troca entre donos|bate-papo/i);
+  assert.match(textos, /só o time da Rook publica/);
 });
