@@ -1,5 +1,5 @@
 /**
- * LP de Black Friday `/bl1/` (ROO-1825): o link da comunidade e a data.
+ * LP de Black Friday `/bl1/` (ROO-1825): o destino do CTA e a data.
  *
  * POR QUE UM MÓDULO SÓ PARA ISSO
  *
@@ -8,9 +8,19 @@
  * três lugares, um convite trocado (o WhatsApp permite redefinir o link) fica
  * certo em dois e quebrado no terceiro. Aqui é o único lugar.
  *
- * Enquanto a comunidade não existir, `BF1_COMMUNITY_URL` fica `null` e o CTA
- * aparece como "Link da comunidade em breve" — nunca um link para lugar
- * nenhum. A trava está em `tests/bf1-community.test.mjs`.
+ * DESTINO: O GRUPO "BLACK ROOK 2026", NÃO O CONVITE DA COMUNIDADE
+ * (decisão do Gabriel, 11/11/2026 17:43). A /bl1 é a porta da Black Friday;
+ * o convite da comunidade "Rook Insights - Bares e Restaurantes" abria a
+ * comunidade inteira e deixava a pessoa escolher o grupo. O convite do grupo
+ * leva direto ao Black Rook 2026 e, por ser grupo de comunidade, também põe a
+ * pessoa na comunidade e no grupo Avisos (FAQ do WhatsApp: "When you're in a
+ * community, you're always added to community Announcements"). O nome da
+ * constante ficou `BF1_COMMUNITY_URL` para não espalhar renome; o valor é o
+ * convite do grupo. A trava contra voltar ao convite da comunidade está em
+ * `tests/bf1-community.test.mjs`.
+ *
+ * Sem convite válido, `BF1_COMMUNITY_URL` fica `null` e o CTA aparece como
+ * "Link da comunidade em breve" — nunca um link para lugar nenhum.
  *
  * Duas datas, uma função cada (decisão de 11/11, feedback da Gabriela):
  * - `BF1_EARLY_ACCESS_START` (quinta, 26/11): o acesso antecipado da
@@ -26,15 +36,22 @@
  * contagem velha.
  */
 
-/** Convite real da comunidade: `https://chat.whatsapp.com/<código>`. */
-export const BF1_COMMUNITY_URL = "https://chat.whatsapp.com/Go9Hy6nnyoGKDg6y8bbEtO";
+/**
+ * Convite do grupo "Black Rook 2026" (comunidade Rook Insights), lido em
+ * "Convidar via link" no WhatsApp Web em 11/11/2026 17:46; og:title do convite
+ * confere "Black Rook 2026". Redefinir o link no WhatsApp invalida este valor.
+ */
+export const BF1_COMMUNITY_URL = "https://chat.whatsapp.com/DBVioSBnT9O4cPDpIlfXCP";
 
 /** Abertura da Black Friday 2026 para o público, horário de Brasília. */
 export const BF1_BLACK_FRIDAY_START = "2026-11-27T00:00:00-03:00";
 /** Acesso antecipado da comunidade (alvo da contagem), horário de Brasília. */
 export const BF1_EARLY_ACCESS_START = "2026-11-26T00:00:00-03:00";
 
-/** Destino registrado no `cta_click`. Valor fixo, sem dado pessoal. */
+/**
+ * Destino registrado no `cta_click`. Valor fixo, sem dado pessoal. Mantido
+ * igual após a troca para o grupo, para não quebrar a série do GA4/GTM.
+ */
 export const BF1_TRACKING_DESTINATION = "bf1_whatsapp_community";
 
 const CONVITE_WHATSAPP = /^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]{16,40}$/;

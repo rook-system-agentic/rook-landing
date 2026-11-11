@@ -115,8 +115,8 @@ export const BF1_CONTENT = {
       {
         n: "04",
         icon: "chat",
-        title: "Troca entre donos",
-        text: "No grupo Geral, você conversa com outros donos e gestores sobre o que tem funcionado.",
+        title: "Sem ruído",
+        text: "Grupos fechados: só o time da Rook publica. Você recebe o essencial, sem enxurrada de mensagens.",
       },
     ],
   },
