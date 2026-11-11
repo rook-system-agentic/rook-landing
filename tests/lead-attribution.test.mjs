@@ -65,6 +65,10 @@ test('normalização aplica limites e descarta campos extras, dados pessoais apa
 });
 
 test('rejeita caminhos não conhecidos e referrers com credenciais, IP ou dados adicionais', () => {
+  assert.deepEqual(normalizeLeadAttribution({ landing_path: '/bl1/' }),
+    { version: 1, source: 'site_form', landing_path: '/bl1' }, 'a LP da Black Friday (ROO-1848) é caminho público rastreável');
+  assert.deepEqual(normalizeLeadAttribution({ landing_path: '/bl9' }),
+    { version: 1, source: 'site_form', omitted_fields: ['landing_path'] }, 'variantes só entram quando a página existir');
   assert.deepEqual(normalizeLeadAttribution({ landing_path: '/guia-cmv/' }),
     { version: 1, source: 'site_form', landing_path: '/guia-cmv' }, 'a LP do guia de CMV (ROO-1642) é caminho público rastreável');
   for (const landing_path of ['/pessoa@example.invalid', '/blog/nome-de-pessoa', '/?email=x', '/#cadastro',
