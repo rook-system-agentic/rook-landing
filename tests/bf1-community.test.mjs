@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   BF1_BLACK_FRIDAY_START,
+  BF1_EARLY_ACCESS_START,
   BF1_COMMUNITY_URL,
   BF1_TRACKING_DESTINATION,
   communityLink,
@@ -45,8 +46,15 @@ test("a Black Friday 2026 começa na sexta, 27/11, horário de Brasília", () =>
   assert.equal(inicio.getUTCDay(), 5);
 });
 
-test("a contagem regressiva quebra o tempo restante e encerra na data", () => {
-  const alvo = Date.parse(BF1_BLACK_FRIDAY_START);
+test("o acesso antecipado é quinta, 26/11, antes da abertura ao público", () => {
+  const acesso = new Date(BF1_EARLY_ACCESS_START);
+  assert.equal(acesso.toISOString(), "2026-11-26T03:00:00.000Z");
+  assert.equal(acesso.getUTCDay(), 4);
+  assert.ok(acesso.getTime() < Date.parse(BF1_BLACK_FRIDAY_START));
+});
+
+test("a contagem regressiva mira o acesso antecipado e encerra na data", () => {
+  const alvo = Date.parse(BF1_EARLY_ACCESS_START);
   const umDiaEUmPouco = alvo - ((1 * 86400 + 2 * 3600 + 3 * 60 + 4) * 1000);
   assert.deepEqual(countdownParts(umDiaEUmPouco), { done: false, days: 1, hours: 2, minutes: 3, seconds: 4 });
   assert.equal(countdownParts(alvo).done, true);
@@ -88,4 +96,29 @@ test("a mentoria tem tema definido e nenhuma regra inventada", async () => {
   // Vagas, percentual de desconto e datas da mentoria são anunciados na comunidade, nunca na página.
   const textos = [...conteudo.matchAll(/"([^"\\]*)"/g)].map((m) => m[1]).join("\n");
   assert.doesNotMatch(textos, /\bvagas?\b|\d+\s?%|\bgr[aá]tis para os \d+/i);
+});
+
+// Textos da página, sem os comentários (os comentários citam as palavras banidas de propósito).
+async function textosDaPagina() {
+  const conteudo = await readFile(path.join(RAIZ, "src/lib/bf1-content.ts"), "utf8");
+  const semComentarios = conteudo.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  return [...semComentarios.matchAll(/"([^"\\]*)"/g)].map((m) => m[1]).join("\n");
+}
+
+test("a copy não promete lucro, não garante desconto e não convida a sair (feedback de 10/11)", async () => {
+  const textos = await textosDaPagina();
+  assert.doesNotMatch(textos, /\blucrar\b|\blucre\b|\bgarant|sai quando quiser|sair quando quiser|personalizada/i);
+});
+
+test("os R$ 925 milhões usam a frase do vídeo, nunca gerenciado ou administrado", async () => {
+  const textos = await textosDaPagina();
+  assert.match(textos, /atendeu empresas que somam R\$ 925 milhões de faturamento/);
+  assert.doesNotMatch(textos, /gerenciad|administrad/i);
+});
+
+test("a comunidade tem valor próprio além da Black Friday e a data destaca o acesso antecipado", async () => {
+  const textos = await textosDaPagina();
+  assert.match(textos, /A comunidade fica\./);
+  assert.match(textos, /Acesso antecipado · quinta, 26\/11/);
+  assert.match(textos, /Abertura para o público: sexta, 27\/11/);
 });

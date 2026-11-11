@@ -21,7 +21,7 @@ const doisDigitos = (n: number) => String(n).padStart(2, "0");
 
 export default function Bf1Countdown() {
   const [parts, setParts] = useState<CountdownParts | null>(null);
-  const { dateLabel, countdownLabels, countdownAria } = BF1_CONTENT.hero;
+  const { dateLabel, dateSecondary, doneLabel, countdownLabels, countdownAria } = BF1_CONTENT.hero;
 
   useEffect(() => {
     const tick = () => setParts(countdownParts(Date.now()));
@@ -36,8 +36,9 @@ export default function Bf1Countdown() {
     <div className={styles.countdown}>
       <p className={styles.countdownDate}>
         <span className={styles.liveDot} aria-hidden="true" />
-        {dateLabel}
+        {parts?.done ? doneLabel : dateLabel}
       </p>
+      <p className={styles.countdownSecondary}>{dateSecondary}</p>
       {parts?.done ? null : (
         <div
           role="timer"
