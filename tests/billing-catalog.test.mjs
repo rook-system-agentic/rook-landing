@@ -8,7 +8,6 @@ import {
   resolvePublicBillingCatalog,
 } from "../src/lib/public-billing-catalog.mjs";
 import { buildDirectCheckoutHref } from "../src/lib/direct-checkout-link.mjs";
-import { buildTrialDateEstimate } from "../src/lib/trial-date-estimate.mjs";
 import snapshotCandidate from "../src/data/billing-catalog-v2.snapshot.json" with {
   type: "json",
 };
@@ -33,22 +32,17 @@ test("snapshot público gera exatamente a oferta mensal exibida", () => {
   assert.equal("chessDiscountTiers" in view, false);
 });
 
-test("estimativa do trial usa o dia corrente de São Paulo, não a data do build", () => {
-  assert.deepEqual(
-    buildTrialDateEstimate(7, new Date("2026-08-06T12:00:00.000Z")),
-    {
-      startDate: "06/08/2026",
-      firstChargeDate: "13/08/2026",
-    },
-  );
-
-  assert.deepEqual(
-    buildTrialDateEstimate(7, new Date("2026-08-06T01:30:00.000Z")),
-    {
-      startDate: "05/08/2026",
-      firstChargeDate: "12/08/2026",
-    },
-  );
+test("catálogo aceita a retirada do trial sem quebrar o envelope publicado", () => {
+  const paidCatalog = structuredClone(snapshotCandidate.catalog);
+  paidCatalog.trial.durationDays = 0;
+  const view = buildBillingCatalogViewModel(paidCatalog);
+  assert.equal(view.trialDays, 0);
+  assert.equal(view.requiresPaymentMethod, true);
+  assert.equal(view.basePlans[0].unitAmountCents, snapshotCandidate.catalog.offers[0].unitAmountCents);
+  for (const invalid of [-1, 1, 6, 30, "0", null]) {
+    paidCatalog.trial.durationDays = invalid;
+    assert.throws(() => parsePublicBillingCatalog(paidCatalog), /trial.durationDays/);
+  }
 });
 
 test("checkout direto aceita somente as faixas Knight e Rook", () => {

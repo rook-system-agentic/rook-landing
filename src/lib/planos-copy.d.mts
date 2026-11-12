@@ -29,5 +29,4 @@ export declare function planoParaExibicao(plano: {
 
 export declare function descricaoParaBuscador(
   productCode: string,
-  diasDeTeste?: number | null,
 ): string | undefined;

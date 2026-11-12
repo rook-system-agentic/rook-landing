@@ -7,9 +7,10 @@
  *
  * - Um CTA só: entrar na comunidade da Rook no WhatsApp. O link e a data vêm de
  *   `bf1-community.mjs`; nenhum texto aqui cita link.
- * - Desconto e mentoria são PROMESSA DE CAMPANHA, sem regra inventada: nada de
- *   percentual, número de vagas ou critério de seleção. Essas condições são
- *   anunciadas dentro da comunidade — e é exatamente o motivo para entrar.
+ * - A oferta de primeiro mês foi definida na ROO-1857 e é revelada no servidor
+ *   a partir de 26/11 (bf1-campaign-server.ts). Não colocar preço futuro neste
+ *   módulo: ele também é importado por componentes cliente. As regras da
+ *   mentoria continuam sem vagas ou critérios inventados.
  * - R$ 925 milhões: informado por Gabriel Abdala (CEO) em 09/11/2026. A frase
  *   canônica é a do vídeo do anúncio (bf26_v1ads_30s): "nossa consultoria de
  *   reestruturação atendeu empresas que somam R$ 925 milhões de faturamento
@@ -55,7 +56,8 @@ export const BF1_CONTENT = {
     label: "Entrar na comunidade gratuita",
     pendingLabel: "Link da comunidade em breve",
     headerLabel: "Entrar na comunidade",
-    trust: ["Gratuito", "No WhatsApp", "Conteúdo exclusivo toda semana"],
+    trust: ["Comunidade gratuita", "No WhatsApp", "Conteúdo exclusivo toda semana"],
+    paidTrust: ["Pagamento seguro na Stripe", "Primeiro mês promocional", "Renovação mensal"],
   },
   access: {
     title: "Falta só um passo",
@@ -97,8 +99,10 @@ export const BF1_CONTENT = {
     },
     secondaryLabel: "Conhecer a mentoria 2027",
     dateLabel: "Acesso antecipado · quinta, 26/11",
-    dateSecondary: "Abertura para o público: sexta, 27/11",
+    dateSecondary: "Abertura para o público: sexta, 27/11 · Até 04/12, às 23h59, horário de Brasília",
     doneLabel: "O acesso antecipado já começou na comunidade",
+    endLabel: "Black Rook · Até 04/12, às 23h59",
+    endedLabel: "Black Rook encerrada em 04/12/2026",
     countdownLabels: { days: "dias", hours: "horas", minutes: "min", seconds: "seg" },
     countdownAria: "Tempo até o acesso antecipado",
     stat: { value: "R$ 925 mi", caption: "faturamento anual das empresas atendidas pela nossa consultoria em 2025" },

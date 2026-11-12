@@ -139,22 +139,17 @@ const COMPLEMENTO_BUSCADOR = Object.freeze({
  * estruturado não é erro de texto — é promessa comercial que a própria
  * página de planos contradiz.
  *
- * `diasDeTeste` vem do catálogo (`trial.durationDays`) e só é passado para os
- * planos-base; o Chess é adicional de organização e não tem teste próprio.
- * Passe `null` e a frase sai sem essa parte.
+ * ROO-1857: novas contratações são pagas. Mesmo um snapshot antigo não pode
+ * recolocar a promessa de teste gratuito no texto de aquisição.
  *
  * @param {string} productCode
- * @param {number | null} [diasDeTeste]
  * @returns {string | undefined} `undefined` para código sem copy escrita.
  */
-export function descricaoParaBuscador(productCode, diasDeTeste = null) {
+export function descricaoParaBuscador(productCode) {
   const copy = copyDoPlano(productCode);
   if (!copy) return undefined;
   const partes = [copy.descricao];
   const complemento = COMPLEMENTO_BUSCADOR[productCode];
   if (complemento) partes.push(complemento);
-  if (typeof diasDeTeste === "number" && diasDeTeste > 0) {
-    partes.push(`${diasDeTeste} dias de teste grátis.`);
-  }
   return partes.join(" ");
 }
