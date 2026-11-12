@@ -107,7 +107,9 @@ function parseTrial(value) {
     ["durationDays", "requiresPaymentMethod", "maxUsesPerOrganizationCnpj"],
     "trial",
   );
-  assert(value.durationDays === 7, "trial.durationDays");
+  // ROO-1857: 0 é contratação paga. Aceitar o formato legado durante a
+  // promoção entre app e landing não autoriza anunciar teste gratuito.
+  assert(value.durationDays === 0 || value.durationDays === 7, "trial.durationDays");
   assert(value.requiresPaymentMethod === true, "trial.requiresPaymentMethod");
   assert(value.maxUsesPerOrganizationCnpj === 1, "trial.maxUsesPerOrganizationCnpj");
 
