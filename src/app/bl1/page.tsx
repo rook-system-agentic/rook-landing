@@ -5,6 +5,7 @@ import styles from "@/components/bf1/bf1.module.css";
 import LpCountUp from "@/components/lp/LpCountUp";
 import Reveal from "@/components/lp/LpReveal";
 import { BF1_CONTENT, type Bf1CommunityIconName, type Bf1IconName, type Bf1PillarIconName } from "@/lib/bf1-content";
+import { getBf1CampaignContent } from "@/lib/bf1-campaign-server";
 import { TWITTER_CARD } from "@/lib/og-image";
 import { siteUrl } from "@/lib/site-origin";
 
@@ -24,6 +25,10 @@ import { siteUrl } from "@/lib/site-origin";
  * desta página. A arte vive em public/og/, em PNG.
  */
 const PAGE_URL = siteUrl("/bl1/");
+
+// A fase e o preço são resolvidos a cada pedido, sem cache de build/ISR
+// atravessando o lançamento ou o encerramento da campanha (ROO-1857).
+export const dynamic = "force-dynamic";
 
 const BF1_OG_IMAGE = {
   url: "/og/bf1-og.png",
@@ -179,10 +184,11 @@ function Headline({ plain, emphasis }: { plain: string; emphasis: string }) {
   );
 }
 
-function TrustLine() {
+function TrustLine({ paid = false }: { paid?: boolean }) {
+  const items = paid ? BF1_CONTENT.cta.paidTrust : BF1_CONTENT.cta.trust;
   return (
     <ul className={styles.trust}>
-      {BF1_CONTENT.cta.trust.map((item) => (
+      {items.map((item) => (
         <li key={item}>{item}</li>
       ))}
     </ul>
@@ -190,7 +196,8 @@ function TrustLine() {
 }
 
 export default function BlackFridayCommunityPage() {
-  const { hero, preview, community, benefits, mentorship, history, steps, final } = BF1_CONTENT;
+  const { content, offer, phase, checkoutHref } = getBf1CampaignContent();
+  const { hero, preview, community, benefits, mentorship, history, steps, final } = content;
 
   return (
     <div className={styles.page} data-bf1>
@@ -218,8 +225,16 @@ export default function BlackFridayCommunityPage() {
               <strong>{hero.lead.strong}</strong>
               {hero.lead.after}
             </p>
+            {offer && (
+              <div className={styles.offerSummary} aria-label="Resumo da oferta Black Rook">
+                <p>{offer.summary}</p>
+                <a href="#condicoes-black-rook">Ver condições da oferta</a>
+              </div>
+            )}
             <div className={styles.ctaRow}>
-              <Bf1CommunityCta />
+              {checkoutHref ? (
+                <a href={checkoutHref} className={styles.cta}>Contratar com a oferta Black Rook</a>
+              ) : <Bf1CommunityCta />}
               <a href={`#${mentorship.id}`} className={styles.secondary}>
                 {hero.secondaryLabel}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
@@ -227,8 +242,8 @@ export default function BlackFridayCommunityPage() {
                 </svg>
               </a>
             </div>
-            <TrustLine />
-            <Bf1Countdown />
+            <TrustLine paid={Boolean(checkoutHref)} />
+            <Bf1Countdown initialPhase={phase} />
           </div>
 
           <div className={styles.preview}>
@@ -267,6 +282,17 @@ export default function BlackFridayCommunityPage() {
           </div>
         </div>
       </section>
+
+      {offer && (
+        <section id="condicoes-black-rook" className={styles.offerDetails} aria-labelledby="bf1-offer-title">
+          <div className={styles.container}>
+            <h2 id="bf1-offer-title">Condições da Black Rook</h2>
+            <p>{offer.period}</p>
+            <p>{offer.terms}</p>
+            <p>{offer.payment}</p>
+          </div>
+        </section>
+      )}
 
       <section className={styles.section} aria-labelledby="bf1-community-title">
         <div className={styles.container}>
@@ -453,9 +479,11 @@ export default function BlackFridayCommunityPage() {
           </h2>
           <p className={styles.finalText}>{final.text}</p>
           <div className={styles.finalCta}>
-            <Bf1CommunityCta />
+            {checkoutHref ? (
+              <a href={checkoutHref} className={styles.cta}>Contratar com a oferta Black Rook</a>
+            ) : <Bf1CommunityCta />}
           </div>
-          <TrustLine />
+          <TrustLine paid={Boolean(checkoutHref)} />
         </div>
       </section>
     </div>

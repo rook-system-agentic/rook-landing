@@ -395,7 +395,7 @@ export function PlansCommercialExperience({
               /estabelecimento/mês
             </span>
           </p>
-          <p className="mt-2 text-xs text-muted">Cobrança mensal recorrente em reais.</p>
+          <p className="mt-2 text-xs text-muted">Pagamento na contratação e renovação mensal em reais.</p>
           <ul className="mt-7 space-y-3">
             {selected.features.map((feature) => (
               <li key={feature} className="flex items-start gap-2 text-sm text-muted">
@@ -427,7 +427,7 @@ export function PlansCommercialExperience({
               })
             }
           >
-            Testar por 7 dias
+            Contratar meu plano
           </a>
           <AsaflowAssistedCta plan={selected.productCode} />
         </article>

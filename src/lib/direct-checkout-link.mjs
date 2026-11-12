@@ -1,4 +1,4 @@
-const DIRECT_CHECKOUT_URL = "https://app.rook.com.br/contratar";
+export const DIRECT_CHECKOUT_URL = "https://app.rook.com.br/contratar";
 const ALLOWED_REVENUE_BANDS = new Set(["knight", "rook"]);
 
 export function buildDirectCheckoutHref(revenueBand) {

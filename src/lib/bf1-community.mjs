@@ -47,6 +47,24 @@ export const BF1_COMMUNITY_URL = "https://chat.whatsapp.com/DBVioSBnT9O4cPDpIlfX
 export const BF1_BLACK_FRIDAY_START = "2026-11-27T00:00:00-03:00";
 /** Acesso antecipado da comunidade (alvo da contagem), horário de Brasília. */
 export const BF1_EARLY_ACCESS_START = "2026-11-26T00:00:00-03:00";
+/** Limite exclusivo: inclui todo o dia 04/12, horário de Brasília. */
+export const BF1_OFFER_END = "2026-12-05T00:00:00-03:00";
+
+/** Calendário de apresentação. A elegibilidade é validada pelo checkout. */
+export function campaignPhase(nowMs) {
+  if (!Number.isFinite(nowMs) || nowMs < Date.parse(BF1_EARLY_ACCESS_START)) return "upcoming";
+  if (nowMs < Date.parse(BF1_BLACK_FRIDAY_START)) return "early";
+  if (nowMs < Date.parse(BF1_OFFER_END)) return "public";
+  return "ended";
+}
+
+export function campaignCountdown(nowMs) {
+  const phase = campaignPhase(nowMs);
+  return {
+    phase,
+    ...countdownParts(nowMs, phase === "upcoming" ? BF1_EARLY_ACCESS_START : BF1_OFFER_END),
+  };
+}
 
 /**
  * Destino registrado no `cta_click`. Valor fixo, sem dado pessoal. Mantido

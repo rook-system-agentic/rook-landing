@@ -1,48 +1,61 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { countdownParts, type CountdownParts } from "@/lib/bf1-community.mjs";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { campaignCountdown, type CampaignPhase, type CountdownParts } from "@/lib/bf1-community.mjs";
 import { BF1_CONTENT } from "@/lib/bf1-content";
 import styles from "./bf1.module.css";
 
 /*
- * Contagem até a Black Friday (ROO-1825).
+ * Contagem até o acesso antecipado e, durante a campanha, até o encerramento.
  *
  * A DATA é a informação e vai no HTML. Os números são o movimento: a página é
- * estática, então qualquer contagem renderizada no build estaria velha quando
- * o visitante chegasse. Por isso eles só aparecem depois de montar — e o
+ * pode ficar aberta por dias. Por isso eles só aparecem depois de montar — e o
  * espaço fica reservado, para o hero não pular.
  *
- * Depois de 27/11 a grade some e fica só a data.
+ * Ao mudar de fase, uma atualização do servidor troca a oferta e os CTAs sem
+ * carregar preço futuro no bundle nem deixar uma promoção expirada na tela.
  */
 const UNIDADES = ["days", "hours", "minutes", "seconds"] as const;
 
 const doisDigitos = (n: number) => String(n).padStart(2, "0");
 
-export default function Bf1Countdown() {
-  const [parts, setParts] = useState<CountdownParts | null>(null);
-  const { dateLabel, dateSecondary, doneLabel, countdownLabels, countdownAria } = BF1_CONTENT.hero;
+export default function Bf1Countdown({ initialPhase }: { initialPhase: CampaignPhase }) {
+  const [parts, setParts] = useState<(CountdownParts & { phase: CampaignPhase }) | null>(null);
+  const router = useRouter();
+  const lastPhase = useRef(initialPhase);
+  const { dateLabel, dateSecondary, doneLabel, countdownLabels, countdownAria, endLabel, endedLabel } = BF1_CONTENT.hero;
 
   useEffect(() => {
-    const tick = () => setParts(countdownParts(Date.now()));
+    const tick = () => {
+      const current = campaignCountdown(Date.now());
+      setParts(current);
+      if (lastPhase.current !== current.phase) {
+        lastPhase.current = current.phase;
+        router.refresh();
+      }
+    };
     tick();
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
-  }, []);
+  }, [router]);
 
   const pronto = parts !== null && !parts.done;
+  const phase = parts?.phase ?? initialPhase;
+  const ended = phase === "ended";
+  const label = phase === "upcoming" ? dateLabel : phase === "early" ? doneLabel : ended ? endedLabel : endLabel;
 
   return (
     <div className={styles.countdown}>
       <p className={styles.countdownDate}>
         <span className={styles.liveDot} aria-hidden="true" />
-        {parts?.done ? doneLabel : dateLabel}
+        {label}
       </p>
-      <p className={styles.countdownSecondary}>{dateSecondary}</p>
-      {parts?.done ? null : (
+      <p className={styles.countdownSecondary}>{phase === "upcoming" || phase === "early" ? dateSecondary : "Horário de Brasília · A comunidade continua depois da Black Friday"}</p>
+      {ended ? null : (
         <div
           role="timer"
-          aria-label={countdownAria}
+          aria-label={phase === "upcoming" ? countdownAria : "Tempo até o encerramento da Black Rook"}
           aria-hidden={pronto ? undefined : true}
           className={`${styles.countdownGrid} ${pronto ? "" : styles.countdownIdle}`.trim()}
         >

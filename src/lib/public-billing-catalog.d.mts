@@ -15,7 +15,7 @@ export interface PublicBillingCatalog {
   release: { key: string; version: number; effectiveFrom: string };
   offers: PublicBillingOffer[];
   trial: {
-    durationDays: 7;
+    durationDays: 0 | 7;
     requiresPaymentMethod: true;
     maxUsesPerOrganizationCnpj: 1;
   };
