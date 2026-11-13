@@ -96,10 +96,13 @@ export default function CookieConsent() {
       ref={banner}
       role="dialog"
       aria-label="Preferências de cookies"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-bg-card p-4 shadow-lg"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-bg-card px-4 py-3 shadow-lg sm:p-4"
     >
-      <div className="mx-auto flex max-w-4xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-muted">
+      {/* ROO-1876: no celular o banner ocupava ~1/4 da primeira tela e
+          disputava espaço com o CTA da /bl1. Mesmo texto e mesmas opções, com
+          fonte menor e botões lado a lado. */}
+      <div className="mx-auto flex max-w-4xl flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <p className="text-xs leading-snug text-muted sm:text-sm sm:leading-normal">
           Usamos cookies para medir o uso do site e, com a sua autorização, para
           personalizar anúncios. Você pode recusar os anúncios e continuar
           navegando normalmente.{" "}
@@ -108,10 +111,10 @@ export default function CookieConsent() {
           </Link>
           .
         </p>
-        <div className="flex shrink-0 flex-wrap gap-2">
+        <div className="flex shrink-0 gap-2">
           <button
             type="button"
-            className="btn-ghost"
+            className="btn-ghost flex-1 !px-3 !py-2 text-sm sm:flex-none sm:!px-5 sm:!py-3 sm:text-[15px]"
             onClick={() => {
               atualizarConsentimento(defaultConsentState());
               setVisivel(false);
@@ -121,7 +124,7 @@ export default function CookieConsent() {
           </button>
           <button
             type="button"
-            className="btn-primary"
+            className="btn-primary flex-1 !px-3 !py-2 text-sm sm:flex-none sm:!px-7 sm:!py-3.5 sm:text-[15px]"
             onClick={() => {
               atualizarConsentimento(grantedConsentState());
               setVisivel(false);

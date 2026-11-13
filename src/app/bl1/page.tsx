@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Bf1AccessHost from "@/components/bf1/Bf1AccessHost";
 import Bf1CommunityCta from "@/components/bf1/Bf1CommunityCta";
 import Bf1Countdown from "@/components/bf1/Bf1Countdown";
 import styles from "@/components/bf1/bf1.module.css";
 import LpCountUp from "@/components/lp/LpCountUp";
 import Reveal from "@/components/lp/LpReveal";
+import { BF1_FINAL_CTA_ID, BF1_HERO_CTA_ID } from "@/lib/bf1-community.mjs";
 import { BF1_CONTENT, type Bf1CommunityIconName, type Bf1IconName, type Bf1PillarIconName } from "@/lib/bf1-content";
 import { getBf1CampaignContent } from "@/lib/bf1-campaign-server";
 import { TWITTER_CARD } from "@/lib/og-image";
@@ -231,7 +233,7 @@ export default function BlackFridayCommunityPage() {
                 <a href="#condicoes-black-rook">Ver condições da oferta</a>
               </div>
             )}
-            <div className={styles.ctaRow}>
+            <div id={BF1_HERO_CTA_ID} className={styles.ctaRow}>
               {checkoutHref ? (
                 <a href={checkoutHref} className={styles.cta}>Contratar com a oferta Black Rook</a>
               ) : <Bf1CommunityCta />}
@@ -478,7 +480,7 @@ export default function BlackFridayCommunityPage() {
             <Headline plain={final.headlinePlain} emphasis={final.headlineEmphasis} />
           </h2>
           <p className={styles.finalText}>{final.text}</p>
-          <div className={styles.finalCta}>
+          <div id={BF1_FINAL_CTA_ID} className={styles.finalCta}>
             {checkoutHref ? (
               <a href={checkoutHref} className={styles.cta}>Contratar com a oferta Black Rook</a>
             ) : <Bf1CommunityCta />}
@@ -486,6 +488,8 @@ export default function BlackFridayCommunityPage() {
           <TrustLine paid={Boolean(checkoutHref)} />
         </div>
       </section>
+      {/* ROO-1876: um host só abre o cadastro para todos os CTAs; a barra fixa só existe enquanto o CTA principal é a comunidade. */}
+      <Bf1AccessHost stickyBar={!checkoutHref} />
     </div>
   );
 }

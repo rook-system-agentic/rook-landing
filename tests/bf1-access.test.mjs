@@ -249,10 +249,14 @@ test("rota: limite, conflito, desafio vencido e banco fora respondem sem PII nos
 // ───────────── UI, copy e privacidade (travas estáticas) ─────────────
 
 test("UI: o CTA abre o cadastro antes do grupo e o modal só abre o grupo depois da gravação", () => {
+  // ROO-1876: o clique é interceptado por um host único; o CTA é só a âncora.
+  const host = read("src/components/bf1/Bf1AccessHost.tsx");
+  assert.match(host, /event\.preventDefault\(\)/);
+  assert.match(host, /Bf1AccessDialog/);
+  assert.match(host, /hasBf1Access\(\)/);
   const cta = read("src/components/bf1/Bf1CommunityCta.tsx");
-  assert.match(cta, /event\.preventDefault\(\)/);
-  assert.match(cta, /Bf1AccessDialog/);
-  assert.match(cta, /hasBf1Access\(\)/);
+  assert.match(cta, /href=\{BF1_ACCESS_ANCHOR\}/);
+  assert.doesNotMatch(cta, /href=\{link\.href\}|target="_blank"/, "o CTA nunca aponta para o convite");
   const dialog = read("src/components/bf1/Bf1AccessDialog.tsx");
   assert.match(dialog, /\/api\/bf1-community-access\//);
   assert.match(dialog, /validateBf1AccessInput/, "cliente usa a mesma validação do servidor");
