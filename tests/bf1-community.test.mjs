@@ -12,9 +12,11 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import {
+  BF1_ACCESS_ANCHOR,
   BF1_BLACK_FRIDAY_START,
   BF1_EARLY_ACCESS_START,
   BF1_COMMUNITY_URL,
+  BF1_LEAD_CHANNEL,
   BF1_TRACKING_DESTINATION,
   communityLink,
   countdownParts,
@@ -134,4 +136,38 @@ test("os grupos são fechados: a página não promete conversa entre membros (de
   const textos = await textosDaPagina();
   assert.doesNotMatch(textos, /você conversa|converse com|troca entre donos|bate-papo/i);
   assert.match(textos, /só o time da Rook publica/);
+});
+
+// ───────────── ROO-1876: CTA visível no celular e lead certo (13/11/2026) ─────────────
+
+test("nenhum CTA da /bl1 aponta para o convite: todos abrem o cadastro", async () => {
+  assert.equal(BF1_ACCESS_ANCHOR, "#acesso");
+  const pagina = await readFile(path.join(RAIZ, "src/app/bl1/page.tsx"), "utf8");
+  assert.doesNotMatch(pagina, /id=["{]?acesso/, "sem elemento #acesso: o toque antes da hidratação não rola a página");
+  assert.match(pagina, /<Bf1AccessHost /, "um host único abre o formulário");
+  const cabecalho = await readFile(path.join(RAIZ, "src/components/Header.tsx"), "utf8");
+  assert.match(cabecalho, /isBf1 \? BF1_ACCESS_ANCHOR/, "o CTA do cabeçalho abre o cadastro");
+  assert.match(cabecalho, /<a href=\{BF1_ACCESS_ANCHOR\}/, "o cabeçalho do celular tem CTA na /bl1");
+  const host = await readFile(path.join(RAIZ, "src/components/bf1/Bf1AccessHost.tsx"), "utf8");
+  assert.match(host, /window\.location\.hash === BF1_ACCESS_ANCHOR/, "toque antes da hidratação abre o formulário ao hidratar");
+  assert.match(host, /--rook-cookie-height|BF1_HERO_CTA_ID/);
+});
+
+test("o cadastro confirmado vira generate_lead com canal fixo e nada além", async () => {
+  assert.deepEqual(
+    buildTrackingEvent(TRACKING_EVENTS.lead, { channel: BF1_LEAD_CHANNEL }),
+    { event: "generate_lead", channel: "bf1_comunidade" },
+  );
+  const dialogo = await readFile(path.join(RAIZ, "src/components/bf1/Bf1AccessDialog.tsx"), "utf8");
+  const lembrou = dialogo.indexOf("rememberBf1Access();");
+  const lead = dialogo.indexOf("track(TRACKING_EVENTS.lead, { channel: BF1_LEAD_CHANNEL });");
+  assert.ok(lembrou > 0 && lead > lembrou, "o Lead só sai depois da confirmação do servidor");
+});
+
+test("o hero diz para quem é e a mentoria é exclusiva da comunidade (decisão de 13/11)", async () => {
+  const textos = await textosDaPagina();
+  assert.match(textos, /Para donos de restaurante/);
+  assert.match(textos, /Mentoria exclusiva para a comunidade\./);
+  // "Sai primeiro" sobre a mentoria implicaria abertura ao público depois.
+  assert.doesNotMatch(textos, /como participar (da mentoria )?saem? (lá )?primeiro|mentoria[^"\n]{0,40}sai primeiro/i);
 });

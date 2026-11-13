@@ -72,6 +72,28 @@ export function campaignCountdown(nowMs) {
  */
 export const BF1_TRACKING_DESTINATION = "bf1_whatsapp_community";
 
+/**
+ * ROO-1876: todo CTA da /bl1 aponta para esta âncora, nunca para o convite.
+ * O host do cadastro (Bf1AccessHost) intercepta o clique e abre o formulário.
+ * Toque antes da hidratação só troca o hash (não há elemento com esse id, então
+ * a página não rola); ao hidratar, o host lê o hash e abre o formulário. Assim,
+ * nenhum caminho da página leva ao grupo sem passar pelo cadastro, exceto a
+ * alternativa de falha de gravação (decisão F2 da ROO-1848).
+ */
+export const BF1_ACCESS_ANCHOR = "#acesso";
+
+/** ROO-1876: ids que a barra fixa observa (CTA do hero e CTA final). */
+export const BF1_HERO_CTA_ID = "bf1-hero-cta";
+export const BF1_FINAL_CTA_ID = "bf1-final-cta";
+
+/**
+ * ROO-1876: canal do `generate_lead` disparado no cadastro confirmado. O GTM
+ * leva `generate_lead` ao GA4 e a `Lead` nos pixels da Meta; o canal separa
+ * este cadastro dos leads comerciais de /planos e das ferramentas. Valor fixo,
+ * sem dado pessoal.
+ */
+export const BF1_LEAD_CHANNEL = "bf1_comunidade";
+
 const CONVITE_WHATSAPP = /^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]{16,40}$/;
 
 /**

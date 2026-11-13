@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { BF1_ACCESS_ANCHOR } from "@/lib/bf1-community.mjs";
 
 const navLinks = [
   { href: "/sobre/", label: "Sobre" },
@@ -86,10 +87,12 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const isCmvGuide = pathname === "/guia-cmv" || pathname === "/guia-cmv/";
-  // ROO-1825: na LP de Black Friday o único destino é a comunidade; o CTA
-  // leva ao bloco final da página, onde está o convite.
+  // ROO-1825/ROO-1876: na LP de Black Friday o CTA abre o cadastro antes do
+  // grupo (BF1_ACCESS_ANCHOR, interceptado pelo Bf1AccessHost), nunca o convite.
+  // No celular ele também aparece no cabeçalho: era a página sem CTA na
+  // primeira tela que derrubava a conversão da campanha.
   const isBf1 = pathname === "/bl1" || pathname === "/bl1/";
-  const headerCtaHref = isCmvGuide ? "#cmv-guide-form" : isBf1 ? "#comunidade" : "#cadastro";
+  const headerCtaHref = isCmvGuide ? "#cmv-guide-form" : isBf1 ? BF1_ACCESS_ANCHOR : "#cadastro";
   const headerCtaLabel = isCmvGuide ? "Receber guia" : isBf1 ? "Entrar na comunidade" : "Agendar demonstração";
 
   return (
@@ -117,11 +120,20 @@ export default function Header() {
         <div className="hidden lg:flex items-center gap-3">
           <ThemeToggle />
           <a href="https://app.rook.com.br/login" className="btn-ghost text-sm">Entrar</a>
-          <Link href={headerCtaHref} className="btn-primary text-sm">{headerCtaLabel}</Link>
+          {isBf1 ? (
+            <a href={headerCtaHref} className="btn-primary text-sm" aria-haspopup="dialog">{headerCtaLabel}</a>
+          ) : (
+            <Link href={headerCtaHref} className="btn-primary text-sm">{headerCtaLabel}</Link>
+          )}
         </div>
 
         {/* Mobile toggle */}
         <div className="lg:hidden flex items-center gap-2">
+          {isBf1 ? (
+            <a href={BF1_ACCESS_ANCHOR} className="btn-primary !px-3.5 !py-2 text-[13px]" aria-haspopup="dialog">
+              Participar
+            </a>
+          ) : null}
           <ThemeToggle />
           <button className="p-2" onClick={() => setOpen(!open)} aria-label="Menu" style={{ color: "var(--color-cream)" }}>
             <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
