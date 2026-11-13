@@ -1,29 +1,21 @@
-"use client";
-
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-import { BF1_TRACKING_DESTINATION, communityLink } from "@/lib/bf1-community.mjs";
+import { BF1_ACCESS_ANCHOR, communityLink } from "@/lib/bf1-community.mjs";
 import { BF1_CONTENT } from "@/lib/bf1-content";
-import { track, TRACKING_EVENTS } from "@/lib/track";
-import { hasBf1Access } from "./bf1-access-storage";
 import styles from "./bf1.module.css";
 
-// O formulário só carrega quando alguém clica: a /bl1 não paga o JS dele no
-// primeiro acesso.
-const Bf1AccessDialog = dynamic(() => import("./Bf1AccessDialog"), { ssr: false });
-
 /*
- * O único CTA da /bl1 (ROO-1825).
+ * CTA da /bl1 (ROO-1825).
  *
  * Sem convite configurado, o botão vira um aviso não clicável: anunciar a
  * comunidade com um link para lugar nenhum custa a confiança do primeiro
  * clique. O link e a validação vivem em `bf1-community.mjs`.
  *
- * ROO-1848: o clique abre o cadastro (nome, WhatsApp, e-mail e restaurante)
- * e só depois o grupo Black Rook 2026. Quem já se cadastrou neste aparelho
- * vai direto ao grupo. Sem JavaScript, o href continua sendo o convite: o
- * cadastro é captação, não controle de acesso (o grupo é fechado).
+ * ROO-1876: o href é a âncora do cadastro, nunca o convite. Antes, o href era o
+ * convite e o JavaScript interceptava o clique; um toque antes da hidratação
+ * (4G lento, navegador do Instagram) levava direto ao grupo, sem cadastro. Agora
+ * o componente é estático e um único host (Bf1AccessHost) abre o formulário,
+ * para qualquer CTA da página, do cabeçalho e da barra fixa.
  */
+
 function ChatIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
@@ -41,19 +33,13 @@ function ArrowIcon() {
   );
 }
 
-export default function Bf1CommunityCta() {
+export default function Bf1CommunityCta({ className = "", tabIndex }: { className?: string; tabIndex?: number }) {
   const link = communityLink();
   const { label, pendingLabel } = BF1_CONTENT.cta;
-  const [open, setOpen] = useState(false);
-  const [registered, setRegistered] = useState(false);
-
-  useEffect(() => {
-    setRegistered(hasBf1Access());
-  }, []);
 
   if (!link.ready) {
     return (
-      <span className={`${styles.cta} ${styles.ctaPending}`} aria-disabled="true">
+      <span className={`${styles.cta} ${styles.ctaPending} ${className}`} aria-disabled="true">
         <ChatIcon />
         <span>{pendingLabel}</span>
       </span>
@@ -61,34 +47,12 @@ export default function Bf1CommunityCta() {
   }
 
   return (
-    <>
-      <a
-        href={link.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={styles.cta}
-        onClick={(event) => {
-          track(TRACKING_EVENTS.ctaClick, { destination: BF1_TRACKING_DESTINATION });
-          if (registered || hasBf1Access()) return;
-          event.preventDefault();
-          setOpen(true);
-        }}
-      >
-        <ChatIcon />
-        <span>{label}</span>
-        <span className={styles.ctaArrow}>
-          <ArrowIcon />
-        </span>
-      </a>
-      {open ? (
-        <Bf1AccessDialog
-          href={link.href}
-          onClose={() => {
-            setOpen(false);
-            setRegistered(hasBf1Access());
-          }}
-        />
-      ) : null}
-    </>
+    <a href={BF1_ACCESS_ANCHOR} className={`${styles.cta} ${className}`} tabIndex={tabIndex} aria-haspopup="dialog">
+      <ChatIcon />
+      <span>{label}</span>
+      <span className={styles.ctaArrow}>
+        <ArrowIcon />
+      </span>
+    </a>
   );
 }

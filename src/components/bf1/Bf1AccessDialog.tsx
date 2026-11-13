@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { validateBf1AccessInput } from "@/lib/bf1-access-validation.mjs";
+import { BF1_LEAD_CHANNEL } from "@/lib/bf1-community.mjs";
 import { BF1_CONTENT } from "@/lib/bf1-content";
 import { captureVisitAttribution } from "@/lib/lead-attribution-client";
 import type { LeadAttribution } from "@/lib/lead-attribution.mjs";
@@ -22,7 +23,8 @@ import styles from "./bf1.module.css";
  * direto. Erro de campo (422) não cai nessa alternativa: pede correção.
  *
  * Nada do formulário vai para analytics: o evento bf1_access_request não tem
- * campos (allowlist em tracking-events.mjs).
+ * campos e o generate_lead leva só o canal fixo (allowlist em
+ * tracking-events.mjs).
  */
 
 const ENDPOINT = "/api/bf1-community-access/";
@@ -216,6 +218,9 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
 
       rememberBf1Access();
       track(TRACKING_EVENTS.bf1AccessRequest);
+      // ROO-1876: a conversão padrão do site. O GTM leva generate_lead a `Lead`
+      // nos pixels da Meta e ao GA4; antes, a campanha não recebia nenhum Lead.
+      track(TRACKING_EVENTS.lead, { channel: BF1_LEAD_CHANNEL });
       setName(firstName(frozen.name));
       setPhase("success");
       redirectTimer.current = window.setTimeout(() => window.location.assign(href), REDIRECT_DELAY_MS);
