@@ -236,7 +236,7 @@ export default function BlackFridayCommunityPage() {
               {checkoutHref ? (
                 <a href={checkoutHref} className={styles.cta}>Contratar com a oferta Black Rook</a>
               ) : <Bf1CommunityCta />}
-              <a href={`#${mentorship.id}`} className={styles.secondary}>
+              <a href={`#${history.id}`} className={styles.secondary}>
                 {hero.secondaryLabel}
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                   <path d="M12 5v14M6 13l6 6 6-6" />
@@ -295,7 +295,48 @@ export default function BlackFridayCommunityPage() {
         </section>
       )}
 
-      {/* 15/11 (ROO-1887): primeiro o que a pessoa leva (acesso antecipado + bônus da contratação), depois a prova e a comunidade. */}
+      {/* 15/11 (ROO-1887 + quem somos): primeiro quem é a Rook, depois o que a pessoa leva (acesso antecipado + bônus da contratação) e a comunidade. */}
+      <section id={history.id} className={`${styles.section} ${styles.historySection}`} aria-labelledby="bf1-history-title">
+        <div className={styles.container}>
+          <div className={styles.historyGrid}>
+            <div>
+              <p className={styles.sectionLabel}>{history.label}</p>
+              <h2 id="bf1-history-title" className={styles.sectionTitle}>
+                <Headline plain={history.headlinePlain} emphasis={history.headlineEmphasis} />
+              </h2>
+              {history.paragraphs.map((paragraph) => (
+                <p key={paragraph.slice(0, 24)} className={styles.historyText}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+            <Reveal className={styles.statCard}>
+              <span className={styles.statCardGlow} aria-hidden="true" />
+              <p className={styles.statCardValue}>
+                <LpCountUp value={history.stat.value} />
+              </p>
+              <p className={styles.statCardCaption}>{history.stat.caption}</p>
+            </Reveal>
+          </div>
+
+          <Reveal className={styles.timeline}>
+            <span className={styles.timelineTrack} aria-hidden="true">
+              <span className={styles.timelineLine} />
+            </span>
+            <ol className={styles.timelineList}>
+              {history.timeline.map((item) => (
+                <li key={item.kicker} className={styles.timelineItem}>
+                  <span className={styles.timelineNode} aria-hidden="true" />
+                  <p className={styles.timelineKicker}>{item.kicker}</p>
+                  <h3 className={styles.timelineTitle}>{item.title}</h3>
+                  <p className={styles.timelineText}>{item.text}</p>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
+        </div>
+      </section>
+
       <section className={styles.section} aria-labelledby="bf1-benefits-title">
         <div className={styles.container}>
           <p className={styles.sectionLabel}>{benefits.label}</p>
@@ -384,47 +425,6 @@ export default function BlackFridayCommunityPage() {
                 </li>
               ))}
             </ul>
-          </Reveal>
-        </div>
-      </section>
-
-      <section id={history.id} className={`${styles.section} ${styles.historySection}`} aria-labelledby="bf1-history-title">
-        <div className={styles.container}>
-          <div className={styles.historyGrid}>
-            <div>
-              <p className={styles.sectionLabel}>{history.label}</p>
-              <h2 id="bf1-history-title" className={styles.sectionTitle}>
-                <Headline plain={history.headlinePlain} emphasis={history.headlineEmphasis} />
-              </h2>
-              {history.paragraphs.map((paragraph) => (
-                <p key={paragraph.slice(0, 24)} className={styles.historyText}>
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-            <Reveal className={styles.statCard}>
-              <span className={styles.statCardGlow} aria-hidden="true" />
-              <p className={styles.statCardValue}>
-                <LpCountUp value={history.stat.value} />
-              </p>
-              <p className={styles.statCardCaption}>{history.stat.caption}</p>
-            </Reveal>
-          </div>
-
-          <Reveal className={styles.timeline}>
-            <span className={styles.timelineTrack} aria-hidden="true">
-              <span className={styles.timelineLine} />
-            </span>
-            <ol className={styles.timelineList}>
-              {history.timeline.map((item) => (
-                <li key={item.kicker} className={styles.timelineItem}>
-                  <span className={styles.timelineNode} aria-hidden="true" />
-                  <p className={styles.timelineKicker}>{item.kicker}</p>
-                  <h3 className={styles.timelineTitle}>{item.title}</h3>
-                  <p className={styles.timelineText}>{item.text}</p>
-                </li>
-              ))}
-            </ol>
           </Reveal>
         </div>
       </section>

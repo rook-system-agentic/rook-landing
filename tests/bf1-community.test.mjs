@@ -191,3 +191,18 @@ test("a mentoria é bônus da contratação, não do grupo (correção do Gabrie
   assert.match(fonte, /contratações confirmadas entre 26\/11 e 04\/12, às 23h59 \(horário de Brasília\), nos planos Knight ou Rook\. Regras completas no grupo Black Rook 2026\./);
   assert.match(fonte, /howTo: BF1_MENTORSHIP_BONUS_RULE,/);
 });
+
+// ───────────── Quem somos (Gabriel, 15/11 09:03): quem não conhece a Rook entende o que ela é antes da oferta ─────────────
+test("o hero diz o que a Rook é antes da oferta e 'Quem é a Rook' vem logo depois do hero", async () => {
+  const conteudo = await readFile(new URL("../src/lib/bf1-content.ts", import.meta.url), "utf8");
+  const servidor = await readFile(new URL("../src/lib/bf1-campaign-server.ts", import.meta.url), "utf8");
+  const pagina = await readFile(new URL("../src/app/bl1/page.tsx", import.meta.url), "utf8");
+  const frase = "A Rook é o sistema que mostra, todo dia, em reais, quanto sobrou no seu restaurante.";
+  assert.ok(conteudo.includes(`before: "${frase}`), "o lead do hero começa dizendo o que a Rook é");
+  assert.ok(servidor.includes(`: "${frase}`), "a fase da oferta (26/11 a 04/12) mantém a mesma frase");
+  assert.match(conteudo, /label: "— Quem é a Rook"/);
+  const hero = pagina.indexOf('aria-labelledby="bf1-title"');
+  const historia = pagina.indexOf("<section id={history.id}");
+  const beneficios = pagina.indexOf('aria-labelledby="bf1-benefits-title"');
+  assert.ok(hero > 0 && historia > hero && beneficios > historia, "ordem: hero, quem é a Rook, benefícios");
+});

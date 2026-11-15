@@ -69,6 +69,12 @@
  *   ("faça seu cadastro e entre no grupo"); a mentoria vem na linha de
  *   confiança. Diagnóstico de 14/11: o botão falava de "comunidade gratuita"
  *   enquanto o anúncio prometia a mentoria. Preço continua fora deste módulo.
+ * - Quem somos (Gabriel, 15/11 09:03: "poucas pessoas conhecem a rook ...
+ *   precisamos ... falar quem nós somos"). O visitante vem do anúncio sem
+ *   conhecer a marca: o hero diz em uma frase o que a Rook é antes da oferta, e
+ *   a seção `history` ("Quem é a Rook") vem logo depois do hero. A frase "mostra,
+ *   todo dia, em reais, quanto sobrou" e o resumo das 7h no WhatsApp são os da
+ *   home (www.rook.com.br, lida em 15/11).
  */
 import { BF1_ACCESS_NOTICE_VERSION } from "./bf1-access-validation.mjs";
 
@@ -86,10 +92,10 @@ export const BF1_CONTENT = {
   meta: {
     title: "Black Friday da Rook: um preço nunca praticado | Rook System",
     description:
-      "Para donos de restaurante: a Black Friday da Rook abre primeiro no grupo Black Rook 2026, em 26/11, com um preço nunca praticado antes pela Rook. E os primeiros a contratar terão a possibilidade de uma mentoria exclusiva com os donos da Rook. Entrar é gratuito.",
+      "A Rook é o sistema que mostra, todo dia, quanto sobrou no seu restaurante. Na Black Friday, um preço nunca praticado abre primeiro no grupo Black Rook 2026, em 26/11.",
     ogTitle: "Black Friday da Rook: um preço nunca praticado antes",
     ogDescription:
-      "Para donos de restaurante. A oferta abre primeiro no grupo Black Rook 2026, na quinta, 26/11.",
+      "O sistema que mostra, todo dia, quanto sobrou no seu restaurante. A oferta abre primeiro no grupo Black Rook 2026, na quinta, 26/11.",
     ogAlt: "Black Friday Rook — grupo no WhatsApp com acesso antecipado à oferta, em 26/11.",
   },
   cta: {
@@ -132,11 +138,11 @@ export const BF1_CONTENT = {
     headlinePlain: "Black Friday da Rook:",
     headlineEmphasis: "um preço nunca praticado antes.",
     lead: {
-      before: "A oferta abre primeiro no grupo Black Rook 2026, na quinta, 26/11. E os primeiros restaurantes a contratar terão a possibilidade de uma ",
+      before: "A Rook é o sistema que mostra, todo dia, em reais, quanto sobrou no seu restaurante. Na Black Friday, a oferta abre primeiro no grupo Black Rook 2026, na quinta, 26/11, e os primeiros restaurantes a contratar terão a possibilidade de uma ",
       strong: BF1_MENTORSHIP_HOOK,
-      after: ", os responsáveis pela reestruturação de dezenas de empresas.",
+      after: ".",
     },
-    secondaryLabel: "Conhecer a mentoria",
+    secondaryLabel: "Quem é a Rook",
     dateLabel: "Acesso antecipado · quinta, 26/11",
     dateSecondary: "Abertura para o público: sexta, 27/11 · Até 04/12, às 23h59, horário de Brasília",
     doneLabel: "O acesso antecipado já começou na comunidade",
@@ -263,13 +269,14 @@ export const BF1_CONTENT = {
   },
   history: {
     id: "historia",
-    label: "— Nossa história",
+    label: "— Quem é a Rook",
     headlinePlain: "Antes de virar sistema, ",
     headlineEmphasis: "foi consultoria.",
     stat: { value: "R$ 925 milhões", caption: "de faturamento anual somado pelas empresas atendidas pela nossa consultoria em 2025." },
     paragraphs: [
-      "Em 2025, nossa consultoria de reestruturação atendeu empresas que somam R$ 925 milhões de faturamento por ano. Entramos onde a operação apertava, reestruturamos o que precisava ser reestruturado e ajudamos as empresas a voltar a ter resultado — de fato, não só no papel.",
-      "Todo esse conhecimento hoje roda de forma automatizada na Rook. O sistema conecta vendas, notas e banco do restaurante e mostra, em reais, quanto sobrou e qual é a próxima decisão.",
+      "A Rook nasceu de 20 anos de consultoria em controladoria, finanças corporativas e reestruturação de empresas. Só em 2025, nossa consultoria de reestruturação atendeu empresas que somam R$ 925 milhões de faturamento por ano.",
+      "Esse método hoje roda de forma automatizada na gestão de restaurantes. A Rook conecta as vendas, as notas e o banco da casa e mostra, em reais, quanto sobrou e qual é a próxima decisão.",
+      "Todo dia, às 7h, o resumo do restaurante chega no seu WhatsApp: faturamento, compras e quanto ainda cabe no orçamento do mês.",
     ],
     timeline: [
       { kicker: "20 anos", title: "Consultoria", text: "Controladoria, finanças corporativas e reestruturação de empresas." },

@@ -26,7 +26,7 @@ export function getBf1CampaignContent(nowMs = Date.now()) {
         lead: {
           before: ended
             ? "A oferta de Black Friday foi encerrada em 04/12/2026. A comunidade da Rook continua com conteúdos sobre custos, caixa e gestão de restaurantes. A "
-            : "Mais visão e controle para decidir os próximos passos do seu restaurante. E os primeiros a contratar terão a possibilidade de uma ",
+            : "A Rook é o sistema que mostra, todo dia, em reais, quanto sobrou no seu restaurante. E os primeiros a contratar terão a possibilidade de uma ",
           strong: BF1_MENTORSHIP_HOOK,
           after: ended ? " segue com os restaurantes que receberam o bônus." : ".",
         },
