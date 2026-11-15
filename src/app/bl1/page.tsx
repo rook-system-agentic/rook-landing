@@ -186,8 +186,7 @@ function Headline({ plain, emphasis }: { plain: string; emphasis: string }) {
   );
 }
 
-function TrustLine({ paid = false }: { paid?: boolean }) {
-  const items = paid ? BF1_CONTENT.cta.paidTrust : BF1_CONTENT.cta.trust;
+function TrustLine({ items }: { items: readonly string[] }) {
   return (
     <ul className={styles.trust}>
       {items.map((item) => (
@@ -244,7 +243,7 @@ export default function BlackFridayCommunityPage() {
                 </svg>
               </a>
             </div>
-            <TrustLine paid={Boolean(checkoutHref)} />
+            <TrustLine items={checkoutHref ? content.cta.paidTrust : content.cta.trust} />
             <Bf1Countdown initialPhase={phase} />
           </div>
 
@@ -296,30 +295,7 @@ export default function BlackFridayCommunityPage() {
         </section>
       )}
 
-      <section className={styles.section} aria-labelledby="bf1-community-title">
-        <div className={styles.container}>
-          <p className={styles.sectionLabel}>{community.label}</p>
-          <h2 id="bf1-community-title" className={styles.sectionTitle}>
-            <Headline plain={community.headlinePlain} emphasis={community.headlineEmphasis} />
-          </h2>
-          <ul className={`${styles.cards} ${styles.cardsFour}`}>
-            {community.items.map((item, index) => (
-              <Reveal as="li" key={item.n} delay={index * 110} className={styles.card}>
-                <span className={styles.cardAccent} aria-hidden="true" />
-                <div className={styles.cardTop}>
-                  <span className={styles.cardIcon}>
-                    <CommunityIcon name={item.icon} />
-                  </span>
-                  <span className={styles.cardNumber}>{item.n}</span>
-                </div>
-                <h3 className={styles.cardTitle}>{item.title}</h3>
-                <p className={styles.cardText}>{item.text}</p>
-              </Reveal>
-            ))}
-          </ul>
-        </div>
-      </section>
-
+      {/* Pitch de 15/11: primeiro o que a pessoa leva (mentoria + Black), depois a prova e a comunidade. */}
       <section className={styles.section} aria-labelledby="bf1-benefits-title">
         <div className={styles.container}>
           <p className={styles.sectionLabel}>{benefits.label}</p>
@@ -372,6 +348,7 @@ export default function BlackFridayCommunityPage() {
               ))}
             </ul>
             <p className={styles.mentorProof}>{mentorship.proof}</p>
+            {mentorship.bridge ? <p className={styles.mentorBridge}>{mentorship.bridge}</p> : null}
             <div className={styles.mentorCta}>
               <Bf1CommunityCta />
               <p className={styles.mentorHowTo}>{mentorship.howTo}</p>
@@ -452,6 +429,30 @@ export default function BlackFridayCommunityPage() {
         </div>
       </section>
 
+      <section className={styles.section} aria-labelledby="bf1-community-title">
+        <div className={styles.container}>
+          <p className={styles.sectionLabel}>{community.label}</p>
+          <h2 id="bf1-community-title" className={styles.sectionTitle}>
+            <Headline plain={community.headlinePlain} emphasis={community.headlineEmphasis} />
+          </h2>
+          <ul className={`${styles.cards} ${styles.cardsFour}`}>
+            {community.items.map((item, index) => (
+              <Reveal as="li" key={item.n} delay={index * 110} className={styles.card}>
+                <span className={styles.cardAccent} aria-hidden="true" />
+                <div className={styles.cardTop}>
+                  <span className={styles.cardIcon}>
+                    <CommunityIcon name={item.icon} />
+                  </span>
+                  <span className={styles.cardNumber}>{item.n}</span>
+                </div>
+                <h3 className={styles.cardTitle}>{item.title}</h3>
+                <p className={styles.cardText}>{item.text}</p>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       <section className={styles.section} aria-labelledby="bf1-steps-title">
         <div className={styles.container}>
           <p className={styles.sectionLabel}>{steps.label}</p>
@@ -485,7 +486,7 @@ export default function BlackFridayCommunityPage() {
               <a href={checkoutHref} className={styles.cta}>Contratar com a oferta Black Rook</a>
             ) : <Bf1CommunityCta />}
           </div>
-          <TrustLine paid={Boolean(checkoutHref)} />
+          <TrustLine items={checkoutHref ? content.cta.paidTrust : content.cta.trust} />
         </div>
       </section>
       {/* ROO-1876: um host só abre o cadastro para todos os CTAs; a barra fixa só existe enquanto o CTA principal é a comunidade. */}

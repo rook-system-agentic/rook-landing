@@ -11,6 +11,13 @@ export function getBf1CampaignContent(nowMs = Date.now()) {
     ...presentation,
     content: {
       ...BF1_CONTENT,
+      // Antes da Black a linha cita 26/11; depois ela precisa continuar verdadeira.
+      cta: {
+        ...BF1_CONTENT.cta,
+        trust: ended
+          ? ["Comunidade gratuita", "No WhatsApp", "Conteúdo toda semana"]
+          : ["Cadastro gratuito", "Mentoria 2027 exclusiva", "Acesso antecipado liberado"],
+      },
       hero: {
         ...BF1_CONTENT.hero,
         eyebrow: ended ? "Black Friday Rook · Encerrada" : "Black Friday Rook",
@@ -29,19 +36,26 @@ export function getBf1CampaignContent(nowMs = Date.now()) {
         label: "— A comunidade da Rook",
         headlinePlain: "Conteúdo e clareza para ",
         headlineEmphasis: "os próximos passos.",
-        items: BF1_CONTENT.benefits.items.map((item) => item.n === "01" ? {
+        // Pitch de 15/11: a mentoria é o cartão 01; a oferta entra nos cartões de acesso (clock) e condição (tag).
+        items: BF1_CONTENT.benefits.items.map((item) => item.icon === "clock" ? {
           ...item,
           title: ended ? "A comunidade continua" : "Acesso à Black Rook",
           text: ended
             ? "A campanha terminou em 04/12. Os conteúdos sobre gestão de restaurantes continuam na comunidade."
             : presentation.offer!.period,
-        } : item.n === "02" ? {
+        } : item.icon === "tag" ? {
           ...item,
           title: ended ? "Condição encerrada" : presentation.offer!.title,
           text: ended
             ? "Novas contratações seguem os preços regulares do plano, conforme a faixa de faturamento do restaurante."
             : presentation.offer!.terms,
         } : item),
+      },
+      mentorship: {
+        ...BF1_CONTENT.mentorship,
+        bridge: ended
+          ? ""
+          : "E é aqui que entra a Black Rook: a condição especial é o jeito de colocar o plano de 2027 para rodar no sistema.",
       },
       steps: {
         ...BF1_CONTENT.steps,
