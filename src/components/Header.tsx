@@ -93,7 +93,7 @@ export default function Header() {
   // primeira tela que derrubava a conversão da campanha.
   const isBf1 = pathname === "/bl1" || pathname === "/bl1/";
   const headerCtaHref = isCmvGuide ? "#cmv-guide-form" : isBf1 ? BF1_ACCESS_ANCHOR : "#cadastro";
-  const headerCtaLabel = isCmvGuide ? "Receber guia" : isBf1 ? "Entrar na comunidade" : "Agendar demonstração";
+  const headerCtaLabel = isCmvGuide ? "Receber guia" : isBf1 ? "Entrar no grupo" : "Agendar demonstração";
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md" style={{ backgroundColor: "var(--color-header-bg)", borderBottom: "1px solid var(--color-border)" }}>

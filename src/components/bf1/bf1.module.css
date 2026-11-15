@@ -1083,6 +1083,18 @@ a.cta:hover .ctaArrow {
   border-radius: 999px;
   background: linear-gradient(180deg, var(--bf-accent), rgba(194, 65, 0, 0.6));
 }
+/* Pitch de 15/11: liga o plano de 2027 à condição da Black Friday. */
+.mentorBridge {
+  margin: 1.25rem 0 0;
+  max-width: 36rem;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--color-cta) 38%, transparent);
+  background: color-mix(in srgb, var(--color-cta) 10%, transparent);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--bf-ink);
+}
 .mentorCta {
   display: flex;
   flex-wrap: wrap;
