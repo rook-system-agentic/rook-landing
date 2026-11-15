@@ -24,19 +24,34 @@
  * - O tema da mentoria (Planejamento Financeiro 2027: a estratégia e o sistema)
  *   foi definido por Gabriel Abdala (CEO) em 09/11/2026. Desde 11/11 a promessa
  *   é de ENTREGA ("planejar metas, custos e resultado"), nunca de lucro — regra
- *   "sem promessa de lucro" da campanha. Formato, vagas e janela NÃO são
- *   citados até o Gabriel defini-los: "como participar" sai na comunidade.
+ *   "sem promessa de lucro" da campanha. Desde 15/11 (ROO-1887) a página cita
+ *   quantidade, janela e planos do bônus, sempre pela frase canônica abaixo;
+ *   formato, duração e agendamento da mentoria saem no grupo quando definidos.
  * - Entrar na comunidade não é contratar: o texto diz "receber o acesso
  *   antecipado à oferta", nunca "garantir o desconto" (CDC, art. 30).
  * - A comunidade é permanente: o valor de toda semana (seção `community`) vem
  *   antes da campanha. Origem: feedback da Isa e da Gabriela em 10/11/2026.
- * - ROO-1876 (decisão do Gabriel em 13/11/2026): a mentoria de Planejamento
- *   Financeiro 2027 é EXCLUSIVA para quem está na comunidade. Só isso: formato,
- *   vagas, janela e "como participar" continuam a definir e saem na comunidade.
- *   Por isso não se escreve "sai primeiro" sobre a mentoria (implicaria abertura
- *   ao público depois). O hero diz para quem é a página ("Para donos de
+ * - ROO-1876 (13/11/2026): o hero diz para quem é a página ("Para donos de
  *   restaurante"), porque "Black Friday" sozinho atrai quem procura desconto de
- *   consumo — era o perfil do clique barato da campanha de 12/11.
+ *   consumo — era o perfil do clique barato da campanha de 12/11. A frase
+ *   "mentoria exclusiva para a comunidade" desta issue foi SUBSTITUÍDA em 15/11
+ *   (ROO-1887, abaixo).
+ * - ROO-1887 (correção do Gabriel em 15/11/2026 08:39): a mentoria NÃO é
+ *   benefício de quem entra no grupo. É BÔNUS para quem CONTRATA a Rook na
+ *   Black Friday, para os primeiros restaurantes. O grupo vale pelo acesso
+ *   antecipado (a oferta abre lá em 26/11, um dia antes do público). Regras de
+ *   10/11 (bf1/comunidade-wpp/PLANO-COMUNIDADE.md): todo texto que cita o bônus
+ *   traz quantidade e prazo; a ordem é a confirmação do pagamento, sem critério
+ *   subjetivo; sem linguagem de corrida ("corra", "seja o primeiro").
+ *   Direção do Gabriel (15/11 08:51): "explicar menos como será". Dois ganchos:
+ *   (1) "um preço nunca praticado antes pela Rook" — o preço de 26/11 (só no
+ *   servidor, ROO-1857) fica abaixo de todo preço pago do catálogo de planos.
+ *   O teste grátis de 7 dias não é preço. (2) "os
+ *   primeiros terão a possibilidade de uma mentoria exclusiva com os donos da
+ *   Rook, os responsáveis pela reestruturação de dezenas de empresas" (fonte da
+ *   frase "dezenas de empresas": Gabriel, 15/11). A mecânica do bônus aparece
+ *   numa linha só (`BF1_MENTORSHIP_BONUS_RULE`), com o prazo; a quantidade, se
+ *   o Gabriel definir, vive só em `BF1_MENTORSHIP_BONUS_QUANTITY`.
  * - O "Plano 2027" da seção da mentoria é ilustrativo (sem valores em reais) e
  *   está marcado como tal.
  * - A conversa da comunidade no hero é prévia ilustrativa, sem telefone
@@ -53,32 +68,46 @@
  *   O CTA diz a ação real ("Entrar no grupo Black Rook"), igual ao anúncio
  *   ("faça seu cadastro e entre no grupo"); a mentoria vem na linha de
  *   confiança. Diagnóstico de 14/11: o botão falava de "comunidade gratuita"
- *   enquanto o anúncio prometia a mentoria. Preço continua fora deste módulo, e
- *   o "bônus para os primeiros" não entra enquanto não estiver definido na
- *   ROO-1857.
+ *   enquanto o anúncio prometia a mentoria. Preço continua fora deste módulo.
+ * - Quem somos (Gabriel, 15/11 09:03: "poucas pessoas conhecem a rook ...
+ *   precisamos ... falar quem nós somos"). O visitante vem do anúncio sem
+ *   conhecer a marca: o hero diz em uma frase o que a Rook é antes da oferta, e
+ *   a seção `history` ("Quem é a Rook") vem logo depois do hero. A frase "mostra,
+ *   todo dia, em reais, quanto sobrou" e o resumo das 7h no WhatsApp são os da
+ *   home (www.rook.com.br, lida em 15/11).
  */
 import { BF1_ACCESS_NOTICE_VERSION } from "./bf1-access-validation.mjs";
 
+/**
+ * Quantidade de contratações com o bônus da mentoria (ROO-1887). Único lugar do
+ * número; `null` enquanto o Gabriel não definir (a página diz "os primeiros").
+ */
+export const BF1_MENTORSHIP_BONUS_QUANTITY: number | null = null;
+/** A linha única com a mecânica do bônus: ordem de confirmação, prazo e planos. */
+export const BF1_MENTORSHIP_BONUS_RULE = `Bônus para as primeiras${BF1_MENTORSHIP_BONUS_QUANTITY ? ` ${BF1_MENTORSHIP_BONUS_QUANTITY}` : ""} contratações confirmadas entre 26/11 e 04/12, às 23h59 (horário de Brasília), nos planos Knight ou Rook. Regras completas no grupo Black Rook 2026.`;
+/** O gancho da mentoria, igual em toda a página. */
+export const BF1_MENTORSHIP_HOOK = "mentoria exclusiva com os donos da Rook";
+
 export const BF1_CONTENT = {
   meta: {
-    title: "Black Friday da Rook e mentoria Planejamento Financeiro 2027 | Rook System",
+    title: "Black Friday da Rook: um preço nunca praticado | Rook System",
     description:
-      "Para donos de restaurante: mentoria de Planejamento Financeiro 2027 exclusiva para a comunidade da Rook no WhatsApp e acesso antecipado à Black Friday em 26/11. Entrar é gratuito.",
-    ogTitle: "Black Friday da Rook + mentoria de Planejamento Financeiro 2027",
+      "A Rook é o sistema que mostra, todo dia, quanto sobrou no seu restaurante. Na Black Friday, um preço nunca praticado abre primeiro no grupo Black Rook 2026, em 26/11.",
+    ogTitle: "Black Friday da Rook: um preço nunca praticado antes",
     ogDescription:
-      "Para donos de restaurante: mentoria de Planejamento Financeiro 2027 exclusiva para a comunidade e acesso antecipado à Black Friday em 26/11.",
-    ogAlt: "Black Friday Rook — comunidade no WhatsApp com pré-lançamento, desconto e mentoria de Planejamento Financeiro 2027.",
+      "O sistema que mostra, todo dia, quanto sobrou no seu restaurante. A oferta abre primeiro no grupo Black Rook 2026, na quinta, 26/11.",
+    ogAlt: "Black Friday Rook — grupo no WhatsApp com acesso antecipado à oferta, em 26/11.",
   },
   cta: {
     label: "Entrar no grupo Black Rook",
     pendingLabel: "Link da comunidade em breve",
     headerLabel: "Entrar no grupo",
-    trust: ["Cadastro gratuito", "Mentoria 2027 exclusiva", "Acesso antecipado em 26/11"],
+    trust: ["Cadastro gratuito", "Acesso antecipado em 26/11", "Preço nunca praticado"],
     paidTrust: ["Pagamento seguro na Stripe", "Primeiro mês promocional", "Renovação mensal"],
   },
   access: {
     title: "Falta só um passo",
-    lead: "Preencha para entrar no grupo Black Rook 2026, na comunidade da Rook no WhatsApp: mentoria de Planejamento Financeiro 2027 exclusiva e acesso antecipado à Black Friday em 26/11.",
+    lead: "Preencha para entrar no grupo Black Rook 2026, na comunidade da Rook no WhatsApp. A Black Friday da Rook abre lá primeiro, na quinta, 26/11.",
     fields: {
       name: { label: "Nome", placeholder: "Como podemos te chamar" },
       phone: { label: "WhatsApp com DDD", placeholder: "(11) 99999-9999" },
@@ -106,15 +135,14 @@ export const BF1_CONTENT = {
   hero: {
     eyebrow: "Black Rook 2026 · Para donos de restaurante",
     liveTag: "Comunidade no WhatsApp",
-    headlinePlain: "Planeje 2027 com a Rook.",
-    headlineEmphasis: "Mentoria exclusiva para a comunidade.",
+    headlinePlain: "Black Friday da Rook:",
+    headlineEmphasis: "um preço nunca praticado antes.",
     lead: {
-      before: "A mentoria de ",
-      strong: "Planejamento Financeiro 2027",
-      after:
-        " é só para quem está no grupo Black Rook 2026: metas, custos e resultado do seu restaurante, com o nosso time. E a Black Friday da Rook chega primeiro para o grupo, em 26/11.",
+      before: "A Rook é o sistema que mostra, todo dia, em reais, quanto sobrou no seu restaurante. Na Black Friday, a oferta abre primeiro no grupo Black Rook 2026, na quinta, 26/11, e os primeiros restaurantes a contratar terão a possibilidade de uma ",
+      strong: BF1_MENTORSHIP_HOOK,
+      after: ".",
     },
-    secondaryLabel: "Conhecer a mentoria 2027",
+    secondaryLabel: "Quem é a Rook",
     dateLabel: "Acesso antecipado · quinta, 26/11",
     dateSecondary: "Abertura para o público: sexta, 27/11 · Até 04/12, às 23h59, horário de Brasília",
     doneLabel: "O acesso antecipado já começou na comunidade",
@@ -139,8 +167,8 @@ export const BF1_CONTENT = {
         text: "O pré-lançamento da Black Friday acontece aqui. Em 26/11, a oferta chega primeiro para quem está na comunidade.",
       },
       {
-        tag: "Mentoria 2027",
-        text: "Planejamento Financeiro 2027: a estratégia e o sistema para planejar metas, custos e resultado do seu restaurante.",
+        tag: "Mentoria",
+        text: "Os primeiros a contratar na Black terão a possibilidade de uma mentoria exclusiva com os donos da Rook.",
       },
     ],
   },
@@ -176,38 +204,38 @@ export const BF1_CONTENT = {
     ],
   },
   benefits: {
-    label: "— O que você leva no grupo Black Rook 2026",
-    headlinePlain: "Uma Black Friday que começa ",
-    headlineEmphasis: "pelo plano de 2027.",
+    label: "— Black Rook 2026",
+    headlinePlain: "Três motivos para ",
+    headlineEmphasis: "entrar antes.",
     items: [
       {
         n: "01",
-        icon: "mentor",
-        title: "Mentoria Planejamento Financeiro 2027",
-        text: "Exclusiva para quem está no grupo. Com o nosso time, você coloca 2027 em números: meta de vendas, teto de custos e resultado do restaurante, mês a mês. Como participar é anunciado no grupo.",
+        icon: "tag",
+        title: "Um preço nunca praticado",
+        text: "A Black Friday da Rook traz um preço que a Rook nunca praticou. Ele é revelado no grupo em 26/11.",
       },
       {
         n: "02",
         icon: "clock",
         title: "Acesso antecipado em 26/11",
-        text: "As condições da Black Friday da Rook saem primeiro no grupo, na quinta, 26/11. O público só vê na sexta, 27/11.",
+        text: "A oferta sai primeiro no grupo, na quinta, 26/11. O público só vê na sexta, 27/11.",
       },
       {
         n: "03",
-        icon: "tag",
-        title: "Condição para pôr o plano em prática",
-        text: "A oferta de Black Friday da Rook para restaurantes: o sistema que conecta vendas, notas e banco para você acompanhar o plano de 2027 todo mês. Entrar é gratuito e não obriga a contratar.",
+        icon: "mentor",
+        title: "Mentoria com os donos da Rook",
+        text: "Os primeiros a contratar terão a possibilidade de uma mentoria exclusiva com os responsáveis pela reestruturação de dezenas de empresas.",
       },
     ],
   },
   mentorship: {
     id: "mentoria",
-    label: "— Exclusiva para a comunidade",
-    headlinePlain: "Planejamento Financeiro ",
-    headlineEmphasis: "2027.",
-    lead: "A estratégia e o sistema para planejar metas, custos e resultado do seu restaurante em 2027.",
+    label: "— Bônus para os primeiros",
+    headlinePlain: "Mentoria com os ",
+    headlineEmphasis: "donos da Rook.",
+    lead: "Planejamento Financeiro 2027: a estratégia e o sistema para planejar metas, custos e resultado do seu restaurante.",
     intro:
-      "Quem entra em janeiro sem plano passa o ano reagindo ao caixa. Na mentoria, só para quem está na comunidade, o nosso time mostra o método da nossa consultoria: colocar 2027 em números e acompanhar esses números todo mês.",
+      "Os primeiros restaurantes a contratar na Black Friday terão a possibilidade de uma mentoria exclusiva com os donos da Rook, os responsáveis pela reestruturação de dezenas de empresas.",
     pillars: [
       {
         n: "01",
@@ -222,10 +250,9 @@ export const BF1_CONTENT = {
         text: "A Rook conecta vendas, notas e banco e mostra, em reais, quanto sobrou — para você acompanhar o plano todo mês.",
       },
     ],
-    proof: "Conduzida pelo time cuja consultoria atendeu, em 2025, empresas que somam R$ 925 milhões de faturamento anual.",
-    bridge:
-      "E é aqui que entra a Black Friday da Rook: a condição especial, com acesso antecipado em 26/11 para quem está no grupo, é o jeito de colocar o plano de 2027 para rodar no sistema.",
-    howTo: "Exclusiva para quem está no grupo Black Rook 2026. Como participar é anunciado lá.",
+    proof: "Em 2025, a consultoria de reestruturação dos donos da Rook atendeu empresas que somam R$ 925 milhões de faturamento anual.",
+    bridge: "E o preço da Black, nunca praticado antes pela Rook, abre primeiro no grupo, em 26/11.",
+    howTo: BF1_MENTORSHIP_BONUS_RULE,
     plan: {
       title: "Plano 2027",
       subtitle: "Seu restaurante",
@@ -242,13 +269,14 @@ export const BF1_CONTENT = {
   },
   history: {
     id: "historia",
-    label: "— Nossa história",
+    label: "— Quem é a Rook",
     headlinePlain: "Antes de virar sistema, ",
     headlineEmphasis: "foi consultoria.",
     stat: { value: "R$ 925 milhões", caption: "de faturamento anual somado pelas empresas atendidas pela nossa consultoria em 2025." },
     paragraphs: [
-      "Em 2025, nossa consultoria de reestruturação atendeu empresas que somam R$ 925 milhões de faturamento por ano. Entramos onde a operação apertava, reestruturamos o que precisava ser reestruturado e ajudamos as empresas a voltar a ter resultado — de fato, não só no papel.",
-      "Todo esse conhecimento hoje roda de forma automatizada na Rook. O sistema conecta vendas, notas e banco do restaurante e mostra, em reais, quanto sobrou e qual é a próxima decisão.",
+      "A Rook nasceu de 20 anos de consultoria em controladoria, finanças corporativas e reestruturação de empresas. Só em 2025, nossa consultoria de reestruturação atendeu empresas que somam R$ 925 milhões de faturamento por ano.",
+      "Esse método hoje roda de forma automatizada na gestão de restaurantes. A Rook conecta as vendas, as notas e o banco da casa e mostra, em reais, quanto sobrou e qual é a próxima decisão.",
+      "Todo dia, às 7h, o resumo do restaurante chega no seu WhatsApp: faturamento, compras e quanto ainda cabe no orçamento do mês.",
     ],
     timeline: [
       { kicker: "20 anos", title: "Consultoria", text: "Controladoria, finanças corporativas e reestruturação de empresas." },
@@ -262,16 +290,16 @@ export const BF1_CONTENT = {
     headlineEmphasis: "Black Friday.",
     items: [
       { n: "1", title: "Faça o cadastro", text: "Nome, WhatsApp, e-mail e restaurante. É gratuito e abre o grupo Black Rook 2026 na hora." },
-      { n: "2", title: "Acompanhe o grupo", text: "Lá saem os conteúdos da semana, como participar da mentoria 2027 e as condições da Black Friday." },
-      { n: "3", title: "Receba o acesso antecipado", text: "Em 26/11, você vê a oferta antes de todo mundo e decide se quer contratar." },
+      { n: "2", title: "Acompanhe o grupo", text: "Lá saem os conteúdos da semana e, em 26/11, a oferta da Black Friday." },
+      { n: "3", title: "Receba o acesso antecipado", text: "Em 26/11, você vê o preço antes de todo mundo e decide se quer contratar." },
     ],
   },
   final: {
     id: "comunidade",
     label: "— Pré-lançamento",
     headlinePlain: "Entre antes e ",
-    headlineEmphasis: "planeje 2027 com a gente.",
-    text: "Cadastro gratuito. É no grupo Black Rook 2026 que acontecem a mentoria de Planejamento Financeiro 2027, exclusiva para a comunidade, e o acesso antecipado à Black Friday da Rook, em 26/11. Depois da Black, a comunidade continua com conteúdo toda semana.",
+    headlineEmphasis: "veja o preço primeiro.",
+    text: "Cadastro gratuito. A Black Friday da Rook abre no grupo Black Rook 2026 em 26/11, um dia antes do público, com um preço nunca praticado antes pela Rook. Depois da Black, a comunidade continua com conteúdo toda semana.",
   },
 } as const;
 
