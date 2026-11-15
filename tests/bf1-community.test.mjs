@@ -109,9 +109,15 @@ test("a mentoria tem tema definido e nenhuma regra inventada", async () => {
 
 // Textos da página, sem os comentários (os comentários citam as palavras banidas de propósito).
 async function textosDaPagina() {
-  const conteudo = await readFile(path.join(RAIZ, "src/lib/bf1-content.ts"), "utf8");
+  return textosDe("src/lib/bf1-content.ts");
+}
+// Strings entre aspas e template literals (com `${...}` removido), sem comentários.
+async function textosDe(arquivo) {
+  const conteudo = await readFile(path.join(RAIZ, arquivo), "utf8");
   const semComentarios = conteudo.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  return [...semComentarios.matchAll(/"([^"\\]*)"/g)].map((m) => m[1]).join("\n");
+  const aspas = [...semComentarios.matchAll(/"([^"\\]*)"/g)].map((m) => m[1]);
+  const crases = [...semComentarios.matchAll(/`([^`]*)`/g)].map((m) => m[1].replace(/\$\{[^}]*\}/g, " "));
+  return [...aspas, ...crases].join("\n");
 }
 
 test("a copy não promete lucro, não garante desconto e não convida a sair (feedback de 10/11)", async () => {
@@ -164,10 +170,39 @@ test("o cadastro confirmado vira generate_lead com canal fixo e nada além", asy
   assert.ok(lembrou > 0 && lead > lembrou, "o Lead só sai depois da confirmação do servidor");
 });
 
-test("o hero diz para quem é e a mentoria é exclusiva da comunidade (decisão de 13/11)", async () => {
+test("a mentoria é bônus da contratação, não do grupo (correção do Gabriel, 15/11 — ROO-1887)", async () => {
   const textos = await textosDaPagina();
+  const servidor = await textosDe("src/lib/bf1-campaign-server.ts");
   assert.match(textos, /Para donos de restaurante/);
-  assert.match(textos, /Mentoria exclusiva para a comunidade\./);
-  // "Sai primeiro" sobre a mentoria implicaria abertura ao público depois.
-  assert.doesNotMatch(textos, /como participar (da mentoria )?saem? (lá )?primeiro|mentoria[^"\n]{0,40}sai primeiro/i);
+  // Os dois ganchos da direção de 15/11 08:51.
+  assert.match(textos, /nunca praticado antes pela Rook/);
+  assert.match(textos, /os primeiros restaurantes a contratar terão a possibilidade de uma/i);
+  for (const t of [textos, servidor]) {
+    // Entrar no grupo dá acesso antecipado; a mentoria só vem com a contratação.
+    assert.doesNotMatch(t, /exclusiv[ao]s? (para|da|do) (a |o )?(comunidade|grupo)|só para quem (está|estiver|entra)|mentoria[^\n]{0,30}(no|do) grupo|Mentoria 2027 exclusiva/i);
+    // Linguagem de corrida contraria a regra de 10/11 (PLANO-COMUNIDADE.md).
+    assert.doesNotMatch(t, /\bcorra\b|seja (o|um dos) primeiros?|últimas|garanta (já|a sua)/i);
+    // A quantidade nunca é escrita à mão: só pela constante.
+    assert.doesNotMatch(t, /primeir[ao]s \d+/i);
+  }
+  // A linha única do bônus tem ordem objetiva, prazo e planos.
+  const fonte = await readFile(path.join(RAIZ, "src/lib/bf1-content.ts"), "utf8");
+  assert.match(fonte, /export const BF1_MENTORSHIP_BONUS_QUANTITY: number \| null = (null|[1-9]\d*);/);
+  assert.match(fonte, /contratações confirmadas entre 26\/11 e 04\/12, às 23h59 \(horário de Brasília\), nos planos Knight ou Rook\. Regras completas no grupo Black Rook 2026\./);
+  assert.match(fonte, /howTo: BF1_MENTORSHIP_BONUS_RULE,/);
+});
+
+// ───────────── Quem somos (Gabriel, 15/11 09:03): quem não conhece a Rook entende o que ela é antes da oferta ─────────────
+test("o hero diz o que a Rook é antes da oferta e 'Quem é a Rook' vem logo depois do hero", async () => {
+  const conteudo = await readFile(new URL("../src/lib/bf1-content.ts", import.meta.url), "utf8");
+  const servidor = await readFile(new URL("../src/lib/bf1-campaign-server.ts", import.meta.url), "utf8");
+  const pagina = await readFile(new URL("../src/app/bl1/page.tsx", import.meta.url), "utf8");
+  const frase = "A Rook é o sistema que mostra, todo dia, em reais, quanto sobrou no seu restaurante.";
+  assert.ok(conteudo.includes(`before: "${frase}`), "o lead do hero começa dizendo o que a Rook é");
+  assert.ok(servidor.includes(`: "${frase}`), "a fase da oferta (26/11 a 04/12) mantém a mesma frase");
+  assert.match(conteudo, /label: "— Quem é a Rook"/);
+  const hero = pagina.indexOf('aria-labelledby="bf1-title"');
+  const historia = pagina.indexOf("<section id={history.id}");
+  const beneficios = pagina.indexOf('aria-labelledby="bf1-benefits-title"');
+  assert.ok(hero > 0 && historia > hero && beneficios > historia, "ordem: hero, quem é a Rook, benefícios");
 });
