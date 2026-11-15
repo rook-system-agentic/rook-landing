@@ -295,7 +295,7 @@ export default function BlackFridayCommunityPage() {
         </section>
       )}
 
-      {/* Pitch de 15/11: primeiro o que a pessoa leva (mentoria + Black), depois a prova e a comunidade. */}
+      {/* 15/11 (ROO-1887): primeiro o que a pessoa leva (acesso antecipado + bônus da contratação), depois a prova e a comunidade. */}
       <section className={styles.section} aria-labelledby="bf1-benefits-title">
         <div className={styles.container}>
           <p className={styles.sectionLabel}>{benefits.label}</p>
