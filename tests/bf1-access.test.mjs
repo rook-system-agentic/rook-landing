@@ -274,6 +274,19 @@ test("UI: o CTA abre o cadastro antes do grupo e o modal só abre o grupo depois
   assert.doesNotMatch(dialog, /track\([^)]*values|track\([^)]*email|console\./, "nada do formulário vai para analytics ou console");
 });
 
+test("UI: a barra fixa aparece quando o CTA do hero está atrás do aviso de cookies", () => {
+  // Diagnóstico 15/11/2026: em 360x640 e 390x605 o CTA ficava atrás do aviso,
+  // o observer o contava como visível e a primeira tela ficava sem CTA principal.
+  const host = read("src/components/bf1/Bf1AccessHost.tsx");
+  assert.match(host, /--rook-cookie-height/, "lê a altura publicada pelo aviso de cookies");
+  assert.match(host, /rootMargin: `0px 0px \$\{-inset\}px 0px`/, "área observada termina no topo do aviso");
+  assert.match(host, /intersectionRatio >= HERO_VISIBLE_RATIO/, "CTA parcialmente coberto não conta como visível");
+  assert.match(host, /new MutationObserver\(observe\)/, "refaz a observação quando o aviso muda de altura ou fecha");
+  assert.match(host, /firstElementChild/, "observa o botão principal, não a linha inteira do hero");
+  const css = read("src/components/bf1/bf1.module.css");
+  assert.match(css, /\.stickyBar \{[^}]*bottom: var\(--rook-cookie-height, 0px\)/, "barra continua acima do aviso");
+});
+
 test("analytics: bf1_access_request não aceita nenhum campo", () => {
   assert.deepEqual(buildTrackingEvent(TRACKING_EVENTS.bf1AccessRequest), { event: "bf1_access_request" });
   assert.throws(() => buildTrackingEvent(TRACKING_EVENTS.bf1AccessRequest, { email: "x" }));
