@@ -221,6 +221,7 @@ export default function BlackFridayCommunityPage() {
             <h1 id="bf1-title" className={styles.title}>
               {hero.headlinePlain} <em>{hero.headlineEmphasis}</em>
             </h1>
+            {hero.reveal ? <p className={styles.reveal}>{hero.reveal}</p> : null}
             <p className={styles.lead}>
               {hero.lead.before}
               <strong>{hero.lead.strong}</strong>
