@@ -137,8 +137,13 @@ export const BF1_CONTENT = {
     liveTag: "Comunidade no WhatsApp",
     headlinePlain: "Black Friday da Rook:",
     headlineEmphasis: "um preço nunca praticado antes.",
+    // Gabriel, 15/11 22:33: responde ao gancho do anúncio ("o preço já foi decidido").
+    // Só antes de 26/11: o servidor remove a linha nas fases seguintes.
+    // Verdade do código: a página mostra o preço a todos em 26/11; o grupo contrata
+    // em 26/11 e o checkout público abre em 27/11 (regra das fases no servidor).
+    reveal: "O preço é revelado na quinta, 26/11, e quem está no grupo contrata antes do público.",
     lead: {
-      before: "A Rook é o sistema que mostra, todo dia, em reais, quanto sobrou no seu restaurante. Na Black Friday, a oferta abre primeiro no grupo Black Rook 2026, na quinta, 26/11, e os primeiros restaurantes a contratar terão a possibilidade de uma ",
+      before: "A Rook é o sistema que mostra, todo dia, em reais, quanto sobrou no seu restaurante. E os primeiros restaurantes a contratar terão a possibilidade de uma ",
       strong: BF1_MENTORSHIP_HOOK,
       after: ".",
     },

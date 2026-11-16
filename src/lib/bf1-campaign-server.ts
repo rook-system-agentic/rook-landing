@@ -23,6 +23,8 @@ export function getBf1CampaignContent(nowMs = Date.now()) {
         eyebrow: ended ? "Black Friday Rook · Encerrada" : "Black Friday Rook",
         headlinePlain: ended ? "A Black Rook terminou." : "Black Rook:",
         headlineEmphasis: ended ? "A comunidade continua." : presentation.offer!.title,
+        // A partir de 26/11 o preço já está no título: a linha "é revelado na quinta" sai.
+        reveal: null,
         lead: {
           before: ended
             ? "A oferta de Black Friday foi encerrada em 04/12/2026. A comunidade da Rook continua com conteúdos sobre custos, caixa e gestão de restaurantes. A "

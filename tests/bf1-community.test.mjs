@@ -206,3 +206,25 @@ test("o hero diz o que a Rook é antes da oferta e 'Quem é a Rook' vem logo dep
   const beneficios = pagina.indexOf('aria-labelledby="bf1-benefits-title"');
   assert.ok(hero > 0 && historia > hero && beneficios > historia, "ordem: hero, quem é a Rook, benefícios");
 });
+
+// ───────────── Preço em 26/11 (Gabriel, 15/11 22:33): o hero responde ao gancho do anúncio sem prometer o que o código não faz ─────────────
+test("o hero diz que o preço sai em 26/11 e que o grupo contrata antes, só antes da Black", async () => {
+  const conteudo = await readFile(new URL("../src/lib/bf1-content.ts", import.meta.url), "utf8");
+  const servidor = await readFile(new URL("../src/lib/bf1-campaign-server.ts", import.meta.url), "utf8");
+  const pagina = await readFile(new URL("../src/app/bl1/page.tsx", import.meta.url), "utf8");
+  const linha = "O preço é revelado na quinta, 26/11, e quem está no grupo contrata antes do público.";
+  assert.ok(conteudo.includes(`reveal: "${linha}"`), "texto aprovado, exato");
+  // A página mostra o preço a todos em 26/11: nunca dizer que ele é revelado/sai primeiro no grupo.
+  assert.doesNotMatch(conteudo, /revelad[oa]s? primeiro|preço[^\n"]{0,20}(sai|é revelado) primeiro/i);
+  // Nas fases a partir de 26/11 a linha sai (o preço já está no título).
+  assert.match(servidor, /reveal: null,/);
+  // Logo abaixo do título e antes do lead; só renderiza quando existe.
+  const titulo = pagina.indexOf('id="bf1-title"');
+  const reveal = pagina.indexOf("{hero.reveal ? <p className={styles.reveal}>{hero.reveal}</p> : null}");
+  const lead = pagina.indexOf("<p className={styles.lead}>");
+  assert.ok(titulo > 0 && reveal > titulo && lead > reveal, "ordem: título, linha do preço, lead");
+  // A primeira tela não repete 26/11 nem o nome do grupo no lead do pré-lançamento.
+  const antes = conteudo.match(/lead: \{\s*before: "([^"]+)"/);
+  assert.ok(antes, "lead do hero encontrado");
+  assert.doesNotMatch(antes[1], /26\/11|Black Rook 2026/);
+});
