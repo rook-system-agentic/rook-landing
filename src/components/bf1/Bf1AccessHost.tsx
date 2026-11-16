@@ -29,7 +29,20 @@ const Bf1AccessDialog = dynamic(() => import("./Bf1AccessDialog"), { ssr: false 
  * 3. Barra fixa no celular: aparece quando o CTA do hero sai da tela e some
  *    quando o CTA final aparece (ou já passou), para não cobrir o rodapé.
  *    Fica acima do banner de cookies (`--rook-cookie-height`).
+ * 4. "Sair da tela" desconta o banner de cookies. Antes, o CTA do hero
+ *    escondido ATRÁS do banner contava como visível e a barra não aparecia:
+ *    em telas de 360x640 e 390x605 (área útil do navegador do Instagram) a
+ *    primeira tela ficava sem nenhum CTA principal à vista (diagnóstico de
+ *    15/11/2026). Agora a área observada termina no topo do banner e o CTA só
+ *    conta como visível com pelo menos 3/4 da altura à mostra.
  */
+
+const HERO_VISIBLE_RATIO = 0.75;
+
+function cookieBannerHeight(root: HTMLElement): number {
+  const value = Number.parseFloat(getComputedStyle(root).getPropertyValue("--rook-cookie-height"));
+  return Number.isFinite(value) && value > 0 ? Math.round(value) : 0;
+}
 
 export default function Bf1AccessHost({ stickyBar = true }: { stickyBar?: boolean }) {
   const link = communityLink();
@@ -67,20 +80,45 @@ export default function Bf1AccessHost({ stickyBar = true }: { stickyBar?: boolea
 
   useEffect(() => {
     if (!stickyBar) return;
-    const hero = document.getElementById(BF1_HERO_CTA_ID);
+    const heroRow = document.getElementById(BF1_HERO_CTA_ID);
+    // Observa o botão principal, não a linha inteira (que inclui "Quem é a Rook").
+    const hero = heroRow?.firstElementChild ?? heroRow;
     const final = document.getElementById(BF1_FINAL_CTA_ID);
     if (!hero || typeof IntersectionObserver === "undefined") return;
+    const heroTarget: Element = hero;
+    const root = document.documentElement;
     const seen = { hero: true, final: false };
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target === hero) seen.hero = entry.isIntersecting;
-        if (entry.target === final) seen.final = entry.isIntersecting || entry.boundingClientRect.top < 0;
-      }
-      setShowBar(!seen.hero && !seen.final);
-    });
-    observer.observe(hero);
-    if (final) observer.observe(final);
-    return () => observer.disconnect();
+    let observer: IntersectionObserver | null = null;
+    let inset = -1;
+
+    function observe() {
+      const next = cookieBannerHeight(root);
+      if (next === inset) return;
+      inset = next;
+      observer?.disconnect();
+      observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.target === heroTarget) seen.hero = entry.isIntersecting && entry.intersectionRatio >= HERO_VISIBLE_RATIO;
+            if (entry.target === final) seen.final = entry.isIntersecting || entry.boundingClientRect.top < 0;
+          }
+          setShowBar(!seen.hero && !seen.final);
+        },
+        { rootMargin: `0px 0px ${-inset}px 0px`, threshold: [0, HERO_VISIBLE_RATIO, 1] },
+      );
+      observer.observe(heroTarget);
+      if (final) observer.observe(final);
+    }
+
+    observe();
+    // O banner publica a altura em `--rook-cookie-height` (style do <html>) e a
+    // remove ao fechar: refaz a observação quando esse valor muda.
+    const watcher = typeof MutationObserver === "undefined" ? null : new MutationObserver(observe);
+    watcher?.observe(root, { attributes: true, attributeFilter: ["style"] });
+    return () => {
+      watcher?.disconnect();
+      observer?.disconnect();
+    };
   }, [stickyBar]);
 
   if (!link.ready) return null;
