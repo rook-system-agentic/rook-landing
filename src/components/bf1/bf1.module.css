@@ -167,6 +167,21 @@
   color: var(--bf-muted);
 }
 
+/* Linha do preço em 26/11 (só antes da Black): resposta direta ao gancho do anúncio. */
+.reveal {
+  margin: 1.1rem 0 0;
+  max-width: 36rem;
+  font-family: Manrope, system-ui, sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--bf-ink);
+}
+
+.reveal + .lead {
+  margin-top: 0.9rem;
+}
+
 .offerSummary {
   max-width: 36rem;
   margin-top: 1.25rem;
