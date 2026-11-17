@@ -107,7 +107,8 @@ export const BF1_CONTENT = {
   },
   access: {
     title: "Falta só um passo",
-    lead: "Preencha para entrar no grupo Black Rook 2026, na comunidade da Rook no WhatsApp. A Black Friday da Rook abre lá primeiro, na quinta, 26/11.",
+    // ROO-1921 (17/11): uma linha só, para o formulário caber no celular.
+    lead: "A Black Friday da Rook abre primeiro no grupo, na quinta, 26/11.",
     fields: {
       name: { label: "Nome", placeholder: "Como podemos te chamar" },
       phone: { label: "WhatsApp com DDD", placeholder: "(11) 99999-9999" },
