@@ -19,6 +19,7 @@ import {
   createBf1AccessPersistence,
 } from "../src/lib/bf1-access-persistence.mjs";
 import { buildTrackingEvent, TRACKING_EVENTS } from "../src/lib/tracking-events.mjs";
+import { BF1_FORM_CLARITY_EVENTS, isAllowedClarityEvent, pushClarityEvent } from "../src/lib/clarity-events.mjs";
 import { ACCESS, FakeBackendError, accessRequest, loadBf1AccessRoute } from "./helpers/bf1-access-route.mjs";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -290,6 +291,64 @@ test("UI: a barra fixa aparece quando o CTA do hero está atrás do aviso de coo
 test("analytics: bf1_access_request não aceita nenhum campo", () => {
   assert.deepEqual(buildTrackingEvent(TRACKING_EVENTS.bf1AccessRequest), { event: "bf1_access_request" });
   assert.throws(() => buildTrackingEvent(TRACKING_EVENTS.bf1AccessRequest, { email: "x" }));
+});
+
+test("UI celular (ROO-1921): botão de envio num rodapé fixo, sem teclado ao abrir, formulário na área visível", () => {
+  // Diagnóstico 17/11/2026: 8 aberturas, 0 envios; em 360x640 e 412x780 o botão
+  // "Liberar meu acesso" ficava abaixo da tela, com e sem teclado.
+  const dialog = read("src/components/bf1/Bf1AccessDialog.tsx");
+  assert.doesNotMatch(dialog, /autoFocus/, "abrir o formulário não pode abrir o teclado sozinho");
+  const footer = dialog.indexOf("className={styles.accessFooter}");
+  const submit = dialog.indexOf('type="submit"');
+  const formEnd = dialog.indexOf("</form>");
+  assert.ok(footer > 0 && submit > footer && formEnd > submit, "o botão de envio fica dentro do rodapé fixo");
+  assert.ok(dialog.indexOf('role="alert">{message}') > footer, "mensagem de erro do envio aparece junto do botão");
+  assert.match(dialog, /window\.visualViewport/, "acompanha a área visível quando o teclado abre");
+  assert.match(dialog, /--bf1-vv-height/);
+  const css = read("src/components/bf1/bf1.module.css");
+  assert.match(css, /\.accessFooter \{[^}]*position: sticky;[^}]*bottom: 0;/, "rodapé gruda no fim da área visível");
+  assert.match(css, /\.accessDialog \{[^}]*scroll-padding-bottom:/, "campo focado não fica atrás do rodapé");
+  const mobile = css.slice(css.indexOf("ROO-1921: no celular"));
+  assert.match(mobile, /\.accessDialog \{[^}]*height: var\(--bf1-vv-height, 100dvh\);/, "tela cheia no celular");
+  assert.match(css, /\.accessInput \{[^}]*font-size: 1rem;/, "campo com 16 px: o iPhone não dá zoom ao focar");
+});
+
+test("copy (ROO-1921): topo do formulário em uma linha", () => {
+  const source = read("src/lib/bf1-content.ts");
+  const access = source.slice(source.indexOf("  access: {"), source.indexOf("  hero: {"));
+  assert.match(access, /title: "Falta só um passo",/);
+  assert.match(access, /lead: "A Black Friday da Rook abre primeiro no grupo, na quinta, 26\/11\.",/);
+  assert.match(access, /submit: "Liberar meu acesso",/);
+});
+
+test("Clarity (ROO-1921): eventos do formulário são só nomes fixos, sem nenhum valor digitado", () => {
+  const calls = [];
+  const target = { clarity: (...args) => calls.push(args) };
+  assert.equal(pushClarityEvent(BF1_FORM_CLARITY_EVENTS.open, { enabled: true, target }), true);
+  assert.deepEqual(calls, [["event", "bf1_form_aberto"]], "só o nome do evento, sem parâmetro de valor");
+  assert.equal(pushClarityEvent("bf1_form_maria@restaurante.com", { enabled: true, target }), false, "nome fora da lista não sai");
+  assert.equal(pushClarityEvent(BF1_FORM_CLARITY_EVENTS.sent, { enabled: false, target }), false, "homologação não envia");
+  assert.equal(pushClarityEvent(BF1_FORM_CLARITY_EVENTS.sent, { enabled: true, target: {} }), false, "sem Clarity (sem consentimento) não envia");
+  const broken = { clarity: () => { throw new Error("x"); } };
+  assert.equal(pushClarityEvent(BF1_FORM_CLARITY_EVENTS.sent, { enabled: true, target: broken }), false, "nunca lança");
+  assert.equal(calls.length, 1);
+  for (const name of Object.values(BF1_FORM_CLARITY_EVENTS.fieldError)) {
+    assert.ok(isAllowedClarityEvent(name));
+    assert.match(name, /^bf1_form_erro_[a-z]+$/);
+  }
+
+  const dialog = read("src/components/bf1/Bf1AccessDialog.tsx");
+  const args = [...dialog.matchAll(/trackClarity\(([^)]*)\)/g)].map((m) => m[1]);
+  assert.ok(args.length >= 6, "aberto, tentativa, erro por campo, verificação, enviado e falha");
+  for (const arg of args) {
+    assert.match(arg, /^BF1_FORM_CLARITY_EVENTS\.[a-zA-Z]+(\[field\])?$/, `trackClarity só recebe nome fixo: ${arg}`);
+  }
+  const sent = dialog.indexOf("trackClarity(BF1_FORM_CLARITY_EVENTS.sent)");
+  assert.ok(sent > dialog.indexOf("rememberBf1Access();"), "enviado só depois da confirmação do servidor");
+  assert.ok(dialog.indexOf("trackClarity(BF1_FORM_CLARITY_EVENTS.attempt)") < dialog.indexOf("validateBf1AccessInput(frozen)"), "tentativa conta antes da validação");
+  const wrapper = read("src/lib/track-clarity.ts");
+  assert.match(wrapper, /pushClarityEvent\(name, \{ enabled: isTrackingEnabled\(\) \}\)/, "mesmo portão de ambiente do track()");
+  assert.doesNotMatch(read("src/lib/track.ts"), /clarity/i, "track.ts (funil GA4/Meta) não muda");
 });
 
 test("copy: aviso de finalidade versionado, opt-in separado e link para a Política de Privacidade", async () => {
