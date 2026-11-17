@@ -5,9 +5,11 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { validateBf1AccessInput } from "@/lib/bf1-access-validation.mjs";
 import { BF1_LEAD_CHANNEL } from "@/lib/bf1-community.mjs";
 import { BF1_CONTENT } from "@/lib/bf1-content";
+import { BF1_FORM_CLARITY_EVENTS } from "@/lib/clarity-events.mjs";
 import { captureVisitAttribution } from "@/lib/lead-attribution-client";
 import type { LeadAttribution } from "@/lib/lead-attribution.mjs";
 import { track, TRACKING_EVENTS } from "@/lib/track";
+import { trackClarity } from "@/lib/track-clarity";
 import { rememberBf1Access } from "./bf1-access-storage";
 import styles from "./bf1.module.css";
 
@@ -25,6 +27,13 @@ import styles from "./bf1.module.css";
  * Nada do formulário vai para analytics: o evento bf1_access_request não tem
  * campos e o generate_lead leva só o canal fixo (allowlist em
  * tracking-events.mjs).
+ *
+ * Celular (ROO-1921, diagnóstico de 17/11: 8 aberturas, 0 envios): o botão
+ * de envio ficava abaixo da tela em 360x640 e 412x780, com e sem teclado.
+ * Agora o formulário ocupa a área visível (acompanha o teclado pelo
+ * visualViewport) e o botão fica num rodapé fixo. Os eventos do Clarity
+ * (clarity-events.mjs) são só nomes fixos: aberto, tentativa, erro por campo,
+ * enviado, falha. Nenhum valor digitado sai do formulário.
  */
 
 const ENDPOINT = "/api/bf1-community-access/";
@@ -40,6 +49,12 @@ const FIELDS: readonly Field[] = ["name", "phone", "email", "restaurant"];
 const EMPTY: Values = { name: "", phone: "", email: "", restaurant: "" };
 const AUTOCOMPLETE: Record<Field, string> = { name: "name", phone: "tel", email: "email", restaurant: "organization" };
 const INPUT_TYPE: Record<Field, string> = { name: "text", phone: "tel", email: "email", restaurant: "text" };
+
+function trackFieldErrors(errors: Errors) {
+  for (const field of FIELDS) {
+    if (errors[field]) trackClarity(BF1_FORM_CLARITY_EVENTS.fieldError[field]);
+  }
+}
 
 async function fetchWithTimeout(input: string, init?: RequestInit) {
   const controller = new AbortController();
@@ -120,6 +135,7 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
     attribution.current = captureVisitAttribution({ href: window.location.href, referrer: document.referrer });
     const element = dialog.current;
     if (element && !element.open) element.showModal();
+    trackClarity(BF1_FORM_CLARITY_EVENTS.open);
     prewarm()
       .then((result) => {
         if (result === "unavailable" && !inFlight.current) goDirect();
@@ -130,6 +146,25 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
       if (element?.open) element.close();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- roda uma vez por abertura
+  }, []);
+
+  useEffect(() => {
+    // Teclado aberto encolhe a área visível, não a página: o formulário segue
+    // o visualViewport para o rodapé com o botão ficar logo acima do teclado.
+    const element = dialog.current;
+    const viewport = window.visualViewport;
+    if (!element || !viewport) return;
+    const sync = () => {
+      element.style.setProperty("--bf1-vv-height", `${Math.round(viewport.height)}px`);
+      element.style.setProperty("--bf1-vv-top", `${Math.round(viewport.offsetTop)}px`);
+    };
+    sync();
+    viewport.addEventListener("resize", sync);
+    viewport.addEventListener("scroll", sync);
+    return () => {
+      viewport.removeEventListener("resize", sync);
+      viewport.removeEventListener("scroll", sync);
+    };
   }, []);
 
   useEffect(() => {
@@ -162,6 +197,7 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
     event.preventDefault();
     if (inFlight.current || phase === "success" || !submissionId.current) return;
     setMessage("");
+    trackClarity(BF1_FORM_CLARITY_EVENTS.attempt);
 
     const frozen: Snapshot = snapshot.current || {
       submissionId: submissionId.current,
@@ -173,6 +209,7 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
     const local = validateBf1AccessInput(frozen);
     if (!local.ok) {
       snapshot.current = null;
+      trackFieldErrors(local.errors as Errors);
       showFieldErrors(local.errors as Errors);
       return;
     }
@@ -204,12 +241,14 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
         }
         snapshot.current = null;
         setMessage(typeof data.error === "string" ? data.error : "Revise os campos destacados.");
+        trackFieldErrors(fieldErrors);
         showFieldErrors(fieldErrors);
         prewarm();
         return;
       }
       if (response.status === 400) {
         // Desafio expirado/reutilizado: novo envio com os mesmos dados resolve.
+        trackClarity(BF1_FORM_CLARITY_EVENTS.verificationError);
         setMessage(typeof data.error === "string" ? data.error : "A verificação expirou. Tente novamente.");
         prewarm();
         return;
@@ -221,10 +260,12 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
       // ROO-1876: a conversão padrão do site. O GTM leva generate_lead a `Lead`
       // nos pixels da Meta e ao GA4; antes, a campanha não recebia nenhum Lead.
       track(TRACKING_EVENTS.lead, { channel: BF1_LEAD_CHANNEL });
+      trackClarity(BF1_FORM_CLARITY_EVENTS.sent);
       setName(firstName(frozen.name));
       setPhase("success");
       redirectTimer.current = window.setTimeout(() => window.location.assign(href), REDIRECT_DELAY_MS);
     } catch {
+      trackClarity(BF1_FORM_CLARITY_EVENTS.failure);
       setPhase("fallback");
     } finally {
       inFlight.current = false;
@@ -270,7 +311,6 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
                     readOnly={locked}
                     required
                     maxLength={field === "email" ? 254 : field === "phone" ? 40 : 120}
-                    autoFocus={field === "name"}
                     onChange={(event) => change(field, event.target.value)}
                     aria-invalid={errors[field] ? true : undefined}
                     aria-describedby={errors[field] ? `bf1-access-${field}-error` : undefined}
@@ -292,10 +332,12 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
                 <Link href="/privacidade/" target="_blank" rel="noopener">{copy.notice.linkLabel}</Link>
                 {copy.notice.after}
               </p>
-              {message ? <p className={styles.accessError} role="alert">{message}</p> : null}
-              <button type="submit" className={`${styles.cta} ${styles.accessSubmit}`} disabled={busy}>
-                <span>{busy ? copy.busy : copy.submit}</span>
-              </button>
+              <div className={styles.accessFooter}>
+                {message ? <p className={styles.accessError} role="alert">{message}</p> : null}
+                <button type="submit" className={`${styles.cta} ${styles.accessSubmit}`} disabled={busy}>
+                  <span>{busy ? copy.busy : copy.submit}</span>
+                </button>
+              </div>
             </form>
           </>
         ) : null}
