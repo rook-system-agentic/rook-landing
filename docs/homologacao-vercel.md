@@ -13,6 +13,8 @@ branch de trabalho  →  homolog  →  main
                         │            │
                         │            └─ projeto rook-landing publica www.rook.com.br
                         └─ projeto rook-landing-hml publica lp-homolog.rooksystem.com.br
+
+branch mkt/*  →  preview próprio no rook-landing-hml (link no PR)  →  homolog  →  main
 ```
 
 Push ou merge na `homolog` publica a homologação pela integração Git da
@@ -26,10 +28,33 @@ variáveis de homologação ficam num projeto que não tem nenhum domínio nem
 variável de produção. Mexer na homologação nunca toca no projeto que serve o
 site real.
 
-**Só a `homolog` constrói.** O projeto tem o *Ignored Build Step*
-`[ "$VERCEL_GIT_COMMIT_REF" != "homolog" ]`: para qualquer outra branch o
-comando sai com 0 e a Vercel pula o build. Sem isso, cada PR e cada push na
-`main` gerariam um segundo deploy, com as variáveis de homologação.
+**Só a `homolog` e as branches `mkt/*` constroem.** O projeto tem o *Ignored
+Build Step* `case "$VERCEL_GIT_COMMIT_REF" in homolog|mkt/*) exit 1;; *) exit 0;; esac`:
+para qualquer outra branch o comando sai com 0 e a Vercel pula o build. Sem
+isso, cada PR e cada push na `main` gerariam um segundo deploy, com as
+variáveis de homologação. Até 17/11/2026 o comando era
+`[ "$VERCEL_GIT_COMMIT_REF" != "homolog" ]` (só a `homolog`).
+
+**Preview das branches `mkt/*` (17/11/2026, decisão do Gabriel).** Quem edita
+texto pelo navegador (marketing) só via a mudança depois do merge na
+`homolog`, que é compartilhada com o time técnico e vai inteira para a `main`
+na promoção. Agora cada push numa branch `mkt/*` gera um deploy de preview
+neste projeto, e o bot da Vercel comenta o link no PR: é a linha
+`rook-landing-hml` → **Preview**. A linha `rook-landing` aparece como
+*Ignored* (o projeto de produção só constrói a `main`), e o link dela não
+serve. O preview usa as variáveis sem filtro de branch da tabela abaixo
+(`NEXT_PUBLIC_ENV=homolog`, portanto sem rastreamento e com `noindex`) e fica
+aberto sem login, como a homologação.
+
+As variáveis com escopo de branch `homolog` **não** chegam às branches
+`mkt/*`, de propósito: o cadastro `BF1_ACCESS_ENABLED` e o conjunto
+`CMV_GUIDE_*` (chave do Resend, service role do Supabase e destinatário de
+teste). No preview, `/api/bf1-community-access/` responde 503, o CTA da /bl1
+leva direto ao grupo e o Guia CMV fica desligado. Não recadastre essas
+variáveis sem branch: elas passariam a valer para qualquer preview. Validado
+no PR #221, em 17/11/2026: preview público com HTTP 200,
+`X-Robots-Tag: noindex, nofollow, nosnippet`, GTM ausente no HTML e cadastro
+BF1 respondendo 503.
 
 **A homologação é um deploy de *preview*.** A branch de produção do projeto
 continua a padrão (`main`), que nunca constrói por causa da regra acima. O
@@ -54,7 +79,7 @@ do projeto para `homolog` (e desligar o Cron Jobs no painel).
 | Variável | Valor | Por quê |
 |---|---|---|
 | `NEXT_PUBLIC_ENV` | `homolog` | desliga o rastreamento (`src/lib/tracking.ts`) e liga o `noindex` (`next.config.mjs`) |
-| `NEXT_PUBLIC_SITE_URL` | `https://lp-homolog.rooksystem.com.br` | canonical, sitemap e origem aceita nos formulários |
+| `NEXT_PUBLIC_SITE_URL` | `https://lp.homolog.rook.com.br` (antes `https://lp-homolog.rooksystem.com.br`, ROO-1611) | canonical, sitemap e origem aceita nos formulários |
 | `ASAFLOW_ACQUISITION_ENABLED` | `false` | nenhum lead de teste vira negócio no AsaFlow |
 | `NEXT_PUBLIC_ASAFLOW_CHAT_ENABLED` | `false` | o chat real não é montado |
 
