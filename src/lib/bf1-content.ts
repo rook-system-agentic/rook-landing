@@ -96,7 +96,7 @@ export const BF1_CONTENT = {
     ogTitle: "Black Friday da Rook: um preço nunca praticado antes",
     ogDescription:
       "O sistema que mostra, todo dia, quanto sobrou no seu restaurante. A oferta abre primeiro no grupo Black Rook 2026, na quinta, 26/11.",
-    ogAlt: "Black Friday Rook — grupo no WhatsApp com acesso antecipado à oferta, em 26/11.",
+    ogAlt: "Black Friday da Rook: um preço nunca praticado antes. A Rook é o sistema que mostra, todo dia, em reais, quanto sobrou no seu restaurante.",
   },
   cta: {
     label: "Entrar no grupo Black Rook",

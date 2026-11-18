@@ -2,15 +2,51 @@ import "server-only";
 import { BF1_CONTENT, BF1_MENTORSHIP_BONUS_RULE, BF1_MENTORSHIP_HOOK } from "./bf1-content";
 import { buildBf1OfferPresentation } from "./bf1-offer-presentation.mjs";
 
+/*
+ * Textos com data fora do corpo da página (ROO-1922, 17/11): o topo
+ * do formulário, a prévia do grupo e os metadados liam o texto fixo do
+ * pré-lançamento e continuariam dizendo "abre na quinta, 26/11" depois de 26/11.
+ * Um aviso por fase, usado nos três lugares.
+ */
+const BF1_PHASE_NOTICE = {
+  early: "Hoje, 26/11, o acesso antecipado está liberado no grupo.",
+  ended: "A Black Rook terminou. A comunidade continua com conteúdo toda semana.",
+} as const;
+
 /** A página dinâmica resolve a fase no servidor; a oferta futura não vai no HTML. */
 export function getBf1CampaignContent(nowMs = Date.now()) {
   const presentation = buildBf1OfferPresentation(nowMs);
   if (presentation.phase === "upcoming") return { content: BF1_CONTENT, ...presentation };
   const ended = presentation.phase === "ended";
+  const notice = presentation.phase === "early"
+    ? BF1_PHASE_NOTICE.early
+    : ended
+      ? BF1_PHASE_NOTICE.ended
+      : presentation.offer!.period;
   return {
     ...presentation,
     content: {
       ...BF1_CONTENT,
+      meta: {
+        ...BF1_CONTENT.meta,
+        title: ended ? "Black Rook 2026 encerrada | Rook System" : BF1_CONTENT.meta.title,
+        description: ended
+          ? notice
+          : `A Rook é o sistema que mostra, todo dia, quanto sobrou no seu restaurante. ${notice}`,
+        ogTitle: ended ? "A Black Rook terminou. A comunidade continua." : BF1_CONTENT.meta.ogTitle,
+        ogDescription: ended
+          ? notice
+          : `O sistema que mostra, todo dia, quanto sobrou no seu restaurante. ${notice}`,
+      },
+      access: { ...BF1_CONTENT.access, lead: notice },
+      preview: {
+        ...BF1_CONTENT.preview,
+        subtitle: ended ? "Avisos · conteúdo" : "Avisos · conteúdo e Black Rook",
+        // Depois de 04/12 o bônus não está mais aberto: a bolha da mentoria sai.
+        messages: BF1_CONTENT.preview.messages
+          .filter((message) => !(ended && message.tag === "Mentoria"))
+          .map((message) => (message.tag === "Aviso" ? { ...message, text: notice } : message)),
+      },
       // Antes da Black a linha cita 26/11; depois ela precisa continuar verdadeira.
       cta: {
         ...BF1_CONTENT.cta,

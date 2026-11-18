@@ -44,7 +44,7 @@ function cookieBannerHeight(root: HTMLElement): number {
   return Number.isFinite(value) && value > 0 ? Math.round(value) : 0;
 }
 
-export default function Bf1AccessHost({ stickyBar = true }: { stickyBar?: boolean }) {
+export default function Bf1AccessHost({ stickyBar = true, accessLead }: { stickyBar?: boolean; accessLead: string }) {
   const link = communityLink();
   const [open, setOpen] = useState(false);
   const [showBar, setShowBar] = useState(false);
@@ -131,7 +131,7 @@ export default function Bf1AccessHost({ stickyBar = true }: { stickyBar?: boolea
           <Bf1CommunityCta className={styles.stickyCta} tabIndex={barVisible ? undefined : -1} />
         </div>
       ) : null}
-      {open ? <Bf1AccessDialog href={link.href} onClose={() => setOpen(false)} /> : null}
+      {open ? <Bf1AccessDialog href={link.href} lead={accessLead} onClose={() => setOpen(false)} /> : null}
     </>
   );
 }

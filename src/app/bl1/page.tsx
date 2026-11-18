@@ -8,7 +8,7 @@ import Reveal from "@/components/lp/LpReveal";
 import { BF1_FINAL_CTA_ID, BF1_HERO_CTA_ID } from "@/lib/bf1-community.mjs";
 import { BF1_CONTENT, type Bf1CommunityIconName, type Bf1IconName, type Bf1PillarIconName } from "@/lib/bf1-content";
 import { getBf1CampaignContent } from "@/lib/bf1-campaign-server";
-import { TWITTER_CARD } from "@/lib/og-image";
+import { OG_IMAGE, TWITTER_CARD } from "@/lib/og-image";
 import { siteUrl } from "@/lib/site-origin";
 
 /*
@@ -24,7 +24,13 @@ import { siteUrl } from "@/lib/site-origin";
  *
  * O `openGraph` daqui substitui o do layout inteiro (ver lib/og-image.ts), então
  * a imagem é declarada de novo — a prévia no WhatsApp é a primeira impressão
- * desta página. A arte vive em public/og/, em PNG.
+ * desta página. A arte vive em public/og/, em PNG, e a fonte em docs/og/.
+ *
+ * Metadados por fase (ROO-1922, 17/11): eram fixos no texto do pré-lançamento e diriam
+ * "abre em 26/11" depois de 26/11. A arte v3 não tem data nem promessa de
+ * mentoria (a v2, de 09/11, dizia "mentoria" para quem entrava na comunidade e
+ * "lucrar", contrariando as correções de 10/11 e 15/11). Encerrada a campanha,
+ * a página volta para a arte padrão do site.
  */
 const PAGE_URL = siteUrl("/bl1/");
 
@@ -33,34 +39,39 @@ const PAGE_URL = siteUrl("/bl1/");
 export const dynamic = "force-dynamic";
 
 const BF1_OG_IMAGE = {
-  url: "/og/bf1-og.png",
+  url: "/og/bf1-og-v3.png",
   width: 1200,
   height: 630,
   alt: BF1_CONTENT.meta.ogAlt,
   type: "image/png",
 } as const;
 
-export const metadata: Metadata = {
-  title: BF1_CONTENT.meta.title,
-  description: BF1_CONTENT.meta.description,
-  alternates: { canonical: PAGE_URL },
-  robots: { index: false, follow: true },
-  openGraph: {
-    title: BF1_CONTENT.meta.ogTitle,
-    description: BF1_CONTENT.meta.ogDescription,
-    url: PAGE_URL,
-    siteName: "Rook System",
-    type: "website",
-    locale: "pt_BR",
-    images: [BF1_OG_IMAGE],
-  },
-  twitter: {
-    card: TWITTER_CARD,
-    title: BF1_CONTENT.meta.ogTitle,
-    description: BF1_CONTENT.meta.ogDescription,
-    images: [BF1_OG_IMAGE.url],
-  },
-};
+export function generateMetadata(): Metadata {
+  const { content, phase } = getBf1CampaignContent();
+  const { meta } = content;
+  const image = phase === "ended" ? OG_IMAGE : BF1_OG_IMAGE;
+  return {
+    title: meta.title,
+    description: meta.description,
+    alternates: { canonical: PAGE_URL },
+    robots: { index: false, follow: true },
+    openGraph: {
+      title: meta.ogTitle,
+      description: meta.ogDescription,
+      url: PAGE_URL,
+      siteName: "Rook System",
+      type: "website",
+      locale: "pt_BR",
+      images: [image],
+    },
+    twitter: {
+      card: TWITTER_CARD,
+      title: meta.ogTitle,
+      description: meta.ogDescription,
+      images: [image.url],
+    },
+  };
+}
 
 // Ícones de traço simples, no mesmo peso dos marcadores do site.
 function BenefitIcon({ name }: { name: Bf1IconName }) {
@@ -491,7 +502,7 @@ export default function BlackFridayCommunityPage() {
         </div>
       </section>
       {/* ROO-1876: um host só abre o cadastro para todos os CTAs; a barra fixa só existe enquanto o CTA principal é a comunidade. */}
-      <Bf1AccessHost stickyBar={!checkoutHref} />
+      <Bf1AccessHost stickyBar={!checkoutHref} accessLead={content.access.lead} />
     </div>
   );
 }
