@@ -99,7 +99,9 @@ async function obtainProof(): Promise<ProofResult> {
   return { token: challenge.token, solution, at: Date.now() };
 }
 
-export default function Bf1AccessDialog({ href, onClose }: { href: string; onClose: () => void }) {
+// O topo do formulário vem do servidor, pela fase da campanha: o texto fixo dizia
+// "abre na quinta, 26/11" também depois de 26/11 (ROO-1922, 17/11).
+export default function Bf1AccessDialog({ href, lead, onClose }: { href: string; lead: string; onClose: () => void }) {
   const copy = BF1_CONTENT.access;
   const dialog = useRef<HTMLDialogElement>(null);
   const submissionId = useRef("");
@@ -294,7 +296,7 @@ export default function Bf1AccessDialog({ href, onClose }: { href: string; onClo
           <>
             <p className={styles.accessEyebrow}>Black Rook 2026</p>
             <h2 id="bf1-access-title" className={styles.accessTitle}>{copy.title}</h2>
-            <p className={styles.accessLead}>{copy.lead}</p>
+            <p className={styles.accessLead}>{lead}</p>
             <form className={styles.accessForm} onSubmit={submit} noValidate aria-busy={busy}>
               {FIELDS.map((field) => (
                 <div key={field} className={styles.accessField}>

@@ -6,7 +6,7 @@
  * botão clicável; e o evento de clique continua sem dado pessoal.
  */
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -227,4 +227,40 @@ test("o hero diz que o preço sai em 26/11 e que o grupo contrata antes, só ant
   const antes = conteudo.match(/lead: \{\s*before: "([^"]+)"/);
   assert.ok(antes, "lead do hero encontrado");
   assert.doesNotMatch(antes[1], /26\/11|Black Rook 2026/);
+});
+// ───────────── Textos por fase fora do corpo (ROO-1922, 17/11): nada diz "abre em 26/11" depois de 26/11 ─────────────
+test("o topo do formulário, a prévia do grupo e os metadados seguem a fase da campanha", async () => {
+  const servidor = await readFile(new URL("../src/lib/bf1-campaign-server.ts", import.meta.url), "utf8");
+  const pagina = await readFile(new URL("../src/app/bl1/page.tsx", import.meta.url), "utf8");
+  const host = await readFile(new URL("../src/components/bf1/Bf1AccessHost.tsx", import.meta.url), "utf8");
+  const dialogo = await readFile(new URL("../src/components/bf1/Bf1AccessDialog.tsx", import.meta.url), "utf8");
+  // O formulário mostra o texto que o servidor resolveu, nunca o fixo do pré-lançamento.
+  assert.doesNotMatch(dialogo, /copy\.lead/);
+  assert.match(dialogo, /<p className=\{styles\.accessLead\}>\{lead\}<\/p>/);
+  assert.match(host, /lead=\{accessLead\}/);
+  assert.match(pagina, /accessLead=\{content\.access\.lead\}/);
+  // Metadados resolvidos a cada pedido, pela mesma fase da página.
+  assert.doesNotMatch(pagina, /export const metadata/);
+  assert.match(pagina, /export function generateMetadata\(\): Metadata \{\s*const \{ content, phase \} = getBf1CampaignContent\(\);/);
+  // A partir de 26/11 os três trocam juntos, pelo mesmo aviso.
+  assert.match(servidor, /access: \{ \.\.\.BF1_CONTENT\.access, lead: notice \}/);
+  assert.match(servidor, /meta: \{\s*\.\.\.BF1_CONTENT\.meta,/);
+  assert.match(servidor, /message\.tag === "Aviso" \? \{ \.\.\.message, text: notice \}/);
+  // Os avisos das fases não falam de 26/11 no futuro.
+  const avisos = servidor.match(/const BF1_PHASE_NOTICE = \{([\s\S]*?)\} as const;/);
+  assert.ok(avisos, "avisos por fase encontrados");
+  assert.doesNotMatch(avisos[1], /\babre\b|na quinta|será|chega primeiro/i);
+});
+test("a arte de compartilhamento da /bl1 não tem data, preço, mentoria nem promessa de lucro", async () => {
+  const pagina = await readFile(new URL("../src/app/bl1/page.tsx", import.meta.url), "utf8");
+  const fonte = await readFile(path.join(RAIZ, "docs/og/bf1-og.html"), "utf8");
+  // Só o texto visível da arte (o comentário de cabeçalho cita as palavras banidas de propósito).
+  const texto = fonte.slice(fonte.indexOf("<body>")).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  assert.match(texto, /Black Friday da Rook: um preço nunca praticado antes\./);
+  assert.match(texto, /O sistema que mostra, todo dia, em reais, quanto sobrou no seu restaurante\./);
+  // Vale de agora até 04/12: sem data nem preço; a regra do bônus não cabe na arte.
+  assert.doesNotMatch(texto, /\blucr|\bgarant|mentoria|personalizada|\d{1,2}\/\d{1,2}|novembro|dezembro|R\$|\d+\s?%/i);
+  assert.match(pagina, /url: "\/og\/bf1-og-v3\.png"/);
+  assert.doesNotMatch(pagina, /\/og\/bf1-og\.png/);
+  await access(path.join(RAIZ, "public/og/bf1-og-v3.png"));
 });

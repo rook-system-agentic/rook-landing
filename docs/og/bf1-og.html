@@ -1,0 +1,75 @@
+<!doctype html>
+<!--
+  Fonte da arte de compartilhamento da /bl1: public/og/bf1-og-v3.png (1200x630, PNG).
+
+  Por que está no repositório (ROO-1922, 17/11/2026): a v2 (09/11) vivia fora daqui e
+  nenhuma trava lia o texto dela. Ela continuou dizendo "mentoria" para quem
+  entrava na comunidade e "lucrar" depois das correções de 10/11 e 15/11.
+  A trava está em tests/bf1-community.test.mjs.
+
+  Regras da arte: ela é usada de hoje até 04/12, então não leva data, preço nem
+  mentoria (a regra do bônus não cabe aqui). Só frases já aprovadas na página.
+
+  Para gerar: abrir este arquivo num navegador com viewport 1200x630, esperar
+  as fontes e salvar a captura em public/og/bf1-og-v3.png.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=JetBrains+Mono:wght@500;600&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    position: relative; overflow: hidden; background: #0b0f14; color: #eef3f8;
+    font-family: Manrope, system-ui, sans-serif;
+  }
+  .glowA { position: absolute; width: 760px; height: 760px; right: -260px; top: -360px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(194,65,0,.62), transparent 64%); filter: blur(30px); }
+  .glowB { position: absolute; width: 560px; height: 560px; left: -260px; bottom: -330px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,131,69,.24), transparent 64%); filter: blur(30px); }
+  .grid { position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 85% 75% at 45% 45%, #000 30%, transparent 78%); }
+  .wrap { position: absolute; inset: 0; padding: 64px 72px; display: flex; flex-direction: column; }
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .logo { height: 46px; }
+  .pill { display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px; border-radius: 999px;
+    border: 1px solid rgba(255,131,69,.4); background: rgba(255,131,69,.1);
+    font-family: "JetBrains Mono", monospace; font-size: 15px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #3ddc84; box-shadow: 0 0 0 5px rgba(61,220,132,.18); }
+  .eyebrow { margin-top: 40px; font-family: "JetBrains Mono", monospace; font-size: 18px; font-weight: 600;
+    letter-spacing: .22em; text-transform: uppercase; color: #ff8345; }
+  h1 { margin-top: 18px; font-weight: 800; font-size: 62px; line-height: 1.06; letter-spacing: -0.03em; max-width: 1056px; }
+  h1 em { display: block; font-style: normal;
+    background: linear-gradient(90deg, #ff8345 0%, #ffb47a 55%, #ff8345 100%); -webkit-background-clip: text; color: transparent; }
+  .about { margin-top: 30px; display: flex; align-items: center; gap: 18px; padding: 16px 22px; max-width: 960px;
+    border-radius: 16px; border: 1px solid rgba(255,131,69,.45);
+    background: linear-gradient(90deg, rgba(255,131,69,.18), rgba(255,131,69,.04)); }
+  .about b { font-family: "JetBrains Mono", monospace; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: #ff8345;
+    padding: 6px 10px; border-radius: 8px; background: rgba(255,131,69,.14); white-space: nowrap; }
+  .about span { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.3; }
+  .foot { margin-top: auto; display: flex; align-items: flex-end; gap: 14px; }
+  .tags { font-family: "JetBrains Mono", monospace; font-size: 16px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #a7b4c2; }
+  .site { margin-left: auto; font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 600; letter-spacing: .06em; color: #eef3f8; }
+</style>
+</head>
+<body>
+  <div class="glowA"></div><div class="glowB"></div><div class="grid"></div>
+  <div class="wrap">
+    <div class="top">
+      <img class="logo" src="../../public/brand/rook-logo-horizontal.png" alt="">
+      <span class="pill"><span class="dot"></span>Grupo no WhatsApp</span>
+    </div>
+    <p class="eyebrow">Black Rook 2026</p>
+    <h1>Black Friday da Rook: <em>um preço nunca praticado antes.</em></h1>
+    <div class="about"><b>A Rook</b><span>O sistema que mostra, todo dia, em reais,<br>quanto sobrou no seu restaurante.</span></div>
+    <div class="foot">
+      <p class="tags">Para donos de restaurante</p>
+      <p class="site">rook.com.br</p>
+    </div>
+  </div>
+</body>
+</html>
