@@ -6,6 +6,7 @@ import { validateBf1AccessInput } from "@/lib/bf1-access-validation.mjs";
 import { BF1_LEAD_CHANNEL } from "@/lib/bf1-community.mjs";
 import { BF1_CONTENT } from "@/lib/bf1-content";
 import { BF1_FORM_CLARITY_EVENTS } from "@/lib/clarity-events.mjs";
+import { CONSENT_STORAGE_KEY, parseConsentState } from "@/lib/consent.mjs";
 import { captureVisitAttribution } from "@/lib/lead-attribution-client";
 import type { LeadAttribution } from "@/lib/lead-attribution.mjs";
 import { track, TRACKING_EVENTS } from "@/lib/track";
@@ -25,8 +26,14 @@ import styles from "./bf1.module.css";
  * direto. Erro de campo (422) não cai nessa alternativa: pede correção.
  *
  * Nada do formulário vai para analytics: o evento bf1_access_request não tem
- * campos e o generate_lead leva só o canal fixo (allowlist em
- * tracking-events.mjs).
+ * campos e o generate_lead leva só o canal fixo e o ID aleatório do evento
+ * (allowlist em tracking-events.mjs).
+ *
+ * API de Conversões (ROO-1939): o POST leva o consentimento de anúncios do
+ * aviso de cookies e um UUID do Lead (leadEventId), sorteado junto com o
+ * submissionId e sem ligação com o cadastro gravado. O servidor manda o Lead
+ * à Meta com esse ID e o pixel do navegador manda o mesmo ID (eventID), para a
+ * Meta contar uma vez só. Regras em meta-capi.mjs.
  *
  * Celular (ROO-1921, diagnóstico de 17/11: 8 aberturas, 0 envios): o botão
  * de envio ficava abaixo da tela em 360x640 e 412x780, com e sem teclado.
@@ -66,6 +73,14 @@ async function fetchWithTimeout(input: string, init?: RequestInit) {
   }
 }
 
+// Mesmo consentimento que o GTM respeita (consent.mjs). Sem aceite salvo, não.
+function adsConsentGranted() {
+  try {
+    return parseConsentState(window.localStorage.getItem(CONSENT_STORAGE_KEY))?.ad_storage === "granted";
+  } catch {
+    return false;
+  }
+}
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
@@ -105,6 +120,7 @@ export default function Bf1AccessDialog({ href, lead, onClose }: { href: string;
   const copy = BF1_CONTENT.access;
   const dialog = useRef<HTMLDialogElement>(null);
   const submissionId = useRef("");
+  const leadEventId = useRef("");
   const attribution = useRef<LeadAttribution | null>(null);
   const snapshot = useRef<Snapshot | null>(null);
   const proof = useRef<Promise<ProofResult> | null>(null);
@@ -134,6 +150,7 @@ export default function Bf1AccessDialog({ href, lead, onClose }: { href: string;
 
   useEffect(() => {
     submissionId.current = crypto.randomUUID();
+    leadEventId.current = crypto.randomUUID();
     attribution.current = captureVisitAttribution({ href: window.location.href, referrer: document.referrer });
     const element = dialog.current;
     if (element && !element.open) element.showModal();
@@ -232,7 +249,12 @@ export default function Bf1AccessDialog({ href, lead, onClose }: { href: string;
       const response = await fetchWithTimeout(ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...frozen, antiBot: { token: current.token, solution: current.solution } }),
+        body: JSON.stringify({
+          ...frozen,
+          adsConsent: adsConsentGranted(),
+          leadEventId: leadEventId.current,
+          antiBot: { token: current.token, solution: current.solution },
+        }),
       });
       const data = asRecord(await response.json().catch(() => null));
 
@@ -261,7 +283,8 @@ export default function Bf1AccessDialog({ href, lead, onClose }: { href: string;
       track(TRACKING_EVENTS.bf1AccessRequest);
       // ROO-1876: a conversão padrão do site. O GTM leva generate_lead a `Lead`
       // nos pixels da Meta e ao GA4; antes, a campanha não recebia nenhum Lead.
-      track(TRACKING_EVENTS.lead, { channel: BF1_LEAD_CHANNEL });
+      // ROO-1939: o mesmo ID do Lead enviado pelo servidor (eventID no pixel).
+      track(TRACKING_EVENTS.lead, { channel: BF1_LEAD_CHANNEL, event_id: leadEventId.current });
       trackClarity(BF1_FORM_CLARITY_EVENTS.sent);
       setName(firstName(frozen.name));
       setPhase("success");

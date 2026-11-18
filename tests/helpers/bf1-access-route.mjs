@@ -40,8 +40,9 @@ export function loadBf1AccessRoute({
   gate = async () => ({ allowed: true, reason: "allowed", retryAfterSeconds: 0 }),
   register = async () => ({ result: "created", requestId: ACCESS.submissionId, attributionRecorded: false }),
   corsAllowed = true,
+  metaLead = async () => undefined,
 } = {}) {
-  const calls = { challenge: 0, gate: [], register: [], logs: [] };
+  const calls = { challenge: 0, gate: [], register: [], logs: [], metaLead: [] };
   const dependencies = {
     "next/server": { NextResponse: Response },
     "@/lib/site-origin": { SITE_ORIGIN: "https://www.rook.com.br" },
@@ -50,6 +51,13 @@ export function loadBf1AccessRoute({
       cmvGuidePreflightPolicy: () => ({ allowed: corsAllowed, headers: { "Cache-Control": "no-store" } }),
     },
     "@/lib/bf1-access-validation.mjs": { validateBf1AccessInput, isBf1AccessChallenge },
+    // ROO-1939: o envio real (meta-capi.mjs) é testado em meta-capi.test.mjs.
+    "@/lib/bf1-meta-lead": {
+      sendBf1MetaLead: async (request, input) => {
+        calls.metaLead.push(input);
+        return metaLead(input);
+      },
+    },
     "@/lib/bf1-access": {
       Bf1AccessBackendError: FakeBackendError,
       Bf1AccessPersistenceError,

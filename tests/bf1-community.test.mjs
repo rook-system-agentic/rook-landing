@@ -166,7 +166,8 @@ test("o cadastro confirmado vira generate_lead com canal fixo e nada além", asy
   );
   const dialogo = await readFile(path.join(RAIZ, "src/components/bf1/Bf1AccessDialog.tsx"), "utf8");
   const lembrou = dialogo.indexOf("rememberBf1Access();");
-  const lead = dialogo.indexOf("track(TRACKING_EVENTS.lead, { channel: BF1_LEAD_CHANNEL });");
+  // ROO-1939: além do canal, só o UUID aleatório do Lead (eventID do pixel).
+  const lead = dialogo.indexOf("track(TRACKING_EVENTS.lead, { channel: BF1_LEAD_CHANNEL, event_id: leadEventId.current });");
   assert.ok(lembrou > 0 && lead > lembrou, "o Lead só sai depois da confirmação do servidor");
 });
 
