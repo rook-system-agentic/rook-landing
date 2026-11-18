@@ -49,7 +49,9 @@ export const TRACKING_EVENTS = Object.freeze({
 const EXPERIMENT_FIELDS = ["experiment_id", "variant"];
 
 const ALLOWED_FIELDS = Object.freeze({
-  [TRACKING_EVENTS.lead]: ["plano", "channel", ...EXPERIMENT_FIELDS],
+  // event_id: UUID aleatório do Lead da /bl1, igual ao event_id da API de
+  // Conversões (ROO-1939). Não identifica a pessoa nem o cadastro gravado.
+  [TRACKING_EVENTS.lead]: ["plano", "channel", "event_id", ...EXPERIMENT_FIELDS],
   [TRACKING_EVENTS.diagnostic]: ["ab_variant"],
   [TRACKING_EVENTS.newsletter]: [],
   [TRACKING_EVENTS.appHandoff]: ["destino", ...EXPERIMENT_FIELDS],
