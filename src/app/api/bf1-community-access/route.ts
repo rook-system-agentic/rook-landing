@@ -9,6 +9,7 @@ import {
   issueBf1AccessChallenge,
   registerBf1Access,
 } from "@/lib/bf1-access";
+import { sendBf1MetaLead } from "@/lib/bf1-meta-lead";
 import { cmvGuideCorsPolicy, cmvGuidePreflightPolicy } from "@/lib/cmv-guide-origin.mjs";
 import { isBf1AccessChallenge, validateBf1AccessInput } from "@/lib/bf1-access-validation.mjs";
 
@@ -121,6 +122,16 @@ export async function POST(request: NextRequest) {
       });
     }
     const saved = await registerBf1Access(parsed.value);
+    // ROO-1939: Lead também pelo servidor, só para cadastro novo e com
+    // consentimento de anúncios. Timeout de 1,5 s; qualquer falha é engolida
+    // aqui, porque o cadastro já foi gravado e a pessoa precisa seguir.
+    if (saved.result === "created") {
+      await sendBf1MetaLead(request, {
+        adsConsent: candidate.adsConsent,
+        eventId: candidate.leadEventId,
+        result: saved.result,
+      }).catch(() => undefined);
+    }
     return NextResponse.json(
       { success: true },
       { status: saved.result === "created" ? 201 : 200, headers: { ...baseHeaders, ...policy.headers } },
