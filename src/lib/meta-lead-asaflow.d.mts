@@ -1,0 +1,10 @@
+import type {MetaLead} from './meta-lead-ads.mjs';
+export const ASAFLOW_BASE_URL:string;
+export const ASAFLOW_PIPELINE_ID:string;
+export const ASAFLOW_STAGE_ID:string;
+export function asaflowRequest(options:{apiKey:string;path:string;method?:string;body?:unknown;fetchImpl?:typeof fetch;idempotencyKey?:string}):Promise<any>;
+export function listSyncedLeadIds(options:{apiKey:string;lookbackHours:number;fetchImpl?:typeof fetch}):Promise<Set<string>>;
+export function resolveAsaflowContact(options:{apiKey:string;lead:MetaLead;fetchImpl?:typeof fetch;create?:boolean}):Promise<{contactId:string|null;created:boolean}>;
+export function buildMetaDealBody(lead:MetaLead,contactId:string,ownerUserId?:string|null):Record<string,unknown>;
+export function createMetaDeal(options:{apiKey:string;lead:MetaLead;contactId:string;ownerUserId?:string|null;fetchImpl?:typeof fetch}):Promise<{dealId:string}>;
+export function isAsaflowUuid(value:unknown):boolean;
