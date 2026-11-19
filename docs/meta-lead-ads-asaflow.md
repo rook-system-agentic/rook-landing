@@ -49,7 +49,9 @@ Os valores fixos, mantidos como fonte de verdade no código, são:
 
 ## Ativação segura
 
-Os crons da Vercel só rodam no deployment de produção. Em homologação (Preview `homolog`) a rota precisa ser chamada manualmente com `Authorization: Bearer <CRON_SECRET>` do ambiente de Preview.
+Os crons da Vercel só rodam no deployment de produção. A homologação (`lp.homolog.rook.com.br`, projeto `rook-landing-hml`, Preview da branch `homolog`) não roda cron: a rota precisa ser chamada manualmente com `Authorization: Bearer <CRON_SECRET>`. Em 19/11/2026 esse Preview não tinha `CRON_SECRET` nem chave do AsaFlow, então a UAT em HML cobre só a leitura da Meta em `dry_run`. Como o AsaFlow tem um único tenant, a gravação só é testável em produção, com o lead da ferramenta de teste (negócio `[TESTE]`, sem WhatsApp).
+
+Não deixe HML e produção em `live` lendo o mesmo formulário ao mesmo tempo: as duas rodadas poderiam ler o ledger vazio juntas. Depois da UAT, desligue o HML (`META_LEADS_SYNC_ENABLED` diferente de `true`).
 
 1. Configure `META_LEADS_SYNC_ENABLED=true`, o token, os IDs dos formulários e `CRON_SECRET`.
 2. Mantenha `META_LEADS_SYNC_MODE=dry_run` e, opcionalmente, configure a chave do AsaFlow. O dry-run faz somente `GET` na Meta e nas leituras do AsaFlow; `created` permanece zero.
