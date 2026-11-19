@@ -6,7 +6,7 @@
       "schedule": "0 * * * *"
     },
     {
-      "path": "/api/cron/meta-leads",
+      "path": "/api/cron/meta-leads/",
       "schedule": "*/10 * * * *"
     }
   ]

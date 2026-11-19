@@ -255,3 +255,13 @@ test('contrato do formulário BF26 v1: chaves reais, papel Gestor e gatilho do W
   const owner=normalizeMetaLead(lead({field_data:formFields.map(item=>item.name==='você_é…'?{...item,values:['Dono ou sócio']}:item)}));
   assert.equal(owner.role,'Dono ou sócio');
 });
+
+test('cron da Vercel aponta para a rota com barra final (trailingSlash responde 308 e o cron não segue redirect)', () => {
+  const nextConfig=readFileSync(new URL('../next.config.mjs',import.meta.url),'utf8');
+  assert.match(nextConfig,/trailingSlash:\s*true/);
+  const vercel=JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
+  const metaCron=(vercel.crons||[]).filter(cron=>cron.path.startsWith('/api/cron/meta-leads'));
+  assert.equal(metaCron.length,1);
+  assert.equal(metaCron[0].path,'/api/cron/meta-leads/');
+  assert.equal(metaCron[0].schedule,'*/10 * * * *');
+});

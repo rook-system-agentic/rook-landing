@@ -2,7 +2,9 @@
 
 ## Fluxo
 
-O cron da Vercel chama `GET /api/cron/meta-leads` a cada dez minutos. A rota exige `Authorization: Bearer <CRON_SECRET>` e não aceita chamadas sem `CRON_SECRET` configurado.
+O cron da Vercel chama `GET /api/cron/meta-leads/` a cada dez minutos. A rota exige `Authorization: Bearer <CRON_SECRET>` e não aceita chamadas sem `CRON_SECRET` configurado.
+
+A barra final é obrigatória. Com `trailingSlash: true` no `next.config.mjs`, o caminho sem barra responde 308 para a versão com barra, e o cron da Vercel não segue redirect (a execução termina no 308, sem chegar à rota e sem log). O teste `cron da Vercel aponta para a rota com barra final` protege essa regra. Em chamadas manuais, use também a URL com barra, para não depender de redirect.
 
 Quando habilitado, o processo consulta cada formulário configurado na Graph API da Meta, usando o cursor `after` construído localmente. Cada rodada lê no máximo dez páginas por formulário e considera somente leads dentro do lookback. Os campos são normalizados no servidor; telefone e e-mail são os identificadores usados na busca exata de contato no AsaFlow.
 
