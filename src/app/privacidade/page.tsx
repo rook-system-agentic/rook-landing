@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 
 const sections = [
   ["1. A quem esta política se aplica", "Esta política abrange visitantes do site, interessados que enviam formulários e usuários da plataforma. Em operações realizadas para clientes empresariais, os papéis e responsabilidades também são definidos no contrato aplicável."],
-  ["2. Dados que podemos tratar", "Podemos tratar dados cadastrais e de contato, informações profissionais e empresariais, registros de acesso, dispositivo, navegação, atendimento e preferências. Quando você contrata a plataforma, também tratamos os dados necessários à execução do serviço e ao faturamento."],
+  ["2. Dados que podemos tratar", "Podemos tratar dados cadastrais e de contato, informações profissionais e empresariais, registros de acesso, dispositivo, navegação, atendimento e preferências. Quando você contrata a plataforma, também tratamos os dados necessários à execução do serviço e ao faturamento. Se você usa o Rook AI, também guardamos as perguntas que você faz e as respostas dadas."],
   ["3. Finalidades", "Tratamos dados para responder contatos, criar e administrar contas, prestar suporte, executar contratos, processar pagamentos, manter segurança, prevenir fraude, cumprir obrigações legais e melhorar nossos serviços."],
-  ["4. Bases legais", "O tratamento pode se apoiar na execução de contrato ou procedimentos preliminares, cumprimento de obrigação legal, exercício regular de direitos, legítimo interesse e consentimento, conforme a finalidade e a legislação aplicável."],
+  ["4. Bases legais", "O tratamento pode se apoiar na execução de contrato ou procedimentos preliminares, cumprimento de obrigação legal, exercício regular de direitos, legítimo interesse e consentimento, conforme a finalidade e a legislação aplicável. A leitura das conversas com o Rook AI pela equipe se apoia na execução do contrato, para o suporte, e no legítimo interesse de melhorar o serviço (art. 7º, V e IX, da LGPD)."],
   ["5. Compartilhamento", "Não vendemos dados pessoais. Podemos compartilhá-los, no limite necessário, com fornecedores de infraestrutura, comunicação, atendimento, análise, segurança, pagamento e outros operadores que apoiam a prestação dos serviços, além de autoridades quando houver obrigação legal."],
   ["6. Cookies e medição", ""],
   ["7. Retenção e segurança", "Mantemos dados pelo período necessário às finalidades informadas, à execução contratual e ao cumprimento de prazos legais. Adotamos medidas técnicas e administrativas proporcionais aos riscos, sem prometer segurança absoluta."],
@@ -26,7 +26,7 @@ export default function PrivacidadePage() {
       <article className="max-w-4xl mx-auto px-6 py-20">
         <header className="text-center mb-16 pb-10 border-b border-border">
           <h1 className="text-3xl md:text-4xl font-bold text-cream tracking-wide uppercase">Política de Privacidade</h1>
-          <p className="text-muted mt-4 italic">Última atualização: 14 de agosto de 2026</p>
+          <p className="text-muted mt-4 italic">Última atualização: 20 de novembro de 2026</p>
         </header>
         <div className="prose-legal space-y-6 text-muted leading-relaxed">
           <p>A <strong className="text-cream">{COMPANY_INFO.razaoSocial}</strong>, CNPJ <strong className="text-cream">{COMPANY_INFO.cnpj}</strong>, é responsável pelos tratamentos em que define finalidade e meios. Esta página apresenta informações gerais, sem expor arquitetura, fornecedores específicos ou controles internos.</p>
@@ -55,6 +55,17 @@ export default function PrivacidadePage() {
                 </>
               ) : (
                 <p>{text}</p>
+              )}
+              {title.startsWith("3") && (
+                // ROO-2033 (20/11/2026): a equipe passou a poder ler as conversas
+                // com o Rook AI no ADM. A tela só existe em produção depois deste
+                // parágrafo, que diz o quê, para quê e com quais cuidados.
+                <p>
+                  <strong className="text-cream">Conversas com o Rook AI.</strong> Uma equipe restrita da Rook pode
+                  ler as perguntas feitas ao Rook AI e as respostas dadas, para prestar suporte, corrigir
+                  respostas e melhorar o serviço. Antes de a equipe ver a conversa, escondemos CPF, CNPJ,
+                  e-mail, telefone e número de cartão, e cada leitura fica registrada (quem leu e quando).
+                </p>
               )}
             </section>
           ))}
