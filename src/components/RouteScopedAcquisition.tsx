@@ -10,6 +10,10 @@ const GUIDE_PATHS = new Set(["/guia-cmv", "/guia-cmv/"]);
 // ROO-1825: a LP de Black Friday também é de conversão única (entrar na
 // comunidade); demonstração e chat do rodapé competiriam com esse CTA.
 const CAMPAIGN_PATHS = new Set(["/bl1", "/bl1/"]);
+// Rook Health (25/11/2026): o formulário de demonstração pergunta segmento
+// culinário e o chat fala de CMV. Para clínica, os dois são da marca errada;
+// a conversão dessa LP é a conversa no WhatsApp.
+const HEALTH_PATHS = new Set(["/health", "/health/"]);
 
 /**
  * A rota do guia é uma LP educativa de quatro campos, não uma entrada do funil
@@ -18,5 +22,5 @@ const CAMPAIGN_PATHS = new Set(["/bl1", "/bl1/"]);
  */
 export default function RouteScopedAcquisition({ children }: RouteScopedAcquisitionProps) {
   const pathname = usePathname();
-  return GUIDE_PATHS.has(pathname) || CAMPAIGN_PATHS.has(pathname) ? null : children;
+  return GUIDE_PATHS.has(pathname) || CAMPAIGN_PATHS.has(pathname) || HEALTH_PATHS.has(pathname) ? null : children;
 }
