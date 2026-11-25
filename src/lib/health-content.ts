@@ -167,28 +167,29 @@ export const HEALTH_HOW = {
   ],
 } as const;
 
+/*
+ * "De onde vem" — a autoridade da página é a CONSULTORIA, não o produto de
+ * restaurantes (Gabriel, 25/11/2026: "a consultoria financeira nossa sempre
+ * será o ponto focal de expertise"). A primeira versão apresentava a Health
+ * como "o método que já roda em restaurantes" e desenhava uma ponte
+ * restaurante → clínica; para quem tem clínica, isso não soma.
+ *
+ * SEM DETALHE DE PESSOA OU DE CLIENTE, por decisão do Gabriel na mesma data:
+ * só a consultoria e as três frentes dela, com foco em reestruturação. Os
+ * vinte anos e a descrição do trabalho são os mesmos da /sobre.
+ */
 export const HEALTH_ORIGIN = {
   label: "— De onde vem",
-  title: "O método que já roda em restaurantes, ",
-  titleEmphasis: "agora no consultório.",
-  body: "A Rook nasceu de uma consultoria de controladoria e de uma contabilidade, e virou plataforma para bares e restaurantes: ela lê vendas, notas e banco e aponta, em reais, a próxima decisão. A Rook Health leva o mesmo olhar de controller para a clínica, com o vocabulário de quem vive de convênio, glosa e repasse.",
+  title: "Vinte anos de consultoria em ",
+  titleEmphasis: "controladoria e reestruturação.",
+  body: "A Rook nasceu de uma consultoria de finanças corporativas, controladoria e reestruturação de empresas: entrar onde a operação está apertando, olhar o número sem romantizar e apontar a decisão. A Rook Health leva esse olhar de controller para a clínica, com o vocabulário de quem vive de convênio, glosa e repasse.",
   linkLabel: "Conhecer a história da Rook",
   linkHref: "/sobre/",
-  /*
-   * A "ponte" ao lado do texto: o que a Rook já lê no restaurante e o que a
-   * Health está sendo construída para ler na clínica. Só repete, lado a lado,
-   * o que o parágrafo e o hero já dizem — sem número e sem promessa nova.
-   */
-  ponte: {
-    de: "No restaurante",
-    para: "Na clínica",
-    linhas: [
-      { de: "Vendas do dia", para: "Atendimentos e guias" },
-      { de: "Notas de compra", para: "Demonstrativos do convênio" },
-      { de: "Extrato do banco", para: "Extrato do banco" },
-    ],
-    fecho: "A pergunta é a mesma: quanto sobrou e o que fazer primeiro.",
-  },
+  provas: [
+    { titulo: "Reestruturação", texto: "Entrar onde a operação aperta e apontar, em reais, o que fazer primeiro." },
+    { titulo: "Controladoria", texto: "Olhar o número antes de ele virar problema, não depois do fechamento." },
+    { titulo: "Finanças corporativas", texto: "Caixa, margem e resultado lidos com critério, sem romantizar." },
+  ],
 } as const;
 
 export const HEALTH_CONTACT = {

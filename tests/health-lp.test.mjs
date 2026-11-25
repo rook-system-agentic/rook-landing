@@ -205,3 +205,16 @@ test("a foto do hero tem tamanhos próprios, espaço reservado e não finge depo
   // Ambientação gerada por IA: sem legenda que a faça parecer cliente.
   assert.doesNotMatch(pagina, /<figcaption[^>]*>[^<]*(Dra\.|CRM|cliente)/);
 });
+
+test("\"De onde vem\" se apoia na consultoria, sem comparar a clínica com restaurante", async () => {
+  // Gabriel, 25/11/2026: a credencial para o dono de clínica é a consultoria
+  // de controladoria e reestruturação, não o produto de restaurantes.
+  const conteudo = await readFile(new URL("../src/lib/health-content.ts", import.meta.url), "utf8");
+  const inicio = conteudo.indexOf("export const HEALTH_ORIGIN");
+  const origem = conteudo.slice(inicio, conteudo.indexOf("} as const;", inicio));
+  assert.doesNotMatch(origem, /restaurante|bares/i);
+  assert.match(origem, /controladoria/);
+  assert.match(origem, /reestruturação/);
+  // Sem detalhe de pessoa nem de cliente, por decisão do Gabriel (25/11/2026).
+  assert.doesNotMatch(origem, /Eraldo|Santa Casa|leitos/);
+});

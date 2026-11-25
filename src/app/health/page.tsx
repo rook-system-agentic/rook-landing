@@ -25,7 +25,9 @@ import { siteUrl } from "@/lib/site-origin";
  * POR QUE ISTO EXISTE
  *
  * A Rook atende bares e restaurantes. Esta página testa se a mesma leitura
- * financeira interessa a clínicas médicas, antes de existir produto: uma tese
+ * financeira interessa a clínicas médicas, antes de existir produto. Para o
+ * visitante, a credencial é a consultoria de controladoria (seção "De onde
+ * vem"), não o produto de restaurantes. A página traz uma tese
  * ("Atender não é receber."), quatro dores na língua de quem vive de convênio e
  * um botão que abre conversa no WhatsApp. O texto mora em `lib/health-content`.
  *
@@ -279,39 +281,32 @@ export default function HealthPage() {
             </Link>
           </div>
           {/*
-            * A ponte restaurante → clínica. O texto ao lado ocupava só metade
-            * da largura e a outra metade ficava vazia; aqui a mesma ideia do
-            * parágrafo aparece desenhada, linha a linha. Cada linha entra com
-            * um pequeno atraso (o `<Reveal>` de sempre); em repouso estão todas.
+            * As três provas ao lado do texto: de onde vem a autoridade para
+            * falar do financeiro de uma clínica. São as três frentes da
+            * consultoria, não resultado de cliente. Cada linha entra com um pequeno
+            * atraso (o `<Reveal>` de sempre); em repouso estão todas.
             */}
           <Reveal className="card p-6 sm:p-8">
-            <div className="section-label mb-5 grid grid-cols-[minmax(0,1fr)_1.5rem_minmax(0,1fr)] items-center gap-3">
-              <span>{HEALTH_ORIGIN.ponte.de}</span>
-              <span aria-hidden="true" />
-              <span style={{ color: "var(--health-accent-text)" }}>{HEALTH_ORIGIN.ponte.para}</span>
-            </div>
             <ul className="flex flex-col gap-3">
-              {HEALTH_ORIGIN.ponte.linhas.map((linha, i) => (
+              {HEALTH_ORIGIN.provas.map((prova, i) => (
                 <Reveal
                   as="li"
-                  key={linha.de}
+                  key={prova.titulo}
                   delay={150 + i * 140}
-                  className="grid grid-cols-[minmax(0,1fr)_1.5rem_minmax(0,1fr)] items-center gap-3 rounded-xl bg-[var(--color-bg-elevated)] px-4 py-4 text-[15px]"
+                  className="flex flex-col gap-1 rounded-xl bg-[var(--color-bg-elevated)] px-5 py-5"
                 >
-                  <span style={{ color: "var(--color-text-muted)" }}>{linha.de}</span>
-                  <span aria-hidden="true" className="health-arrow inline-block font-mono" style={{ color: "var(--health-accent-text)" }}>
-                    →
+                  <span
+                    className="font-display text-xl font-extrabold tracking-tight"
+                    style={{ color: "var(--health-accent-text)" }}
+                  >
+                    {prova.titulo}
                   </span>
-                  <span className="font-semibold">
-                    <span className="sr-only">vira, na clínica: </span>
-                    {linha.para}
+                  <span className="text-[15px] leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
+                    {prova.texto}
                   </span>
                 </Reveal>
               ))}
             </ul>
-            <p className="mt-6 text-sm leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
-              {HEALTH_ORIGIN.ponte.fecho}
-            </p>
           </Reveal>
         </div>
       </section>
