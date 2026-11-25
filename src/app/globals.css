@@ -736,7 +736,20 @@ body .asaflow-chat-root button:focus-visible,body .asaflow-chat-root a:focus-vis
     pointer-events: none;
   }
 
+  /* O painel flutua sobre a foto: a sombra é o que separa os dois planos. */
+  .health-panel {
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.55);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
+    /* A foto respira: aproximação lenta, que não reverte de repente. Só
+       transform, dentro do recorte arredondado — nada some. */
+    .health-photo img {
+      animation: healthPhoto 18s ease-in-out infinite alternate;
+    }
+    @keyframes healthPhoto {
+      to { transform: scale(1.06); }
+    }
     /* Pulso lento: o ponto "ao vivo" do painel, o alerta e os buracos da
        agenda. Só opacidade, e só em elemento decorativo. */
     .health-pulse {
