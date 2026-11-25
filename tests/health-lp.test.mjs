@@ -155,3 +155,37 @@ test("a aba e o compartilhamento de /health usam a arte verde da Health", async 
     assert.ok(size > 0, `${caminho} está vazio`);
   }
 });
+
+test("os números ilustrativos saem de uma fonte só e a conta fecha", async () => {
+  const conteudo = await ler("src/lib/health-content.ts");
+  // `recebido` e `sobra` são calculados, não digitados: o painel do hero e o
+  // "caminho do dinheiro" não podem divergir (docs/design-v4.md).
+  assert.match(conteudo, /recebido: FATURADO - GLOSA,/);
+  assert.match(conteudo, /sobra: FATURADO - GLOSA - REPASSE - CUSTOS,/);
+  assert.match(conteudo, /value: HEALTH_EXEMPLO\.recebido/);
+  const n = (nome) => Number(conteudo.match(new RegExp(`const ${nome} = (\\d+);`))[1]);
+  const sobra = n("FATURADO") - n("GLOSA") - n("REPASSE") - n("CUSTOS");
+  assert.ok(sobra > 0 && sobra < n("FATURADO"), `sobra ilustrativa incoerente: ${sobra}`);
+  // O gráfico é rotulado como exemplo na própria figura.
+  assert.match(conteudo, /disclaimer: "Exemplo ilustrativo\. Não é dado de cliente nem média de mercado\."/);
+  assert.match(await ler("src/components/health/HealthMoneyPath.tsx"), /<figcaption[^>]*>\{HEALTH_PATH\.disclaimer\}/);
+});
+
+test("o movimento da Health respeita as regras da LP", async () => {
+  const [css, valor, arte, pagina] = await Promise.all([
+    ler("src/app/globals.css"),
+    ler("src/components/health/HealthMoney.tsx"),
+    ler("src/components/health/HealthArt.tsx"),
+    ler("src/app/health/page.tsx"),
+  ]);
+  // Toda animação da Health vive dentro de `no-preference`: desligar é o padrão.
+  const bloco = css.slice(css.indexOf("Movimento da Health"));
+  const fora = bloco.slice(0, bloco.indexOf("@media (prefers-reduced-motion: no-preference)"));
+  assert.doesNotMatch(fora, /animation:/);
+  // O valor final já vai no HTML servido; a contagem só assume depois.
+  assert.match(valor, /useState\(valor\)/);
+  assert.match(valor, /prefers-reduced-motion: reduce/);
+  // Ilustração é decorativa e o balão mostra a mensagem que o link envia.
+  assert.match(arte, /aria-hidden="true"/);
+  assert.match(pagina, /mensagem=\{HEALTH_WHATSAPP_MESSAGE\}/);
+});
