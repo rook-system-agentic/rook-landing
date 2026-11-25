@@ -771,6 +771,45 @@ body .asaflow-chat-root button:focus-visible,body .asaflow-chat-root a:focus-vis
   body:has([data-health]) :focus-visible {
     outline-color: var(--health-accent-text);
   }
+
+  /*
+   * Ritmo vertical da Health (25/11/2026). O `section-spacing` do site dá
+   * 120 px em cima e embaixo — 240 px entre o fim de uma seção e o título da
+   * seguinte. Na home isso separa blocos altos e cheios; aqui as seções são
+   * curtas, e numa tela de notebook sobrava uma faixa vazia inteira entre
+   * elas. Fica escopado: a home e as outras rotas não mudam.
+   */
+  [data-health] .section-spacing {
+    padding-block: 56px;
+  }
+  [data-health] > .section-spacing:first-child {
+    padding-top: 40px;
+  }
+  @media (min-width: 1024px) {
+    [data-health] .section-spacing {
+      padding-block: 84px;
+    }
+    [data-health] > .section-spacing:first-child {
+      padding-top: 56px;
+    }
+  }
+
+  /*
+   * Cabeçalho de seção em duas colunas: título à esquerda, parágrafo à
+   * direita, alinhados pela base. Empilhados, o título e o parágrafo ocupavam
+   * só a metade esquerda e a direita ficava em branco.
+   */
+  .health-head {
+    display: grid;
+    gap: 16px 48px;
+    margin-bottom: 40px;
+  }
+  @media (min-width: 1024px) {
+    .health-head {
+      grid-template-columns: 1.25fr 1fr;
+      align-items: end;
+    }
+  }
 }
 
 /*

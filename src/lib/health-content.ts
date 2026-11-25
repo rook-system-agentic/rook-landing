@@ -174,6 +174,21 @@ export const HEALTH_ORIGIN = {
   body: "A Rook nasceu de uma consultoria de controladoria e de uma contabilidade, e virou plataforma para bares e restaurantes: ela lê vendas, notas e banco e aponta, em reais, a próxima decisão. A Rook Health leva o mesmo olhar de controller para a clínica, com o vocabulário de quem vive de convênio, glosa e repasse.",
   linkLabel: "Conhecer a história da Rook",
   linkHref: "/sobre/",
+  /*
+   * A "ponte" ao lado do texto: o que a Rook já lê no restaurante e o que a
+   * Health está sendo construída para ler na clínica. Só repete, lado a lado,
+   * o que o parágrafo e o hero já dizem — sem número e sem promessa nova.
+   */
+  ponte: {
+    de: "No restaurante",
+    para: "Na clínica",
+    linhas: [
+      { de: "Vendas do dia", para: "Atendimentos e guias" },
+      { de: "Notas de compra", para: "Demonstrativos do convênio" },
+      { de: "Extrato do banco", para: "Extrato do banco" },
+    ],
+    fecho: "A pergunta é a mesma: quanto sobrou e o que fazer primeiro.",
+  },
 } as const;
 
 export const HEALTH_CONTACT = {
