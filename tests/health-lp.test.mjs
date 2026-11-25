@@ -133,3 +133,25 @@ test("os logos da Health existem e cabem no limite de arte de marca", async () =
     assert.ok(size > 0 && size <= 20 * 1024, `${arquivo} tem ${size} bytes`);
   }
 });
+
+test("a aba e o compartilhamento de /health usam a arte verde da Health", async () => {
+  const { stat } = await import("node:fs/promises");
+  const [pagina, og] = await Promise.all([ler("src/app/health/page.tsx"), ler("src/lib/og-image.ts")]);
+  assert.match(pagina, /icons: HEALTH_ICONS,/);
+  assert.match(pagina, /images: \[HEALTH_OG_IMAGE\],/);
+  assert.match(pagina, /images: \[HEALTH_OG_IMAGE\.url\],/);
+  // A arte da Rook ("Faturar não é lucrar", restaurante) não volta para esta rota.
+  assert.doesNotMatch(pagina, /\bOG_IMAGE\b/);
+  // Todo arquivo que o metadata anuncia existe; a arte de OG é PNG (ver og-image.ts).
+  const anunciados = [...og.slice(og.indexOf("HEALTH_OG_IMAGE")).matchAll(/url: "(\/(?:og|health)\/[^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(anunciados, [
+    "/og/rook-health-og.png",
+    "/health/favicon.ico",
+    "/health/icon-192.png",
+    "/health/apple-touch-icon.png",
+  ]);
+  for (const caminho of anunciados) {
+    const { size } = await stat(new URL(`../public${caminho}`, import.meta.url));
+    assert.ok(size > 0, `${caminho} está vazio`);
+  }
+});
