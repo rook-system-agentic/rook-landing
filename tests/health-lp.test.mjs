@@ -95,10 +95,13 @@ test("a paleta da Health é escopada e não vaza para o resto do site", async ()
   assert.match(pagina, /<div data-health>/);
 });
 
-test("o texto trata a Health como construção, não como produto pronto", async () => {
+test("o texto fala da Health no presente, com a tese como subtítulo e o exemplo rotulado", async () => {
   const conteudo = await ler("src/lib/health-content.ts");
   const semComentarios = conteudo.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  assert.match(semComentarios, /está sendo construída/);
+  // Gabriel, 25/11/2026: tirar o gerúndio — a Rook já é um sistema.
+  assert.doesNotMatch(semComentarios, /sendo construíd|estamos construindo|estamos abrindo/i);
+  assert.match(semComentarios, /titleBefore: "Inteligência financeira para "/);
+  assert.match(semComentarios, /thesis: "Atender não é receber\."/);
   assert.match(semComentarios, /Exemplo ilustrativo/);
   // Percentual de mercado sem fonte não entra nesta página.
   assert.doesNotMatch(semComentarios, /\d+\s?%/);

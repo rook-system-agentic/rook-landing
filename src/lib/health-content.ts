@@ -6,13 +6,14 @@
  *
  * O QUE ESTA PÁGINA PODE E NÃO PODE DIZER
  *
- * A Rook Health é um teste de interesse (25/11/2026): o produto para clínicas
- * ainda não existe em produção. Por isso o texto descreve O PROBLEMA com
- * precisão e O QUE ESTAMOS CONSTRUINDO como construção — nunca "a Rook Health
- * faz", sempre "a Rook Health vai mostrar". Prometer no presente uma tela que
- * não existe é o tipo de frase que este site não publica.
+ * A primeira versão (25/11/2026, manhã) tratava a Health como teste de
+ * interesse e escrevia tudo em construção: "está sendo construída para",
+ * "o que estamos construindo". No mesmo dia o Gabriel mandou tirar o
+ * gerúndio: a Rook já é um sistema, e a página fala NO PRESENTE ("a Rook
+ * Health lê", "como funciona"). O teste em tests/health-lp.test.mjs barra a
+ * volta do "sendo construída".
  *
- * Pelo mesmo motivo não há número de mercado aqui (percentual de glosa, taxa
+ * O que continua valendo: não há número de mercado aqui (percentual de glosa, taxa
  * de falta): nenhum foi apurado com fonte. O painel de exemplo é ilustrativo e
  * está rotulado como tal na própria página.
  */
@@ -20,20 +21,22 @@
 export const HEALTH_META = {
   title: "Rook Health — Inteligência financeira para clínicas | Rook System",
   description:
-    "Atender não é receber. A Rook Health está sendo construída para mostrar, em reais, o que a clínica faturou, o que o convênio pagou, o que virou glosa e quanto sobra depois do repasse médico.",
+    "Atender não é receber. A Rook Health mostra, em reais, o que a clínica faturou, o que o convênio pagou, o que virou glosa e quanto sobra depois do repasse médico.",
 } as const;
 
 export const HEALTH_HERO = {
   label: "— Rook Health · para clínicas",
-  // A ênfase (`em`) é a palavra que carrega a tese, como no "Faturar não é
-  // lucrar." da home.
-  titleBefore: "Atender não é ",
-  titleEmphasis: "receber.",
+  // O título diz O QUE É (pedido de 25/11/2026: quem chega precisa ler
+  // "inteligência financeira para clínicas" antes da tese). A tese "Atender
+  // não é receber." desce para subtítulo, menor, logo abaixo.
+  titleBefore: "Inteligência financeira para ",
+  titleEmphasis: "clínicas.",
+  thesis: "Atender não é receber.",
   body: "Agenda cheia, guias enviadas, e no fim do mês a conta não fecha. Entre a consulta e o dinheiro no banco existem a tabela do convênio, a glosa, o prazo de pagamento e o repasse médico.",
   body2:
-    "A Rook Health está sendo construída para ler esse caminho inteiro e dizer, em reais, quanto a clínica deixou de receber e o que fazer primeiro.",
+    "A Rook Health lê esse caminho inteiro e diz, em reais, quanto a clínica deixou de receber e o que fazer primeiro.",
   primaryCta: "Quero conhecer a Rook Health",
-  secondaryCta: "Ver o que estamos construindo",
+  secondaryCta: "Ver como funciona",
   secondaryHref: "#como",
   // Foto de ambientação (ver o comentário em app/health/page.tsx). O `alt`
   // descreve a cena; não atribui nome nem cargo a ninguém.
@@ -145,7 +148,7 @@ export const HEALTH_LEAKS = {
 } as const;
 
 export const HEALTH_HOW = {
-  label: "— O que estamos construindo",
+  label: "— Como funciona",
   title: "O financeiro da clínica não precisa ser um exame que ",
   titleEmphasis: "ninguém sabe ler.",
   items: [
@@ -193,9 +196,9 @@ export const HEALTH_ORIGIN = {
 } as const;
 
 export const HEALTH_CONTACT = {
-  label: "— Primeiras clínicas",
-  title: "Estamos abrindo a Rook Health com um grupo pequeno de ",
-  titleEmphasis: "clínicas.",
+  label: "— Fale com a gente",
+  title: "Veja o que a sua clínica está deixando de ",
+  titleEmphasis: "receber.",
   body: "Se a sua clínica atende convênio e você quer enxergar o que está deixando de receber, fale com a gente. A conversa é com uma pessoa da equipe, pelo WhatsApp.",
   cta: "Falar com a Rook no WhatsApp",
   // Legenda do balão que mostra a mensagem pronta (ver HealthArt).
