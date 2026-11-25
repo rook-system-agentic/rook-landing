@@ -11,7 +11,7 @@ import {
   HEALTH_PANEL,
 } from "@/lib/health-content";
 import { HEALTH_CONTACT_ANCHOR, healthWhatsappHref } from "@/lib/health-whatsapp.mjs";
-import { OG_IMAGE, TWITTER_CARD } from "@/lib/og-image";
+import { HEALTH_ICONS, HEALTH_OG_IMAGE, TWITTER_CARD } from "@/lib/og-image";
 import { siteUrl } from "@/lib/site-origin";
 
 /*
@@ -43,7 +43,8 @@ import { siteUrl } from "@/lib/site-origin";
  * e o chat fala de CMV. `RouteScopedAcquisition` tira os dois desta rota.
  *
  * O `openGraph` daqui substitui o do layout inteiro, então a imagem é
- * declarada de novo (ver lib/og-image.ts).
+ * declarada de novo — e é a arte da Health, em verde, junto com o ícone da
+ * aba (ver lib/og-image.ts).
  */
 const PAGE_URL = siteUrl("/health/");
 
@@ -52,6 +53,7 @@ export const metadata: Metadata = {
   description: HEALTH_META.description,
   alternates: { canonical: PAGE_URL },
   robots: { index: false, follow: true },
+  icons: HEALTH_ICONS,
   openGraph: {
     title: HEALTH_META.title,
     description: HEALTH_META.description,
@@ -59,13 +61,13 @@ export const metadata: Metadata = {
     siteName: "Rook System",
     type: "website",
     locale: "pt_BR",
-    images: [OG_IMAGE],
+    images: [HEALTH_OG_IMAGE],
   },
   twitter: {
     card: TWITTER_CARD,
     title: HEALTH_META.title,
     description: HEALTH_META.description,
-    images: [OG_IMAGE.url],
+    images: [HEALTH_OG_IMAGE.url],
   },
 };
 
