@@ -788,3 +788,73 @@ body .asaflow-chat-root button:focus-visible,body .asaflow-chat-root a:focus-vis
     outline-color: var(--health-accent-text);
   }
 }
+
+/*
+ * Movimento da Health (25/11/2026). Mesmas regras da home (docs/design-v4.md):
+ * o repouso é o estado final, e nada aqui roda com `prefers-reduced-motion`.
+ *
+ * `transform-box: fill-box` é o que faz `lp-grow-bar` e `lp-dia` funcionarem
+ * DENTRO de um SVG: sem ele, `transform-origin` é medido a partir do canto do
+ * viewBox, e a barra "cresce" atravessando o desenho em vez de sair da própria
+ * borda. Na home essas classes só vivem em HTML, então a regra fica escopada.
+ */
+@layer utilities {
+  [data-health] svg .lp-grow-bar,
+  [data-health] svg .lp-dia,
+  [data-health] svg .health-grow-up {
+    transform-box: fill-box;
+  }
+  [data-health] svg .lp-dia {
+    transform-origin: center;
+  }
+
+  /* Halo atrás do painel do hero. Decorativo. */
+  .health-halo {
+    position: absolute;
+    inset: -12% -8%;
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, rgba(76, 175, 80, 0.22), transparent);
+    filter: blur(8px);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    /* Pulso lento: o ponto "ao vivo" do painel, o alerta e os buracos da
+       agenda. Só opacidade, e só em elemento decorativo. */
+    .health-pulse {
+      animation: healthPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes healthPulse {
+      50% { opacity: 0.35; }
+    }
+    .health-halo {
+      animation: healthHalo 7s ease-in-out infinite;
+    }
+    @keyframes healthHalo {
+      50% { opacity: 0.55; transform: scale(1.06); }
+    }
+    /* Colunas que sobem do chão do gráfico. */
+    .lp-in .health-grow-up {
+      transform-origin: center bottom;
+      animation: healthGrowUp 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    @keyframes healthGrowUp {
+      from { transform: scaleY(0); }
+    }
+    /* A seta entre o faturado e a sobra anda um passo para a direita. */
+    .lp-in .health-arrow {
+      animation: healthArrow 1.6s ease-in-out 0.4s 2;
+    }
+    @keyframes healthArrow {
+      50% { transform: translateX(8px); }
+    }
+    /* O balão da mensagem chega como mensagem enviada. */
+    .lp-in .health-bubble {
+      transform-origin: right bottom;
+      animation: healthBubble 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s backwards;
+    }
+    @keyframes healthBubble {
+      from { transform: scale(0.85); }
+    }
+  }
+}
