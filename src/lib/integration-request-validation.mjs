@@ -1,3 +1,5 @@
+import { UPCOMING_INTEGRATIONS } from "./integration-catalog.mjs";
+
 /**
  * Validação da solicitação de integração.
  *
@@ -12,18 +14,17 @@
  * decide o que integrar — vira contagem manual. Com lista, `sistema` agrupa
  * sozinho; com o escape, ninguém fica sem pedir o que usa.
  *
- * Os sistemas listados são os que AINDA NÃO são parceiros. Colocar um parceiro
- * aqui seria pedir o que já existe — por isso a lista é conferida contra
- * `PARTNERS` num teste.
+ * As integrações em preparação também recebem indicações. Ao liberar uma
+ * delas, retire-a da lista de preparação e o formulário acompanha a mudança.
  *
  * Dependência zero, `.mjs` puro: `node --test` roda direto, sem build.
  */
 
 /**
- * Sistemas de food service mais citados que ainda não estão no hall de
- * parceiros. Ordem alfabética; `outro` fica por último no formulário.
+ * A seleção reúne pedidos frequentes e integrações em preparação.
+ * As opções seguem em ordem alfabética, com texto livre no final.
  */
-export const SISTEMAS = [
+const candidatos = [
   { valor: "alloy", rotulo: "Alloy Automação" },
   { valor: "anotaai", rotulo: "Anota AI" },
   { valor: "bluesoft", rotulo: "Bluesoft" },
@@ -40,6 +41,11 @@ export const SISTEMAS = [
   { valor: "teknisa", rotulo: "Teknisa" },
   { valor: "totvs", rotulo: "TOTVS" },
   { valor: "zigpay", rotulo: "Zig" },
+  ...UPCOMING_INTEGRATIONS.map(({ id, name }) => ({ valor: id, rotulo: name })),
+];
+
+export const SISTEMAS = [
+  ...candidatos.sort((a, b) => a.rotulo.localeCompare(b.rotulo, "pt-BR")),
   { valor: "outro", rotulo: "Outro — vou escrever" },
 ];
 
