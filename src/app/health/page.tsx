@@ -7,6 +7,7 @@ import HealthWhatsappCta from "@/components/health/HealthWhatsappCta";
 import Reveal from "@/components/lp/LpReveal";
 import {
   HEALTH_CONTACT,
+  HEALTH_FILM,
   HEALTH_HERO,
   HEALTH_HOW,
   HEALTH_LEAKS,
@@ -195,6 +196,44 @@ export default function HealthPage() {
               </li>
             </ul>
           </aside>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="section-spacing" style={divider}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="health-head">
+            <div>
+              <p className="section-label mb-6">{HEALTH_FILM.label}</p>
+              <h2 className="heading-section">
+                {HEALTH_FILM.title}
+                <em>{HEALTH_FILM.titleEmphasis}</em>
+              </h2>
+            </div>
+            <p className="text-body">{HEALTH_FILM.body}</p>
+          </div>
+          {/*
+            * O filme. `preload="none"` + capa: nada do vídeo é baixado até o
+            * play, então a seção custa uma imagem. Sem `autoPlay`: quem decide
+            * ver (e ouvir) é a pessoa. `playsInline` evita a tela cheia forçada
+            * no iPhone. O fundo fixo é o do próprio filme, para a moldura não
+            * piscar clara antes de a capa chegar.
+            */}
+          <Reveal>
+            <figure className="m-0 mx-auto max-w-5xl">
+              <video
+                className="health-panel block aspect-video w-full rounded-2xl"
+                style={{ backgroundColor: "#10151c" }}
+                controls
+                playsInline
+                preload="none"
+                poster={HEALTH_FILM.poster}
+                aria-label={HEALTH_FILM.descricao}
+              >
+                <source src={HEALTH_FILM.src} type="video/mp4" />
+              </video>
+              <figcaption className="section-label mt-4">{HEALTH_PATH.disclaimer}</figcaption>
+            </figure>
           </Reveal>
         </div>
       </section>
