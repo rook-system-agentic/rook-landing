@@ -11,17 +11,13 @@
  * contagem manual.
  */
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
 import {
   SISTEMAS,
   validarSolicitacaoIntegracao,
 } from "../src/lib/integration-request-validation.mjs";
 import { buildIntegrationRequestSourceId } from "../src/lib/integration-request-store.mjs";
-
-const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+import { AVAILABLE_INTEGRATIONS, UPCOMING_INTEGRATIONS } from "../src/lib/integration-catalog.mjs";
 
 const VALIDO = {
   nome: "Maria",
@@ -78,21 +74,19 @@ test("recusa corpo que não é objeto", () => {
   }
 });
 
-test("a lista não oferece sistema que JÁ é parceiro", async () => {
-  // Pedir integração com quem já está integrado é a pior resposta possível ao
-  // visitante — e faria o Comercial perseguir um pedido que não existe.
-  const conteudo = await readFile(path.join(RAIZ, "src/lib/lp-content.ts"), "utf8");
-  const parceiros = [...conteudo.matchAll(/\{ name: "([^"]+)", categoria:/g)].map((m) =>
-    m[1].toLowerCase(),
-  );
-  assert.ok(parceiros.length > 0, "não achei a lista de parceiros — o padrão de busca quebrou");
+test("sistemas disponíveis ficam fora do formulário e só aparecem uma vez na vitrine", () => {
+  const disponiveis = AVAILABLE_INTEGRATIONS.map((s) => s.name.toLowerCase());
+  const nomes = [...disponiveis, ...UPCOMING_INTEGRATIONS.map((s) => s.name.toLowerCase())];
+  assert.equal(new Set(nomes).size, nomes.length);
+  assert.deepEqual(SISTEMAS.filter((s) => disponiveis.includes(s.rotulo.toLowerCase())), []);
+});
 
-  const conflitos = SISTEMAS.filter((s) => parceiros.includes(s.rotulo.toLowerCase()));
-  assert.deepEqual(
-    conflitos.map((c) => c.rotulo),
-    [],
-    "A lista de sistemas oferece um parceiro já integrado. Remova de SISTEMAS.",
-  );
+test("o visitante pode indicar cada integração em preparação pelo nome da vitrine", () => {
+  for (const { id, name } of UPCOMING_INTEGRATIONS) {
+    const r = validarSolicitacaoIntegracao({ ...VALIDO, sistema: id });
+    assert.equal(r.ok, true);
+    assert.equal(r.value.sistemaNome, name);
+  }
 });
 
 test("a lista tem valores únicos e termina em 'outro'", () => {
