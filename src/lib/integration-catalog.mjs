@@ -9,7 +9,6 @@ export const INTEGRATIONS = [
   { name: "Stone", category: "Adquirente", logo: "/partners/stone.webp", w: 152, h: 44 },
   { name: "Olist Tiny", category: "ERP", logo: "/partners/olist.svg", w: 80, h: 39 },
   { name: "Rede", category: "Adquirente", logo: "/partners/rede-itau.webp", w: 359, h: 171, requestId: "rede" },
-  { name: "Pluggy", category: "Open Finance", logo: "/partners/pluggy.webp", w: 250, h: 62 },
   { name: "Takeat", category: "PDV", logo: "/partners/takeat.svg", w: 811, h: 236, requestId: "takeat" },
   { name: "Cielo", category: "Adquirente", logo: "/partners/cielo.svg", w: 96, h: 32 },
   { name: "Omie", category: "ERP", logo: "/partners/omie.png", w: 134, h: 46, requestId: "omie" },

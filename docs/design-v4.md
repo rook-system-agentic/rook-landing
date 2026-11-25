@@ -128,7 +128,6 @@ Fontes das marcas acrescentadas ou atualizadas na ROO-2061:
 - [VUCA](https://vucasolution.com.br/images/logo-vuca-2.webp)
 - [BeeFood, variante para fundo claro](https://beefood.app/lovable-uploads/1829a55a-00cc-4e62-bfde-d7bc5f07dddb.png)
 - [Getnet](https://site.getnet.com.br/wp-content/uploads/2021/08/logo-getnet.png)
-- [Pluggy](https://www.pluggy.ai/images/logos/pluggy-logo.png)
 - [Olist](https://d3hw41hpah8tvx.cloudfront.net/images/logo_olist_rebrand_62df2f9c0a.svg)
 - [Vero](https://www.sejavero.com.br/bom/multimidia/bomd99im_vero_logo-positivo.svg)
 - [SafraPay](https://www.safrapay.com.br/lumis-theme/br/com/safrapay/theme/safrapay/images/logo_safrapay_darkblue.svg)
