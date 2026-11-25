@@ -607,10 +607,9 @@ export const PARTNERS_SECTION = {
   label: "— Integrações",
   headlinePlain: "Funciona com o que você ",
   headlineEmphasis: "já usa.",
-  intro: "Reúna as vendas do caixa e do delivery, os extratos bancários e os recebimentos das maquininhas na Rook.",
-  availableTitle: "Integrações disponíveis",
-  upcomingTitle: "Em preparação",
-  upcomingBody: "Quer usar uma destas integrações ou indicar outro sistema?",
+  intro: "Reúna as vendas do caixa e do delivery, os extratos bancários e os recebimentos das maquininhas na Rook. Consulte a disponibilidade para a sua unidade.",
+  marqueeLabel: "Marcas de integrações",
+  motionLabel: "Pausar movimento das marcas",
   ctaLabel: "Solicitar uma integração →",
 } as const;
 

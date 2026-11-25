@@ -17,7 +17,7 @@ import {
   validarSolicitacaoIntegracao,
 } from "../src/lib/integration-request-validation.mjs";
 import { buildIntegrationRequestSourceId } from "../src/lib/integration-request-store.mjs";
-import { AVAILABLE_INTEGRATIONS, UPCOMING_INTEGRATIONS } from "../src/lib/integration-catalog.mjs";
+import { INTEGRATIONS } from "../src/lib/integration-catalog.mjs";
 
 const VALIDO = {
   nome: "Maria",
@@ -75,15 +75,19 @@ test("recusa corpo que não é objeto", () => {
 });
 
 test("sistemas disponíveis ficam fora do formulário e só aparecem uma vez na vitrine", () => {
-  const disponiveis = AVAILABLE_INTEGRATIONS.map((s) => s.name.toLowerCase());
-  const nomes = [...disponiveis, ...UPCOMING_INTEGRATIONS.map((s) => s.name.toLowerCase())];
+  const disponiveis = INTEGRATIONS.filter((s) => !s.requestId).map((s) => s.name.toLowerCase());
+  const nomes = INTEGRATIONS.map((s) => s.name.toLowerCase());
   assert.equal(new Set(nomes).size, nomes.length);
   assert.deepEqual(SISTEMAS.filter((s) => disponiveis.includes(s.rotulo.toLowerCase())), []);
 });
 
 test("o visitante pode indicar cada integração em preparação pelo nome da vitrine", () => {
-  for (const { id, name } of UPCOMING_INTEGRATIONS) {
-    const r = validarSolicitacaoIntegracao({ ...VALIDO, sistema: id });
+  const idsPublicados = ["beefood", "cardapio_web", "conta_azul", "omie", "rede", "takeat", "vuca"];
+  for (const id of idsPublicados) {
+    assert.equal(validarSolicitacaoIntegracao({ ...VALIDO, sistema: id }).ok, true, id);
+  }
+  for (const { requestId, name } of INTEGRATIONS.filter((s) => s.requestId)) {
+    const r = validarSolicitacaoIntegracao({ ...VALIDO, sistema: requestId });
     assert.equal(r.ok, true);
     assert.equal(r.value.sistemaNome, name);
   }

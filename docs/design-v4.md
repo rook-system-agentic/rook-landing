@@ -58,9 +58,7 @@ A cortina (`clip-path: inset(...)`) é imune à escala e ainda revela linha e
 
 ### 4. `prefers-reduced-motion` mostra tudo, não congela
 
-A vitrine de integrações permanece estática nos dois modos. A camada de movimento das demais seções vive dentro de
-`@media (prefers-reduced-motion: no-preference)`, então desligar é o padrão
-seguro.
+Com movimento reduzido, a faixa de integrações permite rolagem horizontal por toque ou teclado e exibe uma única lista. O movimento automático só é ativado em `prefers-reduced-motion: no-preference`.
 
 ---
 
@@ -111,16 +109,22 @@ operação. **Seguem sendo exemplo, não dado de cliente.**
 
 ## Parceiros e integrações
 
-A vitrine apresenta as marcas em duas listas estáticas. **Integrações disponíveis** indica o que um restaurante pode usar, com a forma de entrada dos dados na legenda. **Em preparação** informa a etapa conhecida. Cada sistema desse grupo também pode ser escolhido no formulário de interesse. As listas e os identificadores do formulário vêm de `src/lib/integration-catalog.mjs`.
+A vitrine mostra as marcas em uma esteira contínua, com a categoria sob cada placa. A animação desloca uma lista inteira mais o intervalo entre as listas. Duas cópias visuais mantêm a continuidade em telas largas e ficam ocultas para leitores de tela. O controle ao lado do formulário permite pausar e retomar o movimento.
 
-O agrupamento adotado na ROO-2061 substitui a faixa animada de sete marcas da primeira versão. No celular, todas as marcas ficam acessíveis por rolagem vertical. Para mudar uma integração de grupo, confira a versão em produção, o acesso que o restaurante precisa ter e as validações do fornecedor.
+As marcas vêm de `src/lib/integration-catalog.mjs`. O campo `requestId` mantém as opções do formulário de interesse estáveis quando a ordem da vitrine muda.
 
 ### Logos de terceiro
 
-A placa branca mantém a versão oficial legível nos dois temas. Preserve as cores e as proporções. Se ainda não houver um arquivo adequado, use o nome da marca em tipografia. O teste de desempenho limita cada arte servida a 20 KB.
+Use a arte oficial de cada marca com suas cores e proporções originais sobre placa branca nos dois temas. O teste de desempenho limita cada arte servida a 20 KB.
 
-Fontes das marcas acrescentadas na ROO-2061:
+Fontes das marcas acrescentadas ou atualizadas na ROO-2061:
 
+- [Cielo](https://www.cielo.com.br/assets_cielo/shared/menu/images/logo.svg)
+- [Rede Itaú, aplicativo da Redecard](https://apps.apple.com/br/app/rede-maquininha-pix-vendas/id1020661630)
+- [Takeat](https://takeat.app/logos/logo-takeat.svg)
+- [iFood](https://institucional.ifood.com.br/wp-content/uploads/2023/09/ifood-logo.svg)
+- [Saipos](https://saipos.com/assets/logo-full-color.svg)
+- [Conta Azul](https://contaazul.com/logos/ca-logo.svg)
 - [VUCA](https://vucasolution.com.br/images/logo-vuca-2.webp)
 - [BeeFood, variante para fundo claro](https://beefood.app/lovable-uploads/1829a55a-00cc-4e62-bfde-d7bc5f07dddb.png)
 - [Getnet](https://site.getnet.com.br/wp-content/uploads/2021/08/logo-getnet.png)
