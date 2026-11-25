@@ -365,16 +365,82 @@
 }
 
 @layer components {
-  /* A placa branca preserva os logos originais nos dois temas da página. */
+  .lp-marquee {
+    --marquee-gap: 20px;
+    display: flex;
+    overflow-x: auto;
+    gap: var(--marquee-gap);
+  }
+  .lp-marquee:focus-visible,
+  .lp-marquee-control:focus-within {
+    outline: 2px solid var(--color-terracota-text);
+    outline-offset: -2px;
+  }
+  .lp-marquee-track {
+    display: flex;
+    flex: none;
+    gap: var(--marquee-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lp-marquee-track[aria-hidden="true"],
+  .lp-marquee-control {
+    display: none;
+  }
+  /* Placas claras mantêm as cores oficiais legíveis também no tema escuro. */
   .lp-partner-plate {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 64px;
-    padding: 0 12px;
+    width: 176px;
+    height: 72px;
+    padding: 0 16px;
     border: 1px solid rgba(16, 21, 28, 0.1);
-    border-radius: 10px;
+    border-radius: 12px;
     background-color: #fff;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .lp-marquee {
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    }
+    .lp-marquee-track,
+    .lp-marquee-track[aria-hidden="true"] {
+      display: flex;
+      animation: lp-marquee 104s linear infinite;
+    }
+    /* Cada volta desloca exatamente uma trilha, incluindo o intervalo da emenda. */
+    @keyframes lp-marquee {
+      to { transform: translateX(calc(-100% - var(--marquee-gap))); }
+    }
+    .lp-marquee-control {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--lp-line);
+      color: var(--lp-muted);
+      cursor: pointer;
+    }
+    .lp-marquee-control .lp-play-icon,
+    .lp-marquee-control:has(:checked) .lp-pause-icon {
+      display: none;
+    }
+    .lp-marquee-control:has(:checked) .lp-play-icon {
+      display: inline;
+    }
+    .lp-partners:has(.lp-marquee-pause:checked) .lp-marquee-track,
+    .lp-marquee:focus-visible .lp-marquee-track {
+      animation-play-state: paused;
+    }
+    @media (hover: hover) {
+      .lp-marquee:hover .lp-marquee-track {
+        animation-play-state: paused;
+      }
+    }
   }
 
   /* ── Barra de progresso de leitura ─────────────────────────────────────── */
@@ -736,7 +802,20 @@ body .asaflow-chat-root button:focus-visible,body .asaflow-chat-root a:focus-vis
     pointer-events: none;
   }
 
+  /* O painel flutua sobre a foto: a sombra é o que separa os dois planos. */
+  .health-panel {
+    box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.55);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
+    /* A foto respira: aproximação lenta, que não reverte de repente. Só
+       transform, dentro do recorte arredondado — nada some. */
+    .health-photo img {
+      animation: healthPhoto 18s ease-in-out infinite alternate;
+    }
+    @keyframes healthPhoto {
+      to { transform: scale(1.06); }
+    }
     /* Pulso lento: o ponto "ao vivo" do painel, o alerta e os buracos da
        agenda. Só opacidade, e só em elemento decorativo. */
     .health-pulse {

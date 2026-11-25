@@ -1,10 +1,10 @@
-export interface Integration {
+interface Integration {
   name: string;
-  detail: string;
-  logo?: string;
-  w?: number;
-  h?: number;
+  category: string;
+  logo: string;
+  w: number;
+  h: number;
+  requestId?: string;
 }
 
-export declare const AVAILABLE_INTEGRATIONS: readonly Integration[];
-export declare const UPCOMING_INTEGRATIONS: readonly (Integration & { id: string })[];
+export declare const INTEGRATIONS: readonly Integration[];

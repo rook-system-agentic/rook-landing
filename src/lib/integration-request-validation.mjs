@@ -1,4 +1,4 @@
-import { UPCOMING_INTEGRATIONS } from "./integration-catalog.mjs";
+import { INTEGRATIONS } from "./integration-catalog.mjs";
 
 /**
  * Validação da solicitação de integração.
@@ -15,7 +15,7 @@ import { UPCOMING_INTEGRATIONS } from "./integration-catalog.mjs";
  * sozinho; com o escape, ninguém fica sem pedir o que usa.
  *
  * As integrações em preparação também recebem indicações. Ao liberar uma
- * delas, retire-a da lista de preparação e o formulário acompanha a mudança.
+ * delas, remova seu requestId do catálogo e o formulário acompanha a mudança.
  *
  * Dependência zero, `.mjs` puro: `node --test` roda direto, sem build.
  */
@@ -41,7 +41,7 @@ const candidatos = [
   { valor: "teknisa", rotulo: "Teknisa" },
   { valor: "totvs", rotulo: "TOTVS" },
   { valor: "zigpay", rotulo: "Zig" },
-  ...UPCOMING_INTEGRATIONS.map(({ id, name }) => ({ valor: id, rotulo: name })),
+  ...INTEGRATIONS.filter((s) => s.requestId).map((s) => ({ valor: s.requestId, rotulo: s.name })),
 ];
 
 export const SISTEMAS = [
