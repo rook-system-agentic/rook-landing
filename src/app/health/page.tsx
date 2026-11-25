@@ -1,6 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { HealthLeakArt, HealthMessageBubble, HealthStepIcon } from "@/components/health/HealthArt";
+import HealthMoney from "@/components/health/HealthMoney";
+import HealthMoneyPath from "@/components/health/HealthMoneyPath";
 import HealthWhatsappCta from "@/components/health/HealthWhatsappCta";
+import Reveal from "@/components/lp/LpReveal";
 import {
   HEALTH_CONTACT,
   HEALTH_HERO,
@@ -9,9 +13,10 @@ import {
   HEALTH_META,
   HEALTH_ORIGIN,
   HEALTH_PANEL,
+  HEALTH_PATH,
 } from "@/lib/health-content";
-import { HEALTH_CONTACT_ANCHOR, healthWhatsappHref } from "@/lib/health-whatsapp.mjs";
-import { OG_IMAGE, TWITTER_CARD } from "@/lib/og-image";
+import { HEALTH_CONTACT_ANCHOR, HEALTH_WHATSAPP_MESSAGE, healthWhatsappHref } from "@/lib/health-whatsapp.mjs";
+import { HEALTH_ICONS, HEALTH_OG_IMAGE, TWITTER_CARD } from "@/lib/og-image";
 import { siteUrl } from "@/lib/site-origin";
 
 /*
@@ -39,11 +44,18 @@ import { siteUrl } from "@/lib/site-origin";
  * cabeçalho, que vive no layout. É o mesmo mecanismo que a home usou com
  * `data-lp-home`.
  *
+ * IMAGEM E MOVIMENTO (25/11/2026): a primeira versão era só texto. Agora o
+ * painel do hero conta os valores, o "caminho do dinheiro" mostra o faturado
+ * encolhendo até a sobra, e cada cartão de dor tem a cena desenhada
+ * (components/health/HealthArt). Tudo segue docs/design-v4.md: o repouso é o
+ * estado final, e o `<Reveal>` só acrescenta a entrada.
+ *
  * SEM DEMONSTRAÇÃO NEM CHAT DO RODAPÉ: o formulário pergunta segmento culinário
  * e o chat fala de CMV. `RouteScopedAcquisition` tira os dois desta rota.
  *
  * O `openGraph` daqui substitui o do layout inteiro, então a imagem é
- * declarada de novo (ver lib/og-image.ts).
+ * declarada de novo — e é a arte da Health, em verde, junto com o ícone da
+ * aba (ver lib/og-image.ts).
  */
 const PAGE_URL = siteUrl("/health/");
 
@@ -52,6 +64,7 @@ export const metadata: Metadata = {
   description: HEALTH_META.description,
   alternates: { canonical: PAGE_URL },
   robots: { index: false, follow: true },
+  icons: HEALTH_ICONS,
   openGraph: {
     title: HEALTH_META.title,
     description: HEALTH_META.description,
@@ -59,13 +72,13 @@ export const metadata: Metadata = {
     siteName: "Rook System",
     type: "website",
     locale: "pt_BR",
-    images: [OG_IMAGE],
+    images: [HEALTH_OG_IMAGE],
   },
   twitter: {
     card: TWITTER_CARD,
     title: HEALTH_META.title,
     description: HEALTH_META.description,
-    images: [OG_IMAGE.url],
+    images: [HEALTH_OG_IMAGE.url],
   },
 };
 
@@ -104,13 +117,18 @@ export default function HealthPage() {
             * depender do tema (branco sobre #141b23 e #1d2631; tinta sobre o
             * Ocre, que mede 8,2:1).
             */}
+          <Reveal className="relative">
+          {/* Halo decorativo atrás do painel. Opacidade só aqui, onde não há
+              informação a esconder (design-v4, regra 1). */}
+          <div aria-hidden="true" className="health-halo" />
           <aside
             aria-label={`${HEALTH_PANEL.label} — ${HEALTH_PANEL.disclaimer.toLowerCase()}`}
-            className="rounded-2xl p-7 sm:p-8"
+            className="relative rounded-2xl p-7 sm:p-8"
             style={{ backgroundColor: "#141b23", color: "#eef3f8" }}
           >
             <div className="flex items-center justify-between gap-4 mb-5">
-              <p className="font-mono text-[11px] uppercase tracking-[0.2em]" style={{ color: "#4caf50" }}>
+              <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em]" style={{ color: "#4caf50" }}>
+                <span aria-hidden="true" className="health-pulse inline-block h-2 w-2 rounded-full" style={{ backgroundColor: "#4caf50" }} />
                 {HEALTH_PANEL.label}
               </p>
               <p className="font-mono text-[11px] uppercase tracking-[0.12em]" style={{ color: "#8fa0b2" }}>
@@ -121,25 +139,38 @@ export default function HealthPage() {
               {HEALTH_PANEL.headline}
             </p>
             <ul className="flex flex-col gap-3">
-              {HEALTH_PANEL.rows.map((row) => (
+              {HEALTH_PANEL.rows.map((row, i) => (
                 <li
                   key={row.label}
-                  className="flex items-center justify-between gap-4 rounded-xl px-5 py-4"
-                  style={{ backgroundColor: "#1d2631" }}
+                  className="lp-dre-row flex items-center justify-between gap-4 rounded-xl px-5 py-4"
+                  style={{ backgroundColor: "#1d2631", animationDelay: `${200 + i * 140}ms` }}
                 >
                   <span className="text-[15px]">{row.label}</span>
-                  <span className="font-mono text-[15px] whitespace-nowrap">{row.value}</span>
+                  <HealthMoney valor={row.value} className="font-mono text-[15px] whitespace-nowrap" />
                 </li>
               ))}
               <li
-                className="flex items-center justify-between gap-4 rounded-xl px-5 py-4"
-                style={{ backgroundColor: "#e79f4a", color: "#10151c" }}
+                className="lp-dre-row flex items-center justify-between gap-4 rounded-xl px-5 py-4"
+                style={{ backgroundColor: "#e79f4a", color: "#10151c", animationDelay: "480ms" }}
               >
                 <span className="text-[15px] font-semibold">{HEALTH_PANEL.alert.label}</span>
                 <span className="font-mono text-[15px] whitespace-nowrap">{HEALTH_PANEL.alert.value}</span>
               </li>
             </ul>
           </aside>
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="section-spacing" style={divider}>
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="section-label mb-6">{HEALTH_PATH.label}</p>
+          <h2 className="heading-section mb-4">
+            {HEALTH_PATH.title}
+            <em>{HEALTH_PATH.titleEmphasis}</em>
+          </h2>
+          <p className="text-body max-w-2xl mb-10">{HEALTH_PATH.body}</p>
+          <HealthMoneyPath />
         </div>
       </section>
 
@@ -152,13 +183,14 @@ export default function HealthPage() {
           </h2>
           <p className="text-body max-w-2xl mb-10">{HEALTH_LEAKS.body}</p>
           <ul className="grid gap-5 md:grid-cols-2">
-            {HEALTH_LEAKS.items.map((item) => (
-              <li key={item.title} className="card h-full p-6">
+            {HEALTH_LEAKS.items.map((item, i) => (
+              <Reveal as="li" key={item.title} delay={(i % 2) * 120} className="card h-full p-6">
+                <HealthLeakArt art={item.art} />
                 <h3 className="heading-section text-xl mb-3">{item.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
                   {item.text}
                 </p>
-              </li>
+              </Reveal>
             ))}
           </ul>
         </div>
@@ -173,15 +205,18 @@ export default function HealthPage() {
           </h2>
           <ol className="grid gap-5 md:grid-cols-3">
             {HEALTH_HOW.items.map((item, index) => (
-              <li key={item.title} className="card h-full p-6">
-                <p className="font-mono text-xs mb-4" style={{ color: "var(--health-accent-text)" }}>
-                  {String(index + 1).padStart(2, "0")}
-                </p>
+              <Reveal as="li" key={item.title} delay={index * 140} className="card h-full p-6">
+                <div className="mb-5 flex items-center justify-between">
+                  <HealthStepIcon icon={item.icon} />
+                  <p className="font-mono text-xs" style={{ color: "var(--health-accent-text)" }}>
+                    {String(index + 1).padStart(2, "0")}
+                  </p>
+                </div>
                 <h3 className="heading-section text-xl mb-3">{item.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
                   {item.text}
                 </p>
-              </li>
+              </Reveal>
             ))}
           </ol>
         </div>
@@ -207,7 +242,8 @@ export default function HealthPage() {
 
       <section id="contato" className="section-spacing scroll-mt-[72px]" style={divider}>
         <div className="max-w-7xl mx-auto px-6">
-          <div className="card p-8 sm:p-12">
+          <Reveal className="card grid gap-10 p-8 sm:p-12 lg:grid-cols-[1.4fr_1fr] lg:items-center">
+            <div>
             <p className="section-label mb-6">{HEALTH_CONTACT.label}</p>
             <h2 className="heading-section mb-6">
               {HEALTH_CONTACT.title}
@@ -222,7 +258,11 @@ export default function HealthPage() {
               </p>
             )}
             <p className="section-label mt-10">{HEALTH_CONTACT.footnote}</p>
-          </div>
+            </div>
+            {whatsappHref ? (
+              <HealthMessageBubble legenda={HEALTH_CONTACT.preview} mensagem={HEALTH_WHATSAPP_MESSAGE} />
+            ) : null}
+          </Reveal>
         </div>
       </section>
     </div>

@@ -133,3 +133,59 @@ test("os logos da Health existem e cabem no limite de arte de marca", async () =
     assert.ok(size > 0 && size <= 20 * 1024, `${arquivo} tem ${size} bytes`);
   }
 });
+
+test("a aba e o compartilhamento de /health usam a arte verde da Health", async () => {
+  const { stat } = await import("node:fs/promises");
+  const [pagina, og] = await Promise.all([ler("src/app/health/page.tsx"), ler("src/lib/og-image.ts")]);
+  assert.match(pagina, /icons: HEALTH_ICONS,/);
+  assert.match(pagina, /images: \[HEALTH_OG_IMAGE\],/);
+  assert.match(pagina, /images: \[HEALTH_OG_IMAGE\.url\],/);
+  // A arte da Rook ("Faturar não é lucrar", restaurante) não volta para esta rota.
+  assert.doesNotMatch(pagina, /\bOG_IMAGE\b/);
+  // Todo arquivo que o metadata anuncia existe; a arte de OG é PNG (ver og-image.ts).
+  const anunciados = [...og.slice(og.indexOf("HEALTH_OG_IMAGE")).matchAll(/url: "(\/(?:og|health)\/[^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(anunciados, [
+    "/og/rook-health-og.png",
+    "/health/favicon.ico",
+    "/health/icon-192.png",
+    "/health/apple-touch-icon.png",
+  ]);
+  for (const caminho of anunciados) {
+    const { size } = await stat(new URL(`../public${caminho}`, import.meta.url));
+    assert.ok(size > 0, `${caminho} está vazio`);
+  }
+});
+
+test("os números ilustrativos saem de uma fonte só e a conta fecha", async () => {
+  const conteudo = await ler("src/lib/health-content.ts");
+  // `recebido` e `sobra` são calculados, não digitados: o painel do hero e o
+  // "caminho do dinheiro" não podem divergir (docs/design-v4.md).
+  assert.match(conteudo, /recebido: FATURADO - GLOSA,/);
+  assert.match(conteudo, /sobra: FATURADO - GLOSA - REPASSE - CUSTOS,/);
+  assert.match(conteudo, /value: HEALTH_EXEMPLO\.recebido/);
+  const n = (nome) => Number(conteudo.match(new RegExp(`const ${nome} = (\\d+);`))[1]);
+  const sobra = n("FATURADO") - n("GLOSA") - n("REPASSE") - n("CUSTOS");
+  assert.ok(sobra > 0 && sobra < n("FATURADO"), `sobra ilustrativa incoerente: ${sobra}`);
+  // O gráfico é rotulado como exemplo na própria figura.
+  assert.match(conteudo, /disclaimer: "Exemplo ilustrativo\. Não é dado de cliente nem média de mercado\."/);
+  assert.match(await ler("src/components/health/HealthMoneyPath.tsx"), /<figcaption[^>]*>\{HEALTH_PATH\.disclaimer\}/);
+});
+
+test("o movimento da Health respeita as regras da LP", async () => {
+  const [css, valor, arte, pagina] = await Promise.all([
+    ler("src/app/globals.css"),
+    ler("src/components/health/HealthMoney.tsx"),
+    ler("src/components/health/HealthArt.tsx"),
+    ler("src/app/health/page.tsx"),
+  ]);
+  // Toda animação da Health vive dentro de `no-preference`: desligar é o padrão.
+  const bloco = css.slice(css.indexOf("Movimento da Health"));
+  const fora = bloco.slice(0, bloco.indexOf("@media (prefers-reduced-motion: no-preference)"));
+  assert.doesNotMatch(fora, /animation:/);
+  // O valor final já vai no HTML servido; a contagem só assume depois.
+  assert.match(valor, /useState\(valor\)/);
+  assert.match(valor, /prefers-reduced-motion: reduce/);
+  // Ilustração é decorativa e o balão mostra a mensagem que o link envia.
+  assert.match(arte, /aria-hidden="true"/);
+  assert.match(pagina, /mensagem=\{HEALTH_WHATSAPP_MESSAGE\}/);
+});

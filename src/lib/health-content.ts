@@ -38,18 +38,74 @@ export const HEALTH_HERO = {
 } as const;
 
 /**
- * Painel de exemplo do hero. Números fictícios e coerentes entre si, rotulados
- * na página. Não são dados de cliente nem média de mercado.
+ * A clínica de exemplo. UMA fonte para todo número ilustrativo da página.
+ *
+ * O painel do hero e o gráfico "caminho do dinheiro" descrevem a mesma clínica
+ * no mesmo mês, e saem daqui. É a mesma regra do `EXEMPLO_DRE` da home (ver
+ * docs/design-v4.md, "Os números dos gráficos"): duas peças a poucos pixels uma
+ * da outra não podem contar histórias diferentes sobre o mesmo dinheiro.
+ *
+ * `recebido` e `sobra` são CALCULADOS — ninguém digita o resultado de uma
+ * conta. Os valores são fictícios: não são dado de cliente nem média de
+ * mercado, e a página diz isso ao lado de cada um.
+ */
+const FATURADO = 96000;
+const GLOSA = 11700;
+const REPASSE = 31200;
+const CUSTOS = 38900;
+
+export const HEALTH_EXEMPLO = {
+  faturado: FATURADO,
+  glosa: GLOSA,
+  recebido: FATURADO - GLOSA,
+  repasse: REPASSE,
+  custos: CUSTOS,
+  sobra: FATURADO - GLOSA - REPASSE - CUSTOS,
+} as const;
+
+/** "R$ 84.300" — inteiro, com ponto de milhar. */
+export function healthReais(valor: number): string {
+  return `R$ ${valor.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}`;
+}
+
+/**
+ * Painel de exemplo do hero. Rotulado na página; os valores vêm de
+ * `HEALTH_EXEMPLO`.
  */
 export const HEALTH_PANEL = {
   label: "Hoje na clínica",
   disclaimer: "Exemplo ilustrativo",
   headline: "Bom dia, doutora. A agenda está cheia e o caixa fecha positivo.",
   rows: [
-    { label: "Recebido de convênios no mês", value: "R$ 84.300" },
-    { label: "Repasse médico a pagar", value: "R$ 31.200" },
+    { label: "Recebido de convênios no mês", value: HEALTH_EXEMPLO.recebido },
+    { label: "Repasse médico a pagar", value: HEALTH_EXEMPLO.repasse },
   ],
   alert: { label: "Glosas com prazo de recurso esta semana", value: "3 guias" },
+} as const;
+
+/**
+ * "O caminho do dinheiro": o faturado encolhendo até virar sobra.
+ *
+ * É a tese da página desenhada. Quem não lê os parágrafos vê a barra de
+ * R$ 96.000 virar R$ 14.200 — e entende "Atender não é receber" sem texto.
+ * `sinal` diz se a linha é o total de partida, uma saída ou o que sobra; a
+ * largura de cada barra é calculada no componente a partir do valor.
+ */
+export const HEALTH_PATH = {
+  label: "— O caminho do dinheiro",
+  title: "Do atendimento ao caixa, ",
+  titleEmphasis: "o dinheiro encolhe.",
+  body: "Um mês de uma clínica de exemplo, em reais. Cada barra é um lugar em que o faturado fica menor antes de virar sobra.",
+  de: "faturados aos convênios",
+  para: "sobram na clínica",
+  disclaimer: "Exemplo ilustrativo. Não é dado de cliente nem média de mercado.",
+  steps: [
+    { key: "faturado", label: "Faturado aos convênios", valor: HEALTH_EXEMPLO.faturado, sinal: "total" },
+    { key: "glosa", label: "Glosa", valor: HEALTH_EXEMPLO.glosa, sinal: "perda" },
+    { key: "repasse", label: "Repasse médico", valor: HEALTH_EXEMPLO.repasse, sinal: "saida" },
+    { key: "custos", label: "Equipe, sala e insumos", valor: HEALTH_EXEMPLO.custos, sinal: "saida" },
+    { key: "sobra", label: "Sobra na clínica", valor: HEALTH_EXEMPLO.sobra, sinal: "sobra" },
+  ],
 } as const;
 
 export const HEALTH_LEAKS = {
@@ -59,18 +115,22 @@ export const HEALTH_LEAKS = {
   body: "Nenhum deles aparece na agenda nem no extrato do dia. Aparecem meses depois, somados, quando já não dá para recorrer.",
   items: [
     {
+      art: "glosa",
       title: "Glosa",
       text: "O convênio paga menos do que foi faturado e o motivo vem num demonstrativo que ninguém tem tempo de conferir guia por guia. O prazo de recurso passa.",
     },
     {
+      art: "repasse",
       title: "Repasse médico",
       text: "Cada profissional tem uma regra, e a conta é feita em planilha sobre o que foi agendado. Quando o convênio paga menos, a clínica já repassou sobre o valor cheio.",
     },
     {
+      art: "falta",
       title: "Falta e horário vago",
       text: "O paciente que não vem não gera guia, mas a sala, a recepção e o profissional continuam custando. O custo do turno vazio não está em relatório nenhum.",
     },
     {
+      art: "tabela",
       title: "Particular e convênio",
       text: "O mesmo procedimento tem preços, prazos e custos diferentes em cada tabela. Sem custo por procedimento, não dá para saber qual convênio dá margem e qual só dá movimento.",
     },
@@ -83,14 +143,17 @@ export const HEALTH_HOW = {
   titleEmphasis: "ninguém sabe ler.",
   items: [
     {
+      icon: "conferido",
       title: "Convênio conferido",
       text: "O que foi faturado contra o que foi pago, guia por guia, com a glosa aparecendo antes de o prazo de recurso vencer.",
     },
     {
+      icon: "repasse",
       title: "Repasse sem planilha",
       text: "A regra de cada profissional aplicada sobre o que realmente entrou, não sobre o que foi agendado.",
     },
     {
+      icon: "agenda",
       title: "Agenda que vira caixa",
       text: "Faltas, horários vagos e valor por atendimento lado a lado, para saber quanto vale cada turno.",
     },
@@ -112,6 +175,8 @@ export const HEALTH_CONTACT = {
   titleEmphasis: "clínicas.",
   body: "Se a sua clínica atende convênio e você quer enxergar o que está deixando de receber, fale com a gente. A conversa é com uma pessoa da equipe, pelo WhatsApp.",
   cta: "Falar com a Rook no WhatsApp",
+  // Legenda do balão que mostra a mensagem pronta (ver HealthArt).
+  preview: "A primeira mensagem já vai escrita",
   // Estado sem número configurado: a página não publica botão morto.
   unavailable:
     "O canal de atendimento da Rook Health abre em breve. Volte a esta página nos próximos dias.",
