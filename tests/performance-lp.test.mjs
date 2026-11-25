@@ -14,7 +14,7 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { AVAILABLE_INTEGRATIONS, UPCOMING_INTEGRATIONS } from "../src/lib/integration-catalog.mjs";
+import { INTEGRATIONS } from "../src/lib/integration-catalog.mjs";
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -129,7 +129,7 @@ test("nenhuma arte de marca ou de parceiro referenciada no código passa de 20 K
   const LIMITE = 20 * 1024;
   const arquivos = await arquivosDe(path.join(RAIZ, "src"), [".tsx", ".ts"]);
   const referenciados = new Set(
-    [...AVAILABLE_INTEGRATIONS, ...UPCOMING_INTEGRATIONS].flatMap((sistema) => sistema.logo ? [sistema.logo] : []),
+    INTEGRATIONS.map((sistema) => sistema.logo),
   );
   for (const arquivo of arquivos) {
     const conteudo = await readFile(arquivo, "utf8");
