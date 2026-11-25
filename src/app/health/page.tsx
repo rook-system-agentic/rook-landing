@@ -91,7 +91,7 @@ export default function HealthPage() {
 
   return (
     <div data-health>
-      <section className="section-spacing">
+      <section className="section-spacing overflow-x-clip">
         <div className="max-w-7xl mx-auto px-6 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <p className="section-label mb-6">{HEALTH_HERO.label}</p>
@@ -121,9 +121,36 @@ export default function HealthPage() {
           {/* Halo decorativo atrás do painel. Opacidade só aqui, onde não há
               informação a esconder (design-v4, regra 1). */}
           <div aria-hidden="true" className="health-halo" />
+          {/*
+            * A foto do hero: a dona da clínica depois do expediente, ainda
+            * fechando a conta. É a tese da página numa imagem, para quem não
+            * vai ler os parágrafos.
+            *
+            * É AMBIENTAÇÃO, gerada por IA (Higgsfield, 25/11/2026): não é
+            * cliente nem depoimento, por isso não leva nome, cargo nem legenda.
+            * Trocar por foto de clínica real quando houver uma.
+            *
+            * `<img>` com `srcSet` escrito à mão porque o projeto roda com
+            * `images.unoptimized` (next.config): o Next não gera tamanhos, então
+            * os dois arquivos em public/health/ SÃO os tamanhos. `width` e
+            * `height` reservam o espaço e a página não pula quando a foto chega.
+            */}
+          <div className="health-photo relative overflow-hidden rounded-2xl">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={HEALTH_HERO.photo.src}
+              srcSet={HEALTH_HERO.photo.srcSet}
+              sizes="(min-width: 1024px) 560px, 100vw"
+              width={1400}
+              height={1045}
+              alt={HEALTH_HERO.photo.alt}
+              decoding="async"
+              className="block h-auto w-full"
+            />
+          </div>
           <aside
             aria-label={`${HEALTH_PANEL.label} — ${HEALTH_PANEL.disclaimer.toLowerCase()}`}
-            className="relative rounded-2xl p-7 sm:p-8"
+            className="health-panel relative z-10 mx-4 -mt-10 rounded-2xl p-7 sm:mx-8 sm:-mt-14 sm:p-8"
             style={{ backgroundColor: "#141b23", color: "#eef3f8" }}
           >
             <div className="flex items-center justify-between gap-4 mb-5">

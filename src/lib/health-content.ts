@@ -35,6 +35,13 @@ export const HEALTH_HERO = {
   primaryCta: "Quero conhecer a Rook Health",
   secondaryCta: "Ver o que estamos construindo",
   secondaryHref: "#como",
+  // Foto de ambientação (ver o comentário em app/health/page.tsx). O `alt`
+  // descreve a cena; não atribui nome nem cargo a ninguém.
+  photo: {
+    src: "/health/hero-clinica-1400.webp",
+    srcSet: "/health/hero-clinica-800.webp 800w, /health/hero-clinica-1400.webp 1400w",
+    alt: "Médica no balcão da recepção depois do expediente, diante do notebook e de uma pilha de guias, com a sala de espera vazia ao fundo.",
+  },
 } as const;
 
 /**

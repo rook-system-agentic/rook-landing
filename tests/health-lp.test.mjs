@@ -189,3 +189,19 @@ test("o movimento da Health respeita as regras da LP", async () => {
   assert.match(arte, /aria-hidden="true"/);
   assert.match(pagina, /mensagem=\{HEALTH_WHATSAPP_MESSAGE\}/);
 });
+
+test("a foto do hero tem tamanhos próprios, espaço reservado e não finge depoimento", async () => {
+  const { stat } = await import("node:fs/promises");
+  const [pagina, conteudo] = await Promise.all([ler("src/app/health/page.tsx"), ler("src/lib/health-content.ts")]);
+  // `images.unoptimized`: os tamanhos são os arquivos. O maior não passa de 250 KB.
+  for (const [arquivo, teto] of [["hero-clinica-800.webp", 110], ["hero-clinica-1400.webp", 250]]) {
+    assert.match(conteudo, new RegExp(`/health/${arquivo}`));
+    const { size } = await stat(new URL(`../public/health/${arquivo}`, import.meta.url));
+    assert.ok(size > 0 && size <= teto * 1024, `${arquivo} tem ${size} bytes`);
+  }
+  assert.match(pagina, /srcSet=\{HEALTH_HERO\.photo\.srcSet\}/);
+  assert.match(pagina, /width=\{1400\}\s+height=\{1045\}/);
+  assert.match(pagina, /alt=\{HEALTH_HERO\.photo\.alt\}/);
+  // Ambientação gerada por IA: sem legenda que a faça parecer cliente.
+  assert.doesNotMatch(pagina, /<figcaption[^>]*>[^<]*(Dra\.|CRM|cliente)/);
+});
