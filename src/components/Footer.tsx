@@ -17,42 +17,79 @@ import { COMPANY_INFO } from "@/lib/company";
  * v5.1: o rodapé é escuro nos dois temas (classe .footer-dark no globals.css),
  * como no preview aprovado — por isso o logo de texto claro é o único servido,
  * sem variante por tema.
+ *
+ * `variant="health"` (25/11/2026): o rodapé de `/health/`. Mesma estrutura e
+ * mesmo rodapé jurídico, com a marca em verde e os links de quem tem clínica.
+ * Quem escolhe entre os dois é o `RouteScopedFooter`, no layout. As âncoras
+ * `#como` e `#contato` existem em `app/health/page.tsx`.
  */
-export default function Footer() {
+export default function Footer({ variant = "rook" }: { variant?: "rook" | "health" }) {
+  const health = variant === "health";
   return (
     <footer className="footer-dark">
       <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div className="md:col-span-1">
-          <Link href="/" className="inline-block mb-4">
-            <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={144} height={47} className="h-10 w-auto" />
-          </Link>
+          {health ? (
+            <Link href="/health/" className="inline-flex items-center gap-2.5 mb-4" aria-label="Rook Health - Início">
+              <Image src="/brand/rook-health-logo-horizontal.webp" alt="" width={122} height={40} className="h-10 w-auto" />
+              <span className="font-display font-semibold text-[13px] uppercase tracking-[0.22em]" style={{ color: "#4caf50" }}>Health</span>
+            </Link>
+          ) : (
+            <Link href="/" className="inline-block mb-4">
+              <Image src="/brand/rook-logo-horizontal.webp" alt="Rook System" width={144} height={47} className="h-10 w-auto" />
+            </Link>
+          )}
           <p className="text-sm leading-relaxed">
-            O lucro do seu restaurante, visível todo dia — com a próxima decisão em reais. Faturar não é lucrar.
+            {health
+              ? "O que a clínica faturou, o que recebeu e o que sobrou, em reais. Atender não é receber."
+              : "O lucro do seu restaurante, visível todo dia — com a próxima decisão em reais. Faturar não é lucrar."}
           </p>
         </div>
 
-        {/* Produto */}
-        <div>
-          <h2 className="font-semibold text-sm mb-4">Produto</h2>
-          <ul className="space-y-2.5 text-sm">
-            <li><Link href="/diagnostico/">Diagnóstico</Link></li>
-            <li><Link href="/calculadora-cmv/">Calculadora de CMV</Link></li>
-            <li><Link href="#cadastro">Agendar demonstração</Link></li>
-            <li><Link href="/sobre/">Sobre o Rook</Link></li>
-          </ul>
-        </div>
+        {health ? (
+          <>
+            <div>
+              <h2 className="font-semibold text-sm mb-4">Rook Health</h2>
+              <ul className="space-y-2.5 text-sm">
+                <li><Link href="/health/#como">O que estamos construindo</Link></li>
+                <li><Link href="/health/#contato">Falar com a Rook</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h2 className="font-semibold text-sm mb-4">A Rook</h2>
+              <ul className="space-y-2.5 text-sm">
+                <li><Link href="/sobre/">Sobre a Rook</Link></li>
+                <li><Link href="/">Rook para restaurantes</Link></li>
+                <li><a href="mailto:contato@rook.com.br">contato@rook.com.br</a></li>
+              </ul>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Produto */}
+            <div>
+              <h2 className="font-semibold text-sm mb-4">Produto</h2>
+              <ul className="space-y-2.5 text-sm">
+                <li><Link href="/diagnostico/">Diagnóstico</Link></li>
+                <li><Link href="/calculadora-cmv/">Calculadora de CMV</Link></li>
+                <li><Link href="#cadastro">Agendar demonstração</Link></li>
+                <li><Link href="/sobre/">Sobre o Rook</Link></li>
+              </ul>
+            </div>
 
-        {/* Conteúdo */}
-        <div>
-          <h2 className="font-semibold text-sm mb-4">Conteúdo</h2>
-          <ul className="space-y-2.5 text-sm">
-            <li><Link href="/restaurantes/">Restaurantes</Link></li>
-            <li><Link href="/restaurantes/">Restaurantes</Link></li>
-            <li><Link href="/blog/">Blog</Link></li>
-            <li><a href="mailto:contato@rook.com.br">contato@rook.com.br</a></li>
-          </ul>
-        </div>
+            {/* Conteúdo */}
+            <div>
+              <h2 className="font-semibold text-sm mb-4">Conteúdo</h2>
+              <ul className="space-y-2.5 text-sm">
+                <li><Link href="/restaurantes/">Restaurantes</Link></li>
+                <li><Link href="/restaurantes/">Restaurantes</Link></li>
+                <li><Link href="/blog/">Blog</Link></li>
+                <li><a href="mailto:contato@rook.com.br">contato@rook.com.br</a></li>
+              </ul>
+            </div>
+          </>
+        )}
 
         {/* Legal */}
         <div>

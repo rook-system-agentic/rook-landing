@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import RouteScopedFooter from "@/components/RouteScopedFooter";
 import DemoSection from "@/components/acquisition/DemoSection";
 import SiteChat from "@/components/acquisition/SiteChat";
 import RouteScopedAcquisition from "@/components/RouteScopedAcquisition";
@@ -169,7 +170,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Header />
         <main className="pt-[72px]">{children}<RouteScopedAcquisition><DemoSection /></RouteScopedAcquisition></main>
         <CookieConsent />
-        <Footer />
+        <RouteScopedFooter health={<Footer variant="health" />}><Footer /></RouteScopedFooter>
         <RouteScopedAcquisition><SiteChat /></RouteScopedAcquisition>
         <Analytics />
       </body>

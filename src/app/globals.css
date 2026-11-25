@@ -749,3 +749,42 @@ body .asaflow-chat-qr,body .asaflow-chat-restart{background:var(--color-bg-card)
 body .asaflow-chat-header-avatar,body .asaflow-chat-bubble-avatar{object-fit:contain;border-radius:8px;background:transparent}
 body .asaflow-chat-bubble-avatar{background:var(--color-cta)}
 body .asaflow-chat-root button:focus-visible,body .asaflow-chat-root a:focus-visible,body .asaflow-chat-input:focus-visible{outline:2px solid var(--color-terracota-text);outline-offset:3px}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ROOK HEALTH — `/health/` (25/11/2026)
+
+   A LP para clínicas usa a identidade da Rook com UMA troca: o Floresta, que
+   já era cor de apoio da marca (`floresta` em tailwind.config), assume o papel
+   que o Terracota tem no resto do site — botão primário, ênfase da manchete,
+   foco. Tinta, fundo, Ocre e tipografia não mudam.
+
+   O escopo é `body:has([data-health])`, e não só `[data-health]`, pelo mesmo
+   motivo que a home usou `data-lp-home`: o botão do cabeçalho vive no layout,
+   fora da página, e precisa acompanhar a paleta.
+
+   Contraste medido: branco sobre #2e7d32 dá 5,13:1 (botão); #2e7d32 como texto
+   dá 4,8:1 sobre o fundo claro e 5,13:1 sobre o cartão; no escuro o texto
+   clareia para #4caf50, que mede 6,3:1 sobre #141b23.
+   ════════════════════════════════════════════════════════════════════════════ */
+@layer base {
+  body:has([data-health]) {
+    --color-cta: #2e7d32;
+    --health-accent-text: #2e7d32;
+  }
+  .dark body:has([data-health]) {
+    --health-accent-text: #4caf50;
+  }
+}
+
+@layer components {
+  [data-health] .heading-hero em,
+  [data-health] .heading-section em {
+    color: var(--health-accent-text);
+  }
+  [data-health] .card:hover {
+    border-color: rgba(46, 125, 50, 0.4);
+  }
+  body:has([data-health]) :focus-visible {
+    outline-color: var(--health-accent-text);
+  }
+}
