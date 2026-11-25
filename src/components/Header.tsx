@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { BF1_ACCESS_ANCHOR } from "@/lib/bf1-community.mjs";
+import { HEALTH_CONTACT_ANCHOR } from "@/lib/health-whatsapp.mjs";
 
 const navLinks = [
   { href: "/sobre/", label: "Sobre" },
@@ -92,13 +93,34 @@ export default function Header() {
   // No celular ele também aparece no cabeçalho: era a página sem CTA na
   // primeira tela que derrubava a conversão da campanha.
   const isBf1 = pathname === "/bl1" || pathname === "/bl1/";
-  const headerCtaHref = isCmvGuide ? "#cmv-guide-form" : isBf1 ? BF1_ACCESS_ANCHOR : "#cadastro";
-  const headerCtaLabel = isCmvGuide ? "Receber guia" : isBf1 ? "Entrar no grupo" : "Agendar demonstração";
+  // Rook Health (25/11/2026): a LP para clínicas tem um CTA só, a conversa no
+  // WhatsApp, e a seção de demonstração (#cadastro) não existe nessa rota. A
+  // navegação de restaurantes (Calculadora CMV, Diagnóstico) some: para quem
+  // tem clínica, é ruído. O logo continua sendo o da Rook, que leva à home.
+  const isHealth = pathname === "/health" || pathname === "/health/";
+  const links = isHealth ? [] : navLinks;
+  const headerCtaHref = isCmvGuide ? "#cmv-guide-form" : isBf1 ? BF1_ACCESS_ANCHOR : isHealth ? HEALTH_CONTACT_ANCHOR : "#cadastro";
+  const headerCtaLabel = isCmvGuide ? "Receber guia" : isBf1 ? "Entrar no grupo" : isHealth ? "Falar com a Rook" : "Agendar demonstração";
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-md" style={{ backgroundColor: "var(--color-header-bg)", borderBottom: "1px solid var(--color-border)" }}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-[72px]">
         {/* Logo */}
+        {isHealth ? (
+          /*
+           * Rook Health: o logotipo oficial na cor da Health (Floresta), com
+           * "Health" ao lado, levando à própria LP — quem tem clínica não deve
+           * cair na home de restaurantes ao tocar na marca. Os arquivos são o
+           * logo padrão recolorido, sem nenhuma alteração de desenho.
+           */
+          <Link href="/health/" className="flex items-center gap-2.5" aria-label="Rook Health - Início">
+            <Image src="/brand/rook-health-logo-horizontal-light.webp" alt="" width={118} height={40} className="h-10 w-auto dark:hidden" />
+            <Image src="/brand/rook-health-logo-horizontal.webp" alt="" width={122} height={40} className="h-10 w-auto hidden dark:block" />
+            <span className="font-display font-semibold text-[13px] uppercase tracking-[0.22em]" style={{ color: "var(--health-accent-text)" }}>
+              Health
+            </span>
+          </Link>
+        ) : (
         <Link href="/" className="flex items-center" aria-label="Rook System - Página inicial">
           {/* ROO-1124: .webp de 360px de largura no lugar do .png de 1961px. O
               logo aparece com 40px de altura — o PNG original era 16× maior que
@@ -106,10 +128,11 @@ export default function Header() {
           <Image src="/brand/rook-logo-horizontal-light.webp" alt="Rook — Visão | Estratégia | Controle" width={118} height={40} className="h-10 w-auto dark:hidden" />
           <Image src="/brand/rook-logo-horizontal.webp" alt="Rook — Visão | Estratégia | Controle" width={122} height={40} className="h-10 w-auto hidden dark:block" />
         </Link>
+        )}
 
         {/* Nav desktop */}
         <nav className="hidden lg:flex items-center gap-8">
-          {navLinks.map((l) => (
+          {links.map((l) => (
             <Link key={l.href} href={l.href} className="text-[15px] font-medium transition-colors" style={{ color: "var(--color-btn-ghost-text)" }}>
               {l.label}
             </Link>
@@ -119,7 +142,8 @@ export default function Header() {
         {/* Actions */}
         <div className="hidden lg:flex items-center gap-3">
           <ThemeToggle />
-          <a href="https://app.rook.com.br/login" className="btn-ghost text-sm">Entrar</a>
+          {/* "Entrar" abre o app de restaurantes; a Health ainda não tem login. */}
+          {isHealth ? null : <a href="https://app.rook.com.br/login" className="btn-ghost text-sm">Entrar</a>}
           {isBf1 ? (
             <a href={headerCtaHref} className="btn-primary text-sm" aria-haspopup="dialog">{headerCtaLabel}</a>
           ) : (
@@ -149,13 +173,13 @@ export default function Header() {
         style={{ backgroundColor: "var(--color-bg)", borderTop: "1px solid var(--color-border)" }}
         aria-label="Menu de navegação mobile"
       >
-        {navLinks.map((l) => (
+        {links.map((l) => (
           <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="text-[15px] py-2" style={{ color: "var(--color-btn-ghost-text)" }}>
             {l.label}
           </Link>
         ))}
         <div className="flex flex-col gap-2 pt-3" style={{ borderTop: "1px solid var(--color-border)" }}>
-          <a href="https://app.rook.com.br/login" className="btn-ghost text-sm text-center">Entrar</a>
+          {isHealth ? null : <a href="https://app.rook.com.br/login" className="btn-ghost text-sm text-center">Entrar</a>}
           <Link href={headerCtaHref} onClick={() => setOpen(false)} className="btn-primary text-sm text-center">{headerCtaLabel}</Link>
         </div>
       </nav>
