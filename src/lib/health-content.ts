@@ -47,6 +47,29 @@ export const HEALTH_HERO = {
   },
 } as const;
 
+/*
+ * O filme de 30 segundos (Motion, 25/11/2026): a mesma clínica de exemplo do
+ * painel e do "caminho do dinheiro", contada em movimento, com trilha.
+ *
+ * Seção própria, logo depois do hero, a pedido do Gabriel. O vídeo NÃO toca
+ * sozinho e não é baixado até a pessoa apertar o play (`preload="none"` na
+ * página): a capa é o estado de repouso, como pede docs/design-v4.md.
+ *
+ * O arquivo leva versão no nome porque `public/` tem cache de 30 dias: filme
+ * novo é arquivo novo (`-v2`), nunca o mesmo nome por cima.
+ */
+export const HEALTH_FILM = {
+  label: "— Em 30 segundos",
+  title: "A conta de uma clínica, ",
+  titleEmphasis: "do faturado à sobra.",
+  body: "O mês de uma clínica de exemplo em meio minuto: o que foi faturado, o que ficou pelo caminho e o que sobrou. Tem trilha, se você ligar o som.",
+  src: "/health/filme-caminho-v1.mp4",
+  poster: "/health/filme-caminho-capa-v1.webp",
+  // Lido por leitor de tela no lugar do vídeo, que não tem narração.
+  descricao:
+    "Filme de 30 segundos, sem narração: uma clínica de exemplo fatura 96 mil reais no mês; glosa, repasse médico e custos reduzem esse valor até sobrarem 14,2 mil reais.",
+} as const;
+
 /**
  * A clínica de exemplo. UMA fonte para todo número ilustrativo da página.
  *

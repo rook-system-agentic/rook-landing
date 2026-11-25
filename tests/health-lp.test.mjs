@@ -221,3 +221,27 @@ test("\"De onde vem\" se apoia na consultoria, sem comparar a clínica com resta
   // Sem detalhe de pessoa nem de cliente, por decisão do Gabriel (25/11/2026).
   assert.doesNotMatch(origem, /Eraldo|Santa Casa|leitos/);
 });
+
+test("o filme só baixa e toca quando a pessoa pede, e tem capa e peso controlado", async () => {
+  const [pagina, conteudo] = await Promise.all([ler("src/app/health/page.tsx"), ler("src/lib/health-content.ts")]);
+  const video = pagina.slice(pagina.indexOf("<video"), pagina.indexOf("</video>"));
+  assert.match(video, /preload="none"/);
+  assert.match(video, /\bcontrols\b/);
+  assert.match(video, /playsInline/);
+  assert.match(video, /poster=\{HEALTH_FILM\.poster\}/);
+  assert.match(video, /aria-label=\{HEALTH_FILM\.descricao\}/);
+  // Vídeo que toca sozinho contraria o "repouso é o estado final" e gasta dados.
+  assert.doesNotMatch(video, /autoPlay|\bloop\b/);
+
+  const src = conteudo.match(/src: "(\/health\/filme-[^"]+\.mp4)"/)[1];
+  const capa = conteudo.match(/poster: "(\/health\/filme-[^"]+)"/)[1];
+  // Nome com versão: public/ tem cache de 30 dias.
+  assert.match(src, /-v\d+\.mp4$/);
+  const { stat } = await import("node:fs/promises");
+  const [mp4, img] = await Promise.all([
+    stat(new URL(`../public${src}`, import.meta.url)),
+    stat(new URL(`../public${capa}`, import.meta.url)),
+  ]);
+  assert.ok(mp4.size < 3_000_000, `filme com ${mp4.size} bytes`);
+  assert.ok(img.size < 120_000, `capa com ${img.size} bytes`);
+});
