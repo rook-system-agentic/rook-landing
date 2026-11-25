@@ -603,49 +603,15 @@ export const AUTHORITY = {
 
 /* ─── Parceiros e integrações ─── */
 
-export interface Partner {
-  name: string;
-  categoria: string;
-  /**
-   * Caminho em `public/partners/`. `null` renderiza o nome em tipografia.
-   *
-   * A ausência de arquivo não é lacuna a esconder: é o estado de quem ainda
-   * não teve o logo obtido de fonte oficial. Basta colocar o arquivo e
-   * preencher este campo para o logo aparecer.
-   */
-  logo: string | null;
-  /** Dimensões intrínsecas do arquivo, para reservar espaço e não deslocar o layout. */
-  w?: number;
-  h?: number;
-}
-
-/*
- * ROO-1124: os logos de bitmap são .webp já reduzidos ao tamanho de tela (a
- * placa exibe no máximo 116×36). Os .png originais continuam em
- * `public/partners/` como fonte — se alguém precisar gerar outro tamanho,
- * gera a partir deles, não do WebP. O `w`/`h` aqui é a dimensão real do
- * arquivo servido, e é o que reserva o espaço antes da imagem chegar.
- * Logo em SVG fica em SVG: escala sozinho e não tem o que reduzir.
- */
-export const PARTNERS: readonly Partner[] = [
-  { name: "Omie", categoria: "ERP", logo: "/partners/omie.png", w: 134, h: 46 },
-  { name: "Conta Azul", categoria: "ERP", logo: "/partners/conta-azul.svg", w: 139, h: 18 },
-  { name: "Saipos", categoria: "PDV", logo: "/partners/saipos.svg", w: 161, h: 51 },
-  { name: "iFood", categoria: "Delivery", logo: "/partners/ifood.webp", w: 120, h: 120 },
-  { name: "Cardápio Web", categoria: "Delivery", logo: "/partners/cardapio-web.webp", w: 240, h: 156 },
-  { name: "Stone", categoria: "Adquirente", logo: "/partners/stone.webp", w: 152, h: 44 },
-  // Sem arquivo: userede.com.br responde 302 e não entrega o SVG. Colocar em
-  // public/partners/rede.svg e preencher `logo` faz o logo aparecer sozinho.
-  { name: "Rede", categoria: "Adquirente", logo: null },
-];
-
 export const PARTNERS_SECTION = {
   label: "— Integrações",
   headlinePlain: "Funciona com o que você ",
   headlineEmphasis: "já usa.",
-  intro:
-    "O PDV, o ERP e o delivery da casa entram no mesmo tabuleiro — sem recadastrar nada. Se o seu ainda não está na lista, peça.",
-  ctaLabel: "Não encontrou o seu sistema? Solicite a integração →",
+  intro: "Reúna as vendas do caixa e do delivery, os extratos bancários e os recebimentos das maquininhas na Rook.",
+  availableTitle: "Integrações disponíveis",
+  upcomingTitle: "Em preparação",
+  upcomingBody: "Quer usar uma destas integrações ou indicar outro sistema?",
+  ctaLabel: "Solicitar uma integração →",
 } as const;
 
 /* ─── FAQ ─── */

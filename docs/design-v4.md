@@ -58,8 +58,7 @@ A cortina (`clip-path: inset(...)`) é imune à escala e ainda revela linha e
 
 ### 4. `prefers-reduced-motion` mostra tudo, não congela
 
-A faixa de parceiros vira **grade estática com os sete logos**, em vez de parar
-no meio escondendo metade. Toda a camada de movimento vive dentro de
+A vitrine de integrações permanece estática nos dois modos. A camada de movimento das demais seções vive dentro de
 `@media (prefers-reduced-motion: no-preference)`, então desligar é o padrão
 seguro.
 
@@ -110,43 +109,26 @@ operação. **Seguem sendo exemplo, não dado de cliente.**
 
 ---
 
-## Parceiros
+## Parceiros e integrações
 
-Sete: Omie, Conta Azul (ERP), Saipos (PDV), iFood, Cardápio Web (delivery),
-Stone, Rede (adquirentes). Levantados do código, não de memória.
+A vitrine apresenta as marcas em duas listas estáticas. **Integrações disponíveis** indica o que um restaurante pode usar, com a forma de entrada dos dados na legenda. **Em preparação** informa a etapa conhecida. Cada sistema desse grupo também pode ser escolhido no formulário de interesse. As listas e os identificadores do formulário vêm de `src/lib/integration-catalog.mjs`.
 
-**Aparecem sem rótulo de estágio, por decisão explícita do PO** — e isso inclui
-Stone e Rede, em homologação com o parceiro, e Saipos, que nunca teve cliente
-conectado (CLAUDE.md §15). O componente aceita um campo de estágio; acrescentar
-o rótulo depois é uma linha.
-
-**ReceitaNet BX foi pedido e não entrou:** no repositório é apenas
-`docs/research/receitanetbx-viability.md`, cuja conclusão é "baixa prioridade
-para a Fase 1". Não é integração.
-
-**Pluggy não está na vitrine** embora Open Finance apareça como fonte no
-diagrama e a integração seja madura (`lib/pluggy/`, sete rotas, um cron). É
-decisão em aberto: expor o fornecedor ou não.
+O agrupamento adotado na ROO-2061 substitui a faixa animada de sete marcas da primeira versão. No celular, todas as marcas ficam acessíveis por rolagem vertical. Para mudar uma integração de grupo, confira a versão em produção, o acesso que o restaurante precisa ter e as validações do fornecedor.
 
 ### Logos de terceiro
 
-Nenhum é recolorido ou filtrado — quase todo manual de marca proíbe, e é o que
-mantém o uso defensável. A **placa branca** atrás resolve o contraste no tema
-escuro sem tocar na arte.
+A placa branca mantém a versão oficial legível nos dois temas. Preserve as cores e as proporções. Se ainda não houver um arquivo adequado, use o nome da marca em tipografia. O teste de desempenho limita cada arte servida a 20 KB.
 
-A Rede está em wordmark tipográfico porque `userede.com.br` responde 302 e não
-entrega o arquivo. Colocar `public/partners/rede.svg` e preencher o campo
-`logo` faz o logo aparecer sozinho.
+Fontes das marcas acrescentadas na ROO-2061:
 
-### A faixa tem três trilhas, não duas
-
-Cada trilha mede ~1.352px (7 placas de 176px + 6 vãos de 20px) e a animação
-desloca uma trilha inteira, então o conteúdo precisa cobrir deslocamento +
-largura da tela. Duas trilhas dão 2.724px, insuficiente para 1.920px. Três dão
-4.096px.
-
-O buraco só aparece em parte do ciclo — capturar num instante qualquer passa
-limpo por sorte. Conferir forçando o relógio da animação em vários pontos.
+- [VUCA](https://vucasolution.com.br/images/logo-vuca-2.webp)
+- [BeeFood, variante para fundo claro](https://beefood.app/lovable-uploads/1829a55a-00cc-4e62-bfde-d7bc5f07dddb.png)
+- [Getnet](https://site.getnet.com.br/wp-content/uploads/2021/08/logo-getnet.png)
+- [Pluggy](https://www.pluggy.ai/images/logos/pluggy-logo.png)
+- [Olist](https://d3hw41hpah8tvx.cloudfront.net/images/logo_olist_rebrand_62df2f9c0a.svg)
+- [Vero](https://www.sejavero.com.br/bom/multimidia/bomd99im_vero_logo-positivo.svg)
+- [SafraPay](https://www.safrapay.com.br/lumis-theme/br/com/safrapay/theme/safrapay/images/logo_safrapay_darkblue.svg)
+- [Fiserv](https://www.fiserv.com/content/dam/fiserv-ent/final-files/digital-graphics/fiserv-com-graphics/fiserv-logo-orange-ff6600.svg)
 
 ---
 

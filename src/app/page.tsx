@@ -43,10 +43,8 @@ import LpCta from "@/components/lp/LpCta";
  *     entendeu a proposta, em vez de abrir a página com dado de mercado.
  *   - AS INTEGRAÇÕES subiram para logo abaixo do hero (24/08/2026). A v6 tinha
  *     posto ali uma faixa estática de logos, e a página passou a mostrar a
- *     MESMA lista duas vezes: a faixa nova e o marquee desta seção. Ficou a
- *     original — ela já rola sozinha, já traz o argumento em texto e já tem o
- *     CTA de solicitar integração. Uma lista só, no lugar onde a dúvida "vai
- *     funcionar com o meu sistema?" de fato aparece: logo depois da promessa.
+ *     mesma lista duas vezes. Hoje uma única seção apresenta os sistemas
+ *     disponíveis, os que estão em preparação e o CTA de solicitar integração.
  *
  * O atributo `data-lp-home` é o que aplica a paleta desta página. Ele é lido
  * por `body:has([data-lp-home])` no `globals.css`, e é assim que o Header e o
