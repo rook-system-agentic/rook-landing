@@ -134,6 +134,10 @@ export default function HealthPage() {
             * `images.unoptimized` (next.config): o Next não gera tamanhos, então
             * os dois arquivos em public/health/ SÃO os tamanhos. `width` e
             * `height` reservam o espaço e a página não pula quando a foto chega.
+            *
+            * No computador a foto é recortada em 3:2 e o painel sobe mais sobre
+            * ela: com a foto inteira a coluna ficava muito mais alta que o texto
+            * ao lado, e sobrava um vazio grande acima do título.
             */}
           <div className="health-photo relative overflow-hidden rounded-2xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -145,12 +149,12 @@ export default function HealthPage() {
               height={1045}
               alt={HEALTH_HERO.photo.alt}
               decoding="async"
-              className="block h-auto w-full"
+              className="block h-auto w-full lg:aspect-[3/2] lg:object-cover lg:object-[50%_38%]"
             />
           </div>
           <aside
             aria-label={`${HEALTH_PANEL.label} — ${HEALTH_PANEL.disclaimer.toLowerCase()}`}
-            className="health-panel relative z-10 mx-4 -mt-10 rounded-2xl p-7 sm:mx-8 sm:-mt-14 sm:p-8"
+            className="health-panel relative z-10 mx-4 -mt-10 rounded-2xl p-7 sm:mx-8 sm:-mt-14 sm:p-8 lg:-mt-28"
             style={{ backgroundColor: "#141b23", color: "#eef3f8" }}
           >
             <div className="flex items-center justify-between gap-4 mb-5">
@@ -191,24 +195,32 @@ export default function HealthPage() {
 
       <section className="section-spacing" style={divider}>
         <div className="max-w-7xl mx-auto px-6">
-          <p className="section-label mb-6">{HEALTH_PATH.label}</p>
-          <h2 className="heading-section mb-4">
-            {HEALTH_PATH.title}
-            <em>{HEALTH_PATH.titleEmphasis}</em>
-          </h2>
-          <p className="text-body max-w-2xl mb-10">{HEALTH_PATH.body}</p>
+          <div className="health-head">
+            <div>
+              <p className="section-label mb-6">{HEALTH_PATH.label}</p>
+              <h2 className="heading-section">
+                {HEALTH_PATH.title}
+                <em>{HEALTH_PATH.titleEmphasis}</em>
+              </h2>
+            </div>
+            <p className="text-body">{HEALTH_PATH.body}</p>
+          </div>
           <HealthMoneyPath />
         </div>
       </section>
 
       <section className="section-spacing" style={divider}>
         <div className="max-w-7xl mx-auto px-6">
-          <p className="section-label mb-6">{HEALTH_LEAKS.label}</p>
-          <h2 className="heading-section mb-4">
-            {HEALTH_LEAKS.title}
-            <em>{HEALTH_LEAKS.titleEmphasis}</em>
-          </h2>
-          <p className="text-body max-w-2xl mb-10">{HEALTH_LEAKS.body}</p>
+          <div className="health-head">
+            <div>
+              <p className="section-label mb-6">{HEALTH_LEAKS.label}</p>
+              <h2 className="heading-section">
+                {HEALTH_LEAKS.title}
+                <em>{HEALTH_LEAKS.titleEmphasis}</em>
+              </h2>
+            </div>
+            <p className="text-body">{HEALTH_LEAKS.body}</p>
+          </div>
           <ul className="grid gap-5 md:grid-cols-2">
             {HEALTH_LEAKS.items.map((item, i) => (
               <Reveal as="li" key={item.title} delay={(i % 2) * 120} className="card h-full p-6">
@@ -250,20 +262,57 @@ export default function HealthPage() {
       </section>
 
       <section className="section-spacing" style={divider}>
-        <div className="max-w-7xl mx-auto px-6">
-          <p className="section-label mb-6">{HEALTH_ORIGIN.label}</p>
-          <h2 className="heading-section mb-6">
-            {HEALTH_ORIGIN.title}
-            <em>{HEALTH_ORIGIN.titleEmphasis}</em>
-          </h2>
-          <p className="text-body max-w-2xl mb-8">{HEALTH_ORIGIN.body}</p>
-          <Link
-            href={HEALTH_ORIGIN.linkHref}
-            className="font-mono text-xs uppercase tracking-wider underline underline-offset-4"
-            style={{ color: "var(--health-accent-text)" }}
-          >
-            {HEALTH_ORIGIN.linkLabel} →
-          </Link>
+        <div className="max-w-7xl mx-auto px-6 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <p className="section-label mb-6">{HEALTH_ORIGIN.label}</p>
+            <h2 className="heading-section mb-6">
+              {HEALTH_ORIGIN.title}
+              <em>{HEALTH_ORIGIN.titleEmphasis}</em>
+            </h2>
+            <p className="text-body mb-8">{HEALTH_ORIGIN.body}</p>
+            <Link
+              href={HEALTH_ORIGIN.linkHref}
+              className="font-mono text-xs uppercase tracking-wider underline underline-offset-4"
+              style={{ color: "var(--health-accent-text)" }}
+            >
+              {HEALTH_ORIGIN.linkLabel} →
+            </Link>
+          </div>
+          {/*
+            * A ponte restaurante → clínica. O texto ao lado ocupava só metade
+            * da largura e a outra metade ficava vazia; aqui a mesma ideia do
+            * parágrafo aparece desenhada, linha a linha. Cada linha entra com
+            * um pequeno atraso (o `<Reveal>` de sempre); em repouso estão todas.
+            */}
+          <Reveal className="card p-6 sm:p-8">
+            <div className="section-label mb-5 grid grid-cols-[minmax(0,1fr)_1.5rem_minmax(0,1fr)] items-center gap-3">
+              <span>{HEALTH_ORIGIN.ponte.de}</span>
+              <span aria-hidden="true" />
+              <span style={{ color: "var(--health-accent-text)" }}>{HEALTH_ORIGIN.ponte.para}</span>
+            </div>
+            <ul className="flex flex-col gap-3">
+              {HEALTH_ORIGIN.ponte.linhas.map((linha, i) => (
+                <Reveal
+                  as="li"
+                  key={linha.de}
+                  delay={150 + i * 140}
+                  className="grid grid-cols-[minmax(0,1fr)_1.5rem_minmax(0,1fr)] items-center gap-3 rounded-xl bg-[var(--color-bg-elevated)] px-4 py-4 text-[15px]"
+                >
+                  <span style={{ color: "var(--color-text-muted)" }}>{linha.de}</span>
+                  <span aria-hidden="true" className="health-arrow inline-block font-mono" style={{ color: "var(--health-accent-text)" }}>
+                    →
+                  </span>
+                  <span className="font-semibold">
+                    <span className="sr-only">vira, na clínica: </span>
+                    {linha.para}
+                  </span>
+                </Reveal>
+              ))}
+            </ul>
+            <p className="mt-6 text-sm leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
+              {HEALTH_ORIGIN.ponte.fecho}
+            </p>
+          </Reveal>
         </div>
       </section>
 
