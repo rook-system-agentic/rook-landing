@@ -171,7 +171,7 @@ export function HealthLeakArt({ art }: { art: keyof typeof ARTES }) {
   return <Arte />;
 }
 
-/** Ícones dos três passos de "o que estamos construindo". Traço, 40 px. */
+/** Ícones dos três passos de "como funciona". Traço, 40 px. */
 const ICONES = {
   // Guia conferida.
   conferido: (

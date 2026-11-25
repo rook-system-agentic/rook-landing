@@ -25,7 +25,7 @@ import { siteUrl } from "@/lib/site-origin";
  * POR QUE ISTO EXISTE
  *
  * A Rook atende bares e restaurantes. Esta página testa se a mesma leitura
- * financeira interessa a clínicas médicas, antes de existir produto. Para o
+ * financeira interessa a clínicas médicas. Para o
  * visitante, a credencial é a consultoria de controladoria (seção "De onde
  * vem"), não o produto de restaurantes. A página traz uma tese
  * ("Atender não é receber."), quatro dores na língua de quem vive de convênio e
@@ -97,10 +97,14 @@ export default function HealthPage() {
         <div className="max-w-7xl mx-auto px-6 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <p className="section-label mb-6">{HEALTH_HERO.label}</p>
-            <h1 className="heading-hero mb-8">
+            <h1 className="heading-hero mb-5">
               {HEALTH_HERO.titleBefore}
               <em>{HEALTH_HERO.titleEmphasis}</em>
             </h1>
+            {/* A tese, como subtítulo: menor que o título, maior que o corpo. */}
+            <p className="font-display mb-8 text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "var(--color-cream)" }}>
+              {HEALTH_HERO.thesis}
+            </p>
             <p className="text-body mb-5">{HEALTH_HERO.body}</p>
             <p className="text-body mb-10">{HEALTH_HERO.body2}</p>
             <div className="flex flex-wrap gap-4">

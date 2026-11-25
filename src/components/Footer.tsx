@@ -52,7 +52,7 @@ export default function Footer({ variant = "rook" }: { variant?: "rook" | "healt
             <div>
               <h2 className="font-semibold text-sm mb-4">Rook Health</h2>
               <ul className="space-y-2.5 text-sm">
-                <li><Link href="/health/#como">O que estamos construindo</Link></li>
+                <li><Link href="/health/#como">Como funciona</Link></li>
                 <li><Link href="/health/#contato">Falar com a Rook</Link></li>
               </ul>
             </div>
